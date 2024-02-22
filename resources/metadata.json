@@ -1,0 +1,15 @@
+{
+  "name": "Modern Window Manager",
+  "description": "A modern window manager on GNOME",
+  "uuid": "modernwindowmanager@ferrarodomenico.com",
+  "shell-version": [
+    "40",
+    "41",
+    "42",
+    "43",
+    "44"
+  ],
+  "version": 1,
+  "url": "https://github.com/domferr/Linux-PowerToys",
+  "settings-schema": "org.gnome.shell.extensions.modernwindowmanager"
+}

@@ -1,0 +1,81 @@
+// From https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/43.0/data/theme/gnome-shell-sass/_common.scss#L28
+$base_padding: 6px;
+$base_margin: 4px;
+
+$base_border_radius: 8px;
+$modal_radius: $base_border_radius * 2;
+
+// From https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/43.0/data/theme/gnome-shell-sass/_colors.scss
+$variant: 'dark';
+$fg_color: if($variant == 'light', transparentize(black, .2), white);
+$borders_color: if($variant == 'light', transparentize($fg_color, .5), transparentize($fg_color, .9));
+$_dark_base_color: darken(desaturate(#241f31, 100%), 2%);
+$base_color: if($variant =='light', #fff, $_dark_base_color);
+$system_bg_color: $base_color;
+
+.custom-tile-preview {
+    border-radius: $base_border_radius;
+}
+
+.snap-assistant {
+    background-color: lighten($system_bg_color, 5%);
+    border-radius: 0 0 $base_border_radius $base_border_radius;
+    border: 1px $borders_color solid;
+    border-top: 1px lighten($system_bg_color, 5%) solid;
+    box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);
+    padding: $base_padding*2; // 12px
+}
+
+.snap-assistant.enlarged {
+    border-radius: $base_border_radius !important;
+    border-top: $borders_color !important;
+}
+
+.snap-assist-layout {
+    /* unstyled, yet... */
+}
+
+.snap-assist-tile {
+    border-radius: 4px;
+    background-color: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.snap-assist-tile:hover {
+    background-color: rgba(255,255,255,0.2);
+}
+
+.popup-menu-layout-selection {
+    background-color: transparent !important;
+
+    // workaround to hide the empty space created by the popup ornament
+    .popup-menu-ornament {
+        width: 0;
+        height: 0;
+    }
+
+    .popup-menu-layout-button {
+        padding: calc($base_padding / 2);
+        background-color: rgba(255,255,255,0.1);
+        border: rgba(255,255,255,0) solid 1px;
+        border-radius: $base_border_radius;
+        margin-right: $base_padding;
+    }
+    
+    .popup-menu-layout-button:last-child {
+        margin-right: 0;
+    }
+
+    .popup-menu-layout-button:hover {
+        background-color: rgba(255,255,255,0.2);
+    }
+
+    .popup-menu-layout-button:checked {
+        border: rgba(255,255,255,0.8) solid 1px;
+        background-color: rgba(255,255,255,0.25);
+    }
+
+    .snap-assist-tile {
+        border-radius: 2px;
+    }
+}

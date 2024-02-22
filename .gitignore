@@ -1,0 +1,55 @@
+### Linux ###
+*~
+
+# temporary files which can be created if a process still has a handle open of a deleted file
+.fuse_hidden*
+
+# KDE directory preferences
+.directory
+
+# Linux trash folder which might appear on any partition or disk
+.Trash-*
+
+# .nfs files are created when an open file is removed but is still being accessed
+.nfs*
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+stats.html
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+node_modules/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# dotenv environment variables file
+.env
+.env.test
+
+# rollup.js default build output
+dist/
+
+### VisualStudioCode ###
+.vscode/*
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+.history
+
+### IntelliJ IDEA
+.idea/
+
+package-lock.json

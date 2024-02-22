@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "lib": ["ES2021"],
+    "target": "ES2021",
+    "strict": true,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "strictPropertyInitialization": false,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "./src/",
+    "moduleResolution": "Node",
+    "experimentalDecorators": true,
+    "paths": {
+      "@imports/*": ["../@types/*"],
+      "@/*": ["./*"]
+    }
+  },
+  "exclude": ["./dist"]
+}

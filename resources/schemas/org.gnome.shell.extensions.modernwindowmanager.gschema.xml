@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gnome-shell-extensions">
+
+    <schema path="/org/gnome/shell/extensions/modernwindowmanager/" id="org.gnome.shell.extensions.modernwindowmanager">
+        <key name="show-indicator" type="b">
+            <default>true</default>
+            <summary>Shows indicator</summary>
+            <description>Shows an indicator on top panel.</description>
+        </key>
+    </schema>
+
+</schemalist>

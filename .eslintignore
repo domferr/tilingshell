@@ -1,0 +1,8 @@
+node_modules/
+lib/
+tmp/
+test/*.js
+templates/
+@types/
+*.js
+*/*.js
