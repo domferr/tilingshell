@@ -19,71 +19,9 @@ const globals = {
     '@gi-types/clutter10': 'imports.gi.Clutter',
 };
 
-/*const thirdParty = [
-    'htmlparser2',
-    'prismjs',
-    'date-fns/formatDistanceToNow',
-    'date-fns/locale',
-    'hex-color-converter',
-    'is-url',
-    'pretty-bytes',
-    'validate-color',
-    'highlight.js/lib/core',
-    'highlight.js/lib/languages/bash',
-    'highlight.js/lib/languages/c',
-    'highlight.js/lib/languages/cpp',
-    'highlight.js/lib/languages/csharp',
-    'highlight.js/lib/languages/dart',
-    'highlight.js/lib/languages/go',
-    'highlight.js/lib/languages/groovy',
-    'highlight.js/lib/languages/haskell',
-    'highlight.js/lib/languages/java',
-    'highlight.js/lib/languages/javascript',
-    'highlight.js/lib/languages/julia',
-    'highlight.js/lib/languages/kotlin',
-    'highlight.js/lib/languages/lua',
-    'highlight.js/lib/languages/markdown',
-    'highlight.js/lib/languages/perl',
-    'highlight.js/lib/languages/php',
-    'highlight.js/lib/languages/python',
-    'highlight.js/lib/languages/ruby',
-    'highlight.js/lib/languages/rust',
-    'highlight.js/lib/languages/scala',
-    'highlight.js/lib/languages/shell',
-    'highlight.js/lib/languages/sql',
-    'highlight.js/lib/languages/swift',
-    'highlight.js/lib/languages/typescript',
-    'highlight.js/lib/languages/yaml',
-];*/
-
-/*const thirdPartyBuild = thirdParty.map((pkg) => {
-    const sanitizedPkg = pkg.split('/').join('_').replaceAll('-', '_').replaceAll('.', '_').replaceAll('@', '');
-    globals[pkg] = `Me.imports.thirdparty["${sanitizedPkg}"].lib`;
-
-    return {
-        input: `node_modules/${pkg}`,
-        output: {
-            file: `${buildPath}/thirdparty/${sanitizedPkg}.js`,
-            format: 'iife',
-            name: 'lib',
-        },
-        treeshake: {
-            moduleSideEffects: 'no-external',
-        },
-        plugins: [
-            commonjs(),
-            nodeResolve({
-                preferBuiltins: false,
-            }),
-        ],
-    };
-});*/
-
 const external = [...Object.keys(globals)/*, thirdParty*/];
 
 const extensionBanner = `
-const Me = imports.misc.extensionUtils.getCurrentExtension();
-
 try {
 `;
 

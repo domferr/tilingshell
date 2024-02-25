@@ -13,9 +13,8 @@
     "moduleResolution": "Node",
     "experimentalDecorators": true,
     "paths": {
-      "@imports/*": ["../@types/*"],
       "@/*": ["./*"]
     }
   },
-  "exclude": ["./dist"]
+  "exclude": ["./dist", "./node_modules"]
 }
