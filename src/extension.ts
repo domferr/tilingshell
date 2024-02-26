@@ -16,15 +16,17 @@ const debug = logger('extension');
 
 class Extension {
   private settings: Settings;
-  private isEnabled = false;
-  private indicator: Indicator | null;
-  private tilingManagers: TilingManager[];
-  private margins: Margin = new Margin({top: 16, left: 16, right: 16, bottom: 16});
+  private indicator: Indicator | null = null;
+  private tilingManagers: TilingManager[] = [];
+  private innerMargin: Margin;
+  private outerMargin: Margin;
 
   private _signalWorkareaChangedId: number | null = null;
 
   constructor() {
     this.settings = getCurrentExtensionSettings();
+    this.innerMargin = new Margin({top: 16, bottom: 16, left: 16, right: 16});
+    this.outerMargin = this.innerMargin.copy(); //new Margin({top: 32, bottom: 32, left: 32, right: 32});
     debug('extension is initialized');
   }
 
@@ -33,13 +35,12 @@ class Extension {
       this.indicator = new Indicator((lay) => this.onLayoutSelected(lay));
       addToStatusArea(this.indicator);
     
-      const hasMargins = this.margins.top > 0 || this.margins.bottom > 0 || this.margins.left > 0 || this.margins.right > 0;
+      const hasMargins = this.innerMargin.top > 0 || this.innerMargin.bottom > 0 || this.innerMargin.left > 0 || this.innerMargin.right > 0;
       this.indicator?.setLayouts(availableLayouts, selectedLayoutIndex, hasMargins);
     }
   }
 
   enable(): void {
-    this.isEnabled = true;
     // for this version we have a custom layout plus three fixed ones
     const availableLayouts = [
       LayoutsUtils.LoadLayouts(),
@@ -68,7 +69,7 @@ class Extension {
 
     if (this.tilingManagers = []) {
       debug('building a tiling manager for each monitor');
-      this.tilingManagers = getMonitors().map(monitor => new TilingManager(monitor, availableLayouts, 0, this.margins));
+      this.tilingManagers = getMonitors().map(monitor => new TilingManager(monitor, availableLayouts, 0, this.innerMargin, this.outerMargin));
     }
 
     this.tilingManagers.forEach(tm => tm.enable());
@@ -78,12 +79,13 @@ class Extension {
       if (this.tilingManagers.length !== allMonitors.length) {
         // a monitor was disconnected or a new one was connected
         this.tilingManagers.forEach(tm => tm.destroy());
-        this.tilingManagers = allMonitors.map(monitor => new TilingManager(monitor, availableLayouts, 0, this.margins));
+        this.tilingManagers = allMonitors.map(monitor => new TilingManager(monitor, availableLayouts, 0, this.innerMargin, this.outerMargin));
         this.tilingManagers.forEach(tm => tm.enable());
         const selectedLayoutIndex = this.indicator?.getSelectedButtonIndex() || 0;
         this.indicator?.destroy();
         this.createIndicator(availableLayouts, selectedLayoutIndex);
       } else {
+        // same number of monitors, but one or more workareas changed
         allMonitors.forEach(monitor => {
           const newWorkArea: Rectangle = Main.layoutManager.getWorkAreaForMonitor(monitor.index);
           this.tilingManagers[monitor.index].workArea = newWorkArea;
@@ -99,7 +101,6 @@ class Extension {
     this.indicator = null;
     this.tilingManagers.forEach(tm => tm.destroy());
     this.tilingManagers = [];
-    this.isEnabled = false;
     if (this._signalWorkareaChangedId) global.display.disconnect(this._signalWorkareaChangedId);
     debug('extension is disabled');
   }

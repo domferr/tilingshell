@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "lib": ["ES2021"],
-    "target": "ES2021",
+    "lib": ["es2022"],
+    "target": "es2022",
     "strict": true,
     "noImplicitAny": false,
     "strictNullChecks": true,
@@ -9,12 +9,13 @@
     "alwaysStrict": true,
     "strictPropertyInitialization": false,
     "allowSyntheticDefaultImports": true,
-    "baseUrl": "./src/",
+    "baseUrl": ".",
     "moduleResolution": "Node",
     "experimentalDecorators": true,
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./src/*"]
     }
   },
-  "exclude": ["./dist", "./node_modules"]
+  "exclude": ["./dist", "./node_modules"],
+  "include": ["./src/**/*.ts"]
 }

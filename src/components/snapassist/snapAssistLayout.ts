@@ -5,7 +5,6 @@ import { Rectangle } from "@gi-types/meta10";
 import { LayoutWidget } from "../layout/LayoutWidget";
 import { TileGroup } from "../tileGroup";
 import { SnapAssistTile } from "./snapAssistTile";
-import { ThemeContext } from "@gi-types/st1";
 import { logger } from "@/utils/shell";
 
 const debug = logger("snapAssistLayout");
@@ -15,10 +14,11 @@ export class SnapAssistLayout extends LayoutWidget<SnapAssistTile> {
     private static readonly _snapAssistHeight: number = 84;
     private static readonly _snapAssistWidth: number = 150; // 16:9 ratio. -> (16*this._snapAssistHeight) / 9 and then rounded to int
 
-    constructor(parent: Actor | null, layout: TileGroup, margins: number, scaleFactor: number) {
-        super(parent, layout, margins * scaleFactor, SnapAssistLayout._snapAssistWidth * scaleFactor, SnapAssistLayout._snapAssistHeight * scaleFactor,
-            "snap-assist-layout"
-        );
+    constructor(parent: Actor | null, layout: TileGroup, margin: Margin, scaleFactor: number) {
+        const rect = new Rectangle({height: SnapAssistLayout._snapAssistHeight * scaleFactor, width: SnapAssistLayout._snapAssistWidth * scaleFactor, x: 0, y: 0});
+        const margins = new Margin({top: margin.top * scaleFactor, bottom: margin.bottom * scaleFactor, left: margin.left * scaleFactor, right: margin.right * scaleFactor});
+        const outerMargin = Math.min(margin.top, Math.min(margin.bottom, Math.min(margin.left, margin.right))) * scaleFactor;
+        super(parent, layout, margins, new Margin({top: outerMargin, bottom: outerMargin, left: outerMargin, right: outerMargin }), rect, "snap-assist-layout");
         this.ensure_style();
     }
 

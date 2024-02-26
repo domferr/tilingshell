@@ -1,7 +1,7 @@
 import { registerGObjectClass } from "@/utils/gjs";
-import { Actor, AnimationMode, ActorAlign } from '@gi-types/clutter10';
+import { Actor, AnimationMode, ActorAlign, Margin } from '@gi-types/clutter10';
 import { Rectangle, Window } from "@gi-types/meta10";
-import { BoxLayout, Side, Widget } from "@gi-types/st1";
+import { BoxLayout, Side, ThemeContext, Widget } from "@gi-types/st1";
 import { TileGroup } from "../tileGroup";
 import { logger } from "@/utils/shell";
 import { MetaInfo, TYPE_DOUBLE } from "@gi-types/gobject2";
@@ -24,9 +24,13 @@ export class SnapAssist extends BoxLayout {
         GTypeName: "SnapAssist"
     }
 
-    private readonly enlargedVerticalDistance = 32;
-    private readonly activationAreaOffset = 8;
-    private readonly shrinkHeight = 12;
+    // distance from top when the snap assistant is enlarged
+    private readonly _enlargedVerticalDistance = 32;
+    // cursor's max distance from the snap assistant to enlarge it 
+    private readonly _activationAreaOffset = 8;
+    // height when it is not enlarged (shrinked)
+    private _shrinkHeight = 12;
+    // distance between layouts
     private readonly _separatorSize = 8;
     
     private _showing: boolean;
@@ -37,7 +41,7 @@ export class SnapAssist extends BoxLayout {
     private _workArea: Rectangle = new Rectangle();
     private _hoveredTile: SnapAssistTile | undefined;
 
-    constructor(parent: Actor, layouts: TileGroup[], hasMargins: boolean, workArea: Rectangle, scaleFactor: number) {
+    constructor(parent: Actor, layouts: TileGroup[], margin: Margin, workArea: Rectangle, scaleFactor: number) {
         super({
             name: 'snap_assist',
             x_align: ActorAlign.CENTER,
@@ -49,8 +53,19 @@ export class SnapAssist extends BoxLayout {
         this._workArea = workArea;
 
         if (parent) parent.add_child(this);
+        
+        this._shrinkHeight *= scaleFactor;
+
+        const layoutMargin = new Margin({
+            top: margin.top === 0 ? 0:2,
+            bottom: margin.bottom === 0 ? 0:2,
+            left: margin.left === 0 ? 0:2,
+            right: margin.right === 0 ? 0:2,
+        })
+        // build the layouts inside the snap assistant. Place a spacer between each layout
         this._snapAssistLayouts = layouts.map((lay, ind) => {
-            const saLay = new SnapAssistLayout(this, lay, hasMargins ? 2:0, scaleFactor);
+            const saLay = new SnapAssistLayout(this, lay, layoutMargin, scaleFactor);
+            // build and place a spacer
             if (ind < layouts.length -1) {
                 this.add_child(new Widget({width: scaleFactor * this._separatorSize, height: 1}));
             }
@@ -60,13 +75,16 @@ export class SnapAssist extends BoxLayout {
         // know the correct size of the entire box layout 
         this._snapAssistLayouts.forEach(lay => lay.ensure_style());
         this.ensure_style();
+
         const padding = this.get_theme_node().get_padding(Side.BOTTOM);
+        const scaledPadding = ThemeContext.get_for_stage(global.get_stage()).get_scale_factor() === 1 ?
+            padding * scaleFactor:padding;
         const color = this.get_theme_node().get_background_color();
         const newAlpha = 200;
         // The final alpha value is divided by 255 since CSS needs a value from 0 to 1, but ClutterColor expresses alpha from 0 to 255
         this.set_style(`
             background-color: rgba(${color.red}, ${color.green}, ${color.blue}, ${newAlpha / 255}) !important;
-            padding: ${padding * scaleFactor}px !important;
+            padding: ${scaledPadding}px !important;
         `);
         
         this.ensure_style();
@@ -89,9 +107,9 @@ export class SnapAssist extends BoxLayout {
         this._isEnlarged = newVal;
         
         this._rect.width = this._enlargedRect.width;
-        this._rect.height = this._isEnlarged ? this._enlargedRect.height:this.shrinkHeight;
+        this._rect.height = this._isEnlarged ? this._enlargedRect.height:this._shrinkHeight;
         this._rect.x = this._workArea.x + (this._workArea.width / 2) - (this._rect.width / 2);
-        this._rect.y = this._workArea.y + (this._isEnlarged ? this.enlargedVerticalDistance:0);
+        this._rect.y = this._workArea.y + (this._isEnlarged ? this._enlargedVerticalDistance:0);
     }
 
     public get isEnlarged() {
@@ -188,8 +206,8 @@ export class SnapAssist extends BoxLayout {
             }
         }
 
-        const isNear = this.isBetween(this._rect.x - this.activationAreaOffset, currPointerPos.x, this._rect.x + this.width + this.activationAreaOffset)
-            && this.isBetween(this._workArea.y - this.activationAreaOffset, currPointerPos.y, this._workArea.y + this.enlargedVerticalDistance + this.height + this.activationAreaOffset);
+        const isNear = this.isBetween(this._rect.x - this._activationAreaOffset, currPointerPos.x, this._rect.x + this.width + this._activationAreaOffset)
+            && this.isBetween(this._workArea.y - this._activationAreaOffset, currPointerPos.y, this._workArea.y + this._enlargedVerticalDistance + this.height + this._activationAreaOffset);
         
         if (this._showing && this._isEnlarged === isNear) return;
 

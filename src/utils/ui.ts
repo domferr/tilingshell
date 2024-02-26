@@ -1,7 +1,7 @@
 import { Global } from '@gi-types/shell0';
-import { getCurrentExtension } from '@/utils/shell';
+import { getCurrentExtension, logger } from '@/utils/shell';
 import { Rectangle } from "@gi-types/meta10";
-import { Actor } from "@gi-types/clutter10";
+import { Actor, Margin } from "@gi-types/clutter10";
 
 export const global = Global.get();
 export const Main = imports.ui.main;
@@ -43,4 +43,20 @@ export const getGlobalPosition = (actor: Actor) : {x: number, y: number} => {
         x: actor.x + parentPos.x,
         y: actor.y + parentPos.y,
     }
+}
+
+export const buildTileMargin = (tilePos: Rectangle, innerMargin: Margin, outerMargin: Margin, containerRect: Rectangle): Margin => {
+    const isLeft = tilePos.x === containerRect.x;
+    const isTop = tilePos.y === containerRect.y;
+    const isRight = tilePos.x + tilePos.width === containerRect.x + containerRect.width;
+    const isBottom = tilePos.y + tilePos.height === containerRect.y + containerRect.height;
+    logger("buildTileMargin")(`isLeft: ${isLeft}, isTop: ${isTop}, isRight: ${isRight}, isBottom: ${isBottom}`);
+    logger("buildTileMargin")(`tilePos.x: ${tilePos.x}, tilePos.y: ${tilePos.y}, tilePos.width: ${tilePos.width}, tilePos.height: ${tilePos.height}`);
+    logger("buildTileMargin")(`maxWidth: ${containerRect.width}, maxHeight: ${containerRect.height}`);
+    return new Margin({
+        top: isTop ? outerMargin.top:innerMargin.top/2,
+        bottom: isBottom ? outerMargin.bottom:innerMargin.bottom/2,
+        left: isLeft ? outerMargin.left:innerMargin.left/2,
+        right: isRight ? outerMargin.right:innerMargin.right/2,
+    })
 }

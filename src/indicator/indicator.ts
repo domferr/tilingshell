@@ -19,10 +19,10 @@ export class LayoutSelectionWidget extends LayoutWidget<SnapAssistTile> {
     private static readonly _layoutHeight: number = 36;
     private static readonly _layoutWidth: number = 64; // 16:9 ratio. -> (16*this._snapAssistHeight) / 9 and then rounded to int
 
-    constructor(layout: TileGroup, margins: number, scalingFactor: number) {
-        super(null, layout, margins, LayoutSelectionWidget._layoutWidth * scalingFactor, LayoutSelectionWidget._layoutHeight * scalingFactor,
-            "snap-assist-layout"
-        );
+    constructor(layout: TileGroup, margin: number, scaleFactor: number) {
+        const rect = new Rectangle({height: LayoutSelectionWidget._layoutHeight * scaleFactor, width: LayoutSelectionWidget._layoutWidth * scaleFactor, x: 0, y: 0});
+        const margins = new Margin({top: margin * scaleFactor, bottom: margin * scaleFactor, left: margin * scaleFactor, right: margin * scaleFactor});
+        super(null, layout, margins, margins, rect, "snap-assist-layout");
     }
 
     buildTile(parent: Actor, rect: Rectangle, margin: Margin): SnapAssistTile {
