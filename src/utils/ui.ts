@@ -50,9 +50,6 @@ export const buildTileMargin = (tilePos: Rectangle, innerMargin: Margin, outerMa
     const isTop = tilePos.y === containerRect.y;
     const isRight = tilePos.x + tilePos.width === containerRect.x + containerRect.width;
     const isBottom = tilePos.y + tilePos.height === containerRect.y + containerRect.height;
-    logger("buildTileMargin")(`isLeft: ${isLeft}, isTop: ${isTop}, isRight: ${isRight}, isBottom: ${isBottom}`);
-    logger("buildTileMargin")(`tilePos.x: ${tilePos.x}, tilePos.y: ${tilePos.y}, tilePos.width: ${tilePos.width}, tilePos.height: ${tilePos.height}`);
-    logger("buildTileMargin")(`maxWidth: ${containerRect.width}, maxHeight: ${containerRect.height}`);
     return new Margin({
         top: isTop ? outerMargin.top:innerMargin.top/2,
         bottom: isBottom ? outerMargin.bottom:innerMargin.bottom/2,

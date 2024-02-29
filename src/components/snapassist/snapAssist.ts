@@ -182,17 +182,24 @@ export class SnapAssist extends BoxLayout {
         });
     }
 
-    public onMovingWindow(window: Window, ease: boolean = false, currPointerPos: {x: number, y: number}) {        
+    public onMovingWindow(window: Window, ease: boolean = false, currPointerPos: {x: number, y: number}) {
+        const wasEnlarged = this._isEnlarged;      
         this.handleOpening(window, ease, currPointerPos);
-        if (!this._showing) {
-            if (this._hoveredTile) this._hoveredTile.set_hover(false);
+        if (!this._showing || !this._isEnlarged) {
+            if (this._hoveredTile) {
+                this._hoveredTile.set_hover(false);
+            }
             this._hoveredTile = undefined;
+            if (wasEnlarged) this.emit(SNAP_ASSIST_SIGNAL, new Rectangle(), 0, 0);
+            return;
         }
         
         const {changed, layout} = this.handleTileHovering(currPointerPos);
-        if (changed) {
+        if (changed && this._hoveredTile) {
             const tileRect = this._hoveredTile ? this._hoveredTile.rect:new Rectangle();
             const layoutRect = this._hoveredTile ? new Rectangle({x: layout?.x, y: layout?.y, width: layout?.width, height: layout?.height}):new Rectangle();
+            
+            // the mouse is still on the snap assist's layout then keep the selection as it was
             this.emit(SNAP_ASSIST_SIGNAL, tileRect, layoutRect.width, layoutRect.height);
         }
     }
@@ -217,10 +224,13 @@ export class SnapAssist extends BoxLayout {
 
     private handleTileHovering(currPointerPos: {x: number, y: number}) : { changed: boolean, layout: SnapAssistLayout | undefined} {
         if (!this._isEnlarged) {
-            if (this._hoveredTile) this._hoveredTile.set_hover(false);
+            const changed = this._hoveredTile !== undefined;
+            if (this._hoveredTile) {
+                this._hoveredTile.set_hover(false);
+            }
             this._hoveredTile = undefined;
             return {
-                changed: true,
+                changed: changed,
                 layout: undefined
             };
         }

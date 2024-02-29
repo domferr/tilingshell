@@ -72,7 +72,6 @@ export class LayoutWidget<TileType extends TilePreview> extends Widget {
         innerMargin: Margin, 
         outerMargin: Margin
     }>) {
-        debug("relayout");
         var trigger_relayout = false;
         if (params?.innerMargin) {
             this._innerMargin = params.innerMargin.copy();

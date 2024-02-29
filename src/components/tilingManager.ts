@@ -16,7 +16,7 @@ const SIGNAL_GRAB_OP_END = 'grab-op-end';
 export class TilingManager {
     private readonly _monitor: Monitor;
 
-    private _selectedTilesPreview: TilePreview;
+    private _selectedTilesPreview: SelectionTilePreview;
     private _snapAssist: SnapAssist;
     private _tilingLayout: TilingLayout;
 
@@ -297,17 +297,15 @@ export class TilingManager {
 
     private _onSnapAssist(hoveredTileRect: Rectangle, widthReference: number, heightReference: number) {
         this._debug(`snap assistant hovered tile: x:${hoveredTileRect.x} y:${hoveredTileRect.y} width:${hoveredTileRect.width} height:${hoveredTileRect.height}`);
-        
+
         // if the mouse is still on the snap assist's layout then do not close selection
         // if there isn't a tile hovered, then close selection
-        const noTileIsHovered = !hoveredTileRect || hoveredTileRect.width === 0 || hoveredTileRect.height === 0;
-        if (!this._snapAssist.isEnlarged && noTileIsHovered) {
+        const noTileIsHovered = !hoveredTileRect || hoveredTileRect.width === 0 || hoveredTileRect.height === 0 || widthReference === 0 || heightReference === 0;
+        if (noTileIsHovered) {
             this._selectedTilesPreview.close();
             this._isSnapAssisting = false;
             return;
         }
-        // the mouse is still on the snap assist's layout then keep the selection as it was
-        if (noTileIsHovered) return;
 
         // apply proportions. We have the tile size and position relative to the snap layout. We apply
         // the proportions to get tile size and position relative to the work area 
