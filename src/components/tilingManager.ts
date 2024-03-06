@@ -1,4 +1,4 @@
-import { Display, Rectangle, SizeChange, Window } from '@gi-types/meta10';
+import { Display, Rectangle, SizeChange, Window, GrabOp } from '@gi-types/meta10';
 import { logger } from "@/utils/shell";
 import { TileGroup } from "@/components/tileGroup";
 import { buildTileMargin, global, isPointInsideRect, Main } from "@/utils/ui";
@@ -87,13 +87,16 @@ export class TilingManager {
      */
     public enable() {
         if (!this._signalsIds[SIGNAL_GRAB_OP_BEGIN]) {
-            this._signalsIds[SIGNAL_GRAB_OP_BEGIN] = global.display.connect(SIGNAL_GRAB_OP_BEGIN, (_display: Display, window: Window) => {
+            this._signalsIds[SIGNAL_GRAB_OP_BEGIN] = global.display.connect(SIGNAL_GRAB_OP_BEGIN, (_display: Display, window: Window, grabOp: GrabOp) => {
+                if (grabOp != GrabOp.MOVING) return;
+
                 this._onWindowGrabBegin(window);
             });
         }
 
         if (!this._signalsIds[SIGNAL_GRAB_OP_END]) {
-            this._signalsIds[SIGNAL_GRAB_OP_END] = global.display.connect(SIGNAL_GRAB_OP_END, (_display: Display, window: Window) => {
+            this._signalsIds[SIGNAL_GRAB_OP_END] = global.display.connect(SIGNAL_GRAB_OP_END, (_display: Display, window: Window, grabOp: GrabOp) => {
+                if (grabOp != GrabOp.MOVING) return;
                 if (!window.allows_resize() || !window.allows_move()) return;
 
                 this._onWindowGrabEnd(window);
