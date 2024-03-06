@@ -7,7 +7,6 @@ import { Margin, ModifierType } from "@gi-types/clutter10";
 import { PRIORITY_DEFAULT_IDLE, Source, SOURCE_CONTINUE, SOURCE_REMOVE, timeout_add } from "@gi-types/glib2";
 import { SNAP_ASSIST_SIGNAL, SnapAssist } from './snapassist/snapAssist';
 import { SelectionTilePreview } from './tilepreview/selectionTilePreview';
-import { TilePreview } from './tilepreview/tilePreview';
 import { ThemeContext } from '@gi-types/st1';
 
 const SIGNAL_GRAB_OP_BEGIN = 'grab-op-begin';

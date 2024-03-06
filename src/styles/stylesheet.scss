@@ -18,17 +18,17 @@ $system_bg_color: $base_color;
 }
 
 .snap-assistant {
-    background-color: lighten($system_bg_color, 5%);
-    border-radius: 0 0 $base_border_radius $base_border_radius;
+    /*background-color: lighten($system_bg_color, 5%);
     border: 1px $borders_color solid;
     border-top: 1px lighten($system_bg_color, 5%) solid;
-    box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);
+    box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1);*/
+    border: 0;
+    border-radius: 0 0 $base_border_radius $base_border_radius;
     padding: $base_padding*2; // 12px
 }
 
 .snap-assistant.enlarged {
-    border-radius: $base_border_radius !important;
-    border-top: $borders_color !important;
+    border-radius: $base_border_radius;
 }
 
 .snap-assist-layout {
@@ -37,12 +37,13 @@ $system_bg_color: $base_color;
 
 .snap-assist-tile {
     border-radius: 4px;
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(255,255,255,0.2);
     border: 1px solid rgba(255,255,255,0.3);
 }
 
 .snap-assist-tile:hover {
-    background-color: rgba(255,255,255,0.2);
+    background-color: rgba(255,255,255,0.35);
+    border: 1px solid rgba(255,255,255,0.8);
 }
 
 .popup-menu-layout-selection {

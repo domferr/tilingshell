@@ -27,9 +27,9 @@ export class SnapAssist extends BoxLayout {
     // distance from top when the snap assistant is enlarged
     private readonly _enlargedVerticalDistance = 32;
     // cursor's max distance from the snap assistant to enlarge it 
-    private readonly _activationAreaOffset = 8;
+    private readonly _activationAreaOffset = 4;
     // height when it is not enlarged (shrinked)
-    private _shrinkHeight = 12;
+    private _shrinkHeight = 16;
     // distance between layouts
     private readonly _separatorSize = 8;
     
@@ -48,7 +48,7 @@ export class SnapAssist extends BoxLayout {
             y_align: ActorAlign.CENTER,
             vertical: false,
             reactive: true,
-            style_class: "snap-assistant",
+            style_class: "popup-menu-content snap-assistant",
         });
         this._workArea = workArea;
 
@@ -79,13 +79,13 @@ export class SnapAssist extends BoxLayout {
         const padding = this.get_theme_node().get_padding(Side.BOTTOM);
         const scaledPadding = ThemeContext.get_for_stage(global.get_stage()).get_scale_factor() === 1 ?
             padding * scaleFactor:padding;
-        const color = this.get_theme_node().get_background_color();
-        const newAlpha = 200;
-        // The final alpha value is divided by 255 since CSS needs a value from 0 to 1, but ClutterColor expresses alpha from 0 to 255
         this.set_style(`
-            background-color: rgba(${color.red}, ${color.green}, ${color.blue}, ${newAlpha / 255}) !important;
             padding: ${scaledPadding}px !important;
         `);
+        /*const color = this.get_theme_node().get_background_color();
+        const newAlpha = 220;
+        background-color: rgba(${color.red}, ${color.green}, ${color.blue}, ${newAlpha / 255}) !important;
+        */
         
         this.ensure_style();
         this._enlargedRect.height = this.size.height;
@@ -120,6 +120,7 @@ export class SnapAssist extends BoxLayout {
         if (!this._showing) return;
 
         this._showing = false;
+        this.enlarged = false;
 
         if (!this._isEnlarged) {
             this._snapAssistLayouts.forEach(lay => lay.easeHide({
@@ -195,11 +196,9 @@ export class SnapAssist extends BoxLayout {
         }
         
         const {changed, layout} = this.handleTileHovering(currPointerPos);
-        if (changed && this._hoveredTile) {
+        if (changed) {
             const tileRect = this._hoveredTile ? this._hoveredTile.rect:new Rectangle();
             const layoutRect = this._hoveredTile ? new Rectangle({x: layout?.x, y: layout?.y, width: layout?.width, height: layout?.height}):new Rectangle();
-            
-            // the mouse is still on the snap assist's layout then keep the selection as it was
             this.emit(SNAP_ASSIST_SIGNAL, tileRect, layoutRect.width, layoutRect.height);
         }
     }

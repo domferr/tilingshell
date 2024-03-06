@@ -31,10 +31,10 @@ export class SnapAssistLayout extends LayoutWidget<SnapAssistTile> {
         
         for (let i = 0; i < this._previews.length; i++) {
             let preview = this._previews[i];
-            const pos = {x: globalPos.x + preview.x, y: globalPos.y + preview.y};
+            const pos = {x: globalPos.x + preview.rect.x, y: globalPos.y + preview.rect.y};
 
-            const isHovering = cursorPos.x >= pos.x && cursorPos.x <= pos.x + preview.width
-                && cursorPos.y >= pos.y && cursorPos.y <= pos.y + preview.height;
+            const isHovering = cursorPos.x >= pos.x && cursorPos.x <= pos.x + preview.rect.width
+                && cursorPos.y >= pos.y && cursorPos.y <= pos.y + preview.rect.height;
             if (isHovering) return preview;
         }
     }
