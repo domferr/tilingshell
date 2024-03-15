@@ -1,11 +1,12 @@
 import { Widget } from "@gi-types/st1";
 import { TilePreview } from "../tilepreview/tilePreview";
 import { Actor, Margin } from '@gi-types/clutter10';
-import { TileGroup } from "./tileGroup";
 import { Rectangle } from "@gi-types/meta10";
 import { registerGObjectClass } from "@/utils/gjs";
 import { buildTileMargin } from "@/utils/ui";
 import { logger } from "@/utils/shell";
+import { Layout } from "./Layout";
+import { Tile } from "./Tile";
 
 const debug = logger(`LayoutWidget`);
 
@@ -14,60 +15,35 @@ const debug = logger(`LayoutWidget`);
 export class LayoutWidget<TileType extends TilePreview> extends Widget {
     protected _previews: TileType[];
     protected _containerRect: Rectangle;
-    protected _layout: TileGroup;
+    protected _layout: Layout;
     protected _innerMargin: Margin;
     protected _outerMargin: Margin;
 
-    constructor(parent: Actor | null, layout: TileGroup, innerMargin: Margin, outerMargin: Margin, containerRect: Rectangle, style_class: string = "") {
+    constructor(parent: Actor | null, layout: Layout, innerMargin: Margin, outerMargin: Margin, containerRect: Rectangle, style_class: string = "") {
         super({ style_class });
         if (parent) parent.add_child(this);
         this._previews = [];
         this._containerRect = new Rectangle();
-        this._layout = new TileGroup({tiles: []});
+        this._layout = new Layout([]);
         this._innerMargin = new Margin();
         this._outerMargin = new Margin();
         this.relayout({ containerRect, layout, innerMargin, outerMargin });
     }
 
-    protected build_layout(groupRect: Rectangle, group: TileGroup, previews: TileType[], innerMargin: Margin, outerMargin: Margin, containerRect: Rectangle): TileType[] {
-        if (group.tiles.length == 0) {
-            const tileMargin = buildTileMargin(groupRect, innerMargin, outerMargin, containerRect);
-            const tile = this.buildTile(this, groupRect.copy(), tileMargin);    
-            previews.push(tile);
-            return previews;
-        }
-
-        const workingRect = groupRect.copy();
-
-        group.tiles.forEach((innerGroup, index) => {
-            let innerGroupRect = new Rectangle({
-                x: workingRect.x,
-                y: workingRect.y,
-                width: group.horizontal ? groupRect.width * innerGroup.perc:groupRect.width,
-                height: group.horizontal ? groupRect.height:groupRect.height * innerGroup.perc,
-            });
-            // if there is remaining width or height, then we have lost some pixel because of
-            // floating point precision. Ensure the remaining width or height is given to the last tile
-            if (index === group.tiles.length - 1) {
-                // ensure we don't go beyond the limits and ensure the remaining 
-                // width or height is given to the last tile
-                innerGroupRect.width = groupRect.x + groupRect.width - innerGroupRect.x;
-                innerGroupRect.height = groupRect.y + groupRect.height - innerGroupRect.y;
-            }
-            this.build_layout(innerGroupRect, innerGroup, previews, innerMargin, outerMargin, containerRect);
-            workingRect.x += group.horizontal ? innerGroupRect.width:0;
-            workingRect.y += group.horizontal ? 0:innerGroupRect.height;
-        })
-
-        return previews;
+    protected draw_layout(): void {
+        this._previews = this._layout.tiles.map(tile => {
+            const tileRect = tile.apply_props(this._containerRect);
+            const tileMargin = buildTileMargin(tileRect, this._innerMargin, this._outerMargin, this._containerRect);
+            return this.buildTile(this, tileRect, tileMargin, tile);
+        });
     }
 
-    protected buildTile(parent: Actor, rect: Rectangle, margin: Margin): TileType {
+    protected buildTile(parent: Actor, rect: Rectangle, margin: Margin, tile: Tile): TileType {
         throw("This class shouldn't be instantiated but be extended instead");
     }
 
     public relayout(params?: Partial<{
-        layout: TileGroup,
+        layout: Layout,
         containerRect: Rectangle, 
         innerMargin: Margin, 
         outerMargin: Margin
@@ -100,14 +76,7 @@ export class LayoutWidget<TileType extends TilePreview> extends Widget {
         this._previews = [];
         if (this._containerRect.width === 0 || this._containerRect.height === 0) return;
 
-        this._previews = this.build_layout(
-            this._containerRect, 
-            this._layout, 
-            [], 
-            this._innerMargin, 
-            this._outerMargin,
-            this._containerRect
-        );
+        this.draw_layout();
         this._previews.forEach((lay) => lay.open());
     }
 }

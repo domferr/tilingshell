@@ -3,9 +3,10 @@ import { Actor, Margin, AnimationMode } from '@gi-types/clutter10';
 import { getGlobalPosition } from "@/utils/ui";
 import { Rectangle } from "@gi-types/meta10";
 import { LayoutWidget } from "../layout/LayoutWidget";
-import { TileGroup } from "../layout/tileGroup";
 import { SnapAssistTile } from "./snapAssistTile";
 import { logger } from "@/utils/shell";
+import { Layout } from "../layout/Layout";
+import { Tile } from "../layout/Tile";
 
 const debug = logger("snapAssistLayout");
 
@@ -14,16 +15,16 @@ export class SnapAssistLayout extends LayoutWidget<SnapAssistTile> {
     private static readonly _snapAssistHeight: number = 84;
     private static readonly _snapAssistWidth: number = 150; // 16:9 ratio. -> (16*this._snapAssistHeight) / 9 and then rounded to int
 
-    constructor(parent: Actor | null, layout: TileGroup, margin: Margin, scaleFactor: number) {
+    constructor(parent: Actor | null, layout: Layout, gaps: Margin, scaleFactor: number) {
         const rect = new Rectangle({height: SnapAssistLayout._snapAssistHeight * scaleFactor, width: SnapAssistLayout._snapAssistWidth * scaleFactor, x: 0, y: 0});
-        const margins = new Margin({top: margin.top * scaleFactor, bottom: margin.bottom * scaleFactor, left: margin.left * scaleFactor, right: margin.right * scaleFactor});
-        const outerMargin = Math.min(margin.top, Math.min(margin.bottom, Math.min(margin.left, margin.right))) * scaleFactor;
-        super(parent, layout, margins, new Margin({top: outerMargin, bottom: outerMargin, left: outerMargin, right: outerMargin }), rect, "snap-assist-layout");
+        gaps = new Margin({top: gaps.top * scaleFactor, bottom: gaps.bottom * scaleFactor, left: gaps.left * scaleFactor, right: gaps.right * scaleFactor});
+        const outerMargin = Math.min(gaps.top, Math.min(gaps.bottom, Math.min(gaps.left, gaps.right))) * scaleFactor;
+        super(parent, layout, gaps, new Margin({top: outerMargin, bottom: outerMargin, left: outerMargin, right: outerMargin }), rect, "snap-assist-layout");
         this.ensure_style();
     }
 
-    buildTile(parent: Actor, rect: Rectangle, margin: Margin): SnapAssistTile {
-        return new SnapAssistTile(parent, rect, margin);
+    buildTile(parent: Actor, rect: Rectangle, gaps: Margin, tile: Tile): SnapAssistTile {
+        return new SnapAssistTile({parent, rect, gaps, tile});
     }
 
     public getTileBelow(cursorPos: {x: number, y: number}) : SnapAssistTile | undefined {

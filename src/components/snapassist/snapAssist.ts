@@ -2,11 +2,12 @@ import { registerGObjectClass } from "@/utils/gjs";
 import { Actor, AnimationMode, ActorAlign, Margin } from '@gi-types/clutter10';
 import { Rectangle, Window } from "@gi-types/meta10";
 import { BoxLayout, Side, ThemeContext, Widget } from "@gi-types/st1";
-import { TileGroup } from "../layout/tileGroup";
 import { logger } from "@/utils/shell";
-import { MetaInfo, TYPE_DOUBLE } from "@gi-types/gobject2";
+import { MetaInfo } from "@gi-types/gobject2";
 import { SnapAssistTile } from "./snapAssistTile";
 import { SnapAssistLayout } from "./snapAssistLayout";
+import { Layout } from "../layout/Layout";
+import { Tile } from "../layout/Tile";
 
 export const SNAP_ASSIST_SIGNAL = 'snap-assist';
 export const SNAP_ASSIST_ANIMATION_TIME = 180;
@@ -18,7 +19,7 @@ export class SnapAssist extends BoxLayout {
     static metaInfo: MetaInfo = {
         Signals: {
             "snap-assist": { 
-                param_types: [Rectangle.$gtype, TYPE_DOUBLE, TYPE_DOUBLE] 
+                param_types: [ Tile.$gtype ]
             },
         },
         GTypeName: "SnapAssist"
@@ -41,7 +42,7 @@ export class SnapAssist extends BoxLayout {
     private _workArea: Rectangle = new Rectangle();
     private _hoveredTile: SnapAssistTile | undefined;
 
-    constructor(parent: Actor, layouts: TileGroup[], margin: Margin, workArea: Rectangle, scaleFactor: number) {
+    constructor(parent: Actor, layouts: Layout[], margin: Margin, workArea: Rectangle, scaleFactor: number) {
         super({
             name: 'snap_assist',
             x_align: ActorAlign.CENTER,
@@ -193,15 +194,14 @@ export class SnapAssist extends BoxLayout {
                 this._hoveredTile.set_hover(false);
             }
             this._hoveredTile = undefined;
-            if (wasEnlarged) this.emit(SNAP_ASSIST_SIGNAL, new Rectangle(), 0, 0);
+            if (wasEnlarged) this.emit(SNAP_ASSIST_SIGNAL, new Tile({x:0, y:0, width: 0, height: 0}));
             return;
         }
         
         const {changed, layout} = this.handleTileHovering(currPointerPos);
         if (changed) {
-            const tileRect = this._hoveredTile ? this._hoveredTile.rect:new Rectangle();
-            const layoutRect = this._hoveredTile ? new Rectangle({x: layout?.x, y: layout?.y, width: layout?.width, height: layout?.height}):new Rectangle();
-            this.emit(SNAP_ASSIST_SIGNAL, tileRect, layoutRect.width, layoutRect.height);
+            const tile = this._hoveredTile?.tile || new Tile({x:0,y:0,width:0,height:0});
+            this.emit(SNAP_ASSIST_SIGNAL, tile);
         }
     }
 

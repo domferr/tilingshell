@@ -3,6 +3,7 @@ import { Rectangle } from "@gi-types/meta10";
 import { Actor, Color, Margin } from '@gi-types/clutter10';
 import { TilePreview } from "./tilePreview";
 import { logger } from "@/utils/shell";
+import { Tile } from "../layout/Tile";
 
 const debug = logger("SelectionTilePreview");
 
@@ -10,8 +11,12 @@ const debug = logger("SelectionTilePreview");
 export class SelectionTilePreview extends TilePreview {
   private _backgroundColor: Color | null = null;
 
-  constructor(parent: Actor, rect?: Rectangle, margins?: Margin) {
-    super(parent, rect, margins);
+  constructor(params: {
+    parent?: Actor,
+    rect?: Rectangle,
+    gaps?: Margin,
+  }) {
+    super({tile: new Tile({x:0, y:0, width: 0, height: 0}), ...params});
     this._recolor();
     this.connect("style-changed", () => {
       const { red, green, blue } = this.get_theme_node().get_background_color();

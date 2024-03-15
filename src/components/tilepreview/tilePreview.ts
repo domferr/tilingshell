@@ -4,6 +4,7 @@ import {registerGObjectClass} from "@/utils/gjs";
 import {logger} from "@/utils/shell";
 import {global} from "@/utils/ui";
 import { Actor, AnimationMode, Margin } from '@gi-types/clutter10';
+import { Tile } from "../layout/Tile";
 
 export const WINDOW_ANIMATION_TIME = 100;
 
@@ -11,19 +12,26 @@ const debug = logger('tilePreview');
 
 @registerGObjectClass
 export class TilePreview extends Widget {
-  private _margins: Margin;
+  private _gaps: Margin;
   protected _rect: Rectangle;
   protected _showing: boolean;
+  protected _tile: Tile;
 
-  constructor(parent: Actor, rect?: Rectangle, margins?: Margin) {
+  constructor(params: {
+    parent?: Actor,
+    rect?: Rectangle,
+    gaps?: Margin,
+    tile: Tile
+  }) {
     super();
-    this._rect = rect ? rect : new Rectangle({ width: 0 });
-    this._margins = margins ? margins : new Margin();
-    parent.add_child(this);
+    this._rect = params.rect || new Rectangle({ width: 0 });
+    this._gaps = params.gaps || new Margin();
+    if (params.parent) params.parent.add_child(this);
+    this._tile = params.tile;
   }
 
-  public set margins(margins: Margin) {
-    this._margins = margins;
+  public set gaps(gaps: Margin) {
+    this._gaps = gaps;
   }
 
   _init() {
@@ -34,19 +42,19 @@ export class TilePreview extends Widget {
   }
 
   public get innerX(): number {
-    return this._rect.x + this._margins.left;
+    return this._rect.x + this._gaps.left;
   }
 
   public get innerY(): number {
-    return this._rect.y + this._margins.top;
+    return this._rect.y + this._gaps.top;
   }
 
   public get innerWidth(): number {
-    return this._rect.width - this._margins.right - this._margins.left;
+    return this._rect.width - this._gaps.right - this._gaps.left;
   }
 
   public get innerHeight(): number {
-    return this._rect.height - this._margins.top - this._margins.bottom;
+    return this._rect.height - this._gaps.top - this._gaps.bottom;
   }
 
   public get rect(): Rectangle {

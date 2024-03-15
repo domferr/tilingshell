@@ -1,6 +1,5 @@
 import { Display, Rectangle, SizeChange, Window, GrabOp } from '@gi-types/meta10';
 import { logger } from "@/utils/shell";
-import { TileGroup } from "@/components/layout/tileGroup";
 import { buildTileMargin, global, isPointInsideRect, Main } from "@/utils/ui";
 import { TilingLayout } from "@/components/tilingLayout";
 import { Margin, ModifierType } from "@gi-types/clutter10";
@@ -10,6 +9,8 @@ import { SelectionTilePreview } from './tilepreview/selectionTilePreview';
 import { ThemeContext } from '@gi-types/st1';
 import Settings from '@/settings';
 import SignalHandling from '@/signalHandling';
+import { Layout } from './layout/Layout';
+import { Tile } from './layout/Tile';
 
 const SIGNAL_GRAB_OP_BEGIN = 'grab-op-begin';
 const SIGNAL_GRAB_OP_END = 'grab-op-end';
@@ -46,7 +47,7 @@ export class TilingManager {
      * @param innerMargin Inner margin for tiling.
      * @param outerMargin Outer margin for tiling.
      */
-    constructor(monitor: Monitor, layouts: TileGroup[], selectedLayout: number) {
+    constructor(monitor: Monitor, layouts: Layout[], selectedLayout: number) {
         this._signals = new SignalHandling();
         this._monitor = monitor;
         this._debug = logger(`TilingManager ${monitor.index}`);
@@ -70,7 +71,7 @@ export class TilingManager {
         this._snapAssist = new SnapAssist(global.window_group, layouts, this._innerGaps, this._workArea, this._scaleFactor);
 
         // build the selection tile
-        this._selectedTilesPreview = new SelectionTilePreview(global.window_group);
+        this._selectedTilesPreview = new SelectionTilePreview({ parent: global.window_group });
     }
 
     /**
@@ -103,7 +104,7 @@ export class TilingManager {
         });
 
         this._signals.connect(this._snapAssist, SNAP_ASSIST_SIGNAL,
-            (_: SnapAssist, rect: Rectangle, w: number, h: number) => this._onSnapAssist(rect, w, h)
+            (_: SnapAssist, tile: Tile) => this._onSnapAssist(tile)
         );
     }
 
@@ -139,7 +140,7 @@ export class TilingManager {
      * Sets the active tiling layout.
      * @param layout The layout to set as active.
      */
-    public setActiveLayout(layout: TileGroup) {
+    public setActiveLayout(layout: Layout) {
         this._tilingLayout.relayout({ layout });
     }
 
@@ -232,7 +233,7 @@ export class TilingManager {
         }
         this._tilingLayout.hoverTilesInRect(selectionRect);
 
-        this._selectedTilesPreview.margins = buildTileMargin(selectionRect, this._innerGaps, this._outerGaps, this._workArea);
+        this._selectedTilesPreview.gaps = buildTileMargin(selectionRect, this._innerGaps, this._outerGaps, this._workArea);
         this._selectedTilesPreview.openAbove(
             window,
             true,
@@ -293,28 +294,16 @@ export class TilingManager {
         );
     }
 
-    private _onSnapAssist(hoveredTileRect: Rectangle, widthReference: number, heightReference: number) {
-        this._debug(`snap assistant hovered tile: x:${hoveredTileRect.x} y:${hoveredTileRect.y} width:${hoveredTileRect.width} height:${hoveredTileRect.height}`);
-
-        // if the mouse is still on the snap assist's layout then do not close selection
+    private _onSnapAssist(tile: Tile) {
         // if there isn't a tile hovered, then close selection
-        const noTileIsHovered = !hoveredTileRect || hoveredTileRect.width === 0 || hoveredTileRect.height === 0 || widthReference === 0 || heightReference === 0;
-        if (noTileIsHovered) {
+        if (tile.width === 0 || tile.height === 0) {
             this._selectedTilesPreview.close();
             this._isSnapAssisting = false;
             return;
         }
 
-        // apply proportions. We have the tile size and position relative to the snap layout. We apply
-        // the proportions to get tile size and position relative to the work area 
-        const scaledRect = new Rectangle({
-            // hoveredTile.x:layoutContainerReference.width = scaledRect.x:workArea.width
-            x: this._workArea.x + ((hoveredTileRect.x * this._workArea.width) / widthReference),
-            y: this._workArea.y + ((hoveredTileRect.y * this._workArea.height) / heightReference),
-            // hoveredTile:layoutContainerReference = scaledRect:workArea
-            width: (hoveredTileRect.width * this._workArea.width) / widthReference,
-            height: (hoveredTileRect.height * this._workArea.height) / heightReference,
-        });
+        // We apply the proportions to get tile size and position relative to the work area 
+        const scaledRect = tile.apply_props(this._workArea);
         // ensure the rect doesn't go horizontally beyond the workarea
         if (scaledRect.x + scaledRect.width > this._workArea.width) {
             scaledRect.width -= scaledRect.x + scaledRect.width - this._workArea.x - this._workArea.width;
@@ -324,7 +313,7 @@ export class TilingManager {
             scaledRect.height -= scaledRect.y + scaledRect.height - this._workArea.y - this._workArea.height;
         }
         
-        this._selectedTilesPreview.margins = buildTileMargin(scaledRect, this._innerGaps, this._outerGaps, this._workArea);
+        this._selectedTilesPreview.gaps = buildTileMargin(scaledRect, this._innerGaps, this._outerGaps, this._workArea);
         this._selectedTilesPreview.open(true, scaledRect);
         // if it is the first time snap assisting
         // then ensure the snap assistant is on top of the selection tile preview 

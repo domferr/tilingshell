@@ -1,7 +1,7 @@
 import {logger} from "@/utils/shell";
 import GLib from "@gi-types/glib2";
-import { TileGroup } from "@/components/layout/tileGroup";
-import { LAYOUT_HORIZONTAL_TYPE, Layout } from "./Layout";
+import { Layout } from "./Layout";
+import { Tile } from "./Tile";
 
 const debug = logger('LayoutsUtils');
 
@@ -14,28 +14,22 @@ export class LayoutsUtils {
         return GLib.build_filenamev([this.configPath, 'layouts.json']);
     }
 
-    public static LoadLayouts(): TileGroup[] {
+    public static LoadLayouts(): Layout[] {
         const availableLayouts = [
-            new TileGroup({}),
-            new TileGroup({
-              tiles: [
-                  new TileGroup({ perc: 0.22 }),
-                  new TileGroup({ perc: 0.56 }),
-                  new TileGroup({ perc: 0.22 }),
-              ],
-            }), 
-            new TileGroup({
-              tiles: [
-                  new TileGroup({ perc: 0.33 }),
-                  new TileGroup({ perc: 0.67 }),
-              ],
-            }), 
-            new TileGroup({
-              tiles: [
-                  new TileGroup({ perc: 0.67 }),
-                  new TileGroup({ perc: 0.33 }),
-              ],
-            })
+            new Layout([]),
+            new Layout([
+                new Tile({ x:0, y:0, height: 1, width: 0.22 }),
+                new Tile({ x:0.22, y:0, height: 1, width: 0.56 }),
+                new Tile({ x:0.78, y:0, height: 1, width: 0.22 }),
+            ]),
+            new Layout([
+                new Tile({ x:0, y:0, height: 1, width: 0.33 }),
+                new Tile({ x:0.33, y:0, height: 1, width: 0.67 }),
+            ]),
+            new Layout([
+                new Tile({ x:0.33, y:0, height: 1, width: 0.67 }),
+                new Tile({ x:0, y:0, height: 1, width: 0.33 }),
+            ]),
         ];
         const filePath = this.layoutsPath;
         if (GLib.file_test(filePath, GLib.FileTest.EXISTS)) {
@@ -45,8 +39,7 @@ export class LayoutsUtils {
                     const decoder = new TextDecoder('utf-8');
                     let contentsString = decoder.decode(contents);
                     const parsed = JSON.parse(contentsString);
-                    const layouts = parsed.definitions as Layout[];
-                    availableLayouts[0] = this._layoutToTileGroup(layouts[0]);
+                    return parsed.definitions as Layout[];
                 }
             } catch (exception) {
                 debug(`exception loading layouts: ${JSON.stringify(exception)}`);
@@ -56,27 +49,13 @@ export class LayoutsUtils {
         return availableLayouts; 
     }
 
-    private static _layoutToTileGroup(layout: Layout) : TileGroup {
-        return new TileGroup({
-            perc: layout.length / 100,
-            horizontal: layout.type === LAYOUT_HORIZONTAL_TYPE,
-            tiles: layout.items ? layout.items.map(LayoutsUtils._layoutToTileGroup):[],
-        });
-    }
-
-    private static _getDefaultLayout(): TileGroup {
-        return new TileGroup({
-            tiles: [
-                new TileGroup({ perc: 0.22, horizontal: false, tiles: [
-                    new TileGroup({ perc: 0.5 }),
-                    new TileGroup({ perc: 0.5 })
-                ] }),
-                new TileGroup({ perc: 0.56 }),
-                new TileGroup({ perc: 0.22, horizontal: false, tiles: [
-                    new TileGroup({ perc: 0.5 }),
-                    new TileGroup({ perc: 0.5 })
-                ] }),
-            ],
-        });
+    private static _getDefaultLayout(): Layout {
+        return new Layout([
+            new Tile({ x:0, y:0, height: 0.5, width: 0.22 }), // top-left
+            new Tile({ x:0, y:0.5, height: 0.5, width: 0.22 }), // bottom-left
+            new Tile({ x:0.22, y:0, height: 1, width: 0.56 }), // center
+            new Tile({ x:0.78, y:0, height: 0.5, width: 0.22 }), // top-right
+            new Tile({ x:0.78, y:0.5, height: 0.5, width: 0.22 }), // bottom-right
+        ]);
     }
 }

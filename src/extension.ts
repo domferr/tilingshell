@@ -6,11 +6,11 @@ import { Main, addToStatusArea, getMonitors } from '@/utils/ui';
 import { getCurrentExtension } from '@/utils/shell';
 import { TilingManager } from "@/components/tilingManager";
 import { LayoutsUtils } from './components/layout/LayoutUtils';
-import { TileGroup } from './components/layout/tileGroup';
 import { Rectangle } from '@gi-types/meta10';
 import { SettingsBindFlags } from '@gi-types/gio2';
 import Settings from '@/settings';
 import SignalHandling from './signalHandling';
+import { Layout } from './components/layout/Layout';
 
 const SIGNAL_WORKAREAS_CHANGED = 'workareas-changed';
 const debug = logger('extension');
@@ -25,7 +25,7 @@ class Extension {
     this._signals = new SignalHandling();
   }
 
-  createIndicator(availableLayouts: TileGroup[]) {
+  createIndicator(availableLayouts: Layout[]) {
     this._indicator = new Indicator((lay) => this.onLayoutSelected(lay));
     addToStatusArea(this._indicator);
     
@@ -59,14 +59,14 @@ class Extension {
     debug('extension is enabled');
   }
   
-  private _createTilingManagers(availableLayouts: TileGroup[]) {
+  private _createTilingManagers(availableLayouts: Layout[]) {
     debug('building a tiling manager for each monitor');
     this._tilingManagers.forEach(tm => tm.destroy());
     this._tilingManagers = getMonitors().map(monitor => new TilingManager(monitor, availableLayouts, 0));
     this._tilingManagers.forEach(tm => tm.enable());
   }
 
-  private _setupSignals(availableLayouts: TileGroup[]) {
+  private _setupSignals(availableLayouts: Layout[]) {
     this._signals.connect(global.display, SIGNAL_WORKAREAS_CHANGED, () => {
       const allMonitors = getMonitors();
       if (this._tilingManagers.length !== allMonitors.length) {
@@ -91,7 +91,7 @@ class Extension {
     debug('extension is disabled');
   }
 
-  onLayoutSelected(layout: TileGroup) {
+  onLayoutSelected(layout: Layout) {
     // notify to each monitors' tiling manager the new active layout
     this._tilingManagers.forEach(tm => tm.setActiveLayout(layout));
   }

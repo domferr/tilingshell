@@ -1,12 +1,13 @@
 import { Rectangle, Window } from '@gi-types/meta10';
 import { logger } from "@/utils/shell";
-import { TileGroup } from "@/components/layout/tileGroup";
 import { registerGObjectClass } from "@/utils/gjs";
 import { global } from "@/utils/ui";
 import { Actor, AnimationMode, Margin } from '@gi-types/clutter10';
 import { BlurTilePreview } from './tilepreview/blurTilePreview';
 import { TilePreview, WINDOW_ANIMATION_TIME } from './tilepreview/tilePreview';
 import { LayoutWidget } from './layout/LayoutWidget';
+import { Layout } from './layout/Layout';
+import { Tile } from './layout/Tile';
 
 const debug = logger('tilingLayout');
 
@@ -22,7 +23,7 @@ export class TilingLayout extends LayoutWidget<TilePreview> {
     private _showing: boolean;
     private _hoveredTiles: TilePreview[];
 
-    constructor(layout: TileGroup, innerMargin: Margin, outerMargin: Margin, workarea: Rectangle) {
+    constructor(layout: Layout, innerMargin: Margin, outerMargin: Margin, workarea: Rectangle) {
         super(global.window_group, layout, innerMargin, outerMargin, workarea);
         this._hoveredTiles = [];
     }
@@ -33,8 +34,8 @@ export class TilingLayout extends LayoutWidget<TilePreview> {
         this._showing = false;
     }
 
-    protected buildTile(parent: Actor, rect: Rectangle, margin: Margin): TilePreview {
-        return this._blur ? new BlurTilePreview(parent, rect, margin):new TilePreview(parent, rect, margin);
+    protected buildTile(parent: Actor, rect: Rectangle, gaps: Margin, tile: Tile): TilePreview {
+        return this._blur ? new BlurTilePreview({parent, rect, gaps, tile}):new TilePreview({parent, rect, gaps, tile});
     }
 
     public get showing(): boolean {

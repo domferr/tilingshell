@@ -1,6 +1,5 @@
 import Gio from '@gi-types/gio2';
 import GObject from '@gi-types/gobject2';
-import SignalHandling from './signalHandling';
 
 export default class Settings {
     static _settings: Gio.Settings;

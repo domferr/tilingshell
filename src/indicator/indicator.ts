@@ -2,13 +2,14 @@ import { icon_new_for_string } from '@gi-types/gio2';
 import { BoxLayout, Button, Icon } from '@gi-types/st1';
 import { registerGObjectClass } from '@/utils/gjs';
 import { getCurrentExtension, logger } from '@/utils/shell';
-import { TileGroup } from '@/components/layout/tileGroup';
 import { Actor, Margin, ActorAlign } from '@gi-types/clutter10';
 import { Rectangle } from '@gi-types/meta10';
 import { LayoutWidget } from '@/components/layout/LayoutWidget';
 import { SnapAssistTile } from '@/components/snapassist/snapAssistTile';
 import { Main } from '@/utils/ui';
 import Settings from '@/settings';
+import { Layout } from '@/components/layout/Layout';
+import { Tile } from '@/components/layout/Tile';
 
 const { PopupBaseMenuItem } = imports.ui.popupMenu;
 const { Button: PopupMenuButton } = imports.ui.panelMenu;
@@ -20,25 +21,25 @@ export class LayoutSelectionWidget extends LayoutWidget<SnapAssistTile> {
     private static readonly _layoutHeight: number = 36;
     private static readonly _layoutWidth: number = 64; // 16:9 ratio. -> (16*this._snapAssistHeight) / 9 and then rounded to int
 
-    constructor(layout: TileGroup, margin: number, scaleFactor: number) {
+    constructor(layout: Layout, gapSize: number, scaleFactor: number) {
         const rect = new Rectangle({height: LayoutSelectionWidget._layoutHeight * scaleFactor, width: LayoutSelectionWidget._layoutWidth * scaleFactor, x: 0, y: 0});
-        const margins = new Margin({top: margin * scaleFactor, bottom: margin * scaleFactor, left: margin * scaleFactor, right: margin * scaleFactor});
-        super(null, layout, margins, margins, rect, "snap-assist-layout");
+        const gaps = new Margin({ top: gapSize * scaleFactor, bottom: gapSize * scaleFactor, left: gapSize * scaleFactor, right: gapSize * scaleFactor });
+        super(null, layout, gaps, gaps, rect, "snap-assist-layout");
     }
 
-    buildTile(parent: Actor, rect: Rectangle, margin: Margin): SnapAssistTile {
-        return new SnapAssistTile(parent, rect, margin);
+    buildTile(parent: Actor, rect: Rectangle, gaps: Margin, tile: Tile): SnapAssistTile {
+        return new SnapAssistTile({parent, rect, gaps, tile});
     }
 }
 
 @registerGObjectClass
 export class Indicator extends PopupMenuButton {
     private icon: Icon;
-    private onLayoutSelected: (layout: TileGroup) => void;
+    private onLayoutSelected: (layout: Layout) => void;
     private layoutsBoxLayout: BoxLayout;
     private layoutsButtons: Button[] = [];
 
-    constructor(onLayoutSelection: (layout: TileGroup) => void) {
+    constructor(onLayoutSelection: (layout: Layout) => void) {
         super(0.5, 'Modern Window Manager Indicator', false);
 
         this.onLayoutSelected = onLayoutSelection;
@@ -64,7 +65,7 @@ export class Indicator extends PopupMenuButton {
         this.menu.addMenuItem(layoutsPopupMenu);
     }
 
-    public setLayouts(layouts: TileGroup[], selectedIndex: number) {
+    public setLayouts(layouts: Layout[], selectedIndex: number) {
         this.layoutsBoxLayout.remove_all_children();
         const scalingFactor = global.display.get_monitor_scale(Main.layoutManager.primaryIndex);
         
@@ -88,7 +89,7 @@ export class Indicator extends PopupMenuButton {
         return this.layoutsButtons.findIndex(btn => btn.checked);
     }
 
-    private selectButtonAtIndex(index: number, layout: TileGroup) {
+    private selectButtonAtIndex(index: number, layout: Layout) {
         this.layoutsButtons.forEach(btn => btn.set_checked(false));
         this.layoutsButtons[index].set_checked(true);
         this.onLayoutSelected(layout);

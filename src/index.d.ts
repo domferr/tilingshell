@@ -72,4 +72,6 @@ declare module '@gi-types/gobject2' {
         Children?: string[];
         InternalChildren?: string[];
     }
+
+    export let TYPE_JSOBJECT: any; 
 }
