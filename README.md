@@ -1,12 +1,10 @@
 # ModernWindowManager #
 
-This is a [Gnome Shell](https://wiki.gnome.org/Projects/GnomeShell) extension which provides a windows tiling system, supporting multiple monitors and focused on providing the best UX. It is also the first and only extension which provides Windows 11's snap assistant!
+This is a Gnome Shell extension implementing modern windows tiling system by extending GNOME's default 2 columns to any layout you want! It has the same UI of your GNOME theme, it supports multiple monitors and spanning of multiple tiles. It is also the first and only extension that provides Windows 11's snap assistant and supports multi monitors with different scaling factors!
 
-Can be installed on Gnome Shells from 40 to 44 on X11 and Wayland.
+Can be installed on Gnome Shells from 40 to 44 on X11 and Wayland. This extension also provides all the functionalities of Windows 11 Snap Assistant and Windows PowerToys FancyZones.
 
 Have issues, you want to suggest a new feature or contribute? Please open a new [issue](https://github.com/domferr/modernwindowmanager/issues)!
-
-If you're in search of a tiling manager for GNOME or if you are looking for features akin to Windows 11 Snap Assistant or Windows PowerToys FancyZones, this extension is the perfect solution for you!
 
 ## Usage ##
 
@@ -33,7 +31,12 @@ The layout is not strict. You can select multiple tiles too! Just press <kbd>SHI
 
 ## Installation
 
+Download the latest [release](https://github.com/domferr/modernwindowmanager/releases). Extract the downloaded archive. Copy the folder to `~/.local/share/gnome-shell/extensions` directory. You need to reload GNOME Shell afterwards (e.g. by logging out). Then you can enable the extension:
+```bash
+/usr/bin/gnome-extensions enable modernwindowmanager@ferrarodomenico.com
+```
 Currently, this extension is not on [extensions.gnome.org](https://extensions.gnome.org/extension/6099/paperwm/). However, if you are interested we can publish it there. Let us know by opening a new [issue](https://github.com/domferr/modernwindowmanager/issues)!
+
 
 ### Install via Source
 

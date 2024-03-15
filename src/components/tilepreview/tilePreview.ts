@@ -12,8 +12,8 @@ const debug = logger('tilePreview');
 @registerGObjectClass
 export class TilePreview extends Widget {
   private _margins: Margin;
-  private _showing: boolean;
-  private _rect: Rectangle;
+  protected _rect: Rectangle;
+  protected _showing: boolean;
 
   constructor(parent: Actor, rect?: Rectangle, margins?: Margin) {
     super();
@@ -53,31 +53,46 @@ export class TilePreview extends Widget {
     return this._rect;
   }
 
-  public set rect(newRect: Rectangle) {
+  public get showing(): boolean {
+    return this._showing;
+  }
+
+  /*public set rect(newRect: Rectangle) {
     this._rect = newRect;
     this.set_size(this._rect.width, this._rect.height);
     this.set_position(this._rect.x, this._rect.y);
-  }
+  }*/
 
   open(ease: boolean = false, position?: Rectangle) {
-    if (position) {
-      this._rect = position;
-    }
+    if (position) this._rect = position;
+    
     /*debug(
       `open tile -> x: ${this._rect.x}, y: ${this._rect.y}, width: ${this._rect.width}, height: ${this._rect.height}`,
     );*/
+    const fadeInMove = this._showing;
     this._showing = true;
     this.show();
-    // @ts-ignore
-    this.ease({
-      x: this.innerX,
-      y: this.innerY,
-      width: this.innerWidth,
-      height: this.innerHeight,
-      opacity: 255,
-      duration: ease ? WINDOW_ANIMATION_TIME : 0,
-      mode: AnimationMode.EASE_OUT_QUAD,
-    });
+    if (fadeInMove) {
+      // @ts-ignore
+      this.ease({
+        x: this.innerX,
+        y: this.innerY,
+        width: this.innerWidth,
+        height: this.innerHeight,
+        opacity: 255,
+        duration: ease ? WINDOW_ANIMATION_TIME : 0,
+        mode: AnimationMode.EASE_OUT_QUAD,
+      });
+    } else {
+      this.set_position(this.innerX, this.innerY);
+      this.set_size(this.innerWidth, this.innerHeight);
+      // @ts-ignore
+      this.ease({
+        opacity: 255,
+        duration: ease ? WINDOW_ANIMATION_TIME : 0,
+        mode: AnimationMode.EASE_OUT_QUAD,
+      });
+    }
   }
 
   openBelow(window: Window, ease: boolean = false, position?: Rectangle) {
@@ -85,13 +100,6 @@ export class TilePreview extends Widget {
       let windowActor = window.get_compositor_private();
       if (!windowActor) return;
       global.window_group.set_child_below_sibling(this, windowActor as any);
-    }
-
-    if (this._rect.width === 0) {
-      const window_rect = window.get_frame_rect();
-      this.set_size(window_rect.width, window_rect.height);
-      this.set_position(window_rect.x, window_rect.y);
-      this.opacity = 0;
     }
 
     this.open(ease, position);
@@ -102,13 +110,6 @@ export class TilePreview extends Widget {
       let windowActor = window.get_compositor_private();
       if (!windowActor) return;
       global.window_group.set_child_above_sibling(this, windowActor as any);
-    }
-
-    if (this._rect.width === 0) {
-      const window_rect = window.get_frame_rect();
-      this.set_size(window_rect.width, window_rect.height);
-      this.set_position(window_rect.x, window_rect.y);
-      this.opacity = 0;
     }
 
     this.open(ease, position);

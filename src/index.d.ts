@@ -1,4 +1,4 @@
-import { Rectangle } from "@gi-types/meta10";
+import { LayoutManager } from "@gnome-shell/main";
 
 export {};
 
@@ -16,14 +16,7 @@ declare global {
                 };
                 panel: any;
                 wm: any;
-                layoutManager: {
-                    monitors: Monitor[];
-                    primaryIndex: number;
-                    addChrome(param: any, options?: any): any;
-                    removeChrome(param: any): any;
-                    addTopChrome(param: any, options?: any): any;
-                    getWorkAreaForMonitor(param: number): Rectangle;
-                };
+                layoutManager: LayoutManager;
                 uiGroup: any;
                 extensionManager: any;
                 overview: {

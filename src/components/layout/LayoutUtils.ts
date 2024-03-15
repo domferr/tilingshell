@@ -1,6 +1,6 @@
 import {logger} from "@/utils/shell";
 import GLib from "@gi-types/glib2";
-import { TileGroup } from "@/components/tileGroup";
+import { TileGroup } from "@/components/layout/tileGroup";
 import { LAYOUT_HORIZONTAL_TYPE, Layout } from "./Layout";
 
 const debug = logger('LayoutsUtils');
@@ -14,24 +14,46 @@ export class LayoutsUtils {
         return GLib.build_filenamev([this.configPath, 'layouts.json']);
     }
 
-    public static LoadLayouts(): TileGroup {
+    public static LoadLayouts(): TileGroup[] {
+        const availableLayouts = [
+            new TileGroup({}),
+            new TileGroup({
+              tiles: [
+                  new TileGroup({ perc: 0.22 }),
+                  new TileGroup({ perc: 0.56 }),
+                  new TileGroup({ perc: 0.22 }),
+              ],
+            }), 
+            new TileGroup({
+              tiles: [
+                  new TileGroup({ perc: 0.33 }),
+                  new TileGroup({ perc: 0.67 }),
+              ],
+            }), 
+            new TileGroup({
+              tiles: [
+                  new TileGroup({ perc: 0.67 }),
+                  new TileGroup({ perc: 0.33 }),
+              ],
+            })
+        ];
         const filePath = this.layoutsPath;
-        if(!GLib.file_test(filePath, GLib.FileTest.EXISTS)) return this._getDefaultLayout();
-
-        try {
-            let [ok, contents] = GLib.file_get_contents(filePath);
-            if (!ok) return new TileGroup({});
-            
-            const decoder = new TextDecoder('utf-8');
-            let contentsString = decoder.decode(contents);
-            const parsed = JSON.parse(contentsString);
-            const layouts = parsed.definitions as Layout[];
-            return this._layoutToTileGroup(layouts[0]);
-        } catch (exception) {
-            debug(`exception loading layout: ${JSON.stringify(exception)}`);
+        if (GLib.file_test(filePath, GLib.FileTest.EXISTS)) {
+            try {
+                let [ok, contents] = GLib.file_get_contents(filePath);
+                if (ok) {
+                    const decoder = new TextDecoder('utf-8');
+                    let contentsString = decoder.decode(contents);
+                    const parsed = JSON.parse(contentsString);
+                    const layouts = parsed.definitions as Layout[];
+                    availableLayouts[0] = this._layoutToTileGroup(layouts[0]);
+                }
+            } catch (exception) {
+                debug(`exception loading layouts: ${JSON.stringify(exception)}`);
+            }
         }
-
-        return this._getDefaultLayout();
+        availableLayouts[0] = this._getDefaultLayout();
+        return availableLayouts; 
     }
 
     private static _layoutToTileGroup(layout: Layout) : TileGroup {

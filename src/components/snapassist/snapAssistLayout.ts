@@ -3,7 +3,7 @@ import { Actor, Margin, AnimationMode } from '@gi-types/clutter10';
 import { getGlobalPosition } from "@/utils/ui";
 import { Rectangle } from "@gi-types/meta10";
 import { LayoutWidget } from "../layout/LayoutWidget";
-import { TileGroup } from "../tileGroup";
+import { TileGroup } from "../layout/tileGroup";
 import { SnapAssistTile } from "./snapAssistTile";
 import { logger } from "@/utils/shell";
 

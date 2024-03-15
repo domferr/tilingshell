@@ -9,7 +9,7 @@
     "43",
     "44"
   ],
-  "version": 1,
+  "version": 2,
   "url": "https://github.com/domferr/Linux-PowerToys",
   "settings-schema": "org.gnome.shell.extensions.modernwindowmanager"
 }

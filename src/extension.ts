@@ -1,112 +1,99 @@
 import './styles/stylesheet.scss';
 
-import { Settings } from '@gi-types/gio2';
 import { Indicator } from '@/indicator/indicator';
 import { logger } from '@/utils/shell';
 import { Main, addToStatusArea, getMonitors } from '@/utils/ui';
-import { getCurrentExtension, getCurrentExtensionSettings } from '@/utils/shell';
+import { getCurrentExtension } from '@/utils/shell';
 import { TilingManager } from "@/components/tilingManager";
-import { Margin } from "@gi-types/clutter10";
 import { LayoutsUtils } from './components/layout/LayoutUtils';
-import { TileGroup } from './components/tileGroup';
+import { TileGroup } from './components/layout/tileGroup';
 import { Rectangle } from '@gi-types/meta10';
+import { SettingsBindFlags } from '@gi-types/gio2';
+import Settings from '@/settings';
+import SignalHandling from './signalHandling';
 
 const SIGNAL_WORKAREAS_CHANGED = 'workareas-changed';
 const debug = logger('extension');
 
 class Extension {
-  private settings: Settings;
-  private indicator: Indicator | null = null;
-  private tilingManagers: TilingManager[] = [];
-  private innerMargin: Margin;
-  private outerMargin: Margin;
+  private _indicator: Indicator | null = null;
+  private _tilingManagers: TilingManager[] = [];
 
-  private _signalWorkareaChangedId: number | null = null;
-
+  private readonly _signals: SignalHandling;
+  
   constructor() {
-    this.settings = getCurrentExtensionSettings();
-    this.innerMargin = new Margin({top: 16, bottom: 16, left: 16, right: 16});
-    this.outerMargin = this.innerMargin.copy(); //new Margin({top: 32, bottom: 32, left: 32, right: 32});
-    debug('extension is initialized');
+    this._signals = new SignalHandling();
   }
 
-  createIndicator(availableLayouts: TileGroup[], selectedLayoutIndex: number) {
-    if (this.settings.get_boolean('show-indicator')) {
-      this.indicator = new Indicator((lay) => this.onLayoutSelected(lay));
-      addToStatusArea(this.indicator);
+  createIndicator(availableLayouts: TileGroup[]) {
+    this._indicator = new Indicator((lay) => this.onLayoutSelected(lay));
+    addToStatusArea(this._indicator);
     
-      const hasMargins = this.innerMargin.top > 0 || this.innerMargin.bottom > 0 || this.innerMargin.left > 0 || this.innerMargin.right > 0;
-      this.indicator?.setLayouts(availableLayouts, selectedLayoutIndex, hasMargins);
-    }
+    this._indicator.setLayouts(availableLayouts, 0);
+
+    // Bind the "show-indicator" setting to the "visible" property.
+    //@ts-ignore
+    Settings.bind('show-indicator', this._indicator, 'visible', SettingsBindFlags.DEFAULT);
   }
 
   enable(): void {
+    Settings.initialize();
+    
     // for this version we have a custom layout plus three fixed ones
-    const availableLayouts = [
-      LayoutsUtils.LoadLayouts(),
-      new TileGroup({
-        tiles: [
-            new TileGroup({ perc: 0.22 }),
-            new TileGroup({ perc: 0.56 }),
-            new TileGroup({ perc: 0.22 }),
-        ],
-      }), 
-      new TileGroup({
-        tiles: [
-            new TileGroup({ perc: 0.33 }),
-            new TileGroup({ perc: 0.67 }),
-        ],
-      }), 
-      new TileGroup({
-        tiles: [
-            new TileGroup({ perc: 0.67 }),
-            new TileGroup({ perc: 0.33 }),
-        ],
-      })
-    ];
-
-    this.createIndicator(availableLayouts, 0);
-
-    if (this.tilingManagers = []) {
-      debug('building a tiling manager for each monitor');
-      this.tilingManagers = getMonitors().map(monitor => new TilingManager(monitor, availableLayouts, 0, this.innerMargin, this.outerMargin));
+    const availableLayouts = LayoutsUtils.LoadLayouts();
+    
+    //@ts-ignore
+    if (Main.layoutManager._startingUp) {
+      this._signals.connect(Main.layoutManager, 'startup-complete', () => {
+        debug("startup complete!");
+        this._createTilingManagers(availableLayouts);
+        this._setupSignals(availableLayouts);
+      });
+    } else {
+        this._createTilingManagers(availableLayouts);
+        this._setupSignals(availableLayouts);
     }
 
-    this.tilingManagers.forEach(tm => tm.enable());
+    this.createIndicator(availableLayouts);
 
-    this._signalWorkareaChangedId = global.display.connect(SIGNAL_WORKAREAS_CHANGED, () => {
+    debug('extension is enabled');
+  }
+  
+  private _createTilingManagers(availableLayouts: TileGroup[]) {
+    debug('building a tiling manager for each monitor');
+    this._tilingManagers.forEach(tm => tm.destroy());
+    this._tilingManagers = getMonitors().map(monitor => new TilingManager(monitor, availableLayouts, 0));
+    this._tilingManagers.forEach(tm => tm.enable());
+  }
+
+  private _setupSignals(availableLayouts: TileGroup[]) {
+    this._signals.connect(global.display, SIGNAL_WORKAREAS_CHANGED, () => {
       const allMonitors = getMonitors();
-      if (this.tilingManagers.length !== allMonitors.length) {
+      if (this._tilingManagers.length !== allMonitors.length) {
         // a monitor was disconnected or a new one was connected
-        this.tilingManagers.forEach(tm => tm.destroy());
-        this.tilingManagers = allMonitors.map(monitor => new TilingManager(monitor, availableLayouts, 0, this.innerMargin, this.outerMargin));
-        this.tilingManagers.forEach(tm => tm.enable());
-        const selectedLayoutIndex = this.indicator?.getSelectedButtonIndex() || 0;
-        this.indicator?.destroy();
-        this.createIndicator(availableLayouts, selectedLayoutIndex);
+        this._createTilingManagers(availableLayouts);
       } else {
         // same number of monitors, but one or more workareas changed
         allMonitors.forEach(monitor => {
           const newWorkArea: Rectangle = Main.layoutManager.getWorkAreaForMonitor(monitor.index);
-          this.tilingManagers[monitor.index].workArea = newWorkArea;
+          this._tilingManagers[monitor.index].workArea = newWorkArea;
         });
       }
     });
-
-    debug('extension is enabled');
   }
 
   disable(): void {
-    this.indicator?.destroy();
-    this.indicator = null;
-    this.tilingManagers.forEach(tm => tm.destroy());
-    this.tilingManagers = [];
-    if (this._signalWorkareaChangedId) global.display.disconnect(this._signalWorkareaChangedId);
+    this._indicator?.destroy();
+    this._indicator = null;
+    this._tilingManagers.forEach(tm => tm.destroy());
+    this._tilingManagers = [];
+    this._signals.disconnect();
     debug('extension is disabled');
   }
 
   onLayoutSelected(layout: TileGroup) {
-    this.tilingManagers.forEach(tm => tm.setActiveLayout(layout));
+    // notify to each monitors' tiling manager the new active layout
+    this._tilingManagers.forEach(tm => tm.setActiveLayout(layout));
   }
 }
 

@@ -1,7 +1,7 @@
 import { Widget } from "@gi-types/st1";
 import { TilePreview } from "../tilepreview/tilePreview";
 import { Actor, Margin } from '@gi-types/clutter10';
-import { TileGroup } from "../tileGroup";
+import { TileGroup } from "./tileGroup";
 import { Rectangle } from "@gi-types/meta10";
 import { registerGObjectClass } from "@/utils/gjs";
 import { buildTileMargin } from "@/utils/ui";

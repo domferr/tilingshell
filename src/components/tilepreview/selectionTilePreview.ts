@@ -1,5 +1,5 @@
 import { registerGObjectClass } from "@/utils/gjs";
-import { Rectangle, Window } from "@gi-types/meta10";
+import { Rectangle } from "@gi-types/meta10";
 import { Actor, Color, Margin } from '@gi-types/clutter10';
 import { TilePreview } from "./tilePreview";
 import { logger } from "@/utils/shell";
@@ -12,14 +12,18 @@ export class SelectionTilePreview extends TilePreview {
 
   constructor(parent: Actor, rect?: Rectangle, margins?: Margin) {
     super(parent, rect, margins);
+    this._recolor();
+    this.connect("style-changed", () => {
+      const { red, green, blue } = this.get_theme_node().get_background_color();
+      
+      if (this._backgroundColor?.red !== red || this._backgroundColor?.green !== green || this._backgroundColor?.blue !== blue) {
+        this._recolor();
+      }
+    });
   }
 
-  private _ensureBackgroundIsSet() {
-    // delay setting up the background color so we are sure that the gnome shell theme was applied
-    if (this._backgroundColor !== null) return;
-
-    this._backgroundColor = this.get_theme_node().get_background_color();
-    //debug(`constructor, tile color is ${this._backgroundColor.red} ${this._backgroundColor.green} ${this._backgroundColor.blue} ${this._backgroundColor.alpha}`);
+  _recolor() {
+    this._backgroundColor = this.get_theme_node().get_background_color().copy();
     
     // since an alpha value lower than 160 is not so much visible, enforce a minimum value of 160
     let newAlpha = Math.max(Math.min(this._backgroundColor.alpha + 35, 255), 160);
@@ -27,21 +31,13 @@ export class SelectionTilePreview extends TilePreview {
     this.set_style(`
       background-color: rgba(${this._backgroundColor.red}, ${this._backgroundColor.green}, ${this._backgroundColor.blue}, ${newAlpha / 255}) !important;
     `);
-    this.remove_style_class_name("tile-preview");
   }
 
-  open(ease: boolean = false, position?: Rectangle) {
-    this._ensureBackgroundIsSet();
-    super.open(ease, position);
-  }
+  close() {
+    if (!this._showing) return;
 
-  openBelow(window: Window, ease: boolean = false, position?: Rectangle) {
-    this._ensureBackgroundIsSet();
-    super.openBelow(window, ease, position);
-  }
-
-  openAbove(window: Window, ease: boolean = false, position?: Rectangle) {
-    this._ensureBackgroundIsSet();
-    super.openAbove(window, ease, position);
+    this._rect.width = 0;
+    this._rect.height = 0;
+    super.close();
   }
 }

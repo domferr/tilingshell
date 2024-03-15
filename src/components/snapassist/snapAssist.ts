@@ -2,7 +2,7 @@ import { registerGObjectClass } from "@/utils/gjs";
 import { Actor, AnimationMode, ActorAlign, Margin } from '@gi-types/clutter10';
 import { Rectangle, Window } from "@gi-types/meta10";
 import { BoxLayout, Side, ThemeContext, Widget } from "@gi-types/st1";
-import { TileGroup } from "../tileGroup";
+import { TileGroup } from "../layout/tileGroup";
 import { logger } from "@/utils/shell";
 import { MetaInfo, TYPE_DOUBLE } from "@gi-types/gobject2";
 import { SnapAssistTile } from "./snapAssistTile";
@@ -56,15 +56,16 @@ export class SnapAssist extends BoxLayout {
         
         this._shrinkHeight *= scaleFactor;
 
-        const layoutMargin = new Margin({
-            top: margin.top === 0 ? 0:2,
-            bottom: margin.bottom === 0 ? 0:2,
-            left: margin.left === 0 ? 0:2,
-            right: margin.right === 0 ? 0:2,
+        const gap = 3;
+        const layoutGaps = new Margin({
+            top: margin.top === 0 ? 0:gap,
+            bottom: margin.bottom === 0 ? 0:gap,
+            left: margin.left === 0 ? 0:gap,
+            right: margin.right === 0 ? 0:gap,
         })
         // build the layouts inside the snap assistant. Place a spacer between each layout
         this._snapAssistLayouts = layouts.map((lay, ind) => {
-            const saLay = new SnapAssistLayout(this, lay, layoutMargin, scaleFactor);
+            const saLay = new SnapAssistLayout(this, lay, layoutGaps, scaleFactor);
             // build and place a spacer
             if (ind < layouts.length -1) {
                 this.add_child(new Widget({width: scaleFactor * this._separatorSize, height: 1}));
@@ -95,6 +96,7 @@ export class SnapAssist extends BoxLayout {
         this.hide();
         this._showing = false;
         this.enlarged = false;
+        this.set_position(this._rect.x, this._rect.y);
     }
 
     public set workArea(newWorkArea: Rectangle) {

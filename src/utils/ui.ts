@@ -1,5 +1,5 @@
 import { Global } from '@gi-types/shell0';
-import { getCurrentExtension, logger } from '@/utils/shell';
+import { getCurrentExtension } from '@/utils/shell';
 import { Rectangle } from "@gi-types/meta10";
 import { Actor, Margin } from "@gi-types/clutter10";
 

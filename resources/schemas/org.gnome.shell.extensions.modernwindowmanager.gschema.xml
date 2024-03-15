@@ -2,10 +2,35 @@
 <schemalist gettext-domain="gnome-shell-extensions">
 
     <schema path="/org/gnome/shell/extensions/modernwindowmanager/" id="org.gnome.shell.extensions.modernwindowmanager">
+        <key name="enable-tiling-system" type="b">
+            <default>true</default>
+            <summary>Enable tiling system</summary>
+            <description>Hold CTRL while moving a window to tile it.</description>
+        </key>
+        <key name="enable-snap-assist" type="b">
+            <default>true</default>
+            <summary>Enable snap assist</summary>
+            <description>Move the window on top of the screen to snap assist it.</description>
+        </key>
         <key name="show-indicator" type="b">
             <default>true</default>
             <summary>Shows indicator</summary>
             <description>Shows an indicator on top panel.</description>
+        </key>
+        <key name="inner-gaps" type="u">
+            <default>16</default>
+            <summary>Inner gaps</summary>
+            <description>Internal gaps between tiles in a layout</description>
+        </key>
+        <key name="outer-gaps" type="u">
+            <default>16</default>
+            <summary>Outer gaps</summary>
+            <description>External gaps between the layout and the monitor borders</description>
+        </key>
+        <key name="enable-span-multiple-tiles" type="b">
+            <default>true</default>
+            <summary>Span multiple tiles</summary>
+            <description>Hold ALT to span multiple tiles.</description>
         </key>
     </schema>
 
