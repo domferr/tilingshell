@@ -6,10 +6,11 @@ import { Actor, Margin, ActorAlign } from '@gi-types/clutter10';
 import { Rectangle } from '@gi-types/meta10';
 import { LayoutWidget } from '@/components/layout/LayoutWidget';
 import { SnapAssistTile } from '@/components/snapassist/snapAssistTile';
-import { Main } from '@/utils/ui';
+import { Main, getMonitors } from '@/utils/ui';
 import Settings from '@/settings';
 import { Layout } from '@/components/layout/Layout';
-import { Tile } from '@/components/layout/Tile';
+import Tile from '@/components/layout/Tile';
+import SignalHandling from '@/signalHandling';
 
 const { PopupBaseMenuItem } = imports.ui.popupMenu;
 const { Button: PopupMenuButton } = imports.ui.panelMenu;
@@ -35,15 +36,13 @@ export class LayoutSelectionWidget extends LayoutWidget<SnapAssistTile> {
 @registerGObjectClass
 export class Indicator extends PopupMenuButton {
     private icon: Icon;
-    private onLayoutSelected: (layout: Layout) => void;
     private layoutsBoxLayout: BoxLayout;
     private layoutsButtons: Button[] = [];
+    private readonly _signals: SignalHandling;
 
-    constructor(onLayoutSelection: (layout: Layout) => void) {
+    constructor() {
         super(0.5, 'Modern Window Manager Indicator', false);
-
-        this.onLayoutSelected = onLayoutSelection;
-
+        this._signals = new SignalHandling();
         this.icon = new Icon({
             gicon: icon_new_for_string(`${getCurrentExtension().path}/icons/indicator.svg`),
             style_class: 'system-status-icon indicator-icon',
@@ -63,36 +62,46 @@ export class Indicator extends PopupMenuButton {
         layoutsPopupMenu.add_actor(this.layoutsBoxLayout);
 
         this.menu.addMenuItem(layoutsPopupMenu);
+
+        this._setLayouts(
+            Settings.get_layouts(), 
+            Settings.get_selected_layouts()[imports.ui.main.layoutManager.primaryIndex]
+        );
+        // update the layouts shown by the indicator when they are modified
+        this._signals.connect(Settings, Settings.SETTING_LAYOUTS, () => {
+            this._setLayouts(
+                Settings.get_layouts(), 
+                Settings.get_selected_layouts()[imports.ui.main.layoutManager.primaryIndex]
+            );
+        });
+
+        // if the selected layout was changed externaly, update the selected button
+        this._signals.connect(Settings, Settings.SETTING_SELECTED_LAYOUTS, () => {
+            const btnInd = Settings.get_selected_layouts()[imports.ui.main.layoutManager.primaryIndex];
+            if (this.layoutsButtons[btnInd].checked) return;
+            this.layoutsButtons.forEach((btn, layInd) => btn.set_checked(layInd === btnInd));
+        });
     }
 
-    public setLayouts(layouts: Layout[], selectedIndex: number) {
+    private _setLayouts(layouts: Layout[], selectedIndex: number) {
         this.layoutsBoxLayout.remove_all_children();
         const scalingFactor = global.display.get_monitor_scale(Main.layoutManager.primaryIndex);
         
         const hasGaps = Settings.get_inner_gaps(1).top > 0;
 
-        this.layoutsButtons = layouts.map((lay, ind) => {
+        this.layoutsButtons = layouts.map((lay, btnInd) => {
             const btn = new Button({style_class: "popup-menu-layout-button"});
             btn.child = new LayoutSelectionWidget(lay, hasGaps ? 1:0, scalingFactor);
             this.layoutsBoxLayout.add_child(btn);
             btn.connect('clicked', (self) => {
-                this.selectButtonAtIndex(ind, lay);
+                // change the layout of all the monitors
+                Settings.set_selected_layouts(getMonitors().map((monitor) => btnInd))
                 this.menu.toggle();
             });
             return btn;
         });
 
         this.layoutsButtons[selectedIndex].set_checked(true);
-    }
-    
-    public getSelectedButtonIndex() {
-        return this.layoutsButtons.findIndex(btn => btn.checked);
-    }
-
-    private selectButtonAtIndex(index: number, layout: Layout) {
-        this.layoutsButtons.forEach(btn => btn.set_checked(false));
-        this.layoutsButtons[index].set_checked(true);
-        this.onLayoutSelected(layout);
     }
 
     destroy() {

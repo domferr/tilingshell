@@ -10,7 +10,8 @@ import { ThemeContext } from '@gi-types/st1';
 import Settings from '@/settings';
 import SignalHandling from '@/signalHandling';
 import { Layout } from './layout/Layout';
-import { Tile } from './layout/Tile';
+import Tile from './layout/Tile';
+import TileUtils from './layout/TileUtils';
 
 const SIGNAL_GRAB_OP_BEGIN = 'grab-op-begin';
 const SIGNAL_GRAB_OP_END = 'grab-op-end';
@@ -47,10 +48,11 @@ export class TilingManager {
      * @param innerMargin Inner margin for tiling.
      * @param outerMargin Outer margin for tiling.
      */
-    constructor(monitor: Monitor, layouts: Layout[], selectedLayout: number) {
-        this._signals = new SignalHandling();
+    constructor(monitor: Monitor) {
         this._monitor = monitor;
+        this._signals = new SignalHandling();
         this._debug = logger(`TilingManager ${monitor.index}`);
+        const layout: Layout = Settings.get_layouts()[Settings.get_selected_layouts()[monitor.index]];
 
         // handle scale factor of the monitor
         this._scaleFactor = ThemeContext.get_for_stage(global.get_stage()).get_scale_factor();
@@ -65,10 +67,10 @@ export class TilingManager {
         this._debug(`Work area for monitor ${this._monitor.index}: ${this._workArea.x} ${this._workArea.y} ${this._workArea.width}x${this._workArea.height}`);
 
         // build the tiling layout
-        this._tilingLayout = new TilingLayout(layouts[selectedLayout], this._innerGaps, this._outerGaps, this._workArea);
+        this._tilingLayout = new TilingLayout(layout, this._innerGaps, this._outerGaps, this._workArea);
         
         // build the snap assistant
-        this._snapAssist = new SnapAssist(global.window_group, layouts, this._innerGaps, this._workArea, this._scaleFactor);
+        this._snapAssist = new SnapAssist(global.window_group, this._workArea, this._scaleFactor);
 
         // build the selection tile
         this._selectedTilesPreview = new SelectionTilePreview({ parent: global.window_group });
@@ -81,6 +83,11 @@ export class TilingManager {
      *  - handle grabbed window's movement.
      */
     public enable() {
+        this._signals.connect(Settings, Settings.SETTING_SELECTED_LAYOUTS, () => {
+            const layout: Layout = Settings.get_layouts()[Settings.get_selected_layouts()[this._monitor.index]];
+            this._tilingLayout.relayout({ layout });
+        });
+        
         this._signals.connect(Settings, Settings.SETTING_INNER_GAPS, () => {
             this._innerGaps = new Margin(Settings.get_inner_gaps(this._scaleFactor));
             this._tilingLayout.relayout({ innerMargin: this._innerGaps });
@@ -134,14 +141,6 @@ export class TilingManager {
         // so we will have the layout already computed to be shown quickly when needed
         this._tilingLayout.relayout({ containerRect: this._workArea });
         this._snapAssist.workArea = this._workArea;
-    }
-
-    /**
-     * Sets the active tiling layout.
-     * @param layout The layout to set as active.
-     */
-    public setActiveLayout(layout: Layout) {
-        this._tilingLayout.relayout({ layout });
     }
 
     private _onWindowGrabBegin(window: Window) {
@@ -303,7 +302,7 @@ export class TilingManager {
         }
 
         // We apply the proportions to get tile size and position relative to the work area 
-        const scaledRect = tile.apply_props(this._workArea);
+        const scaledRect = TileUtils.apply_props(tile, this._workArea);
         // ensure the rect doesn't go horizontally beyond the workarea
         if (scaledRect.x + scaledRect.width > this._workArea.width) {
             scaledRect.width -= scaledRect.x + scaledRect.width - this._workArea.x - this._workArea.width;

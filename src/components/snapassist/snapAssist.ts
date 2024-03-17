@@ -7,7 +7,8 @@ import { MetaInfo } from "@gi-types/gobject2";
 import { SnapAssistTile } from "./snapAssistTile";
 import { SnapAssistLayout } from "./snapAssistLayout";
 import { Layout } from "../layout/Layout";
-import { Tile } from "../layout/Tile";
+import Tile from "../layout/Tile";
+import Settings from "@/settings";
 
 export const SNAP_ASSIST_SIGNAL = 'snap-assist';
 export const SNAP_ASSIST_ANIMATION_TIME = 180;
@@ -33,6 +34,7 @@ export class SnapAssist extends BoxLayout {
     private _shrinkHeight = 16;
     // distance between layouts
     private readonly _separatorSize = 8;
+    private readonly _gaps = 3;
     
     private _showing: boolean;
     private _snapAssistLayouts: SnapAssistLayout[];
@@ -42,7 +44,7 @@ export class SnapAssist extends BoxLayout {
     private _workArea: Rectangle = new Rectangle();
     private _hoveredTile: SnapAssistTile | undefined;
 
-    constructor(parent: Actor, layouts: Layout[], margin: Margin, workArea: Rectangle, scaleFactor: number) {
+    constructor(parent: Actor, workArea: Rectangle, scaleFactor: number) {
         super({
             name: 'snap_assist',
             x_align: ActorAlign.CENTER,
@@ -57,13 +59,14 @@ export class SnapAssist extends BoxLayout {
         
         this._shrinkHeight *= scaleFactor;
 
-        const gap = 3;
+        const inner_gaps = Settings.get_inner_gaps(1);
         const layoutGaps = new Margin({
-            top: margin.top === 0 ? 0:gap,
-            bottom: margin.bottom === 0 ? 0:gap,
-            left: margin.left === 0 ? 0:gap,
-            right: margin.right === 0 ? 0:gap,
-        })
+            top: inner_gaps.top === 0 ? 0:this._gaps,
+            bottom: inner_gaps.bottom === 0 ? 0:this._gaps,
+            left: inner_gaps.left === 0 ? 0:this._gaps,
+            right: inner_gaps.right === 0 ? 0:this._gaps,
+        });
+        const layouts = Settings.get_layouts();
         // build the layouts inside the snap assistant. Place a spacer between each layout
         this._snapAssistLayouts = layouts.map((lay, ind) => {
             const saLay = new SnapAssistLayout(this, lay, layoutGaps, scaleFactor);
@@ -80,14 +83,10 @@ export class SnapAssist extends BoxLayout {
 
         const padding = this.get_theme_node().get_padding(Side.BOTTOM);
         const scaledPadding = ThemeContext.get_for_stage(global.get_stage()).get_scale_factor() === 1 ?
-            padding * scaleFactor:padding;
+            (padding * scaleFactor):padding;
         this.set_style(`
             padding: ${scaledPadding}px !important;
         `);
-        /*const color = this.get_theme_node().get_background_color();
-        const newAlpha = 220;
-        background-color: rgba(${color.red}, ${color.green}, ${color.blue}, ${newAlpha / 255}) !important;
-        */
         
         this.ensure_style();
         this._enlargedRect.height = this.size.height;

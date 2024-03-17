@@ -6,7 +6,8 @@ import { registerGObjectClass } from "@/utils/gjs";
 import { buildTileMargin } from "@/utils/ui";
 import { logger } from "@/utils/shell";
 import { Layout } from "./Layout";
-import { Tile } from "./Tile";
+import Tile from "./Tile";
+import TileUtils from "./TileUtils";
 
 const debug = logger(`LayoutWidget`);
 
@@ -32,7 +33,7 @@ export class LayoutWidget<TileType extends TilePreview> extends Widget {
 
     protected draw_layout(): void {
         this._previews = this._layout.tiles.map(tile => {
-            const tileRect = tile.apply_props(this._containerRect);
+            const tileRect = TileUtils.apply_props(tile, this._containerRect);
             const tileMargin = buildTileMargin(tileRect, this._innerMargin, this._outerMargin, this._containerRect);
             return this.buildTile(this, tileRect, tileMargin, tile);
         });

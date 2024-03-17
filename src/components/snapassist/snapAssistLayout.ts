@@ -6,7 +6,7 @@ import { LayoutWidget } from "../layout/LayoutWidget";
 import { SnapAssistTile } from "./snapAssistTile";
 import { logger } from "@/utils/shell";
 import { Layout } from "../layout/Layout";
-import { Tile } from "../layout/Tile";
+import Tile from "../layout/Tile";
 
 const debug = logger("snapAssistLayout");
 

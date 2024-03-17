@@ -20,17 +20,27 @@
         <key name="inner-gaps" type="u">
             <default>16</default>
             <summary>Inner gaps</summary>
-            <description>Internal gaps between tiles in a layout</description>
+            <description>Internal gaps between tiles in a layout.</description>
         </key>
         <key name="outer-gaps" type="u">
             <default>16</default>
             <summary>Outer gaps</summary>
-            <description>External gaps between the layout and the monitor borders</description>
+            <description>External gaps between the layout and the monitor borders.</description>
         </key>
         <key name="enable-span-multiple-tiles" type="b">
             <default>true</default>
             <summary>Span multiple tiles</summary>
             <description>Hold ALT to span multiple tiles.</description>
+        </key>
+        <key name="layouts-json" type="s">
+            <default>'[]'</default>
+            <summary>Layouts</summary>
+            <description>The layouts available to the tiling managers and the snap assist.</description>
+        </key>
+        <key name="selected-layouts" type="as">
+            <default>['0']</default>
+            <summary>Selected layouts</summary>
+            <description>Each monitor's active layout used by the monitor tiling manager.</description>
         </key>
     </schema>
 

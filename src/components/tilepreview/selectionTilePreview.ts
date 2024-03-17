@@ -3,7 +3,7 @@ import { Rectangle } from "@gi-types/meta10";
 import { Actor, Color, Margin } from '@gi-types/clutter10';
 import { TilePreview } from "./tilePreview";
 import { logger } from "@/utils/shell";
-import { Tile } from "../layout/Tile";
+import Tile from "../layout/Tile";
 
 const debug = logger("SelectionTilePreview");
 

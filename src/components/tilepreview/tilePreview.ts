@@ -4,7 +4,7 @@ import {registerGObjectClass} from "@/utils/gjs";
 import {logger} from "@/utils/shell";
 import {global} from "@/utils/ui";
 import { Actor, AnimationMode, Margin } from '@gi-types/clutter10';
-import { Tile } from "../layout/Tile";
+import Tile from "../layout/Tile";
 
 export const WINDOW_ANIMATION_TIME = 100;
 

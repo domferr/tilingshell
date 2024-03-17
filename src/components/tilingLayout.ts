@@ -7,7 +7,7 @@ import { BlurTilePreview } from './tilepreview/blurTilePreview';
 import { TilePreview, WINDOW_ANIMATION_TIME } from './tilepreview/tilePreview';
 import { LayoutWidget } from './layout/LayoutWidget';
 import { Layout } from './layout/Layout';
-import { Tile } from './layout/Tile';
+import Tile from './layout/Tile';
 
 const debug = logger('tilingLayout');
 

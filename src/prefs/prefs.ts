@@ -1,6 +1,5 @@
 import Gtk from "@gi-types/gtk4"; // Starting from GNOME 40, the preferences dialog uses GTK4
 import Adw from "@gi-types/adw1";
-import Gio from "@gi-types/gio2";
 import { logger } from "../utils/shell";
 import Settings from "../settings";
 
@@ -67,6 +66,10 @@ function fillPreferencesWindow(window: Adw.PreferencesWindow) {
     );
     appearenceGroup.add(showIndicatorRow);
 
+    Settings.connect(Settings.SETTING_LAYOUTS, () => {
+        debug(`changed ${Settings.SETTING_LAYOUTS} to ${JSON.stringify(Settings.get_layouts())}`)
+    })
+
     const innerGapsRow = buildSpinButtonRow(
         Settings.SETTING_INNER_GAPS,
         "Inner gaps",
@@ -118,7 +121,7 @@ function buildSwitchRow(settingsKey: string, title: string, subtitle: string): A
         activatableWidget: gtkSwitch
     });
     adwRow.add_suffix(gtkSwitch);
-    Settings.bind(settingsKey, gtkSwitch, 'active', Gio.SettingsBindFlags.DEFAULT);
+    Settings.bind(settingsKey, gtkSwitch, 'active');
 
     return adwRow;
 }
@@ -133,7 +136,7 @@ function buildSpinButtonRow(settingsKey: string, title: string, subtitle: string
         activatableWidget: spinBtn
     });
     adwRow.add_suffix(spinBtn);
-    Settings.bind(settingsKey, spinBtn, 'value', Gio.SettingsBindFlags.DEFAULT);
+    Settings.bind(settingsKey, spinBtn, 'value');
 
     return adwRow;
 }

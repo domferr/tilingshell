@@ -5,7 +5,6 @@ import { logger } from '@/utils/shell';
 import { Main, addToStatusArea, getMonitors } from '@/utils/ui';
 import { getCurrentExtension } from '@/utils/shell';
 import { TilingManager } from "@/components/tilingManager";
-import { LayoutsUtils } from './components/layout/LayoutUtils';
 import { Rectangle } from '@gi-types/meta10';
 import { SettingsBindFlags } from '@gi-types/gio2';
 import Settings from '@/settings';
@@ -25,11 +24,9 @@ class Extension {
     this._signals = new SignalHandling();
   }
 
-  createIndicator(availableLayouts: Layout[]) {
-    this._indicator = new Indicator((lay) => this.onLayoutSelected(lay));
+  createIndicator() {
+    this._indicator = new Indicator();
     addToStatusArea(this._indicator);
-    
-    this._indicator.setLayouts(availableLayouts, 0);
 
     // Bind the "show-indicator" setting to the "visible" property.
     //@ts-ignore
@@ -39,39 +36,45 @@ class Extension {
   enable(): void {
     Settings.initialize();
     
-    // for this version we have a custom layout plus three fixed ones
-    const availableLayouts = LayoutsUtils.LoadLayouts();
-    
     //@ts-ignore
     if (Main.layoutManager._startingUp) {
       this._signals.connect(Main.layoutManager, 'startup-complete', () => {
         debug("startup complete!");
-        this._createTilingManagers(availableLayouts);
-        this._setupSignals(availableLayouts);
+        this._createTilingManagers();
+        this._setupSignals();
       });
     } else {
-        this._createTilingManagers(availableLayouts);
-        this._setupSignals(availableLayouts);
+        this._createTilingManagers();
+        this._setupSignals();
     }
 
-    this.createIndicator(availableLayouts);
+    this.createIndicator();
 
     debug('extension is enabled');
   }
   
-  private _createTilingManagers(availableLayouts: Layout[]) {
+  private _createTilingManagers() {
     debug('building a tiling manager for each monitor');
     this._tilingManagers.forEach(tm => tm.destroy());
-    this._tilingManagers = getMonitors().map(monitor => new TilingManager(monitor, availableLayouts, 0));
+    this._tilingManagers = getMonitors().map(monitor => new TilingManager(monitor));
     this._tilingManagers.forEach(tm => tm.enable());
   }
 
-  private _setupSignals(availableLayouts: Layout[]) {
+  private _setupSignals() {
     this._signals.connect(global.display, SIGNAL_WORKAREAS_CHANGED, () => {
       const allMonitors = getMonitors();
       if (this._tilingManagers.length !== allMonitors.length) {
         // a monitor was disconnected or a new one was connected
-        this._createTilingManagers(availableLayouts);
+        // update the index of selected layouts
+        const oldIndexes = Settings.get_selected_layouts();
+        const indexes = allMonitors.map(monitor => {
+          // If there is a new monitor, give the same layout as the primary monitor
+          if (monitor.index >= oldIndexes.length) return oldIndexes[imports.ui.main.layoutManager.primaryIndex];
+          return oldIndexes[monitor.index];
+        })
+        Settings.set_selected_layouts(indexes);
+        
+        this._createTilingManagers();
       } else {
         // same number of monitors, but one or more workareas changed
         allMonitors.forEach(monitor => {
@@ -89,11 +92,6 @@ class Extension {
     this._tilingManagers = [];
     this._signals.disconnect();
     debug('extension is disabled');
-  }
-
-  onLayoutSelected(layout: Layout) {
-    // notify to each monitors' tiling manager the new active layout
-    this._tilingManagers.forEach(tm => tm.setActiveLayout(layout));
   }
 }
 
