@@ -40,7 +40,7 @@ Currently, this extension is not on [extensions.gnome.org](https://extensions.gn
 
 ### Install via Source
 
-Clone the repo then run
+Clone the repo then run ```npm i``` to install dependencies and then run ```npm run build``` to build the extension. To finally install the extension run
 ```bash
 npm run install:extension
 ```

@@ -1,30 +1,36 @@
 import { registerGObjectClass } from "@/utils/gjs";
-import { Rectangle } from "@gi-types/meta10";
-import { Actor, Color, Margin } from '@gi-types/clutter10';
-import { TilePreview } from "./tilePreview";
+import Meta from "@gi-types/meta10";
+import Clutter from '@gi-types/clutter10';
+import TilePreview from "./tilePreview";
 import { logger } from "@/utils/shell";
-import Tile from "../layout/Tile";
 
 const debug = logger("SelectionTilePreview");
 
 @registerGObjectClass
-export class SelectionTilePreview extends TilePreview {
-  private _backgroundColor: Color | null = null;
+export default class SelectionTilePreview extends TilePreview {
+  private _backgroundColor: Clutter.Color | null = null;
+  private _styleChangedSignalID: number | null = null;
 
   constructor(params: {
-    parent?: Actor,
-    rect?: Rectangle,
-    gaps?: Margin,
+    parent?: Clutter.Actor,
+    rect?: Meta.Rectangle,
+    gaps?: Clutter.Margin,
   }) {
-    super({tile: new Tile({x:0, y:0, width: 0, height: 0}), ...params});
+    super({ name:"SelectionTilePreview", ...params });
+
     this._recolor();
-    this.connect("style-changed", () => {
+    this._styleChangedSignalID = this.connect("style-changed", () => {
       const { red, green, blue } = this.get_theme_node().get_background_color();
       
       if (this._backgroundColor?.red !== red || this._backgroundColor?.green !== green || this._backgroundColor?.blue !== blue) {
         this._recolor();
       }
     });
+  }
+
+  _init() {
+    super._init();
+    this.add_style_class_name("selection-tile-preview");
   }
 
   _recolor() {
@@ -44,5 +50,16 @@ export class SelectionTilePreview extends TilePreview {
     this._rect.width = 0;
     this._rect.height = 0;
     super.close();
+  }
+
+  public open(ease?: boolean, position?: Meta.Rectangle | undefined): void {
+    super.open(ease, position);
+    debug(`x:${position?.x} y:${position?.y} width:${position?.width} height:${position?.height}`);
+  }
+
+  destroy() {
+    if (this._styleChangedSignalID) this.disconnect(this._styleChangedSignalID);
+    this._styleChangedSignalID = null;
+    super.destroy();
   }
 }

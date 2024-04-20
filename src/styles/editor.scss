@@ -1,0 +1,52 @@
+.layout-editor {
+    background-color: rgba(255, 255, 255, 0.14);
+}
+
+.layout-editor-slider {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 6px;
+    border: 2px solid rgb(65, 65, 65, 0.8);
+}
+
+.editable-tile-preview-button {
+    text-align: center;
+    font-weight: bold;
+    font-size: 20px;
+    color: white;
+}
+
+.editor-dialog {
+    .layouts-box-layout {
+        spacing: 18px;
+    }
+
+    .layout-button-container {
+        spacing: 8px;
+    }
+
+    .delete-layout-button {
+        padding: $base_padding;
+    }
+
+    .editor-dialog-title {
+        text-align: center;
+        @extend %title_2;
+    }
+
+    .legend {
+        spacing: 12px;
+    }
+
+    .kbd {
+        @include fontsize($base_font_size);
+        font-weight: bold;
+        text-align: center;
+        font-family: monospace;
+        padding: calc($base-padding / 2) $base_padding;
+        box-shadow: 0px 3px 0px 0px rgba(0,0,0,0.2);
+    }
+}
+
+.hover-line {
+    background-color: rgba(255, 255, 255, 0.2);
+}

@@ -1,6 +1,6 @@
 {
   "name": "Modern Window Manager",
-  "description": "A modern window manager on GNOME",
+  "description": "Extend Gnome Shell with advanced tiling window management. Supports multiple monitors, windows 11 snap assistant, fancy zones, customised tiling layouts and more.",
   "uuid": "modernwindowmanager@ferrarodomenico.com",
   "shell-version": [
     "40",
@@ -9,7 +9,7 @@
     "43",
     "44"
   ],
-  "version": 2,
-  "url": "https://github.com/domferr/Linux-PowerToys",
+  "version": 3,
+  "url": "https://github.com/domferr/modernwindowmanager",
   "settings-schema": "org.gnome.shell.extensions.modernwindowmanager"
 }

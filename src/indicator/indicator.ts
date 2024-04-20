@@ -1,112 +1,182 @@
-import { icon_new_for_string } from '@gi-types/gio2';
-import { BoxLayout, Button, Icon } from '@gi-types/st1';
+import Gio from '@gi-types/gio2';
+import St from '@gi-types/st1';
 import { registerGObjectClass } from '@/utils/gjs';
 import { getCurrentExtension, logger } from '@/utils/shell';
-import { Actor, Margin, ActorAlign } from '@gi-types/clutter10';
-import { Rectangle } from '@gi-types/meta10';
-import { LayoutWidget } from '@/components/layout/LayoutWidget';
-import { SnapAssistTile } from '@/components/snapassist/snapAssistTile';
-import { Main, getMonitors } from '@/utils/ui';
+import { Main, getMonitors, getScalingFactor } from '@/utils/ui';
 import Settings from '@/settings';
-import { Layout } from '@/components/layout/Layout';
+import Layout from '@/components/layout/Layout';
 import Tile from '@/components/layout/Tile';
-import SignalHandling from '@/signalHandling';
+import LayoutEditor from '@/components/editor/layoutEditor';
+import DefaultMenu from './defaultMenu';
+import GlobalState from '@/globalState';
+import EditingMenu from './editingMenu';
+import EditorDialog from '../components/editor/editorDialog';
+import Shell from "@gi-types/shell0";
 
-const { PopupBaseMenuItem } = imports.ui.popupMenu;
+const PopupMenu = imports.ui.popupMenu;
 const { Button: PopupMenuButton } = imports.ui.panelMenu;
 
 const debug = logger('indicator');
 
-@registerGObjectClass
-export class LayoutSelectionWidget extends LayoutWidget<SnapAssistTile> {
-    private static readonly _layoutHeight: number = 36;
-    private static readonly _layoutWidth: number = 64; // 16:9 ratio. -> (16*this._snapAssistHeight) / 9 and then rounded to int
-
-    constructor(layout: Layout, gapSize: number, scaleFactor: number) {
-        const rect = new Rectangle({height: LayoutSelectionWidget._layoutHeight * scaleFactor, width: LayoutSelectionWidget._layoutWidth * scaleFactor, x: 0, y: 0});
-        const gaps = new Margin({ top: gapSize * scaleFactor, bottom: gapSize * scaleFactor, left: gapSize * scaleFactor, right: gapSize * scaleFactor });
-        super(null, layout, gaps, gaps, rect, "snap-assist-layout");
-    }
-
-    buildTile(parent: Actor, rect: Rectangle, gaps: Margin, tile: Tile): SnapAssistTile {
-        return new SnapAssistTile({parent, rect, gaps, tile});
-    }
+enum IndicatorState {
+    DEFAULT = 1,
+    CREATE_NEW,
+    EDITING_LAYOUT
 }
 
 @registerGObjectClass
-export class Indicator extends PopupMenuButton {
-    private icon: Icon;
-    private layoutsBoxLayout: BoxLayout;
-    private layoutsButtons: Button[] = [];
-    private readonly _signals: SignalHandling;
+export default class Indicator extends PopupMenuButton {
+    private _layoutEditor: LayoutEditor | null = null;
+    private _currentMenu: CurrentMenu;
+    private _state: IndicatorState;
 
     constructor() {
         super(0.5, 'Modern Window Manager Indicator', false);
-        this._signals = new SignalHandling();
-        this.icon = new Icon({
-            gicon: icon_new_for_string(`${getCurrentExtension().path}/icons/indicator.svg`),
+        const icon = new St.Icon({
+            gicon: Gio.icon_new_for_string(`${getCurrentExtension().path}/icons/indicator.svg`),
             style_class: 'system-status-icon indicator-icon',
         });
 
-        this.add_child(this.icon);
+        this.add_child(icon);
+        this._state = IndicatorState.DEFAULT;
         
-        this.layoutsBoxLayout = new BoxLayout({
-            x_align: ActorAlign.CENTER,
-            y_align: ActorAlign.CENTER,
-            x_expand: true,
-            y_expand: true,
-            vertical: false // horizontal box layout
-        });
-
-        const layoutsPopupMenu = new PopupBaseMenuItem({ style_class: 'popup-menu-layout-selection' });
-        layoutsPopupMenu.add_actor(this.layoutsBoxLayout);
-
-        this.menu.addMenuItem(layoutsPopupMenu);
-
-        this._setLayouts(
-            Settings.get_layouts(), 
-            Settings.get_selected_layouts()[imports.ui.main.layoutManager.primaryIndex]
-        );
-        // update the layouts shown by the indicator when they are modified
-        this._signals.connect(Settings, Settings.SETTING_LAYOUTS, () => {
-            this._setLayouts(
-                Settings.get_layouts(), 
-                Settings.get_selected_layouts()[imports.ui.main.layoutManager.primaryIndex]
-            );
-        });
-
-        // if the selected layout was changed externaly, update the selected button
-        this._signals.connect(Settings, Settings.SETTING_SELECTED_LAYOUTS, () => {
-            const btnInd = Settings.get_selected_layouts()[imports.ui.main.layoutManager.primaryIndex];
-            if (this.layoutsButtons[btnInd].checked) return;
-            this.layoutsButtons.forEach((btn, layInd) => btn.set_checked(layInd === btnInd));
-        });
+        this.connect('destroy', this._onDestroy.bind(this));
     }
 
-    private _setLayouts(layouts: Layout[], selectedIndex: number) {
-        this.layoutsBoxLayout.remove_all_children();
-        const scalingFactor = global.display.get_monitor_scale(Main.layoutManager.primaryIndex);
-        
+    public enable() {
+        this.menu.removeAll();
+        this._currentMenu = new DefaultMenu(this);
+
+        // todo
+        /*Main.panel.statusArea.appMenu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
+        const layouts = GlobalState.get().layouts;
+        const rowsBoxLayout: St.BoxLayout[] = [];
+        const layoutsPerRow = 2;
+        for (let i = 0; i < layouts.length / layoutsPerRow; i++) {
+            const item = new PopupMenu.PopupBaseMenuItem({ style_class: 'indicator-menu-item' });
+            const box = new St.BoxLayout({
+                x_align: Clutter.ActorAlign.CENTER,
+                y_align: Clutter.ActorAlign.CENTER,
+                x_expand: true,
+                vertical: false, // horizontal box layout
+                style_class: "layouts-box-layout",
+            });
+            rowsBoxLayout.push(box);
+            item.add_actor(box);
+            Main.panel.statusArea.appMenu.menu.addMenuItem(item);
+        }
         const hasGaps = Settings.get_inner_gaps(1).top > 0;
 
-        this.layoutsButtons = layouts.map((lay, btnInd) => {
-            const btn = new Button({style_class: "popup-menu-layout-button"});
-            btn.child = new LayoutSelectionWidget(lay, hasGaps ? 1:0, scalingFactor);
-            this.layoutsBoxLayout.add_child(btn);
-            btn.connect('clicked', (self) => {
-                // change the layout of all the monitors
-                Settings.set_selected_layouts(getMonitors().map((monitor) => btnInd))
-                this.menu.toggle();
-            });
+        const layoutHeight: number = 36;
+        const layoutWidth: number = 64; // 16:9 ratio. -> (16*layoutHeight) / 9 and then rounded to int
+        const layoutsButtons: St.Widget[] = layouts.map((lay, ind) => {
+            const btn = new St.Button({x_expand: false, style_class: "layout-button button"});
+            btn.child = new LayoutSelectionWidget(lay, hasGaps ? 1:0, 1, layoutHeight, layoutWidth);
+            rowsBoxLayout[Math.floor(ind / layoutsPerRow)].add_child(btn);
             return btn;
-        });
-
-        this.layoutsButtons[selectedIndex].set_checked(true);
+        });*/
     }
 
-    destroy() {
-        this.layoutsButtons.forEach(btn => btn.destroy());
-        this.layoutsButtons = [];
-        super.destroy();
+    public selectLayoutOnClick(layoutToSelect: Layout) {
+        // change the layout of all the monitors
+        Settings.save_selected_layouts_json(getMonitors().map((monitor) => layoutToSelect.id));
+        this.menu.toggle();
+    }
+
+    public newLayoutOnClick(showLegend: boolean) {        
+        this.menu.close();
+
+        const newLayout = new Layout([
+            new Tile({x: 0, y: 0, width: 0.30, height: 1, groups: [1]}),
+            new Tile({x: 0.30, y: 0, width: 0.70, height: 1, groups: [1]}),
+        ], `${Shell.Global.get().get_current_time()}`);
+
+        if (this._layoutEditor) this._layoutEditor.layout = newLayout;
+        else this._layoutEditor = new LayoutEditor(newLayout, Main.layoutManager.monitors[Main.layoutManager.primaryIndex]);
+        this._setState(IndicatorState.CREATE_NEW);
+        if (showLegend) this.openMenu(true);
+    }
+
+    public openMenu(legend: boolean) {
+        const scalingFactor = getScalingFactor(Shell.Global.get().display.get_current_monitor());
+        
+        const dialog = new EditorDialog({
+            scalingFactor,
+            onNewLayout: () => {
+                this.newLayoutOnClick(false);
+            },
+            onDeleteLayout: (ind: number, lay: Layout) => {
+                GlobalState.get().deleteLayout(lay);
+                
+                if (this._layoutEditor && this._layoutEditor.layout.id === lay.id) {
+                    this.cancelLayoutOnClick();
+                }
+            },
+            onSelectLayout: (ind: number, lay: Layout) => {
+                const layCopy = new Layout(lay.tiles.map(t => new Tile({x: t.x, y: t.y, width: t.width, height: t.height, groups: [...t.groups]})), lay.id);
+
+                if (this._layoutEditor) this._layoutEditor.layout = layCopy;
+                else this._layoutEditor = new LayoutEditor(layCopy, Main.layoutManager.monitors[Main.layoutManager.primaryIndex]);
+                
+                this._setState(IndicatorState.EDITING_LAYOUT);
+            },
+            legend
+        });
+        dialog.open(Shell.Global.get().get_current_time());
+    }
+
+    public editLayoutsOnClick() {        
+        this.openMenu(false);
+    }
+
+    public saveLayoutOnClick() {
+        if (this._layoutEditor === null || this._state === IndicatorState.DEFAULT) return;
+        const newLayout = this._layoutEditor.layout;
+
+        if (this._state === IndicatorState.CREATE_NEW) {
+            GlobalState.get().addLayout(newLayout);
+        } else {
+            GlobalState.get().editLayout(newLayout);
+        }
+
+        this.menu.toggle();
+
+        this._layoutEditor.destroy();
+        this._layoutEditor = null;
+
+        this._setState(IndicatorState.DEFAULT);
+    }
+
+    public cancelLayoutOnClick() {
+        if (this._layoutEditor === null || this._state === IndicatorState.DEFAULT) return;
+
+        this.menu.toggle();
+
+        this._layoutEditor.destroy();
+        this._layoutEditor = null;
+
+        this._setState(IndicatorState.DEFAULT);
+    }
+
+    private _setState(newState: IndicatorState) {
+        if (this._state === newState) return;
+        this._state = newState;
+        this._currentMenu.destroy();
+        switch(newState) {
+            case IndicatorState.DEFAULT:
+                this._currentMenu = new DefaultMenu(this);
+                break;
+            case IndicatorState.CREATE_NEW:
+            case IndicatorState.EDITING_LAYOUT:
+                this._currentMenu = new EditingMenu(this);
+                break;
+        }
+    }
+
+    private _onDestroy() {
+        this._layoutEditor?.destroy();
+        this._layoutEditor = null;
+        this._currentMenu.destroy();
     }
 }

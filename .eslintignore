@@ -1,8 +1,8 @@
 node_modules/
 lib/
+dist/
 tmp/
 test/*.js
 templates/
-@types/
 *.js
 */*.js

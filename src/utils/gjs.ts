@@ -1,4 +1,4 @@
-import { registerClass } from '@gi-types/gobject2';
+import GObject from '@gi-types/gobject2';
 
 // Taken from https://github.com/material-shell/material-shell/blob/main/src/utils/gjs.ts
 /// Decorator function to call `GObject.registerClass` with the given class.
@@ -14,10 +14,10 @@ export function registerGObjectClass<K, T extends { metaInfo?: any; new (...para
         // eslint-disable-next-line
         // @ts-ignore
         // eslint-disable-next-line
-        return registerClass<K, T>(target.metaInfo!, target) as typeof target;
+        return GObject.registerClass<K, T>(target.metaInfo!, target) as typeof target;
     } else {
         // eslint-disable-next-line
         // @ts-ignore
-        return registerClass<K, T>(target) as typeof target;
+        return GObject.registerClass<K, T>(target) as typeof target;
     }
 }

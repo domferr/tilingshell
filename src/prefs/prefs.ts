@@ -1,7 +1,10 @@
 import Gtk from "@gi-types/gtk4"; // Starting from GNOME 40, the preferences dialog uses GTK4
 import Adw from "@gi-types/adw1";
-import { logger } from "../utils/shell";
 import Settings from "../settings";
+import { logger } from "../utils/shell";
+/*import Layout from "@/components/layout/Layout";
+import GObject from "@gi-types/gobject2";
+import Cairo from "@gi-types/cairo1";*/
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -66,10 +69,6 @@ function fillPreferencesWindow(window: Adw.PreferencesWindow) {
     );
     appearenceGroup.add(showIndicatorRow);
 
-    Settings.connect(Settings.SETTING_LAYOUTS, () => {
-        debug(`changed ${Settings.SETTING_LAYOUTS} to ${JSON.stringify(Settings.get_layouts())}`)
-    })
-
     const innerGapsRow = buildSpinButtonRow(
         Settings.SETTING_INNER_GAPS,
         "Inner gaps",
@@ -111,6 +110,26 @@ function fillPreferencesWindow(window: Adw.PreferencesWindow) {
         "Move the window on top of the screen to snap assist it"
     );
     behaviourGroup.add(snapAssistRow);
+
+    // Layouts section
+    const layoutsGroup = new Adw.PreferencesGroup({
+        title: 'Layouts',
+        description: `Configure the layouts of ${Me.metadata.name}`,
+    });
+    prefsPage.add(layoutsGroup);
+
+    const resetBtn = buildButtonRow(
+        "Reset layouts", 
+        "Reset layouts",
+        "Bring back the default layouts",
+        () => {
+            Settings.reset_layouts_json();
+            const layouts = Settings.get_layouts_json();
+            const selected = Settings.get_selected_layouts().map(val => layouts[0].id);
+            Settings.save_selected_layouts_json(selected);
+        }
+    );
+    layoutsGroup.add(resetBtn);
 }
 
 function buildSwitchRow(settingsKey: string, title: string, subtitle: string): Adw.ActionRow {
@@ -141,4 +160,70 @@ function buildSpinButtonRow(settingsKey: string, title: string, subtitle: string
     return adwRow;
 }
 
+function buildButtonRow(label: string, title: string, subtitle: string, onClick: () => void) {
+    const btn = Gtk.Button.new_with_label(label);
+    btn.connect("clicked", onClick);
+    btn.set_vexpand(false);
+    btn.set_valign(Gtk.Align.CENTER);
+    const adwRow = new Adw.ActionRow({
+        title: title,
+        subtitle: subtitle,
+        activatableWidget: btn
+    });
+    adwRow.add_suffix(btn);
+
+    return adwRow;
+}
+
 export default { init, fillPreferencesWindow };
+
+/*class LayoutWidget extends Gtk.DrawingArea {
+    private _layout: Layout;
+    
+    static {
+        GObject.registerClass(this);
+    }
+
+    constructor(
+        params: Partial<Gtk.DrawingArea.ConstructorProperties> | undefined,
+        layout: Layout
+    ) {
+        super(params);
+        this._layout = layout;
+        this.set_draw_func(this.drawFunc.bind(this));
+    }
+
+    private drawFunc(superDa: Gtk.DrawingArea, ctx: Cairo.Context) {
+        const da = superDa as LayoutWidget;
+        const maxHeight = da.get_allocated_height();
+        const maxWidth = da.get_allocated_width();
+        
+        //const color = da.get_style_context().lookup_color("yellow");
+        const color = da.get_style_context().get_color();
+        //@ts-ignore
+        ctx.setSourceRGBA(color.red, color.green, color.blue, color.alpha);
+        // Because the cairo module isn't real, we have to use these to ignore `any`.
+        // We keep them to the minimum possible scope to catch real errors.
+        /* eslint-disable @typescript-eslint/no-unsafe-call */
+        /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+        //@ts-ignore
+        /*ctx.setLineCap(Cairo.LineCap.SQUARE);
+        //@ts-ignore
+        ctx.setAntialias(Cairo.Antialias.NONE);
+        //@ts-ignore
+        ctx.setLineWidth(1);
+
+        //da.setSourceRGBA(ctx, dividerColor);
+        const gaps = 8;
+
+        this._layout.tiles.forEach(tile => {
+            //@ts-ignore
+            ctx.rectangle(tile.x * maxWidth + gaps, tile.y * maxHeight + gaps, (tile.width * maxWidth) - (gaps*2), (tile.height * maxHeight) - (gaps*2));
+            //@ts-ignore
+            ctx.fill();
+        });
+
+        //@ts-ignore
+        ctx.setLineWidth(2);
+    }
+}*/

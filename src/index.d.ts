@@ -25,7 +25,9 @@ declare global {
             };
             panelMenu: any;
             popupMenu: any;
-            modalDialog: any;
+            modalDialog: {
+                ModalDialog: any;
+            }
             dialog: any;
             switcherPopup: {
                 SwitcherPopup: any;

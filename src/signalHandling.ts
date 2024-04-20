@@ -13,10 +13,20 @@ export default class SignalHandling {
         this._signalsIds[key] = { id: signalId, obj: obj };
     }
 
-    public disconnect() {
-        Object.keys(this._signalsIds).forEach(key => {
-            this._signalsIds[key].obj.disconnect(this._signalsIds[key].id);
-            delete this._signalsIds[key];
-        });
+    public disconnect(): void;
+    public disconnect(obj: ObjectWithSignals) : void;
+    public disconnect(obj?: ObjectWithSignals) {
+        if (!obj) {
+            Object.keys(this._signalsIds).forEach(key => {
+                this._signalsIds[key].obj.disconnect(this._signalsIds[key].id);
+                delete this._signalsIds[key];
+            });
+        } else {
+            const keyFound = Object.keys(this._signalsIds).find(key => this._signalsIds[key].obj === obj);
+            if (keyFound) {
+                obj.disconnect(this._signalsIds[keyFound].id);
+                delete this._signalsIds[keyFound];
+            }
+        }
     }
 }

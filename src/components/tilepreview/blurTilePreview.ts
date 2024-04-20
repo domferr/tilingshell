@@ -1,17 +1,18 @@
 import { registerGObjectClass } from "@/utils/gjs";
-import { BlurEffect } from "@gi-types/shell0";
-import { TilePreview } from "./tilePreview";
+import Shell from "@gi-types/shell0";
+import TilePreview from "./tilePreview";
 
 @registerGObjectClass
-export class BlurTilePreview extends TilePreview {
+export default class BlurTilePreview extends TilePreview {
   _init() {
     super._init();
     this.add_effect(
-      new BlurEffect({
-        sigma: 4,
+      new Shell.BlurEffect({
+        sigma: 12,
         brightness: 1,
-        mode: 1, // blur the background of the widget
+        mode: Shell.BlurMode.BACKGROUND, // blur what is behind the widget
       }),
     );
+    this.add_style_class_name("blur-tile-preview");
   }
 }

@@ -1,29 +1,27 @@
 import { registerGObjectClass } from "@/utils/gjs";
-import { Actor, Margin, AnimationMode } from '@gi-types/clutter10';
 import { getGlobalPosition } from "@/utils/ui";
-import { Rectangle } from "@gi-types/meta10";
-import { LayoutWidget } from "../layout/LayoutWidget";
-import { SnapAssistTile } from "./snapAssistTile";
 import { logger } from "@/utils/shell";
-import { Layout } from "../layout/Layout";
+import Clutter from '@gi-types/clutter10';
+import Meta from "@gi-types/meta10";
+import LayoutWidget from "../layout/LayoutWidget";
+import Layout from "../layout/Layout";
 import Tile from "../layout/Tile";
+import SnapAssistTile from "./snapAssistTile";
 
 const debug = logger("snapAssistLayout");
 
 @registerGObjectClass
-export class SnapAssistLayout extends LayoutWidget<SnapAssistTile> {
-    private static readonly _snapAssistHeight: number = 84;
-    private static readonly _snapAssistWidth: number = 150; // 16:9 ratio. -> (16*this._snapAssistHeight) / 9 and then rounded to int
+export default class SnapAssistLayout extends LayoutWidget<SnapAssistTile> {
+    private static readonly _snapAssistHeight: number = 68;
+    private static readonly _snapAssistWidth: number = 120; // 16:9 ratio. -> (16*this._snapAssistHeight) / 9 and then rounded to int
 
-    constructor(parent: Actor | null, layout: Layout, gaps: Margin, scaleFactor: number) {
-        const rect = new Rectangle({height: SnapAssistLayout._snapAssistHeight * scaleFactor, width: SnapAssistLayout._snapAssistWidth * scaleFactor, x: 0, y: 0});
-        gaps = new Margin({top: gaps.top * scaleFactor, bottom: gaps.bottom * scaleFactor, left: gaps.left * scaleFactor, right: gaps.right * scaleFactor});
-        const outerMargin = Math.min(gaps.top, Math.min(gaps.bottom, Math.min(gaps.left, gaps.right))) * scaleFactor;
-        super(parent, layout, gaps, new Margin({top: outerMargin, bottom: outerMargin, left: outerMargin, right: outerMargin }), rect, "snap-assist-layout");
-        this.ensure_style();
+    constructor(parent: Clutter.Actor | null, layout: Layout, gaps: Clutter.Margin, scaleFactor: number) {
+        const rect = new Meta.Rectangle({height: SnapAssistLayout._snapAssistHeight * scaleFactor, width: SnapAssistLayout._snapAssistWidth * scaleFactor, x: 0, y: 0});
+        gaps = new Clutter.Margin({top: gaps.top * scaleFactor, bottom: gaps.bottom * scaleFactor, left: gaps.left * scaleFactor, right: gaps.right * scaleFactor});
+        super(parent, layout, gaps, new Clutter.Margin(), rect, "snap-assist-layout");
     }
 
-    buildTile(parent: Actor, rect: Rectangle, gaps: Margin, tile: Tile): SnapAssistTile {
+    buildTile(parent: Clutter.Actor, rect: Meta.Rectangle, gaps: Clutter.Margin, tile: Tile): SnapAssistTile {
         return new SnapAssistTile({parent, rect, gaps, tile});
     }
 
@@ -38,36 +36,5 @@ export class SnapAssistLayout extends LayoutWidget<SnapAssistTile> {
                 && cursorPos.y >= pos.y && cursorPos.y <= pos.y + preview.rect.height;
             if (isHovering) return preview;
         }
-    }
-
-    public hide() {
-        this.set_height(0);
-        this.set_opacity(0);
-    }
-
-    public show() {
-        this.set_height(SnapAssistLayout._snapAssistHeight);
-        this.set_opacity(255);
-    }
-
-    public easeHide(params: {duration: number, mode: AnimationMode}) {
-        // @ts-ignore
-        this.ease({
-            height: 0,
-            opacity: 0,
-            duration: params.duration,
-            mode: params.mode,
-        })
-    }
-
-    public easeShow(params: {duration: number, mode: AnimationMode}) {
-        this.show();
-        // @ts-ignore
-        this.ease({
-            height: SnapAssistLayout._snapAssistHeight,
-            opacity: 255,
-            duration: params.duration,
-            mode: params.mode,
-        })
     }
 }

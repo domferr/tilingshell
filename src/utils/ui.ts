@@ -1,7 +1,8 @@
 import { Global } from '@gi-types/shell0';
 import { getCurrentExtension } from '@/utils/shell';
-import { Rectangle } from "@gi-types/meta10";
+import Meta from "@gi-types/meta10";
 import { Actor, Margin } from "@gi-types/clutter10";
+import { ThemeContext } from '@gi-types/st1';
 
 export const global = Global.get();
 export const Main = imports.ui.main;
@@ -12,7 +13,7 @@ export const addToStatusArea = (button: any) => {
     imports.ui.main.panel.addToStatusArea(getCurrentExtension().metadata.uuid, button, 1, 'right');
 };
 
-export const isPointInsideRect = (point: {x: number, y:number }, rect: Rectangle) => {
+export const isPointInsideRect = (point: {x: number, y:number }, rect: Meta.Rectangle) => {
     return point.x >= rect.x && point.x <= rect.x + rect.width &&
         point.y >= rect.y && point.y <= rect.y + rect.height;
 }
@@ -45,7 +46,7 @@ export const getGlobalPosition = (actor: Actor) : {x: number, y: number} => {
     }
 }
 
-export const buildTileMargin = (tilePos: Rectangle, innerMargin: Margin, outerMargin: Margin, containerRect: Rectangle): Margin => {
+export const buildTileMargin = (tilePos: Meta.Rectangle, innerMargin: Margin, outerMargin: Margin, containerRect: Meta.Rectangle): Margin => {
     const isLeft = tilePos.x === containerRect.x;
     const isTop = tilePos.y === containerRect.y;
     const isRight = tilePos.x + tilePos.width === containerRect.x + containerRect.width;
@@ -56,4 +57,25 @@ export const buildTileMargin = (tilePos: Rectangle, innerMargin: Margin, outerMa
         left: isLeft ? outerMargin.left:innerMargin.left/2,
         right: isRight ? outerMargin.right:innerMargin.right/2,
     })
+}
+
+export const getScalingFactor = (monitorIndex: number) => {
+    const scalingFactor = ThemeContext.get_for_stage(global.get_stage()).get_scale_factor();
+    if (scalingFactor === 1) return global.display.get_monitor_scale(monitorIndex);
+    return scalingFactor;
+}
+
+export const getStyleScalingFactor = (monitorIndex: number) => {
+    if (Main.layoutManager.monitors.length == 1) return 1;
+
+    return getScalingFactor(monitorIndex);
+}
+
+export function getWindowsOfMonitor(monitor: Monitor): Meta.Window[] {
+    let windows = global.workspaceManager
+        .get_active_workspace()
+        .list_windows()
+        .filter(win => win.get_window_type() === Meta.WindowType.NORMAL
+                  && Main.layoutManager.monitors[win.get_monitor()] === monitor);
+    return windows;
 }

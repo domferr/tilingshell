@@ -13,7 +13,7 @@
     "moduleResolution": "Node",
     "experimentalDecorators": true,
     "paths": {
-      "@gnome-shell/*": ["./src/gnome-shell-types/*"],
+      "@gnome-shell/*": ["gnome-shell-types/*"],
       "@/*": ["./src/*"]
     }
   },

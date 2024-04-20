@@ -1,20 +1,17 @@
 import { Display, Rectangle, SizeChange, Window, GrabOp } from '@gi-types/meta10';
 import { logger } from "@/utils/shell";
-import { buildTileMargin, global, isPointInsideRect, Main } from "@/utils/ui";
-import { TilingLayout } from "@/components/tilingLayout";
+import { buildTileMargin, getScalingFactor, getStyleScalingFactor, global, isPointInsideRect, Main } from "@/utils/ui";
+import TilingLayout from "@/components/tilingsystem/tilingLayout";
 import { Margin, ModifierType } from "@gi-types/clutter10";
 import { PRIORITY_DEFAULT_IDLE, Source, SOURCE_CONTINUE, SOURCE_REMOVE, timeout_add } from "@gi-types/glib2";
-import { SNAP_ASSIST_SIGNAL, SnapAssist } from './snapassist/snapAssist';
-import { SelectionTilePreview } from './tilepreview/selectionTilePreview';
-import { ThemeContext } from '@gi-types/st1';
+import { SNAP_ASSIST_SIGNAL, SnapAssist } from '../snapassist/snapAssist';
+import SelectionTilePreview from '../tilepreview/selectionTilePreview';
 import Settings from '@/settings';
 import SignalHandling from '@/signalHandling';
-import { Layout } from './layout/Layout';
-import Tile from './layout/Tile';
-import TileUtils from './layout/TileUtils';
-
-const SIGNAL_GRAB_OP_BEGIN = 'grab-op-begin';
-const SIGNAL_GRAB_OP_END = 'grab-op-end';
+import Layout from '../layout/Layout';
+import Tile from '../layout/Tile';
+import TileUtils from '../layout/TileUtils';
+import GlobalState from '@/globalState';
 
 export class TilingManager {
     private readonly _monitor: Monitor;
@@ -43,22 +40,15 @@ export class TilingManager {
     /**
      * Constructs a new TilingManager instance.
      * @param monitor The monitor to manage tiling for.
-     * @param layouts Available tiling layouts.
-     * @param selectedLayout Index of the selected layout.
-     * @param innerMargin Inner margin for tiling.
-     * @param outerMargin Outer margin for tiling.
      */
     constructor(monitor: Monitor) {
         this._monitor = monitor;
         this._signals = new SignalHandling();
         this._debug = logger(`TilingManager ${monitor.index}`);
-        const layout: Layout = Settings.get_layouts()[Settings.get_selected_layouts()[monitor.index]];
+        const layout: Layout = GlobalState.get().getSelectedLayoutOfMonitor(monitor.index);
 
         // handle scale factor of the monitor
-        this._scaleFactor = ThemeContext.get_for_stage(global.get_stage()).get_scale_factor();
-        if (this._scaleFactor === 1) this._scaleFactor = global.display.get_monitor_scale(monitor.index);
-        this._debug(`monitor ${monitor.index} scale factor is ${global.display.get_monitor_scale(monitor.index)} and ThemeContext scale factor is ${ThemeContext.get_for_stage(global.get_stage()).get_scale_factor()}`);
-        
+        this._scaleFactor = getScalingFactor(monitor.index);
         this._innerGaps = new Margin(Settings.get_inner_gaps(this._scaleFactor));
         this._outerGaps = new Margin(Settings.get_outer_gaps(this._scaleFactor));
 
@@ -68,12 +58,12 @@ export class TilingManager {
 
         // build the tiling layout
         this._tilingLayout = new TilingLayout(layout, this._innerGaps, this._outerGaps, this._workArea);
-        
-        // build the snap assistant
-        this._snapAssist = new SnapAssist(global.window_group, this._workArea, this._scaleFactor);
 
         // build the selection tile
         this._selectedTilesPreview = new SelectionTilePreview({ parent: global.window_group });
+        
+        // build the snap assistant
+        this._snapAssist = new SnapAssist(global.window_group, this._workArea, this._scaleFactor, getStyleScalingFactor(monitor.index));
     }
 
     /**
@@ -84,7 +74,11 @@ export class TilingManager {
      */
     public enable() {
         this._signals.connect(Settings, Settings.SETTING_SELECTED_LAYOUTS, () => {
-            const layout: Layout = Settings.get_layouts()[Settings.get_selected_layouts()[this._monitor.index]];
+            const layout = GlobalState.get().getSelectedLayoutOfMonitor(this._monitor.index);
+            this._tilingLayout.relayout({ layout });
+        });
+        this._signals.connect(GlobalState.get(), GlobalState.SIGNAL_LAYOUTS_CHANGED, () => {
+            const layout = GlobalState.get().getSelectedLayoutOfMonitor(this._monitor.index);
             this._tilingLayout.relayout({ layout });
         });
         
@@ -97,15 +91,14 @@ export class TilingManager {
             this._tilingLayout.relayout({ outerMargin: this._outerGaps });
         });
 
-        this._signals.connect(global.display, SIGNAL_GRAB_OP_BEGIN, (_display: Display, window: Window, grabOp: GrabOp) => {
+        this._signals.connect(global.display, 'grab-op-begin', (_display: Display, window: Window, grabOp: GrabOp) => {
             if (grabOp != GrabOp.MOVING) return;
 
             this._onWindowGrabBegin(window);
         });
 
-        this._signals.connect(global.display, SIGNAL_GRAB_OP_END, (_display: Display, window: Window, grabOp: GrabOp) => {
-            if (grabOp != GrabOp.MOVING) return;
-            if (!window.allows_resize() || !window.allows_move()) return;
+        this._signals.connect(global.display, 'grab-op-end', (_display: Display, window: Window, grabOp: GrabOp) => {
+            if (!this._isGrabbingWindow) return;
 
             this._onWindowGrabEnd(window);
         });
@@ -144,6 +137,8 @@ export class TilingManager {
     }
 
     private _onWindowGrabBegin(window: Window) {
+        if (this._isGrabbingWindow) return;
+
         this._isGrabbingWindow = true;
         this._movingWindowTimerId = timeout_add(
             PRIORITY_DEFAULT_IDLE,
@@ -165,7 +160,7 @@ export class TilingManager {
         if (!window.allows_resize() || !window.allows_move() || !this._isPointerInsideThisMonitor()) {
             this._tilingLayout.close();
             this._selectedTilesPreview.close();
-            this._snapAssist.close();
+            this._snapAssist.close(true);
             this._isSnapAssisting = false;
             
             return SOURCE_CONTINUE;
@@ -209,7 +204,7 @@ export class TilingManager {
         if (!this._tilingLayout.showing) {
             //this._debug("open layout below grabbed window");
             this._tilingLayout.openAbove(window);
-            this._snapAssist.close();
+            this._snapAssist.close(true);
         }
         // if it was snap assisting then close the selection tile preview. We may reopen it if that's the case
         if (this._isSnapAssisting) {
@@ -221,7 +216,6 @@ export class TilingManager {
         if (!changedSpanMultipleTiles && isPointInsideRect(currPointerPos, this._selectedTilesPreview.rect)) {
             return SOURCE_CONTINUE;
         }
-        //this._debug("update selection tile");
         
         let selectionRect = this._tilingLayout.getTileBelow(currPointerPos);
         if (!selectionRect) return SOURCE_CONTINUE;
@@ -252,7 +246,7 @@ export class TilingManager {
             height: this._selectedTilesPreview.innerHeight
         });
         this._selectedTilesPreview.close();
-        this._snapAssist.close();
+        this._snapAssist.close(true);
         this._lastCursorPos = null;
         
         const isCtrlPressed = (global.get_pointer()[2] & ModifierType.CONTROL_MASK);
@@ -278,19 +272,19 @@ export class TilingManager {
             global.window_manager,
             windowActor,
             window.get_frame_rect().copy(),
-            SizeChange.MAXIMIZE
+            SizeChange.UNMAXIMIZE
         );
         
         // move and resize the window to the current selection
         window.move_to_monitor(this._monitor.index);
-        window.move_frame(true, selectionRect.x, selectionRect.y);
         window.move_resize_frame(
-            true,
+            false,
             selectionRect.x,
             selectionRect.y,
             selectionRect.width,
             selectionRect.height
         );
+        //window.move_frame(true, selectionRect.x, selectionRect.y);
     }
 
     private _onSnapAssist(tile: Tile) {
@@ -304,11 +298,11 @@ export class TilingManager {
         // We apply the proportions to get tile size and position relative to the work area 
         const scaledRect = TileUtils.apply_props(tile, this._workArea);
         // ensure the rect doesn't go horizontally beyond the workarea
-        if (scaledRect.x + scaledRect.width > this._workArea.width) {
+        if (scaledRect.x + scaledRect.width > this._workArea.x + this._workArea.width) {
             scaledRect.width -= scaledRect.x + scaledRect.width - this._workArea.x - this._workArea.width;
         }
         // ensure the rect doesn't go vertically beyond the workarea
-        if (scaledRect.y + scaledRect.height > this._workArea.height) {
+        if (scaledRect.y + scaledRect.height > this._workArea.y + this._workArea.height) {
             scaledRect.height -= scaledRect.y + scaledRect.height - this._workArea.y - this._workArea.height;
         }
         
@@ -319,7 +313,7 @@ export class TilingManager {
         if (!this._isSnapAssisting) {
             const parent = this._snapAssist.get_parent();
             if (parent && parent === this._selectedTilesPreview.get_parent()) {
-                parent.set_child_above_sibling(this._snapAssist, this._selectedTilesPreview);
+                parent?.set_child_above_sibling(this._snapAssist, this._selectedTilesPreview);
             }
         }
         this._isSnapAssisting = true;

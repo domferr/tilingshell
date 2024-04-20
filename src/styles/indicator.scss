@@ -1,0 +1,17 @@
+.indicator-menu-item {
+    background-color: transparent !important;
+
+    .buttons-box-layout {
+        spacing: 16px;
+    }
+
+    // workaround to hide the empty space created by the popup ornament
+    .popup-menu-ornament {
+        width: 0;
+        height: 0;
+    }
+
+    .snap-assist-tile {
+        border-radius: 2px;
+    }
+}

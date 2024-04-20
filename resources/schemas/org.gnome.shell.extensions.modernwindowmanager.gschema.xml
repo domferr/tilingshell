@@ -2,6 +2,11 @@
 <schemalist gettext-domain="gnome-shell-extensions">
 
     <schema path="/org/gnome/shell/extensions/modernwindowmanager/" id="org.gnome.shell.extensions.modernwindowmanager">
+        <key name="last-version-installed" type="u">
+            <default>0</default>
+            <summary>Last version installed</summary>
+            <description>Last version installed of this extension.</description>
+        </key>
         <key name="enable-tiling-system" type="b">
             <default>true</default>
             <summary>Enable tiling system</summary>

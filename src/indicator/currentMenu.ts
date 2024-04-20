@@ -1,0 +1,3 @@
+interface CurrentMenu {
+    destroy(): void;
+}

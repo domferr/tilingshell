@@ -1,36 +1,38 @@
-import {Widget} from "@gi-types/st1";
-import {Rectangle, Window} from "@gi-types/meta10";
-import {registerGObjectClass} from "@/utils/gjs";
-import {logger} from "@/utils/shell";
-import {global} from "@/utils/ui";
-import { Actor, AnimationMode, Margin } from '@gi-types/clutter10';
-import Tile from "../layout/Tile";
+import St from "@gi-types/st1";
+import Meta from "@gi-types/meta10";
+import { registerGObjectClass } from "@/utils/gjs";
+import { logger } from "@/utils/shell";
+import { global } from "@/utils/ui";
+import Clutter from '@gi-types/clutter10';
 
 export const WINDOW_ANIMATION_TIME = 100;
 
 const debug = logger('tilePreview');
 
-@registerGObjectClass
-export class TilePreview extends Widget {
-  private _gaps: Margin;
-  protected _rect: Rectangle;
-  protected _showing: boolean;
-  protected _tile: Tile;
+export module TilePreview {
+  export interface ConstructorProperties 
+    extends St.Widget.ConstructorProperties {
+        parent: Clutter.Actor;
+        rect: Meta.Rectangle;
+        gaps: Clutter.Margin;
+  }
+}
 
-  constructor(params: {
-    parent?: Actor,
-    rect?: Rectangle,
-    gaps?: Margin,
-    tile: Tile
-  }) {
-    super();
-    this._rect = params.rect || new Rectangle({ width: 0 });
-    this._gaps = params.gaps || new Margin();
+@registerGObjectClass
+export default class TilePreview extends St.Widget {
+  protected _rect: Meta.Rectangle;
+  protected _showing: boolean;
+  
+  private _gaps: Clutter.Margin;
+
+  constructor(params: Partial<TilePreview.ConstructorProperties>) {
+    super(params);
+    this._rect = params.rect || new Meta.Rectangle({ width: 0 });
+    this._gaps = params.gaps || new Clutter.Margin();
     if (params.parent) params.parent.add_child(this);
-    this._tile = params.tile;
   }
 
-  public set gaps(gaps: Margin) {
+  public set gaps(gaps: Clutter.Margin) {
     this._gaps = gaps;
   }
 
@@ -57,7 +59,7 @@ export class TilePreview extends Widget {
     return this._rect.height - this._gaps.top - this._gaps.bottom;
   }
 
-  public get rect(): Rectangle {
+  public get rect(): Meta.Rectangle {
     return this._rect;
   }
 
@@ -65,13 +67,7 @@ export class TilePreview extends Widget {
     return this._showing;
   }
 
-  /*public set rect(newRect: Rectangle) {
-    this._rect = newRect;
-    this.set_size(this._rect.width, this._rect.height);
-    this.set_position(this._rect.x, this._rect.y);
-  }*/
-
-  open(ease: boolean = false, position?: Rectangle) {
+  public open(ease: boolean = false, position?: Meta.Rectangle) {
     if (position) this._rect = position;
     
     /*debug(
@@ -89,7 +85,7 @@ export class TilePreview extends Widget {
         height: this.innerHeight,
         opacity: 255,
         duration: ease ? WINDOW_ANIMATION_TIME : 0,
-        mode: AnimationMode.EASE_OUT_QUAD,
+        mode: Clutter.AnimationMode.EASE_OUT_QUAD,
       });
     } else {
       this.set_position(this.innerX, this.innerY);
@@ -98,12 +94,12 @@ export class TilePreview extends Widget {
       this.ease({
         opacity: 255,
         duration: ease ? WINDOW_ANIMATION_TIME : 0,
-        mode: AnimationMode.EASE_OUT_QUAD,
+        mode: Clutter.AnimationMode.EASE_OUT_QUAD,
       });
     }
   }
 
-  openBelow(window: Window, ease: boolean = false, position?: Rectangle) {
+  public openBelow(window: Meta.Window, ease: boolean = false, position?: Meta.Rectangle) {
     if (this.get_parent() === global.window_group) {
       let windowActor = window.get_compositor_private();
       if (!windowActor) return;
@@ -113,7 +109,7 @@ export class TilePreview extends Widget {
     this.open(ease, position);
   }
 
-  openAbove(window: Window, ease: boolean = false, position?: Rectangle) {
+  public openAbove(window: Meta.Window, ease: boolean = false, position?: Meta.Rectangle) {
     if (this.get_parent() === global.window_group) {
       let windowActor = window.get_compositor_private();
       if (!windowActor) return;
@@ -123,7 +119,7 @@ export class TilePreview extends Widget {
     this.open(ease, position);
   }
 
-  close() {
+  public close() {
     if (!this._showing) return;
 
     this._showing = false;
@@ -131,13 +127,8 @@ export class TilePreview extends Widget {
     this.ease({
       opacity: 0,
       duration: WINDOW_ANIMATION_TIME,
-      mode: AnimationMode.EASE_OUT_QUAD,
+      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
       onComplete: () => this.hide(),
     });
-  }
-
-  destroy() {
-    //debug(`destroy tile at position { x: ${this.x}, y: ${this.y} }`);
-    super.destroy();
   }
 }

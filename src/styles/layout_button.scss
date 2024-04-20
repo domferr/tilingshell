@@ -1,0 +1,27 @@
+.layouts-box-layout {
+    spacing: 12px;
+}
+
+.layout-button {
+    padding: calc($base_padding / 2);
+}
+
+.layout-button:hover {
+    border: rgba(255,255,255,0.8) solid 1px;
+    background-color: rgba(255,255,255,0.25);
+
+    .snap-assist-tile {
+        background-color: rgba(255,255,255,0.3);
+        border: 1px solid rgba(255,255,255,0.5);
+    }
+}
+
+.layout-button:checked {
+    border: rgba(255,255,255,0.8) solid 1px;
+    background-color: rgba(255,255,255,0.25);
+
+    .snap-assist-tile {
+        background-color: rgba(255,255,255,0.3);
+        border: 1px solid rgba(255,255,255,0.5);
+    }
+}
