@@ -1,72 +1,14 @@
-import { LayoutManager } from "@gnome-shell/main";
-
 export {};
 
-declare global {
-    export const imports: {
-        lang: any;
-        ui: {
-            layout: any;
-            lightbox: any;
-            messageTray: any;
-            main: {
-                notify: (text: string, body: string) => void;
-                messageTray: {
-                    add(source: any): any;
-                };
-                panel: any;
-                wm: any;
-                layoutManager: LayoutManager;
-                uiGroup: any;
-                extensionManager: any;
-                overview: {
-                    hide(): any;
-                };
-            };
-            panelMenu: any;
-            popupMenu: any;
-            modalDialog: {
-                ModalDialog: any;
-            }
-            dialog: any;
-            switcherPopup: {
-                SwitcherPopup: any;
-            };
-        };
-        misc: {
-            extensionUtils: {
-                initTranslations: (domain: string) => void;
-                getCurrentExtension: () => any;
-                openPrefs: () => void;
-                getSettings: () => any;
-            };
-            config: any;
-        };
-        byteArray: {
-            fromString: (input: string) => Uint8Array;
-            fromArray: (input: number[]) => any;
-            fromGBytes: (input: any) => Uint8Array;
-            toString: (x: Uint8Array) => string;
-        };
-        gettext: any;
-    };
-    export interface Monitor {
-        index: number;
-        width: number;
-        height: number;
-        x: number;
-        y: number;
-    }
-
-    export const log: (arg: any) => void;
-}
-
-declare module '@gi-types/gobject2' {
+declare module 'gi://GObject' {
     export interface MetaInfo {
         GTypeName: string;
+        //@ts-ignore
         GTypeFlags?: TypeFlags;
         Implements?: Function[];
+        //@ts-ignore
         Properties?: { [K: string]: ParamSpec };
+        //@ts-ignore
         Signals?: { [K: string]: SignalDefinition };
         Requires?: Function[];
         CssName?: string;
@@ -74,6 +16,4 @@ declare module '@gi-types/gobject2' {
         Children?: string[];
         InternalChildren?: string[];
     }
-
-    export let TYPE_JSOBJECT: any; 
 }

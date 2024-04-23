@@ -1,33 +1,34 @@
-import { Widget } from "@gi-types/st1";
+import St from "gi://St";
 import TilePreview from "../tilepreview/tilePreview";
-import { Actor, Margin } from '@gi-types/clutter10';
-import { Rectangle } from "@gi-types/meta10";
-import { registerGObjectClass } from "@/utils/gjs";
-import { buildTileMargin } from "@/utils/ui";
+import Clutter from 'gi://Clutter';
+import Mtk from 'gi://Mtk';
+import GObject from 'gi://GObject';
+import { buildRectangle, buildTileMargin } from "@/utils/ui";
 import { logger } from "@/utils/shell";
 import Layout from "./Layout";
 import Tile from "./Tile";
 import TileUtils from "./TileUtils";
+import { registerGObjectClass } from "@utils/gjs";
 
 const debug = logger(`LayoutWidget`);
 
 // A widget to draw a layout
 @registerGObjectClass
-export default class LayoutWidget<TileType extends TilePreview> extends Widget {
+export default class LayoutWidget<TileType extends TilePreview> extends St.Widget {
     protected _previews: TileType[];
-    protected _containerRect: Rectangle;
+    protected _containerRect: Mtk.Rectangle;
     protected _layout: Layout;
-    protected _innerMargin: Margin;
-    protected _outerMargin: Margin;
+    protected _innerMargin: Clutter.Margin;
+    protected _outerMargin: Clutter.Margin;
 
-    constructor(parent: Actor | null, layout: Layout, innerMargin: Margin, outerMargin: Margin, containerRect: Rectangle, style_class: string = "") {
-        super({ style_class });
+    constructor(parent: Clutter.Actor | null, layout: Layout, innerMargin: Clutter.Margin, outerMargin: Clutter.Margin, containerRect: Mtk.Rectangle, styleClass: string = "") {
+        super({ styleClass });
         if (parent) parent.add_child(this);
         this._previews = [];
-        this._containerRect = new Rectangle();
+        this._containerRect = buildRectangle();
         this._layout = new Layout([], "");
-        this._innerMargin = new Margin();
-        this._outerMargin = new Margin();
+        this._innerMargin = new Clutter.Margin();
+        this._outerMargin = new Clutter.Margin();
         this.relayout({ containerRect, layout, innerMargin, outerMargin });
     }
 
@@ -39,15 +40,15 @@ export default class LayoutWidget<TileType extends TilePreview> extends Widget {
         });
     }
 
-    protected buildTile(parent: Actor, rect: Rectangle, margin: Margin, tile: Tile): TileType {
+    protected buildTile(parent: Clutter.Actor, rect: Mtk.Rectangle, margin: Clutter.Margin, tile: Tile): TileType {
         throw("This class shouldn't be instantiated but it should be extended instead");
     }
 
     public relayout(params?: Partial<{
         layout: Layout,
-        containerRect: Rectangle, 
-        innerMargin: Margin, 
-        outerMargin: Margin
+        containerRect: Mtk.Rectangle, 
+        innerMargin: Clutter.Margin, 
+        outerMargin: Clutter.Margin
     }>) {
         var trigger_relayout = false;
         if (params?.innerMargin) {

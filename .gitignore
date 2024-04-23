@@ -39,8 +39,9 @@ node_modules/
 .env
 .env.test
 
-# rollup.js default build output
+# build outputs
 dist/
+dist_legacy/
 
 ### VisualStudioCode ###
 .vscode/*

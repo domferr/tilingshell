@@ -12,6 +12,6 @@
     }
 
     .snap-assist-tile {
-        border-radius: 2px;
+        border-radius-value: $snap-assist-tile-border-radius - 2;
     }
 }

@@ -1,21 +1,17 @@
 import Layout from "./components/layout/Layout";
-import { registerGObjectClass } from "./utils/gjs";
 import Settings from "./settings";
 import SignalHandling from "./signalHandling";
-import GObject, { MetaInfo } from "@gi-types/gobject2";
-import { Main } from "./utils/ui";
+import GObject from "gi://GObject";
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-@registerGObjectClass
-export default class GlobalState extends GObject.Object {
-    static metaInfo: MetaInfo = {
-        Signals: {
-            "layouts-changed": { 
-                param_types: []
-            },
+export default GObject.registerClass({
+    GTypeName: 'GlobalState',
+    Signals: {
+        "layouts-changed": { 
+            param_types: []
         },
-        GTypeName: "GlobalState"
-    }
-
+    },
+}, class GlobalState extends GObject.Object {
     public static SIGNAL_LAYOUTS_CHANGED = "layouts-changed";
 
     private static _instance: GlobalState | null;
@@ -95,4 +91,4 @@ export default class GlobalState extends GObject.Object {
         
         return this._layouts.find(lay => lay.id === selectedLayouts[monitorIndex]) || this._layouts[0];
     }
-}
+})

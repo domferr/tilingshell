@@ -1,6 +1,6 @@
 import { registerGObjectClass } from "@/utils/gjs";
-import Meta from "@gi-types/meta10";
-import Clutter from '@gi-types/clutter10';
+import Mtk from 'gi://Mtk';
+import Clutter from 'gi://Clutter';
 import TilePreview from "./tilePreview";
 import { logger } from "@/utils/shell";
 
@@ -13,7 +13,7 @@ export default class SelectionTilePreview extends TilePreview {
 
   constructor(params: {
     parent?: Clutter.Actor,
-    rect?: Meta.Rectangle,
+    rect?: Mtk.Rectangle,
     gaps?: Clutter.Margin,
   }) {
     super({ name:"SelectionTilePreview", ...params });
@@ -50,11 +50,6 @@ export default class SelectionTilePreview extends TilePreview {
     this._rect.width = 0;
     this._rect.height = 0;
     super.close();
-  }
-
-  public open(ease?: boolean, position?: Meta.Rectangle | undefined): void {
-    super.open(ease, position);
-    debug(`x:${position?.x} y:${position?.y} width:${position?.width} height:${position?.height}`);
   }
 
   destroy() {

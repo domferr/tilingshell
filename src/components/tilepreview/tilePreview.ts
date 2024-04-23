@@ -1,9 +1,10 @@
-import St from "@gi-types/st1";
-import Meta from "@gi-types/meta10";
+import St from 'gi://St';
+import Meta from 'gi://Meta';
+import Mtk from "gi://Mtk";
 import { registerGObjectClass } from "@/utils/gjs";
 import { logger } from "@/utils/shell";
-import { global } from "@/utils/ui";
-import Clutter from '@gi-types/clutter10';
+import Clutter from 'gi://Clutter';
+import { buildRectangle } from '@utils/ui';
 
 export const WINDOW_ANIMATION_TIME = 100;
 
@@ -13,21 +14,22 @@ export module TilePreview {
   export interface ConstructorProperties 
     extends St.Widget.ConstructorProperties {
         parent: Clutter.Actor;
-        rect: Meta.Rectangle;
+        rect: Mtk.Rectangle;
         gaps: Clutter.Margin;
   }
 }
 
 @registerGObjectClass
 export default class TilePreview extends St.Widget {
-  protected _rect: Meta.Rectangle;
+  protected _rect: Mtk.Rectangle;
   protected _showing: boolean;
   
   private _gaps: Clutter.Margin;
 
   constructor(params: Partial<TilePreview.ConstructorProperties>) {
     super(params);
-    this._rect = params.rect || new Meta.Rectangle({ width: 0 });
+    this._showing = false;
+    this._rect = params.rect || buildRectangle({});
     this._gaps = params.gaps || new Clutter.Margin();
     if (params.parent) params.parent.add_child(this);
   }
@@ -40,7 +42,6 @@ export default class TilePreview extends St.Widget {
     super._init();
     this.set_style_class_name('tile-preview custom-tile-preview');
     this.hide();
-    this._showing = false;
   }
 
   public get innerX(): number {
@@ -59,7 +60,7 @@ export default class TilePreview extends St.Widget {
     return this._rect.height - this._gaps.top - this._gaps.bottom;
   }
 
-  public get rect(): Meta.Rectangle {
+  public get rect(): Mtk.Rectangle {
     return this._rect;
   }
 
@@ -67,7 +68,7 @@ export default class TilePreview extends St.Widget {
     return this._showing;
   }
 
-  public open(ease: boolean = false, position?: Meta.Rectangle) {
+  public open(ease: boolean = false, position?: Mtk.Rectangle) {
     if (position) this._rect = position;
     
     /*debug(
@@ -99,21 +100,21 @@ export default class TilePreview extends St.Widget {
     }
   }
 
-  public openBelow(window: Meta.Window, ease: boolean = false, position?: Meta.Rectangle) {
-    if (this.get_parent() === global.window_group) {
+  public openBelow(window: Meta.Window, ease: boolean = false, position?: Mtk.Rectangle) {
+    if (this.get_parent() === global.windowGroup) {
       let windowActor = window.get_compositor_private();
       if (!windowActor) return;
-      global.window_group.set_child_below_sibling(this, windowActor as any);
+      global.windowGroup.set_child_below_sibling(this, windowActor as any);
     }
 
     this.open(ease, position);
   }
 
-  public openAbove(window: Meta.Window, ease: boolean = false, position?: Meta.Rectangle) {
-    if (this.get_parent() === global.window_group) {
+  public openAbove(window: Meta.Window, ease: boolean = false, position?: Mtk.Rectangle) {
+    if (this.get_parent() === global.windowGroup) {
       let windowActor = window.get_compositor_private();
       if (!windowActor) return;
-      global.window_group.set_child_above_sibling(this, windowActor as any);
+      global.windowGroup.set_child_above_sibling(this, windowActor as any);
     }
 
     this.open(ease, position);

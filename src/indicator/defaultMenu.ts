@@ -1,21 +1,22 @@
-import St from '@gi-types/st1';
-import Clutter from '@gi-types/clutter10';
+import St from 'gi://St';
+import Clutter from 'gi://Clutter';
 import SignalHandling from "@/signalHandling";
 import Indicator from "./indicator";
-import { Main, getScalingFactor } from '@/utils/ui';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import { getScalingFactor } from '@/utils/ui';
 import Settings from '@/settings';
 import * as IndicatorUtils from './utils';
 import GlobalState from '@/globalState';
-import LayoutSelectionWidget from './layoutSelectionWidget';
-
-const { PopupBaseMenuItem } = imports.ui.popupMenu;
+import CurrentMenu from './currentMenu';
+import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
+import LayoutButton from './layoutButton';
 
 export default class DefaultMenu implements CurrentMenu {
     private readonly _signals: SignalHandling;
     private readonly _indicator: Indicator;
 
     private _layoutsBoxLayout: St.BoxLayout;
-    private _layoutsButtons: St.Button[];
+    private _layoutsButtons: LayoutButton[];
     private _scalingFactor: number;
 
     constructor(indicator: Indicator) {
@@ -23,21 +24,21 @@ export default class DefaultMenu implements CurrentMenu {
         this._indicator = indicator;
         this._signals = new SignalHandling();
 
-        //@ts-ignore
         let monitor = Main.layoutManager.findMonitorForActor(indicator);
         this._scalingFactor = getScalingFactor(monitor?.index || Main.layoutManager.primaryIndex);
 
         this._layoutsBoxLayout = new St.BoxLayout({
-            x_align: Clutter.ActorAlign.CENTER,
-            y_align: Clutter.ActorAlign.CENTER,
-            x_expand: true,
-            y_expand: true,
+            xAlign: Clutter.ActorAlign.CENTER,
+            yAlign: Clutter.ActorAlign.CENTER,
+            xExpand: true,
+            yExpand: true,
             vertical: false, // horizontal box layout
-            style_class: "layouts-box-layout"
+            styleClass: "layouts-box-layout"
         });
-        const layoutsPopupMenu = new PopupBaseMenuItem({ style_class: 'indicator-menu-item' });
-        layoutsPopupMenu.add_actor(this._layoutsBoxLayout);
-        this._indicator.menu.addMenuItem(layoutsPopupMenu);
+        const layoutsPopupMenu = new PopupMenu.PopupBaseMenuItem({ style_class: 'indicator-menu-item' });
+        layoutsPopupMenu.add_child(this._layoutsBoxLayout);
+
+        (this._indicator.menu as PopupMenu.PopupMenu).addMenuItem(layoutsPopupMenu);
 
         this._drawLayouts();
         // update the layouts shown by the indicator when they are modified
@@ -49,7 +50,7 @@ export default class DefaultMenu implements CurrentMenu {
         });
 
         const buttonsPopupMenu = this._buildEditingButtonsRow();
-        this._indicator.menu.addMenuItem(buttonsPopupMenu);
+        (this._indicator.menu as PopupMenu.PopupMenu).addMenuItem(buttonsPopupMenu);
 
         // if the selected layout was changed externaly, update the selected button
         this._signals.connect(Settings, Settings.SETTING_SELECTED_LAYOUTS, () => {
@@ -60,8 +61,7 @@ export default class DefaultMenu implements CurrentMenu {
         });
 
         this._signals.connect(Main.layoutManager, 'monitors-changed', () => {
-            //@ts-ignore
-            let monitor = Main.layoutManager.findMonitorForActor(this);
+            let monitor = Main.layoutManager.findMonitorForActor(this._indicator);
             const newScalingFactor = getScalingFactor(monitor?.index || Main.layoutManager.primaryIndex);
             if (this._scalingFactor === newScalingFactor) return;
 
@@ -72,12 +72,12 @@ export default class DefaultMenu implements CurrentMenu {
 
     private _buildEditingButtonsRow() {
         const buttonsBoxLayout = new St.BoxLayout({
-            x_align: Clutter.ActorAlign.CENTER,
-            y_align: Clutter.ActorAlign.CENTER,
-            x_expand: true,
-            y_expand: true,
+            xAlign: Clutter.ActorAlign.CENTER,
+            yAlign: Clutter.ActorAlign.CENTER,
+            xExpand: true,
+            yExpand: true,
             vertical: false, // horizontal box layout
-            style_class: "buttons-box-layout"
+            styleClass: "buttons-box-layout"
         });
 
         const editLayoutsBtn = IndicatorUtils.createButton("document-edit-symbolic", "Edit Layouts...");
@@ -87,8 +87,9 @@ export default class DefaultMenu implements CurrentMenu {
         newLayoutBtn.connect('clicked', (self) => this._indicator.newLayoutOnClick(true) );
         buttonsBoxLayout.add_child(newLayoutBtn);
 
-        const buttonsPopupMenu = new PopupBaseMenuItem({ style_class: 'indicator-menu-item' });
-        buttonsPopupMenu.add_actor(buttonsBoxLayout);
+        const buttonsPopupMenu = new PopupMenu.PopupBaseMenuItem({ style_class: 'indicator-menu-item' });
+        buttonsPopupMenu.add_child(buttonsBoxLayout);
+        
         return buttonsPopupMenu;
     }
 
@@ -103,9 +104,7 @@ export default class DefaultMenu implements CurrentMenu {
         const layoutHeight: number = 36;
         const layoutWidth: number = 64; // 16:9 ratio. -> (16*layoutHeight) / 9 and then rounded to int
         this._layoutsButtons = layouts.map((lay, btnInd) => {
-            const btn = new St.Button({x_expand: false, style_class: "layout-button button"});
-            btn.child = new LayoutSelectionWidget(lay, hasGaps ? 1:0, this._scalingFactor, layoutHeight, layoutWidth);
-            this._layoutsBoxLayout.add_child(btn);
+            const btn = new LayoutButton(this._layoutsBoxLayout, lay, hasGaps ? 1:0, this._scalingFactor, layoutHeight, layoutWidth);
             btn.connect('clicked', (self) => !btn.checked && this._indicator.selectLayoutOnClick(lay));
             return btn;
         });
@@ -116,6 +115,7 @@ export default class DefaultMenu implements CurrentMenu {
     }
 
     public destroy() {
+        //@ts-ignore todo
         this._indicator.menu.removeAll();
         this._layoutsButtons = [];
         this._signals.disconnect();

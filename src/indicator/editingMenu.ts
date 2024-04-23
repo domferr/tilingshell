@@ -1,8 +1,8 @@
-import St from '@gi-types/st1';
+import St from 'gi://St';
 import Indicator from './indicator';
 import * as IndicatorUtils from './utils';
-
-const { PopupBaseMenuItem } = imports.ui.popupMenu;
+import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
+import CurrentMenu from './currentMenu';
 
 export default class EditingMenu implements CurrentMenu {
     private readonly _indicator: Indicator;
@@ -12,11 +12,11 @@ export default class EditingMenu implements CurrentMenu {
 
         const boxLayout = new St.BoxLayout({
             vertical: true,
-            style_class: "buttons-box-layout",
-            x_expand: true,
+            styleClass: "buttons-box-layout",
+            xExpand: true,
             style: "spacing: 8px"
         });
-        const menuItem = new PopupBaseMenuItem({ style_class: 'indicator-menu-item' });
+        const menuItem = new PopupMenu.PopupBaseMenuItem({ style_class: 'indicator-menu-item' });
 
         const openMenuBtn = IndicatorUtils.createButton("video-display-symbolic", "Menu");
         openMenuBtn.connect('clicked', (self) => this._indicator.openMenu(false) );
@@ -42,10 +42,12 @@ export default class EditingMenu implements CurrentMenu {
 
         menuItem.add_child(boxLayout);
 
+        //@ts-ignore todo
         this._indicator.menu.addMenuItem(menuItem);
     }
 
     destroy(): void {
+        //@ts-ignore todo
         this._indicator.menu.removeAll();
     }
 }

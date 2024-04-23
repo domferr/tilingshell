@@ -1,42 +1,41 @@
-import { registerGObjectClass } from "@/utils/gjs";
 import TilePreview from "../tilepreview/tilePreview";
-import St from "@gi-types/st1";
-import Clutter from "@gi-types/clutter10";
-import Meta from "@gi-types/meta10";
+import St from 'gi://St';
+import Clutter from "gi://Clutter";
+import Mtk from "gi://Mtk";
 import Tile from "../layout/Tile";
 import Slider from "./slider";
 import TileUtils from "../layout/TileUtils";
 import { logger } from "@/utils/shell";
-import GObject from "@gi-types/gobject2";
-import HoverLine from "./hoverLine";
+import { MetaInfo } from "gi://GObject";
+import { registerGObjectClass } from "@utils/gjs";
 
 const debug = logger("EditableTilePreview");
 
 @registerGObjectClass
 export default class EditableTilePreview extends TilePreview {
-    static metaInfo: GObject.MetaInfo = {
+    static metaInfo: MetaInfo = {
         Signals: {
             "size-changed": { 
-                param_types: [ Meta.Rectangle.$gtype, Meta.Rectangle.$gtype ] // oldSize, newSize
+                //@ts-ignore todo
+                param_types: [ Mtk.Rectangle.$gtype, Mtk.Rectangle.$gtype ] // oldSize, newSize
             },
         },
         GTypeName: "EditableTilePreview"
     }
-
     public static MIN_TILE_SIZE: number = 140;
 
     private readonly _btn: St.Button;
     private readonly _tile: Tile;
-    private readonly _containerRect: Meta.Rectangle;
+    private readonly _containerRect: Mtk.Rectangle;
 
     private _sliders: (Slider | null)[];
     private _signals: (number | null)[];
 
     constructor(params: {
         tile: Tile,
-        containerRect: Meta.Rectangle,
+        containerRect: Mtk.Rectangle,
         parent?: Clutter.Actor,
-        rect?: Meta.Rectangle,
+        rect?: Mtk.Rectangle,
         gaps?: Clutter.Margin
     }) {
         super(params);
@@ -46,9 +45,9 @@ export default class EditableTilePreview extends TilePreview {
         this._sliders = [null, null, null, null];
         this._signals = [null, null, null, null];
         this._btn = new St.Button({
-            style_class: "editable-tile-preview-button",
-            x_expand: true,
-            track_hover: true
+            styleClass: "editable-tile-preview-button",
+            xExpand: true,
+            trackHover: true
         });
         this.add_child(this._btn);
         this._btn.set_size(this.innerWidth, this.innerHeight);
@@ -123,11 +122,13 @@ export default class EditableTilePreview extends TilePreview {
     }
 
     public connect(id: string, callback: (...args: any[]) => any): number;
-    public connect(signal: "size-changed", callback: (_source: this, oldSize: Meta.Rectangle, newSize: Meta.Rectangle) => void): number;
+    public connect(signal: "size-changed", callback: (_source: this, oldSize: Mtk.Rectangle, newSize: Mtk.Rectangle) => void): number;
     public connect(signal: "notify::hover", callback: (_source: this) => void): number;
     public connect(signal: "clicked", callback: (_source: this, clicked_button: number) => void): number;
     public connect(signal: string, callback: any): number {
-        if (signal === "clicked" || signal === "notify::hover" || signal === "motion-event") return this._btn.connect(signal, callback);
+        if (signal === "clicked" || signal === "notify::hover" || signal === "motion-event") {
+            return this._btn.connect(signal, callback);
+        }
         return super.connect(signal, callback);
     }
 

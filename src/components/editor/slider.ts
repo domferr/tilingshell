@@ -1,16 +1,19 @@
 import { registerGObjectClass } from "@/utils/gjs";
-import Clutter from "@gi-types/clutter10";
-import St from "@gi-types/st1";
+import Clutter from "gi://Clutter";
+import St from 'gi://St';
 import EditableTilePreview from "./editableTilePreview";
 import { logger } from "@/utils/shell";
-import Meta from "@gi-types/meta10";
-import GObject from "@gi-types/gobject2";
+import Meta from 'gi://Meta';
+import Mtk from 'gi://Mtk';
+import GObject from "gi://GObject";
+import { MetaInfo } from "gi://GObject";
+import { getEventCoords } from "@utils/ui";
 
 const debug = logger("Slider");
 
 @registerGObjectClass
 export default class Slider extends St.Button {
-    static metaInfo: GObject.MetaInfo = {
+    static metaInfo: MetaInfo = {
         Signals: {
             "slide": { 
                 param_types: [ GObject.TYPE_INT ] // movement
@@ -36,10 +39,10 @@ export default class Slider extends St.Button {
 
     constructor(parent: Clutter.Actor, groupId: number, x: number, y: number, horizontal: boolean, scaleFactor: number) {
         super({ 
-            style_class: "layout-editor-slider",
-            can_focus: true,
-            x_expand: false,
-            track_hover: true,
+            styleClass: "layout-editor-slider",
+            canFocus: true,
+            xExpand: false,
+            trackHover: true,
         });
         parent.add_child(this);
         this._signals = new Map<EditableTilePreview, number[]>();
@@ -95,7 +98,7 @@ export default class Slider extends St.Button {
         this._createTileSignals(tile);
     }
 
-    private _onTileSizeChanged(tile: EditableTilePreview, oldSize: Meta.Rectangle, newSize: Meta.Rectangle) {
+    private _onTileSizeChanged(tile: EditableTilePreview, oldSize: Mtk.Rectangle, newSize: Mtk.Rectangle) {
         if (this._horizontalDir) {
             if (this._minTileCoord !== oldSize.y && this._maxTileCoord !== oldSize.y + oldSize.height) {
                 return;
@@ -230,7 +233,8 @@ export default class Slider extends St.Button {
 
     vfunc_motion_event(event: Clutter.MotionEvent) {
         if (this._dragging) {
-            this._move(event.x, event.y);
+            const [stageX, stageY] = getEventCoords(event);
+            this._move(stageX, stageY);
             return Clutter.EVENT_STOP;
         }
 
@@ -244,9 +248,11 @@ export default class Slider extends St.Button {
         this._dragging = true;
         global.display.set_cursor(this.preferredCursor);
 
+        //@ts-ignore todo
         this._grab = global.stage.grab(this);
         
-        this._move(event.x, event.y);
+        const [stageX, stageY] = getEventCoords(event);
+        this._move(stageX, stageY);
         return Clutter.EVENT_STOP;
     }
 

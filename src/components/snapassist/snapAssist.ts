@@ -1,9 +1,10 @@
 import { registerGObjectClass } from "@/utils/gjs";
-import { Actor, AnimationMode, ActorAlign, Margin } from '@gi-types/clutter10';
-import { Rectangle, Window } from "@gi-types/meta10";
-import St, { Side } from "@gi-types/st1";
+import Clutter from "gi://Clutter";
+import Meta from "gi://Meta";
+import Mtk from "gi://Mtk";
+import St from "gi://St";
 import { logger } from "@/utils/shell";
-import { MetaInfo } from "@gi-types/gobject2";
+import { MetaInfo } from "gi://GObject";
 import SnapAssistTile from "./snapAssistTile";
 import SnapAssistLayout from "./snapAssistLayout";
 import Layout from "../layout/Layout";
@@ -11,6 +12,7 @@ import Tile from "../layout/Tile";
 import Settings from "@/settings";
 import GlobalState from "@/globalState";
 import SignalHandling from "@/signalHandling";
+import { buildMargin } from "@utils/ui";
 
 export const SNAP_ASSIST_SIGNAL = 'snap-assist';
 export const SNAP_ASSIST_ANIMATION_TIME = 180;
@@ -46,14 +48,14 @@ export class SnapAssist extends St.BoxLayout {
     private _scaleFactor: number;
     private _bottomPadding: number;
 
-    constructor(parent: Actor, workArea: Rectangle, scaleFactor: number, styleScaleFactor: number) {
+    constructor(parent: Clutter.Actor, workArea: Mtk.Rectangle, scaleFactor: number, styleScaleFactor: number) {
         super({
             name: 'snap_assist',
-            x_align: ActorAlign.CENTER,
-            y_align: ActorAlign.CENTER,
+            xAlign: Clutter.ActorAlign.CENTER,
+            yAlign: Clutter.ActorAlign.CENTER,
             vertical: false,
             reactive: true,
-            style_class: "popup-menu-content snap-assistant",
+            styleClass: "popup-menu-content snap-assistant",
         });
         this._signals = new SignalHandling();
         this._scaleFactor = scaleFactor;
@@ -65,25 +67,26 @@ export class SnapAssist extends St.BoxLayout {
 
         this._container.add_child(this);
         this._container.set_clip(0, 0, workArea.width, workArea.height);
-        if (parent) parent.add_child(this._container);
+        parent.add_child(this._container);
 
         this._setLayouts(GlobalState.get().layouts, scaleFactor);
         this._signals.connect(GlobalState.get(), GlobalState.SIGNAL_LAYOUTS_CHANGED, () => {
             this._setLayouts(GlobalState.get().layouts, scaleFactor);
         });
+
+        this.connect("destroy", this._onDestroy.bind(this));
         
         // scale padding if it is not already scaled
-        this._bottomPadding = this.get_theme_node().get_padding(Side.BOTTOM) * styleScaleFactor;
+        this._bottomPadding = this.get_theme_node().get_padding(St.Side.BOTTOM) * styleScaleFactor;
+        debug("bottom padding is", this._bottomPadding);
         this.set_style(`
             padding: ${this._bottomPadding}px !important;
         `);
-        
-        this.close(false);
 
-        this.connect("destroy", this._onDestroy.bind(this));
+        this.close(false);
     }
 
-    public set workArea(newWorkArea: Rectangle) {
+    public set workArea(newWorkArea: Mtk.Rectangle) {
         this._container.set_position(newWorkArea.x, newWorkArea.y);
         this._container.set_width(newWorkArea.width);
         this._container.set_clip(0, 0, newWorkArea.width, newWorkArea.height);
@@ -102,7 +105,7 @@ export class SnapAssist extends St.BoxLayout {
             y: this._desiredY,
             opacity: 0,
             duration: ease ? SNAP_ASSIST_ANIMATION_TIME : 0,
-            mode: AnimationMode.EASE_OUT_QUAD,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
             onComplete: () => {
                 this.hide();
             }
@@ -114,6 +117,10 @@ export class SnapAssist extends St.BoxLayout {
     }
 
     private open(ease: boolean = false) {
+        // if it is the first time showing the snap assistant
+        // then ensure the snap assistant is the topmost widget
+        if (!this._showing) this.get_parent()?.set_child_above_sibling(this, null);
+        
         this.set_x((this._container.width / 2) - (this.width / 2));
         this.show();
         
@@ -123,7 +130,7 @@ export class SnapAssist extends St.BoxLayout {
             y: this._desiredY,
             opacity: 255,
             duration: ease ? SNAP_ASSIST_ANIMATION_TIME : 0,
-            mode: AnimationMode.EASE_OUT_QUAD,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
         });
     }
 
@@ -132,7 +139,7 @@ export class SnapAssist extends St.BoxLayout {
         this.remove_all_children();
 
         const inner_gaps = Settings.get_inner_gaps(scaleFactor);
-        const layoutGaps = new Margin({
+        const layoutGaps = buildMargin({
             top: inner_gaps.top === 0 ? 0:this._gaps,
             bottom: inner_gaps.bottom === 0 ? 0:this._gaps,
             left: inner_gaps.left === 0 ? 0:this._gaps,
@@ -152,7 +159,7 @@ export class SnapAssist extends St.BoxLayout {
         this.set_x((this._container.width / 2) - (this.width / 2));
     }
 
-    public onMovingWindow(window: Window, ease: boolean = false, currPointerPos: {x: number, y: number}) {
+    public onMovingWindow(window: Meta.Window, ease: boolean = false, currPointerPos: {x: number, y: number}) {
         const wasEnlarged = this._isEnlarged;      
         this.handleOpening(window, ease, currPointerPos);
         if (!this._showing || !this._isEnlarged) {
@@ -171,12 +178,12 @@ export class SnapAssist extends St.BoxLayout {
         }
     }
 
-    private handleOpening(window: Window, ease: boolean = false, currPointerPos: {x: number, y: number}) {      
+    private handleOpening(window: Meta.Window, ease: boolean = false, currPointerPos: {x: number, y: number}) {      
         if (!this._showing) {
-            if (this.get_parent() === global.window_group) {
+            if (this.get_parent() === global.windowGroup) {
                 let windowActor = window.get_compositor_private();
                 if (!windowActor) return;
-                global.window_group.set_child_above_sibling(this, windowActor as any);
+                global.windowGroup.set_child_above_sibling(this, windowActor as any);
             }
         }
 

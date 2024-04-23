@@ -7,9 +7,11 @@
     "41",
     "42",
     "43",
-    "44"
+    "44",
+    "45",
+    "46"
   ],
-  "version": 3,
+  "version": 4,
   "url": "https://github.com/domferr/modernwindowmanager",
   "settings-schema": "org.gnome.shell.extensions.modernwindowmanager"
 }

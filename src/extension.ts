@@ -1,44 +1,48 @@
 import './styles/stylesheet.scss';
 
-import Indicator from '@/indicator/indicator';
 import { logger } from '@/utils/shell';
-import { Main, addToStatusArea, getMonitors } from '@/utils/ui';
-import { getCurrentExtension } from '@/utils/shell';
+import { addToStatusArea, getMonitors } from '@/utils/ui';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { TilingManager } from "@/components/tilingsystem/tilingManager";
-import { Rectangle } from '@gi-types/meta10';
-import { SettingsBindFlags } from '@gi-types/gio2';
+import Mtk from 'gi://Mtk';
+import Gio from 'gi://Gio';
 import Settings from '@/settings';
 import SignalHandling from './signalHandling';
 import GlobalState from './globalState';
+import Indicator from './indicator/indicator';
+import { Extension, ExtensionMetadata } from 'resource:///org/gnome/shell/extensions/extension.js';
 
 const SIGNAL_WORKAREAS_CHANGED = 'workareas-changed';
 const debug = logger('extension');
 
-class Extension {
+export default class MWMExtension extends Extension {
   private _indicator: Indicator | null = null;
   private _tilingManagers: TilingManager[] = [];
 
   private readonly _signals: SignalHandling;
-  
-  constructor() {
+
+  constructor(metadata: ExtensionMetadata) {
+    super(metadata);
     this._signals = new SignalHandling();
   }
 
   createIndicator() {
-    this._indicator = new Indicator();
-    addToStatusArea(this._indicator);
+    this._indicator = new Indicator(this.path);
+    addToStatusArea(this._indicator, this.uuid);
 
     // Bind the "show-indicator" setting to the "visible" property.
     //@ts-ignore
-    Settings.bind('show-indicator', this._indicator, 'visible', SettingsBindFlags.DEFAULT);
+    Settings.bind('show-indicator', this._indicator, 'visible', Gio.SettingsBindFlags.DEFAULT);
     this._indicator.enable();
   }
 
   private _validateSettings() {
     // Setting used for compatibility changes if necessary
     // Settings.get_last_version_installed()
-    Settings.set_last_version_installed(getCurrentExtension().metadata.version);
-    
+    if (this.metadata.version) {
+      Settings.set_last_version_installed(Number(this.metadata.version));
+    }
+
     const selectedLayouts = Settings.get_selected_layouts();
     const monitors = getMonitors();
     const layouts = GlobalState.get().layouts;
@@ -47,7 +51,7 @@ class Extension {
     while (monitors.length < selectedLayouts.length) {
       selectedLayouts.pop();
     }
-    while(monitors.length > selectedLayouts.length) {
+    while (monitors.length > selectedLayouts.length) {
       selectedLayouts.push(selectedLayouts[0]);
     }
 
@@ -60,7 +64,7 @@ class Extension {
   }
 
   enable(): void {
-    Settings.initialize();
+    Settings.initialize(this.getSettings());
     this._validateSettings();
 
     //@ts-ignore
@@ -70,15 +74,15 @@ class Extension {
         this._setupSignals();
       });
     } else {
-        this._createTilingManagers();
-        this._setupSignals();
+      this._createTilingManagers();
+      this._setupSignals();
     }
 
     this.createIndicator();
 
     debug('extension is enabled');
   }
-  
+
   private _createTilingManagers() {
     debug('building a tiling manager for each monitor');
     this._tilingManagers.forEach(tm => tm.destroy());
@@ -95,16 +99,16 @@ class Extension {
         const oldIndexes = Settings.get_selected_layouts();
         const indexes = allMonitors.map(monitor => {
           // If there is a new monitor, give the same layout as the primary monitor
-          if (monitor.index >= oldIndexes.length) return oldIndexes[imports.ui.main.layoutManager.primaryIndex];
+          if (monitor.index >= oldIndexes.length) return oldIndexes[Main.layoutManager.primaryIndex];
           return oldIndexes[monitor.index];
         })
         Settings.save_selected_layouts_json(indexes);
-        
+
         this._createTilingManagers();
       } else {
         // same number of monitors, but one or more workareas changed
         allMonitors.forEach(monitor => {
-          const newWorkArea: Rectangle = Main.layoutManager.getWorkAreaForMonitor(monitor.index);
+          const newWorkArea: Mtk.Rectangle = Main.layoutManager.getWorkAreaForMonitor(monitor.index);
           this._tilingManagers[monitor.index].workArea = newWorkArea;
         });
       }
@@ -120,9 +124,4 @@ class Extension {
     GlobalState.destroy();
     debug('extension is disabled');
   }
-}
-
-export default function (): Extension {
-  imports.misc.extensionUtils.initTranslations(getCurrentExtension().metadata.uuid);
-  return new Extension();
 }

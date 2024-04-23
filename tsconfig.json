@@ -1,22 +1,22 @@
 {
   "compilerOptions": {
-    "lib": ["es2022"],
-    "target": "es2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "./dist",
+    "sourceMap": false,
     "strict": true,
-    "noImplicitAny": false,
-    "strictNullChecks": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-    "strictPropertyInitialization": false,
-    "allowSyntheticDefaultImports": true,
-    "baseUrl": ".",
-    "moduleResolution": "Node",
-    "experimentalDecorators": true,
+    "target": "ES2022",
+    "lib": [
+      "ES2022"
+    ],
     "paths": {
-      "@gnome-shell/*": ["gnome-shell-types/*"],
-      "@/*": ["./src/*"]
-    }
+      "@*": ["./src/*"]
+    },
+    "experimentalDecorators": true
   },
-  "exclude": ["./dist", "./node_modules"],
-  "include": ["./src/**/*.ts"]
+  "include": [
+    "ambient.d.ts",
+    "src/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
 }

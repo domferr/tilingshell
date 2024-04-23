@@ -1,11 +1,11 @@
 import { registerGObjectClass } from "@/utils/gjs";
-import St from "@gi-types/st1";
-import GLib from "@gi-types/glib2";
-import Clutter from "@gi-types/clutter10";
+import St from 'gi://St';
+import GLib from 'gi://GLib';
+import Shell from 'gi://Shell';
+import Mtk from 'gi://Mtk';
+import Clutter from "gi://Clutter";
 import EditableTilePreview from "./editableTilePreview";
-import { Global } from "@gi-types/shell0";
 import { logger } from "@/utils/shell";
-import Meta from "@gi-types/meta10";
 
 const debug = logger("HoverLine");
 
@@ -14,13 +14,14 @@ export default class HoverLine extends St.Widget {
 
     private readonly _hoverTimer: number;
     private readonly _size: number;
-    private readonly _workArea: Meta.Rectangle;
+    private readonly _workArea: Mtk.Rectangle;
 
     private _hoveredTile: EditableTilePreview | null;
 
-    constructor(workArea: Meta.Rectangle, scalingFactor: number) {
+    constructor(workArea: Mtk.Rectangle, scalingFactor: number) {
         super({ styleClass: "hover-line"});
         
+        this._hoveredTile = null;
         this._size = 16 * scalingFactor;
         this._workArea = workArea;
 
@@ -45,7 +46,7 @@ export default class HoverLine extends St.Widget {
     public handleMouseMove(tile: EditableTilePreview, x: number, y: number) {
         this._hoveredTile = tile;
 
-        const modifier = Global.get().get_pointer()[2];
+        const modifier = Shell.Global.get().get_pointer()[2];
         // split horizontally when CTRL is NOT pressed, split vertically instead
         const splitHorizontally = (modifier & Clutter.ModifierType.CONTROL_MASK) == 0;
         this._drawLine(splitHorizontally, x, y);
@@ -60,7 +61,7 @@ export default class HoverLine extends St.Widget {
             return GLib.SOURCE_CONTINUE;
         }
         
-        const [x, y, modifier] = Global.get().get_pointer();
+        const [x, y, modifier] = global.get_pointer();
         // split horizontally when CTRL is NOT pressed, split vertically instead
         const splitHorizontally = (modifier & Clutter.ModifierType.CONTROL_MASK) == 0;
         

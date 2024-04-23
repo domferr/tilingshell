@@ -1,5 +1,5 @@
-import Gio from '@gi-types/gio2';
-import GObject from '@gi-types/gobject2';
+import Gio from 'gi://Gio';
+import GObject from "gi://GObject";
 import Layout from './components/layout/Layout';
 import Tile from './components/layout/Tile';
 
@@ -16,12 +16,13 @@ export default class Settings {
     static SETTING_SPAN_MULTIPLE_TILES = 'enable-span-multiple-tiles';
     static SETTING_LAYOUTS_JSON = 'layouts-json';
     static SETTING_SELECTED_LAYOUTS = 'selected-layouts';
+    static SETTING_RESTORE_WINDOW_ORIGINAL_SIZE = 'restore-window-original-size';
     
-    static initialize(settings?: Gio.Settings) {
+    static initialize(settings: Gio.Settings) {
         if (this._is_initialized) return;
         
         this._is_initialized = true;
-        this._settings = settings ? settings:imports.misc.extensionUtils.getSettings();
+        this._settings = settings;
     }
 
     static bind(key: string, object: GObject.Object, property: string): void {
@@ -72,13 +73,21 @@ export default class Settings {
 
     static get_layouts_json() : Layout[] {
         try {
-            const layouts = JSON.parse(this._settings.get_string(this.SETTING_LAYOUTS_JSON)) as Layout[];
+            const layouts = JSON.parse(this._settings.get_string(this.SETTING_LAYOUTS_JSON) || "[]") as Layout[];
             if (layouts.length === 0) throw "At least one layout is required";
             return layouts.filter(layout => layout.tiles.length > 0);
         } catch(ex: any) {
             this.reset_layouts_json();
-            return JSON.parse(this._settings.get_string(this.SETTING_LAYOUTS_JSON)) as Layout[];
+            return JSON.parse(this._settings.get_string(this.SETTING_LAYOUTS_JSON) || "[]") as Layout[];
         }
+    }
+
+    static get_selected_layouts() : string[] {
+        return this._settings.get_strv(Settings.SETTING_SELECTED_LAYOUTS);
+    }
+
+    static get_restore_window_original_size() : boolean {
+        return this._settings.get_boolean(Settings.SETTING_RESTORE_WINDOW_ORIGINAL_SIZE);
     }
 
     static set_last_version_installed(version: number) {
@@ -116,10 +125,6 @@ export default class Settings {
 
     static save_selected_layouts_json(ids: string[]) {
         this._settings.set_strv(Settings.SETTING_SELECTED_LAYOUTS, ids);
-    }
-
-    static get_selected_layouts() : string[] {
-        return this._settings.get_strv(Settings.SETTING_SELECTED_LAYOUTS);
     }
 
     static connect(key: string, func: (...arg: any[]) => void) : number {

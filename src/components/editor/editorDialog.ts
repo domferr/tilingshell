@@ -1,17 +1,16 @@
 import Settings from '@/settings';
 import { registerGObjectClass } from '@/utils/gjs';
-import Clutter from "@gi-types/clutter10";
-import St from '@gi-types/st1';
-import LayoutSelectionWidget from '../../indicator/layoutSelectionWidget';
+import Clutter from "gi://Clutter";
+import St from 'gi://St';
+import LayoutButton from '../../indicator/layoutButton';
 import GlobalState from '@/globalState';
 import { logger } from '@/utils/shell';
 import Layout from '@/components/layout/Layout';
 import SignalHandling from '@/signalHandling';
 import Tile from '@/components/layout/Tile';
+import * as ModalDialog from 'resource:///org/gnome/shell/ui/modalDialog.js';
 
 const debug = logger('EditorDialog');
-
-const ModalDialog = imports.ui.modalDialog;
 
 @registerGObjectClass
 export default class EditorDialog extends ModalDialog.ModalDialog {
@@ -38,15 +37,15 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
 
         this.contentLayout.add_child(new St.Label({
             text: "Select the layout to edit", 
-            x_align: Clutter.ActorAlign.CENTER, 
-            x_expand: true, 
-            style_class: 'editor-dialog-title'
+            xAlign: Clutter.ActorAlign.CENTER, 
+            xExpand: true, 
+            styleClass: 'editor-dialog-title'
         }));
         
         this._layoutsBoxLayout = new St.BoxLayout({
             vertical: false, // horizontal box layout
-            style_class: "layouts-box-layout",
-            x_align: Clutter.ActorAlign.CENTER,
+            styleClass: "layouts-box-layout",
+            xAlign: Clutter.ActorAlign.CENTER,
         });
         this.contentLayout.add_child(this._layoutsBoxLayout);
 
@@ -59,7 +58,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
 
         this.addButton({
             label: 'Close',
-            isDefault: true,
+            default: true,
             key: Clutter.KEY_Escape,
             action: () => {
                 this.destroy();
@@ -76,68 +75,68 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         // LEFT-CLICK to split a tile
         suggestion1.add_child(new St.Label({ 
             text: "LEFT-CLICK", 
-            x_align: Clutter.ActorAlign.CENTER,
-            y_align: Clutter.ActorAlign.CENTER,
-            style_class: 'button kbd',
-            x_expand: false
+            xAlign: Clutter.ActorAlign.CENTER,
+            yAlign: Clutter.ActorAlign.CENTER,
+            styleClass: 'button kbd',
+            xExpand: false
         }));
         suggestion1.add_child(new St.Label({ 
             text: " to split a tile.", 
-            x_align: Clutter.ActorAlign.CENTER,
-            y_align: Clutter.ActorAlign.CENTER,
-            style_class: '',
-            x_expand: false
+            xAlign: Clutter.ActorAlign.CENTER,
+            yAlign: Clutter.ActorAlign.CENTER,
+            styleClass: '',
+            xExpand: false
         }));
 
         const suggestion2 = new St.BoxLayout({ vertical: false });
         // LEFT-CLICK + CTRL to split a tile vertically
         suggestion2.add_child(new St.Label({ 
             text: "LEFT-CLICK", 
-            x_align: Clutter.ActorAlign.CENTER,
-            y_align: Clutter.ActorAlign.CENTER,
-            style_class: 'button kbd',
-            x_expand: false
+            xAlign: Clutter.ActorAlign.CENTER,
+            yAlign: Clutter.ActorAlign.CENTER,
+            styleClass: 'button kbd',
+            xExpand: false
         }));
         suggestion2.add_child(new St.Label({ 
             text: " + ", 
-            x_align: Clutter.ActorAlign.CENTER,
-            y_align: Clutter.ActorAlign.CENTER,
-            style_class: '',
-            x_expand: false
+            xAlign: Clutter.ActorAlign.CENTER,
+            yAlign: Clutter.ActorAlign.CENTER,
+            styleClass: '',
+            xExpand: false
         }));
         suggestion2.add_child(new St.Label({ 
             text: "CTRL", 
-            x_align: Clutter.ActorAlign.CENTER,
-            y_align: Clutter.ActorAlign.CENTER,
-            style_class: 'button kbd',
-            x_expand: false
+            xAlign: Clutter.ActorAlign.CENTER,
+            yAlign: Clutter.ActorAlign.CENTER,
+            styleClass: 'button kbd',
+            xExpand: false
         }));
         suggestion2.add_child(new St.Label({ 
             text: " to split a tile vertically.", 
-            x_align: Clutter.ActorAlign.CENTER,
-            y_align: Clutter.ActorAlign.CENTER,
-            style_class: '',
-            x_expand: false
+            xAlign: Clutter.ActorAlign.CENTER,
+            yAlign: Clutter.ActorAlign.CENTER,
+            styleClass: '',
+            xExpand: false
         }));
 
         const suggestion3 = new St.BoxLayout({ vertical: false });
         // RIGHT-CLICK to delete a tile
         suggestion3.add_child(new St.Label({ 
             text: "RIGHT-CLICK",
-            x_align: Clutter.ActorAlign.CENTER,
-            y_align: Clutter.ActorAlign.CENTER,
-            style_class: 'button kbd',
-            x_expand: false
+            xAlign: Clutter.ActorAlign.CENTER,
+            yAlign: Clutter.ActorAlign.CENTER,
+            styleClass: 'button kbd',
+            xExpand: false
         }));
         suggestion3.add_child(new St.Label({ 
             text: " to delete a tile.", 
-            x_align: Clutter.ActorAlign.CENTER,
-            y_align: Clutter.ActorAlign.CENTER,
-            style_class: '',
-            x_expand: false
+            xAlign: Clutter.ActorAlign.CENTER,
+            yAlign: Clutter.ActorAlign.CENTER,
+            styleClass: '',
+            xExpand: false
         }));
         
-        const legend = new St.BoxLayout({ vertical: true, style_class: "legend" });
+        const legend = new St.BoxLayout({ vertical: true, styleClass: "legend" });
         legend.add_child(suggestion1);
         legend.add_child(suggestion2);
         legend.add_child(suggestion3);
@@ -145,16 +144,16 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         this.contentLayout.remove_all_children();
         this.contentLayout.add_child(new St.Label({
             text: "How to use the editor", 
-            x_align: Clutter.ActorAlign.CENTER, 
-            x_expand: true, 
-            style_class: 'editor-dialog-title'
+            xAlign: Clutter.ActorAlign.CENTER, 
+            xExpand: true, 
+            styleClass: 'editor-dialog-title'
         }));
         this.contentLayout.add_child(legend);
 
         this.clearButtons();
         this.addButton({
             label: 'Start editing',
-            isDefault: true,
+            default: true,
             key: Clutter.KEY_Escape,
             action: () => {
                 this.destroy();
@@ -173,23 +172,21 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         this._layoutsBoxLayout.remove_all_children();
         
         params.layouts.forEach((lay, btnInd) => {
-            const btn = new St.Button({ x_expand: false, style_class: "layout-button button" });
-            btn.child = new LayoutSelectionWidget(lay, gaps, params.scalingFactor, this._layoutHeight, this._layoutWidth);
             const box = new St.BoxLayout({ 
                 vertical: true, 
-                x_align: Clutter.ActorAlign.CENTER,
-                style_class: "layout-button-container" 
+                xAlign: Clutter.ActorAlign.CENTER,
+                styleClass: "layout-button-container" 
             });
-            box.add_child(btn);
+            this._layoutsBoxLayout.add_child(box);
+            const btn = new LayoutButton(box, lay, gaps, params.scalingFactor, this._layoutHeight, this._layoutWidth);
             if (params.layouts.length > 1) {
-                const deleteBtn = new St.Button({x_expand: false, x_align: Clutter.ActorAlign.CENTER, style_class: "message-list-clear-button icon-button button delete-layout-button"});
-                deleteBtn.child = new St.Icon({ icon_name: "edit-delete-symbolic", icon_size: 16 });
+                const deleteBtn = new St.Button({xExpand: false, xAlign: Clutter.ActorAlign.CENTER, styleClass: "message-list-clear-button icon-button button delete-layout-button"});
+                deleteBtn.child = new St.Icon({ iconName: "edit-delete-symbolic", iconSize: 16 });
                 deleteBtn.connect('clicked', (self) => {
                     params.onDeleteLayout(btnInd, lay);
                 });
                 box.add_child(deleteBtn);
             }
-            this._layoutsBoxLayout.add_child(box);
             btn.connect('clicked', (self) => {
                 params.onSelectLayout(btnInd, lay);
                 this._makeLegendDialog();
@@ -199,14 +196,12 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
 
         const box = new St.BoxLayout({ 
             vertical: true, 
-            x_align: Clutter.ActorAlign.CENTER,
-            style_class: "layout-button-container" 
+            xAlign: Clutter.ActorAlign.CENTER,
+            styleClass: "layout-button-container" 
         });
-        const newLayoutBtn = new St.Button({ x_expand: false, y_expand: false, style_class: "layout-button button" });
-        box.add_child(newLayoutBtn);
         this._layoutsBoxLayout.add_child(box);
-        newLayoutBtn.child = new LayoutSelectionWidget(new Layout([new Tile({x: 0, y: 0, width: 1, height: 1, groups: []})], "New Layout"), gaps, params.scalingFactor, this._layoutHeight, this._layoutWidth);
-        const icon = new St.Icon({ icon_name: "list-add-symbolic", icon_size: 32 });
+        const newLayoutBtn = new LayoutButton(box, new Layout([new Tile({x: 0, y: 0, width: 1, height: 1, groups: []})], "New Layout"), gaps, params.scalingFactor, this._layoutHeight, this._layoutWidth);
+        const icon = new St.Icon({ iconName: "list-add-symbolic", iconSize: 32 });
         icon.set_size(newLayoutBtn.child.width, newLayoutBtn.child.height);
         newLayoutBtn.child.add_child(icon);
         newLayoutBtn.connect('clicked', (self) => {

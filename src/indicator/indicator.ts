@@ -1,8 +1,10 @@
-import Gio from '@gi-types/gio2';
-import St from '@gi-types/st1';
-import { registerGObjectClass } from '@/utils/gjs';
-import { getCurrentExtension, logger } from '@/utils/shell';
-import { Main, getMonitors, getScalingFactor } from '@/utils/ui';
+import Gio from 'gi://Gio';
+import St from 'gi://St';
+import Shell from 'gi://Shell';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
+import { logger } from '@/utils/shell';
+import { getMonitors, getScalingFactor } from '@/utils/ui';
 import Settings from '@/settings';
 import Layout from '@/components/layout/Layout';
 import Tile from '@/components/layout/Tile';
@@ -11,10 +13,9 @@ import DefaultMenu from './defaultMenu';
 import GlobalState from '@/globalState';
 import EditingMenu from './editingMenu';
 import EditorDialog from '../components/editor/editorDialog';
-import Shell from "@gi-types/shell0";
-
-const PopupMenu = imports.ui.popupMenu;
-const { Button: PopupMenuButton } = imports.ui.panelMenu;
+import CurrentMenu from './currentMenu';
+import { registerGObjectClass } from '@utils/gjs';
+import { PopupMenu } from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
 const debug = logger('indicator');
 
@@ -25,16 +26,17 @@ enum IndicatorState {
 }
 
 @registerGObjectClass
-export default class Indicator extends PopupMenuButton {
+export default class Indicator extends PanelMenu.Button {
     private _layoutEditor: LayoutEditor | null = null;
+    //@ts-ignore todo
     private _currentMenu: CurrentMenu;
     private _state: IndicatorState;
 
-    constructor() {
+    constructor(path: string) {
         super(0.5, 'Modern Window Manager Indicator', false);
         const icon = new St.Icon({
-            gicon: Gio.icon_new_for_string(`${getCurrentExtension().path}/icons/indicator.svg`),
-            style_class: 'system-status-icon indicator-icon',
+            gicon: Gio.icon_new_for_string(`${path}/icons/indicator-symbolic.svg`),
+            styleClass: 'system-status-icon indicator-icon',
         });
 
         this.add_child(icon);
@@ -44,7 +46,7 @@ export default class Indicator extends PopupMenuButton {
     }
 
     public enable() {
-        this.menu.removeAll();
+        (this.menu as PopupMenu).removeAll();
         this._currentMenu = new DefaultMenu(this);
 
         // todo
@@ -54,13 +56,13 @@ export default class Indicator extends PopupMenuButton {
         const rowsBoxLayout: St.BoxLayout[] = [];
         const layoutsPerRow = 2;
         for (let i = 0; i < layouts.length / layoutsPerRow; i++) {
-            const item = new PopupMenu.PopupBaseMenuItem({ style_class: 'indicator-menu-item' });
+            const item = new PopupMenu.PopupBaseMenuItem({ styleClass: 'indicator-menu-item' });
             const box = new St.BoxLayout({
                 x_align: Clutter.ActorAlign.CENTER,
                 y_align: Clutter.ActorAlign.CENTER,
-                x_expand: true,
+                xExpand: true,
                 vertical: false, // horizontal box layout
-                style_class: "layouts-box-layout",
+                styleClass: "layouts-box-layout",
             });
             rowsBoxLayout.push(box);
             item.add_actor(box);
@@ -71,7 +73,7 @@ export default class Indicator extends PopupMenuButton {
         const layoutHeight: number = 36;
         const layoutWidth: number = 64; // 16:9 ratio. -> (16*layoutHeight) / 9 and then rounded to int
         const layoutsButtons: St.Widget[] = layouts.map((lay, ind) => {
-            const btn = new St.Button({x_expand: false, style_class: "layout-button button"});
+            const btn = new St.Button({xExpand: false, styleClass: "layout-button button"});
             btn.child = new LayoutSelectionWidget(lay, hasGaps ? 1:0, 1, layoutHeight, layoutWidth);
             rowsBoxLayout[Math.floor(ind / layoutsPerRow)].add_child(btn);
             return btn;
@@ -85,7 +87,7 @@ export default class Indicator extends PopupMenuButton {
     }
 
     public newLayoutOnClick(showLegend: boolean) {        
-        this.menu.close();
+        this.menu.close(true);
 
         const newLayout = new Layout([
             new Tile({x: 0, y: 0, width: 0.30, height: 1, groups: [1]}),
@@ -99,7 +101,7 @@ export default class Indicator extends PopupMenuButton {
     }
 
     public openMenu(legend: boolean) {
-        const scalingFactor = getScalingFactor(Shell.Global.get().display.get_current_monitor());
+        const scalingFactor = getScalingFactor(global.display.get_current_monitor());
         
         const dialog = new EditorDialog({
             scalingFactor,
@@ -123,7 +125,7 @@ export default class Indicator extends PopupMenuButton {
             },
             legend
         });
-        dialog.open(Shell.Global.get().get_current_time());
+        dialog.open();
     }
 
     public editLayoutsOnClick() {        

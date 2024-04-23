@@ -1,3 +1,5 @@
+$snap-assist-tile-border-radius: 6px;
+
 .snap-assistant {
     box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px;
     border: 0;
@@ -6,7 +8,8 @@
 }
 
 .snap-assist-tile {
-    border-radius: 4px;
+    transition: 100ms ease all;
+    border-radius-value: $snap-assist-tile-border-radius;
     background-color: rgba(255,255,255,0.15);
     border: 1px solid rgba(255,255,255,0.3);
 }

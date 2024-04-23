@@ -1,9 +1,12 @@
 import { registerGObjectClass } from "@/utils/gjs";
-import Clutter from "@gi-types/clutter10";
-import St from "@gi-types/st1";
-import Meta from "@gi-types/meta10";
+import Clutter from "gi://Clutter";
+import St from 'gi://St';
+import Meta from 'gi://Meta';
+import Mtk from "gi://Mtk";
 import Settings from "@/settings";
-import { Main, buildTileMargin, getScalingFactor, getWindowsOfMonitor } from "@/utils/ui";
+import Shell from 'gi://Shell';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import { buildMargin, buildRectangle, buildTileMargin, getEventCoords, getScalingFactor, getWindowsOfMonitor } from "@/utils/ui";
 import Layout from "../layout/Layout";
 import TileUtils from "../layout/TileUtils";
 import Slider from "./slider";
@@ -11,14 +14,14 @@ import EditableTilePreview from "./editableTilePreview";
 import { logger } from "@/utils/shell";
 import Tile from "../layout/Tile";
 import HoverLine from "./hoverLine";
-import { Global } from "@gi-types/shell0";
+import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
 
 const debug = logger("LayoutEditor");
 
 @registerGObjectClass
 export default class LayoutEditor extends St.Widget {
     private _layout: Layout;
-    private _containerRect: Meta.Rectangle;
+    private _containerRect: Mtk.Rectangle;
     private _sliders: Slider[];
     private _scaleFactor: number;
     private _innerGaps: Clutter.Margin;
@@ -29,19 +32,18 @@ export default class LayoutEditor extends St.Widget {
     private readonly _hoverWidget: HoverLine;
 
     constructor(layout: Layout, monitor: Monitor) {
-        super({ style_class: "layout-editor" });
-        global.window_group.add_child(this);
+        super({ styleClass: "layout-editor" });
+        Shell.Global.get().windowGroup.add_child(this);
         
         const workArea = Main.layoutManager.getWorkAreaForMonitor(monitor.index);
         this.set_position(workArea.x, workArea.y);
         this.set_size(workArea.width, workArea.height);
         this._scaleFactor = getScalingFactor(monitor.index);
-        this._innerGaps = new Clutter.Margin(Settings.get_inner_gaps(this._scaleFactor));
-        this._outerGaps = new Clutter.Margin(Settings.get_outer_gaps(this._scaleFactor));
+        this._innerGaps = buildMargin(Settings.get_inner_gaps(this._scaleFactor));
+        this._outerGaps = buildMargin(Settings.get_outer_gaps(this._scaleFactor));
         this._sliders = [];
-        this._containerRect = new Meta.Rectangle({ x:0, y:0, width: workArea.width, height: workArea.height });
+        this._containerRect = buildRectangle({ x: 0, y: 0, width: workArea.width, height: workArea.height });
         
-        this.layout = layout;
 
         this._minimizedWindows = getWindowsOfMonitor(monitor).filter(win => !win.is_hidden());
         this._minimizedWindows.forEach(win => win.can_minimize() && win.minimize());
@@ -50,6 +52,9 @@ export default class LayoutEditor extends St.Widget {
         this.add_child(this._hoverWidget);
 
         this.connect("destroy", this._onDestroy.bind(this));
+
+        this._layout = layout;
+        this._drawEditor();
     }
 
     public get layout(): Layout {
@@ -57,6 +62,7 @@ export default class LayoutEditor extends St.Widget {
     }
 
     public set layout(newLayout: Layout) {
+        debug("set layout");
         // cleanup
         this._sliders.forEach(slider => slider.destroy());
         this._sliders = [];
@@ -65,6 +71,10 @@ export default class LayoutEditor extends St.Widget {
         // change layout
         this._layout = newLayout;
 
+        this._drawEditor();
+    }
+
+    private _drawEditor() {
         const groups = new Map<number, EditableTilePreview[]>();
 
         // render layout's tile and group tiles
@@ -118,7 +128,7 @@ export default class LayoutEditor extends St.Widget {
         });
     }
     
-    private _buildEditableTile(tile: Tile, rect: Meta.Rectangle) : EditableTilePreview {
+    private _buildEditableTile(tile: Tile, rect: Mtk.Rectangle) : EditableTilePreview {
         const gaps = buildTileMargin(rect, this._innerGaps, this._outerGaps, this._containerRect);
         const editableTile = new EditableTilePreview({ parent: this, tile, containerRect: this._containerRect, rect, gaps });
         editableTile.open();
@@ -128,12 +138,12 @@ export default class LayoutEditor extends St.Widget {
             else if (clicked_button === 3) this.deleteTile(editableTile);
         });
         editableTile.connect("motion-event", (tile: EditableTilePreview, event: Clutter.Event) => {
-            let [stageX, stageY] = event.get_coords();
+            const [stageX, stageY] = getEventCoords(event);
             this._hoverWidget.handleMouseMove(editableTile, stageX, stageY);
             return Clutter.EVENT_PROPAGATE;
         });
         editableTile.connect("notify::hover", () => {
-            const [stageX, stageY] = Global.get().get_pointer();
+            const [stageX, stageY] = Shell.Global.get().get_pointer();
             this._hoverWidget.handleMouseMove(editableTile, stageX, stageY);
         });
         if (this._sliders.length > 0) this.set_child_below_sibling(editableTile, this._sliders[0]);

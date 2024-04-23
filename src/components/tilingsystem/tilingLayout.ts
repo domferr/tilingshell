@@ -1,8 +1,8 @@
-import Meta from '@gi-types/meta10';
+import Meta from 'gi://Meta';
 import { logger } from "@/utils/shell";
 import { registerGObjectClass } from "@/utils/gjs";
-import { global } from "@/utils/ui";
-import { Actor, AnimationMode, Margin } from '@gi-types/clutter10';
+import Mtk from 'gi://Mtk';
+import Clutter from 'gi://Clutter';
 import BlurTilePreview from '../tilepreview/blurTilePreview';
 import TilePreview, { WINDOW_ANIMATION_TIME } from '../tilepreview/tilePreview';
 import LayoutWidget from '../layout/LayoutWidget';
@@ -23,18 +23,18 @@ export default class TilingLayout extends LayoutWidget<TilePreview> {
     private _showing: boolean;
     private _hoveredTiles: TilePreview[];
 
-    constructor(layout: Layout, innerMargin: Margin, outerMargin: Margin, workarea: Meta.Rectangle) {
-        super(global.window_group, layout, innerMargin, outerMargin, workarea);
+    constructor(layout: Layout, innerMargin: Clutter.Margin, outerMargin: Clutter.Margin, workarea: Mtk.Rectangle) {
+        super(global.windowGroup, layout, innerMargin, outerMargin, workarea);
+        this._showing = false;
         this._hoveredTiles = [];
     }
 
     _init() {
         super._init();
         this.hide();
-        this._showing = false;
     }
 
-    protected buildTile(parent: Actor, rect: Meta.Rectangle, gaps: Margin, tile: Tile): TilePreview {
+    protected buildTile(parent: Clutter.Actor, rect: Mtk.Rectangle, gaps: Clutter.Margin, tile: Tile): TilePreview {
         return this._blur ? new BlurTilePreview({parent, rect, gaps}):new TilePreview({parent, rect, gaps});
     }
 
@@ -49,7 +49,7 @@ export default class TilingLayout extends LayoutWidget<TilePreview> {
         if (!windowActor)
             return;
 
-        global.window_group.set_child_below_sibling(this, windowActor as any);
+        global.windowGroup.set_child_below_sibling(this, windowActor as any);
         this.open();
     }
 
@@ -60,7 +60,7 @@ export default class TilingLayout extends LayoutWidget<TilePreview> {
         if (!windowActor)
             return;
 
-        global.window_group.set_child_above_sibling(this, windowActor as any);
+        global.windowGroup.set_child_above_sibling(this, windowActor as any);
         this.open();
     }
 
@@ -75,7 +75,7 @@ export default class TilingLayout extends LayoutWidget<TilePreview> {
             y: this.y,
             opacity: 255,
             duration: WINDOW_ANIMATION_TIME,
-            mode: AnimationMode.EASE_OUT_QUAD,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
         });
     }
 
@@ -87,7 +87,7 @@ export default class TilingLayout extends LayoutWidget<TilePreview> {
         this.ease({
             opacity: 0,
             duration: WINDOW_ANIMATION_TIME,
-            mode: AnimationMode.EASE_OUT_QUAD,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
             onComplete: () => {
                 this.unhoverAllTiles();
                 this.hide();
@@ -95,7 +95,7 @@ export default class TilingLayout extends LayoutWidget<TilePreview> {
         });
     }
 
-    public getTileBelow(currPointerPos: { x: number; y: number }) : Meta.Rectangle | undefined {
+    public getTileBelow(currPointerPos: { x: number; y: number }) : Mtk.Rectangle | undefined {
         for (let i = 0; i < this._previews.length; i++) {
             let preview = this._previews[i];
             const isHovering = currPointerPos.x >= preview.x && currPointerPos.x <= preview.x + preview.width
@@ -110,7 +110,7 @@ export default class TilingLayout extends LayoutWidget<TilePreview> {
         this._hoveredTiles = [];
     }
 
-    public hoverTilesInRect(rect: Meta.Rectangle) {
+    public hoverTilesInRect(rect: Mtk.Rectangle) {
         this._hoveredTiles = [];
         this._previews.forEach(preview => {
             const [isInside, _] = rect.intersect(preview.rect);

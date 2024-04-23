@@ -47,6 +47,11 @@
             <summary>Selected layouts</summary>
             <description>Each monitor's active layout used by the monitor tiling manager.</description>
         </key>
+        <key name="restore-window-original-size" type="b">
+            <default>true</default>
+            <summary>Restore window size</summary>
+            <description>Restore the windows to their original size when untiled.</description>
+        </key>
     </schema>
 
 </schemalist>

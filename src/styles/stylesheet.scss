@@ -19,8 +19,8 @@ $base_border_radius: 8px;
     @include fontsize(15pt);
 }
 
-@import "indicator.scss";
-@import "snap_assist.scss";
-@import "editor.scss";
-@import "layout_button.scss";
 @import "tile_preview.scss";
+@import "snap_assist.scss";
+@import "indicator.scss";
+@import "layout_button.scss";
+@import "editor.scss";

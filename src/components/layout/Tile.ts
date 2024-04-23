@@ -1,6 +1,7 @@
-import GObject from "@gi-types/gobject2";
+import GObject from "gi://GObject";
 
 export default class Tile {
+    //@ts-ignore todo
     static $gtype = GObject.TYPE_JSOBJECT;
     
     x: number;

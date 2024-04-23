@@ -4,6 +4,8 @@
 
 .layout-button {
     padding: calc($base_padding / 2);
+    border: rgba(255,255,255,0) solid 1px;
+    transition: 100ms ease all;
 }
 
 .layout-button:hover {

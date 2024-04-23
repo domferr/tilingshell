@@ -1,8 +1,8 @@
 import { registerGObjectClass } from "@/utils/gjs";
-import { getGlobalPosition } from "@/utils/ui";
+import { buildRectangle, getGlobalPosition } from "@/utils/ui";
 import { logger } from "@/utils/shell";
-import Clutter from '@gi-types/clutter10';
-import Meta from "@gi-types/meta10";
+import Clutter from 'gi://Clutter';
+import Mtk from "gi://Mtk";
 import LayoutWidget from "../layout/LayoutWidget";
 import Layout from "../layout/Layout";
 import Tile from "../layout/Tile";
@@ -16,13 +16,22 @@ export default class SnapAssistLayout extends LayoutWidget<SnapAssistTile> {
     private static readonly _snapAssistWidth: number = 120; // 16:9 ratio. -> (16*this._snapAssistHeight) / 9 and then rounded to int
 
     constructor(parent: Clutter.Actor | null, layout: Layout, gaps: Clutter.Margin, scaleFactor: number) {
-        const rect = new Meta.Rectangle({height: SnapAssistLayout._snapAssistHeight * scaleFactor, width: SnapAssistLayout._snapAssistWidth * scaleFactor, x: 0, y: 0});
-        gaps = new Clutter.Margin({top: gaps.top * scaleFactor, bottom: gaps.bottom * scaleFactor, left: gaps.left * scaleFactor, right: gaps.right * scaleFactor});
+        const rect = buildRectangle({
+            x: 0, 
+            y: 0, 
+            width: SnapAssistLayout._snapAssistWidth * scaleFactor, 
+            height: SnapAssistLayout._snapAssistHeight * scaleFactor
+        });
+        gaps = gaps.copy();
+        gaps.top *= scaleFactor;
+        gaps.bottom *= scaleFactor;
+        gaps.left *= scaleFactor;
+        gaps.right *= scaleFactor;
         super(parent, layout, gaps, new Clutter.Margin(), rect, "snap-assist-layout");
     }
 
-    buildTile(parent: Clutter.Actor, rect: Meta.Rectangle, gaps: Clutter.Margin, tile: Tile): SnapAssistTile {
-        return new SnapAssistTile({parent, rect, gaps, tile});
+    buildTile(parent: Clutter.Actor, rect: Mtk.Rectangle, gaps: Clutter.Margin, tile: Tile): SnapAssistTile {
+        return new SnapAssistTile({ parent, rect, gaps, tile });
     }
 
     public getTileBelow(cursorPos: {x: number, y: number}) : SnapAssistTile | undefined {
