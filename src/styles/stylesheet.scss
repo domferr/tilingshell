@@ -1,8 +1,16 @@
+// Function to convert px values to em
+// From https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/main/data/theme/gnome-shell-sass/_drawing.scss#L6
+@function to_em($input, $base: 16px) {
+    // multiplied and divided by 1000 to make up for round() shortcoming
+    $em_value: calc($input / $base) * 1.091 * 1000;
+    @return calc(round($em_value) / 1000) * 1em;
+}  
+
 // From https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/43.0/data/theme/gnome-shell-sass/_common.scss
 $base_font_size: 11pt;      // font size
-$base_padding: 6px;
+$base_padding: to_em(6px); //6px;
 $base_margin: 4px;
-$base_border_radius: 8px;
+$base_border_radius: 8px; //to_em(8px);
 
 // From https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/main/data/theme/gnome-shell-sass/_drawing.scss#L66
 // Mixin to convert provided font size in pt to em units

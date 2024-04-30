@@ -9,6 +9,8 @@ import Layout from '@/components/layout/Layout';
 import SignalHandling from '@/signalHandling';
 import Tile from '@/components/layout/Tile';
 import * as ModalDialog from 'resource:///org/gnome/shell/ui/modalDialog.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import { enableScalingFactorSupport, getScalingFactor } from '@utils/ui';
 
 const debug = logger('EditorDialog');
 
@@ -22,7 +24,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
     private _layoutsBoxLayout: St.BoxLayout;
 
     constructor(params: {
-        scalingFactor: number,
+        enableScaling: boolean,
         onDeleteLayout: (ind: number, lay: Layout) => void,
         onSelectLayout: (ind: number, lay: Layout) => void,
         onNewLayout: () => void,
@@ -32,6 +34,12 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
             destroyOnClose: false,
             styleClass: 'editor-dialog',
         });
+        
+        if (params.enableScaling) {
+            const monitor = Main.layoutManager.findMonitorForActor(this);
+            const scalingFactor = getScalingFactor(monitor?.index || Main.layoutManager.primaryIndex);
+            enableScalingFactorSupport(this, scalingFactor);
+        }
         
         this._signals = new SignalHandling();
 
@@ -74,11 +82,12 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         const suggestion1 = new St.BoxLayout({ vertical: false });
         // LEFT-CLICK to split a tile
         suggestion1.add_child(new St.Label({ 
-            text: "LEFT-CLICK", 
+            text: "LEFT CLICK", 
             xAlign: Clutter.ActorAlign.CENTER,
             yAlign: Clutter.ActorAlign.CENTER,
             styleClass: 'button kbd',
-            xExpand: false
+            xExpand: false,
+            pseudoClass: "active"
         }));
         suggestion1.add_child(new St.Label({ 
             text: " to split a tile.", 
@@ -91,11 +100,12 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         const suggestion2 = new St.BoxLayout({ vertical: false });
         // LEFT-CLICK + CTRL to split a tile vertically
         suggestion2.add_child(new St.Label({ 
-            text: "LEFT-CLICK", 
+            text: "LEFT CLICK", 
             xAlign: Clutter.ActorAlign.CENTER,
             yAlign: Clutter.ActorAlign.CENTER,
             styleClass: 'button kbd',
-            xExpand: false
+            xExpand: false,
+            pseudoClass: "active"
         }));
         suggestion2.add_child(new St.Label({ 
             text: " + ", 
@@ -109,7 +119,8 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
             xAlign: Clutter.ActorAlign.CENTER,
             yAlign: Clutter.ActorAlign.CENTER,
             styleClass: 'button kbd',
-            xExpand: false
+            xExpand: false,
+            pseudoClass: "active"
         }));
         suggestion2.add_child(new St.Label({ 
             text: " to split a tile vertically.", 
@@ -122,11 +133,12 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         const suggestion3 = new St.BoxLayout({ vertical: false });
         // RIGHT-CLICK to delete a tile
         suggestion3.add_child(new St.Label({ 
-            text: "RIGHT-CLICK",
+            text: "RIGHT CLICK",
             xAlign: Clutter.ActorAlign.CENTER,
             yAlign: Clutter.ActorAlign.CENTER,
             styleClass: 'button kbd',
-            xExpand: false
+            xExpand: false,
+            pseudoClass: "active"
         }));
         suggestion3.add_child(new St.Label({ 
             text: " to delete a tile.", 
@@ -163,7 +175,6 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
 
     private _drawLayouts(params: {
         layouts: Layout[],
-        scalingFactor: number,
         onDeleteLayout: (ind: number, lay: Layout) => void,
         onSelectLayout: (ind: number, lay: Layout) => void,
         onNewLayout: () => void
@@ -178,7 +189,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
                 styleClass: "layout-button-container" 
             });
             this._layoutsBoxLayout.add_child(box);
-            const btn = new LayoutButton(box, lay, gaps, params.scalingFactor, this._layoutHeight, this._layoutWidth);
+            const btn = new LayoutButton(box, lay, gaps, this._layoutHeight, this._layoutWidth);
             if (params.layouts.length > 1) {
                 const deleteBtn = new St.Button({xExpand: false, xAlign: Clutter.ActorAlign.CENTER, styleClass: "message-list-clear-button icon-button button delete-layout-button"});
                 deleteBtn.child = new St.Icon({ iconName: "edit-delete-symbolic", iconSize: 16 });
@@ -195,12 +206,12 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         });
 
         const box = new St.BoxLayout({ 
-            vertical: true, 
+            vertical: true,
             xAlign: Clutter.ActorAlign.CENTER,
             styleClass: "layout-button-container" 
         });
         this._layoutsBoxLayout.add_child(box);
-        const newLayoutBtn = new LayoutButton(box, new Layout([new Tile({x: 0, y: 0, width: 1, height: 1, groups: []})], "New Layout"), gaps, params.scalingFactor, this._layoutHeight, this._layoutWidth);
+        const newLayoutBtn = new LayoutButton(box, new Layout([new Tile({x: 0, y: 0, width: 1, height: 1, groups: []})], "New Layout"), gaps, this._layoutHeight, this._layoutWidth);
         const icon = new St.Icon({ iconName: "list-add-symbolic", iconSize: 32 });
         icon.set_size(newLayoutBtn.child.width, newLayoutBtn.child.height);
         newLayoutBtn.child.add_child(icon);

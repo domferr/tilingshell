@@ -45,7 +45,7 @@ export default class Settings {
         return this._settings.get_boolean(this.SETTING_SHOW_INDICATOR);
     }
 
-    static get_inner_gaps(scaleFactor: number) : { top: number, bottom: number, left: number, right: number } {
+    static get_inner_gaps(scaleFactor: number = 1) : { top: number, bottom: number, left: number, right: number } {
         // get the gaps settings and scale by scale factor
         const value = this._settings.get_uint(this.SETTING_INNER_GAPS) * scaleFactor;
         return {
@@ -56,7 +56,7 @@ export default class Settings {
         };
     }
 
-    static get_outer_gaps(scaleFactor: number) : { top: number, bottom: number, left: number, right: number } {
+    static get_outer_gaps(scaleFactor: number = 1) : { top: number, bottom: number, left: number, right: number } {
         // get the gaps settings and scale by scale factor
         const value = this._settings.get_uint(this.SETTING_OUTER_GAPS) * scaleFactor;
         return {

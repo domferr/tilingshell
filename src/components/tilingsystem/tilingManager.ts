@@ -2,11 +2,11 @@ import Meta from "gi://Meta";
 import Mtk from "gi://Mtk";
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { logger } from "@/utils/shell";
-import { buildMargin, buildRectangle, buildTileMargin, getScalingFactor, getStyleScalingFactor, isPointInsideRect } from "@/utils/ui";
+import { buildMargin, buildRectangle, buildTileGaps, getScalingFactor, getScalingFactorOf, isPointInsideRect } from "@/utils/ui";
 import TilingLayout from "@/components/tilingsystem/tilingLayout";
 import Clutter from "gi://Clutter";
 import GLib from "gi://GLib";
-import { SNAP_ASSIST_SIGNAL, SnapAssist } from '../snapassist/snapAssist';
+import SnapAssist from '../snapassist/snapAssist';
 import SelectionTilePreview from '../tilepreview/selectionTilePreview';
 import Settings from '@/settings';
 import SignalHandling from '@/signalHandling';
@@ -25,9 +25,9 @@ export class TilingManager {
     private _tilingLayout: TilingLayout;
 
     private _workArea: Mtk.Rectangle;
-    private _scaleFactor: number;
     private _innerGaps: Clutter.Margin;
     private _outerGaps: Clutter.Margin;
+    private _enableScaling: boolean;
 
     private _isGrabbingWindow: boolean;
     private _movingWindowTimerDuration: number = 15;
@@ -45,33 +45,34 @@ export class TilingManager {
      * Constructs a new TilingManager instance.
      * @param monitor The monitor to manage tiling for.
      */
-    constructor(monitor: Monitor) {
+    constructor(monitor: Monitor, enableScaling: boolean) {
         this._isGrabbingWindow = false;
         this._wasAltPressed = false;
         this._wasCtrlPressed = false;
         this._isSnapAssisting = false;
+        this._enableScaling = enableScaling;
         this._monitor = monitor;
         this._signals = new SignalHandling();
         this._debug = logger(`TilingManager ${monitor.index}`);
         const layout: Layout = GlobalState.get().getSelectedLayoutOfMonitor(monitor.index);
 
         // handle scale factor of the monitor
-        this._scaleFactor = getScalingFactor(monitor.index);
-        this._innerGaps = buildMargin(Settings.get_inner_gaps(this._scaleFactor));
-        this._outerGaps = buildMargin(Settings.get_outer_gaps(this._scaleFactor));
+        this._innerGaps = buildMargin(Settings.get_inner_gaps());
+        this._outerGaps = buildMargin(Settings.get_outer_gaps());
 
         // get the monitor's workarea
         this._workArea = Main.layoutManager.getWorkAreaForMonitor(this._monitor.index);
         this._debug(`Work area for monitor ${this._monitor.index}: ${this._workArea.x} ${this._workArea.y} ${this._workArea.width}x${this._workArea.height}`);
 
+        const monitorScalingFactor = this._enableScaling ? getScalingFactor(monitor.index):undefined;
         // build the tiling layout
-        this._tilingLayout = new TilingLayout(layout, this._innerGaps, this._outerGaps, this._workArea);
+        this._tilingLayout = new TilingLayout(layout, this._innerGaps, this._outerGaps, this._workArea, monitorScalingFactor);
 
         // build the selection tile
         this._selectedTilesPreview = new SelectionTilePreview({ parent: global.windowGroup });
-        
+
         // build the snap assistant
-        this._snapAssist = new SnapAssist(global.windowGroup, this._workArea, this._scaleFactor, getStyleScalingFactor(monitor.index));
+        this._snapAssist = new SnapAssist(global.windowGroup, this._workArea, monitorScalingFactor);
     }
 
     /**
@@ -91,12 +92,12 @@ export class TilingManager {
         });
         
         this._signals.connect(Settings, Settings.SETTING_INNER_GAPS, () => {
-            this._innerGaps = buildMargin(Settings.get_inner_gaps(this._scaleFactor));
-            this._tilingLayout.relayout({ innerMargin: this._innerGaps });
+            this._innerGaps = buildMargin(Settings.get_inner_gaps());
+            this._tilingLayout.relayout({ innerGaps: this._innerGaps });
         });
         this._signals.connect(Settings, Settings.SETTING_OUTER_GAPS, () => {
-            this._outerGaps = buildMargin(Settings.get_outer_gaps(this._scaleFactor));
-            this._tilingLayout.relayout({ outerMargin: this._outerGaps });
+            this._outerGaps = buildMargin(Settings.get_outer_gaps());
+            this._tilingLayout.relayout({ outerGaps: this._outerGaps });
         });
 
         this._signals.connect(global.display, 'grab-op-begin', (_display: Meta.Display, window: Meta.Window, grabOp: Meta.GrabOp) => {
@@ -111,7 +112,7 @@ export class TilingManager {
             this._onWindowGrabEnd(window);
         });
 
-        this._signals.connect(this._snapAssist, SNAP_ASSIST_SIGNAL,
+        this._signals.connect(this._snapAssist, "snap-assist",
             (_: SnapAssist, tile: Tile) => this._onSnapAssist(tile)
         );
     }
@@ -250,7 +251,13 @@ export class TilingManager {
         }
         this._tilingLayout.hoverTilesInRect(selectionRect);
 
-        this._selectedTilesPreview.gaps = buildTileMargin(selectionRect, this._innerGaps, this._outerGaps, this._workArea);
+        this._selectedTilesPreview.gaps = buildTileGaps(
+            selectionRect, 
+            this._tilingLayout.innerGaps, 
+            this._tilingLayout.outerGaps, 
+            this._workArea,
+            this._enableScaling ? getScalingFactorOf(this._tilingLayout)[1]:undefined
+        );
         this._selectedTilesPreview.openAbove(
             window,
             true,
@@ -335,7 +342,13 @@ export class TilingManager {
             scaledRect.height -= scaledRect.y + scaledRect.height - this._workArea.y - this._workArea.height;
         }
         
-        this._selectedTilesPreview.gaps = buildTileMargin(scaledRect, this._innerGaps, this._outerGaps, this._workArea);
+        this._selectedTilesPreview.gaps = buildTileGaps(
+            scaledRect,
+            this._tilingLayout.innerGaps, 
+            this._tilingLayout.outerGaps, 
+            this._workArea,
+            this._enableScaling ? getScalingFactorOf(this._tilingLayout)[1]:undefined
+        ); 
         this._selectedTilesPreview.open(true, scaledRect);
         this._isSnapAssisting = true;
     }

@@ -1,6 +1,6 @@
 {
   "name": "modernwindowmanager",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "author": "Domenico Ferraro <ferraro.domenico125@gmail.com>",
   "private": true,
   "license": "GPL v2.0",
@@ -9,7 +9,7 @@
     "clean": "rm -rf dist; rm -rf dist_legacy",
     "build:schema": "npm run clean:schema && glib-compile-schemas ./resources/schemas --targetdir=./dist/schemas/ && cp ./dist/schemas/ ./dist_legacy/ -r",
     "clean:schema": "rm -rf ./dist/schemas/*.compiled; rm -rf ./dist_legacy/schemas/*.compiled",
-    "build:package": "rm -rf './dist/modernwindowmanager@ferrarodomenico.com.zip'; rm -rf './dist_legacy/modernwindowmanager@ferrarodomenico.com.zip'; npm run build && cd ./dist && zip -qr 'modernwindowmanager@ferrarodomenico.com.zip' . && cd ../dist_legacy && zip -qr 'modernwindowmanager@ferrarodomenico.com.zip' .",
+    "build:package": "rm -rf './dist/modernwindowmanager@ferrarodomenico.com.zip'; rm -rf './dist_legacy/modernwindowmanager@ferrarodomenico.com.zip'; npm run build && cd ./dist && zip -qr ../modernwindowmanager@ferrarodomenico.com.zip * && cd ../dist_legacy && zip -qr ../GNOME.40-44.modernwindowmanager@ferrarodomenico.com.zip *",
     "install:extension": "mkdir -p ~/.local/share/gnome-shell/extensions/modernwindowmanager@ferrarodomenico.com && cp ./dist$([ $(gnome-shell --version | grep -o -E '[0-9]+' | head -n 1) -le 44 ] && echo '_legacy')/* ~/.local/share/gnome-shell/extensions/modernwindowmanager@ferrarodomenico.com/ -r",
     "wayland-session": "dbus-run-session -- gnome-shell --nested --wayland",
     "dev:wayland": "npm run build && npm run install:extension && npm run wayland-session"

@@ -4,7 +4,7 @@ import Shell from 'gi://Shell';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import { logger } from '@/utils/shell';
-import { getMonitors, getScalingFactor } from '@/utils/ui';
+import { addToStatusArea, enableScalingFactorSupport, getMonitors, getScalingFactor } from '@/utils/ui';
 import Settings from '@/settings';
 import Layout from '@/components/layout/Layout';
 import Tile from '@/components/layout/Tile';
@@ -31,9 +31,15 @@ export default class Indicator extends PanelMenu.Button {
     //@ts-ignore todo
     private _currentMenu: CurrentMenu;
     private _state: IndicatorState;
+    private _enableScaling: boolean;
 
-    constructor(path: string) {
+    constructor(path: string, uuid: string) {
         super(0.5, 'Modern Window Manager Indicator', false);
+        addToStatusArea(this, uuid);
+
+        // Bind the "show-indicator" setting to the "visible" property.
+        Settings.bind(Settings.SETTING_SHOW_INDICATOR, this, 'visible');
+
         const icon = new St.Icon({
             gicon: Gio.icon_new_for_string(`${path}/icons/indicator-symbolic.svg`),
             styleClass: 'system-status-icon indicator-icon',
@@ -41,8 +47,26 @@ export default class Indicator extends PanelMenu.Button {
 
         this.add_child(icon);
         this._state = IndicatorState.DEFAULT;
+        this._enableScaling = false;
         
         this.connect('destroy', this._onDestroy.bind(this));
+    }
+
+    public set enableScaling(value: boolean) {
+        if (this._enableScaling === value) return;
+        this._enableScaling = value;
+        
+        if (value) {
+            const monitor = Main.layoutManager.findMonitorForActor(this);
+            const scalingFactor = getScalingFactor(monitor?.index || Main.layoutManager.primaryIndex);
+            //@ts-ignore
+            enableScalingFactorSupport(this.menu.box, scalingFactor);
+        }
+
+        if (this._currentMenu && this._state === IndicatorState.DEFAULT) {
+            this._currentMenu.destroy();
+            this._currentMenu = new DefaultMenu(this);
+        }
     }
 
     public enable() {
@@ -95,16 +119,14 @@ export default class Indicator extends PanelMenu.Button {
         ], `${Shell.Global.get().get_current_time()}`);
 
         if (this._layoutEditor) this._layoutEditor.layout = newLayout;
-        else this._layoutEditor = new LayoutEditor(newLayout, Main.layoutManager.monitors[Main.layoutManager.primaryIndex]);
+        else this._layoutEditor = new LayoutEditor(newLayout, Main.layoutManager.monitors[Main.layoutManager.primaryIndex], this._enableScaling);
         this._setState(IndicatorState.CREATE_NEW);
         if (showLegend) this.openMenu(true);
     }
 
-    public openMenu(legend: boolean) {
-        const scalingFactor = getScalingFactor(global.display.get_current_monitor());
-        
+    public openMenu(legend: boolean) {        
         const dialog = new EditorDialog({
-            scalingFactor,
+            enableScaling: this._enableScaling,
             onNewLayout: () => {
                 this.newLayoutOnClick(false);
             },
@@ -119,7 +141,7 @@ export default class Indicator extends PanelMenu.Button {
                 const layCopy = new Layout(lay.tiles.map(t => new Tile({x: t.x, y: t.y, width: t.width, height: t.height, groups: [...t.groups]})), lay.id);
 
                 if (this._layoutEditor) this._layoutEditor.layout = layCopy;
-                else this._layoutEditor = new LayoutEditor(layCopy, Main.layoutManager.monitors[Main.layoutManager.primaryIndex]);
+                else this._layoutEditor = new LayoutEditor(layCopy, Main.layoutManager.monitors[Main.layoutManager.primaryIndex], this._enableScaling);
                 
                 this._setState(IndicatorState.EDITING_LAYOUT);
             },

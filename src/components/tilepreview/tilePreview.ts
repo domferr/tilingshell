@@ -4,7 +4,7 @@ import Mtk from "gi://Mtk";
 import { registerGObjectClass } from "@/utils/gjs";
 import { logger } from "@/utils/shell";
 import Clutter from 'gi://Clutter';
-import { buildRectangle } from '@utils/ui';
+import { buildRectangle, getScalingFactorOf } from '@utils/ui';
 
 export const WINDOW_ANIMATION_TIME = 100;
 
@@ -28,14 +28,20 @@ export default class TilePreview extends St.Widget {
 
   constructor(params: Partial<TilePreview.ConstructorProperties>) {
     super(params);
+    if (params.parent) params.parent.add_child(this);
+    
     this._showing = false;
     this._rect = params.rect || buildRectangle({});
-    this._gaps = params.gaps || new Clutter.Margin();
-    if (params.parent) params.parent.add_child(this);
+    this._gaps = new Clutter.Margin();
+    this.gaps = params.gaps || new Clutter.Margin();
   }
 
   public set gaps(gaps: Clutter.Margin) {
-    this._gaps = gaps;
+    const [_, scalingFactor] = getScalingFactorOf(this);
+    this._gaps.top = gaps.top * scalingFactor;
+    this._gaps.right = gaps.right * scalingFactor;
+    this._gaps.bottom = gaps.bottom * scalingFactor;
+    this._gaps.left = gaps.left * scalingFactor;
   }
 
   _init() {

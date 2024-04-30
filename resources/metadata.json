@@ -11,7 +11,7 @@
     "45",
     "46"
   ],
-  "version": 4,
+  "version": 5,
   "url": "https://github.com/domferr/modernwindowmanager",
   "settings-schema": "org.gnome.shell.extensions.modernwindowmanager"
 }

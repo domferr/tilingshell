@@ -128,6 +128,8 @@ export default class MWMExtensionPreferences extends ExtensionPreferences {
             }
         );
         layoutsGroup.add(resetBtn);
+
+        window.searchEnabled = true;
     }
 
     _buildSwitchRow(settingsKey: string, title: string, subtitle: string): Adw.ActionRow {

@@ -1,6 +1,7 @@
 import { registerGObjectClass } from "@/utils/gjs";
 import Mtk from 'gi://Mtk';
 import Clutter from 'gi://Clutter';
+import St from 'gi://St';
 import TilePreview from "./tilePreview";
 import { logger } from "@/utils/shell";
 
@@ -8,24 +9,17 @@ const debug = logger("SelectionTilePreview");
 
 @registerGObjectClass
 export default class SelectionTilePreview extends TilePreview {
-  private _backgroundColor: Clutter.Color | null = null;
-  private _styleChangedSignalID: number | null = null;
-
   constructor(params: {
-    parent?: Clutter.Actor,
-    rect?: Mtk.Rectangle,
-    gaps?: Clutter.Margin,
+    parent: Clutter.Actor,
   }) {
-    super({ name:"SelectionTilePreview", ...params });
+    super({ parent: params.parent, name: "SelectionTilePreview" });
 
     this._recolor();
-    this._styleChangedSignalID = this.connect("style-changed", () => {
-      const { red, green, blue } = this.get_theme_node().get_background_color();
-      
-      if (this._backgroundColor?.red !== red || this._backgroundColor?.green !== green || this._backgroundColor?.blue !== blue) {
-        this._recolor();
-      }
+    const styleChangedSignalID = St.ThemeContext.get_for_stage(global.get_stage()).connect("changed", () => {
+      this.set_style(null);
+      this._recolor();
     });
+    this.connect("destroy", () => St.ThemeContext.get_for_stage(global.get_stage()).disconnect(styleChangedSignalID));
   }
 
   _init() {
@@ -34,13 +28,12 @@ export default class SelectionTilePreview extends TilePreview {
   }
 
   _recolor() {
-    this._backgroundColor = this.get_theme_node().get_background_color().copy();
-    
+    const backgroundColor = this.get_theme_node().get_background_color().copy();
     // since an alpha value lower than 160 is not so much visible, enforce a minimum value of 160
-    let newAlpha = Math.max(Math.min(this._backgroundColor.alpha + 35, 255), 160);
+    const newAlpha = Math.max(Math.min(backgroundColor.alpha + 35, 255), 160);
     // The final alpha value is divided by 255 since CSS needs a value from 0 to 1, but ClutterColor expresses alpha from 0 to 255
     this.set_style(`
-      background-color: rgba(${this._backgroundColor.red}, ${this._backgroundColor.green}, ${this._backgroundColor.blue}, ${newAlpha / 255}) !important;
+      background-color: rgba(${backgroundColor.red}, ${backgroundColor.green}, ${backgroundColor.blue}, ${newAlpha / 255}) !important;
     `);
   }
 
@@ -50,11 +43,5 @@ export default class SelectionTilePreview extends TilePreview {
     this._rect.width = 0;
     this._rect.height = 0;
     super.close();
-  }
-
-  destroy() {
-    if (this._styleChangedSignalID) this.disconnect(this._styleChangedSignalID);
-    this._styleChangedSignalID = null;
-    super.destroy();
   }
 }

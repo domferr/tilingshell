@@ -32,28 +32,16 @@ export const positionRelativeTo = (actor: Clutter.Actor, anchestor: Clutter.Acto
     }
 }
 
-export const getGlobalPosition = (actor: Clutter.Actor) : {x: number, y: number} => {
-    if (!actor) return {x:0, y:0};
-
-    const parent = actor.get_parent();
-    const parentPos = parent === null ? {x:0, y:0}:getGlobalPosition(parent);
-
-    return {
-        x: actor.x + parentPos.x,
-        y: actor.y + parentPos.y,
-    }
-}
-
-export const buildTileMargin = (tilePos: Mtk.Rectangle, innerMargin: Clutter.Margin, outerMargin: Clutter.Margin, containerRect: Mtk.Rectangle): Clutter.Margin => {
+export const buildTileGaps = (tilePos: Mtk.Rectangle, innerMargin: Clutter.Margin, outerMargin: Clutter.Margin, containerRect: Mtk.Rectangle, scalingFactor: number = 1): Clutter.Margin => {
     const isLeft = tilePos.x === containerRect.x;
     const isTop = tilePos.y === containerRect.y;
     const isRight = tilePos.x + tilePos.width === containerRect.x + containerRect.width;
     const isBottom = tilePos.y + tilePos.height === containerRect.y + containerRect.height;
     const margin = new Clutter.Margin();
-    margin.top = isTop ? outerMargin.top:innerMargin.top/2;
-    margin.bottom = isBottom ? outerMargin.bottom:innerMargin.bottom/2;
-    margin.left = isLeft ? outerMargin.left:innerMargin.left/2;
-    margin.right = isRight ? outerMargin.right:innerMargin.right/2;
+    margin.top = (isTop ? outerMargin.top:innerMargin.top/2) * scalingFactor;
+    margin.bottom = (isBottom ? outerMargin.bottom:innerMargin.bottom/2) * scalingFactor;
+    margin.left = (isLeft ? outerMargin.left:innerMargin.left/2) * scalingFactor;
+    margin.right = (isRight ? outerMargin.right:innerMargin.right/2) * scalingFactor;
     return margin;
 }
 
@@ -63,10 +51,21 @@ export const getScalingFactor = (monitorIndex: number) => {
     return scalingFactor;
 }
 
-export const getStyleScalingFactor = (monitorIndex: number) => {
-    if (Main.layoutManager.monitors.length == 1) return 1;
+export const getScalingFactorOf = (widget: St.Widget): [boolean, number] => {
+    const [hasReference, scalingReference] = widget.get_theme_node().lookup_length('scaling-reference', true);
+    // if the reference is missing, then the parent opted out of scaling the child
+    if (!hasReference) return [true, 1];
+    // if the scalingReference is not 1, then the scaling factor is already applied on styles (but not on width and height)
 
-    return getScalingFactor(monitorIndex);
+    const [hasValue, monitorScalingFactor] = widget.get_theme_node().lookup_length('monitor-scaling-factor', true);
+    if (!hasValue) return [true, 1];
+
+    return [scalingReference != 1, monitorScalingFactor / scalingReference];
+}
+
+export const enableScalingFactorSupport = (widget: St.Widget, monitorScalingFactor?: number) => {
+    if (!monitorScalingFactor) return;
+    widget.set_style(`scaling-reference: 1px; monitor-scaling-factor: ${monitorScalingFactor}px;`);
 }
 
 export function getWindowsOfMonitor(monitor: Monitor): Meta.Window[] {

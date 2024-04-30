@@ -3,27 +3,34 @@
 }
 
 .layout-button {
-    padding: calc($base_padding / 2);
-    border: rgba(255,255,255,0) solid 1px;
     transition: 100ms ease all;
-}
-
-.layout-button:hover {
-    border: rgba(255,255,255,0.8) solid 1px;
-    background-color: rgba(255,255,255,0.25);
+    padding: calc($base_padding / 2);
+    border-radius: $snap-assist-tile-border-radius;
+    border-width: $snap-assist-tile-border-width;
+    border-color: transparent;
 
     .snap-assist-tile {
-        background-color: rgba(255,255,255,0.3);
-        border: 1px solid rgba(255,255,255,0.5);
+        border-color: rgba(255,255,255,0.4);
+        background-color: rgba(255,255,255,0.1);
+    }
+
+    .snap-assist-tile.dark {
+        border-color: #939393;
+        background-color: #e2e2e2;
     }
 }
 
+.layout-button:hover,
 .layout-button:checked {
-    border: rgba(255,255,255,0.8) solid 1px;
-    background-color: rgba(255,255,255,0.25);
+    border-color: rgba(255,255,255,0.7);
 
     .snap-assist-tile {
-        background-color: rgba(255,255,255,0.3);
-        border: 1px solid rgba(255,255,255,0.5);
+        border-color: rgba(255,255,255,0.7);
+        background-color: rgba(255,255,255,0.25);
+    }
+
+    .snap-assist-tile.dark {
+        border-color: #6c6c6c;
+        background-color: #d3d3d3;
     }
 }

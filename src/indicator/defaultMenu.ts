@@ -3,7 +3,7 @@ import Clutter from 'gi://Clutter';
 import SignalHandling from "@/signalHandling";
 import Indicator from "./indicator";
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import { getScalingFactor } from '@/utils/ui';
+import { getScalingFactorOf } from '@/utils/ui';
 import Settings from '@/settings';
 import * as IndicatorUtils from './utils';
 import GlobalState from '@/globalState';
@@ -24,9 +24,6 @@ export default class DefaultMenu implements CurrentMenu {
         this._indicator = indicator;
         this._signals = new SignalHandling();
 
-        let monitor = Main.layoutManager.findMonitorForActor(indicator);
-        this._scalingFactor = getScalingFactor(monitor?.index || Main.layoutManager.primaryIndex);
-
         this._layoutsBoxLayout = new St.BoxLayout({
             xAlign: Clutter.ActorAlign.CENTER,
             yAlign: Clutter.ActorAlign.CENTER,
@@ -35,10 +32,12 @@ export default class DefaultMenu implements CurrentMenu {
             vertical: false, // horizontal box layout
             styleClass: "layouts-box-layout"
         });
+        
         const layoutsPopupMenu = new PopupMenu.PopupBaseMenuItem({ style_class: 'indicator-menu-item' });
         layoutsPopupMenu.add_child(this._layoutsBoxLayout);
 
         (this._indicator.menu as PopupMenu.PopupMenu).addMenuItem(layoutsPopupMenu);
+        this._scalingFactor = getScalingFactorOf(this._layoutsBoxLayout)[1];
 
         this._drawLayouts();
         // update the layouts shown by the indicator when they are modified
@@ -61,13 +60,16 @@ export default class DefaultMenu implements CurrentMenu {
         });
 
         this._signals.connect(Main.layoutManager, 'monitors-changed', () => {
-            let monitor = Main.layoutManager.findMonitorForActor(this._indicator);
-            const newScalingFactor = getScalingFactor(monitor?.index || Main.layoutManager.primaryIndex);
-            if (this._scalingFactor === newScalingFactor) return;
-
-            this._scalingFactor = newScalingFactor;
-            this._drawLayouts();
+            this._updateScaling();
         });
+    }
+
+    private _updateScaling() {
+        const newScalingFactor = getScalingFactorOf(this._layoutsBoxLayout)[1];
+        if (this._scalingFactor === newScalingFactor) return;
+
+        this._scalingFactor = newScalingFactor;
+        this._drawLayouts();
     }
 
     private _buildEditingButtonsRow() {
@@ -104,7 +106,7 @@ export default class DefaultMenu implements CurrentMenu {
         const layoutHeight: number = 36;
         const layoutWidth: number = 64; // 16:9 ratio. -> (16*layoutHeight) / 9 and then rounded to int
         this._layoutsButtons = layouts.map((lay, btnInd) => {
-            const btn = new LayoutButton(this._layoutsBoxLayout, lay, hasGaps ? 1:0, this._scalingFactor, layoutHeight, layoutWidth);
+            const btn = new LayoutButton(this._layoutsBoxLayout, lay, hasGaps ? 2:0, layoutHeight, layoutWidth);
             btn.connect('clicked', (self) => !btn.checked && this._indicator.selectLayoutOnClick(lay));
             return btn;
         });
@@ -115,9 +117,8 @@ export default class DefaultMenu implements CurrentMenu {
     }
 
     public destroy() {
-        //@ts-ignore todo
-        this._indicator.menu.removeAll();
-        this._layoutsButtons = [];
         this._signals.disconnect();
+        (this._indicator.menu as PopupMenu.PopupMenu).removeAll();
+        this._layoutsButtons = [];
     }
 }

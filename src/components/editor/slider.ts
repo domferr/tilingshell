@@ -7,7 +7,7 @@ import Meta from 'gi://Meta';
 import Mtk from 'gi://Mtk';
 import GObject from "gi://GObject";
 import { MetaInfo } from "gi://GObject";
-import { getEventCoords } from "@utils/ui";
+import { getEventCoords, getScalingFactorOf } from "@utils/ui";
 
 const debug = logger("Slider");
 
@@ -37,7 +37,7 @@ export default class Slider extends St.Button {
     private _maxTileCoord: number;
     private _scalingFactor: number;
 
-    constructor(parent: Clutter.Actor, groupId: number, x: number, y: number, horizontal: boolean, scaleFactor: number) {
+    constructor(parent: Clutter.Actor, groupId: number, x: number, y: number, horizontal: boolean) {
         super({ 
             styleClass: "layout-editor-slider",
             canFocus: true,
@@ -45,11 +45,13 @@ export default class Slider extends St.Button {
             trackHover: true,
         });
         parent.add_child(this);
+
         this._signals = new Map<EditableTilePreview, number[]>();
 
         this._groupId = groupId;
         this._horizontalDir = horizontal;
-        this._scalingFactor = scaleFactor;
+        const [_, scalingFactor] = getScalingFactorOf(this);
+        this._scalingFactor = scalingFactor;
         this.set_width(this.desiredWidth);
         this.set_height(this.desiredHeight);
 

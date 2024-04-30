@@ -6,7 +6,7 @@ import Mtk from "gi://Mtk";
 import Settings from "@/settings";
 import Shell from 'gi://Shell';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import { buildMargin, buildRectangle, buildTileMargin, getEventCoords, getScalingFactor, getWindowsOfMonitor } from "@/utils/ui";
+import { buildMargin, buildRectangle, buildTileGaps, enableScalingFactorSupport, getEventCoords, getScalingFactor, getWindowsOfMonitor } from "@/utils/ui";
 import Layout from "../layout/Layout";
 import TileUtils from "../layout/TileUtils";
 import Slider from "./slider";
@@ -23,7 +23,6 @@ export default class LayoutEditor extends St.Widget {
     private _layout: Layout;
     private _containerRect: Mtk.Rectangle;
     private _sliders: Slider[];
-    private _scaleFactor: number;
     private _innerGaps: Clutter.Margin;
     private _outerGaps: Clutter.Margin;
 
@@ -31,16 +30,20 @@ export default class LayoutEditor extends St.Widget {
 
     private readonly _hoverWidget: HoverLine;
 
-    constructor(layout: Layout, monitor: Monitor) {
+    constructor(layout: Layout, monitor: Monitor, enableScaling: boolean) {
         super({ styleClass: "layout-editor" });
-        Shell.Global.get().windowGroup.add_child(this);
+        global.windowGroup.add_child(this);
+
+        if (enableScaling) {
+            const scalingFactor = getScalingFactor(monitor.index);
+            enableScalingFactorSupport(this, scalingFactor);
+        }
         
         const workArea = Main.layoutManager.getWorkAreaForMonitor(monitor.index);
         this.set_position(workArea.x, workArea.y);
         this.set_size(workArea.width, workArea.height);
-        this._scaleFactor = getScalingFactor(monitor.index);
-        this._innerGaps = buildMargin(Settings.get_inner_gaps(this._scaleFactor));
-        this._outerGaps = buildMargin(Settings.get_outer_gaps(this._scaleFactor));
+        this._innerGaps = buildMargin(Settings.get_inner_gaps());
+        this._outerGaps = buildMargin(Settings.get_outer_gaps());
         this._sliders = [];
         this._containerRect = buildRectangle({ x: 0, y: 0, width: workArea.width, height: workArea.height });
         
@@ -48,8 +51,7 @@ export default class LayoutEditor extends St.Widget {
         this._minimizedWindows = getWindowsOfMonitor(monitor).filter(win => !win.is_hidden());
         this._minimizedWindows.forEach(win => win.can_minimize() && win.minimize());
         
-        this._hoverWidget = new HoverLine(workArea.copy(), this._scaleFactor);
-        this.add_child(this._hoverWidget);
+        this._hoverWidget = new HoverLine(this, workArea.copy());
 
         this.connect("destroy", this._onDestroy.bind(this));
 
@@ -129,7 +131,7 @@ export default class LayoutEditor extends St.Widget {
     }
     
     private _buildEditableTile(tile: Tile, rect: Mtk.Rectangle) : EditableTilePreview {
-        const gaps = buildTileMargin(rect, this._innerGaps, this._outerGaps, this._containerRect);
+        const gaps = buildTileGaps(rect, this._innerGaps, this._outerGaps, this._containerRect);
         const editableTile = new EditableTilePreview({ parent: this, tile, containerRect: this._containerRect, rect, gaps });
         editableTile.open();
         editableTile.connect("clicked", (_, clicked_button: number) => {
@@ -243,8 +245,7 @@ export default class LayoutEditor extends St.Widget {
             groupId,
             coord,
             coord,
-            isHorizontal,
-            this._scaleFactor
+            isHorizontal
         );
     }
 

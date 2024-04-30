@@ -3,7 +3,7 @@ import Clutter from 'gi://Clutter';
 
 export const createButton = (icon_name: string, text: string) : St.Button => {
     const btn = new St.Button({ 
-        styleClass: "message-list-clear-button button default",
+        styleClass: "button",
         canFocus: true,
         xExpand: true,
         child: new St.BoxLayout({

@@ -6,6 +6,7 @@ import Mtk from 'gi://Mtk';
 import Clutter from "gi://Clutter";
 import EditableTilePreview from "./editableTilePreview";
 import { logger } from "@/utils/shell";
+import { getScalingFactorOf } from "@utils/ui";
 
 const debug = logger("HoverLine");
 
@@ -18,10 +19,13 @@ export default class HoverLine extends St.Widget {
 
     private _hoveredTile: EditableTilePreview | null;
 
-    constructor(workArea: Mtk.Rectangle, scalingFactor: number) {
+    constructor(parent: Clutter.Actor, workArea: Mtk.Rectangle) {
         super({ styleClass: "hover-line"});
+        parent.add_child(this);
         
         this._hoveredTile = null;
+        
+        const [_, scalingFactor] = getScalingFactorOf(this);
         this._size = 16 * scalingFactor;
         this._workArea = workArea;
 

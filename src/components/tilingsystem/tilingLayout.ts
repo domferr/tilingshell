@@ -23,10 +23,18 @@ export default class TilingLayout extends LayoutWidget<TilePreview> {
     private _showing: boolean;
     private _hoveredTiles: TilePreview[];
 
-    constructor(layout: Layout, innerMargin: Clutter.Margin, outerMargin: Clutter.Margin, workarea: Mtk.Rectangle) {
-        super(global.windowGroup, layout, innerMargin, outerMargin, workarea);
+    constructor(layout: Layout, innerGaps: Clutter.Margin, outerGaps: Clutter.Margin, workarea: Mtk.Rectangle, scalingFactor?: number) {
+        super({
+            containerRect: workarea,
+            parent: global.windowGroup,
+            layout,
+            innerGaps,
+            outerGaps,
+            scalingFactor
+        });
         this._showing = false;
         this._hoveredTiles = [];
+        super.relayout();
     }
 
     _init() {
@@ -35,7 +43,7 @@ export default class TilingLayout extends LayoutWidget<TilePreview> {
     }
 
     protected buildTile(parent: Clutter.Actor, rect: Mtk.Rectangle, gaps: Clutter.Margin, tile: Tile): TilePreview {
-        return this._blur ? new BlurTilePreview({parent, rect, gaps}):new TilePreview({parent, rect, gaps});
+        return this._blur ? new BlurTilePreview({ parent, rect, gaps }):new TilePreview({ parent, rect, gaps });
     }
 
     public get showing(): boolean {
@@ -106,7 +114,7 @@ export default class TilingLayout extends LayoutWidget<TilePreview> {
     }
 
     public unhoverAllTiles() {
-        this._hoveredTiles.forEach(prev => prev.open() /*prev.set_hover(false)*/);
+        this._hoveredTiles.forEach(prev => prev.open());
         this._hoveredTiles = [];
     }
 

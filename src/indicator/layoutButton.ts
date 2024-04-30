@@ -4,21 +4,21 @@ import LayoutWidget from '@/components/layout/LayoutWidget';
 import SnapAssistTile from '@/components/snapassist/snapAssistTile';
 import Layout from '@/components/layout/Layout';
 import Tile from '@/components/layout/Tile';
-import { buildRectangle } from '@utils/ui';
+import { buildMarginOf, buildRectangle, getScalingFactorOf } from '@utils/ui';
 import { registerGObjectClass } from '@utils/gjs';
 import St from 'gi://St';
 
 @registerGObjectClass
 class LayoutButtonWidget extends LayoutWidget<SnapAssistTile> {
-    constructor(parent: Clutter.Actor, layout: Layout, gapSize: number, scaleFactor: number, height: number, width: number) {
-        const rect = buildRectangle({ x: 0, y: 0, width: width * scaleFactor, height: height * scaleFactor});
-        const gaps = new Clutter.Margin();
-        gaps.top = gapSize * scaleFactor;
-        gaps.bottom = gapSize * scaleFactor;
-        gaps.left = gapSize * scaleFactor;
-        gaps.right = gapSize * scaleFactor;
-        
-        super(parent, layout, gaps, new Clutter.Margin(), rect, "");
+    constructor(parent: Clutter.Actor, layout: Layout, gapSize: number, height: number, width: number) {        
+        super({ 
+            parent, 
+            layout,
+            containerRect: buildRectangle({ x: 0, y: 0, width, height }),
+            innerGaps: buildMarginOf(gapSize), 
+            outerGaps: new Clutter.Margin()
+        });
+        this.relayout();
     }
 
     buildTile(parent: Clutter.Actor, rect: Mtk.Rectangle, gaps: Clutter.Margin, tile: Tile): SnapAssistTile {
@@ -28,7 +28,7 @@ class LayoutButtonWidget extends LayoutWidget<SnapAssistTile> {
 
 @registerGObjectClass
 export default class LayoutButton extends St.Button {
-    constructor(parent: Clutter.Actor, layout: Layout, gapSize: number, scaleFactor: number, height: number, width: number) {
+    constructor(parent: Clutter.Actor, layout: Layout, gapSize: number, height: number, width: number) {
         super({
             styleClass: "layout-button button",
             xExpand: false,
@@ -37,7 +37,9 @@ export default class LayoutButton extends St.Button {
 
         parent.add_child(this);
 
+        const [_, scalingFactor] = getScalingFactorOf(this);
+
         this.child = new St.Widget(); // the child is just a container
-        new LayoutButtonWidget(this.child, layout, gapSize, scaleFactor, height, width);
+        new LayoutButtonWidget(this.child, layout, gapSize, height * scalingFactor, width * scalingFactor);
     }
 }
