@@ -31,7 +31,7 @@ export default class SnapAssistLayout extends LayoutWidget<SnapAssistTile> {
 
         super.relayout({
             containerRect: buildRectangle({x: 0, y: 0, width, height})
-        })
+        });
     }
 
     buildTile(parent: Clutter.Actor, rect: Mtk.Rectangle, gaps: Clutter.Margin, tile: Tile): SnapAssistTile {

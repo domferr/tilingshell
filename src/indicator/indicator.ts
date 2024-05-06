@@ -4,7 +4,7 @@ import Shell from 'gi://Shell';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import { logger } from '@/utils/shell';
-import { addToStatusArea, enableScalingFactorSupport, getMonitors, getScalingFactor } from '@/utils/ui';
+import { enableScalingFactorSupport, getMonitors, getScalingFactor } from '@/utils/ui';
 import Settings from '@/settings';
 import Layout from '@/components/layout/Layout';
 import Tile from '@/components/layout/Tile';
@@ -15,7 +15,7 @@ import EditingMenu from './editingMenu';
 import EditorDialog from '../components/editor/editorDialog';
 import CurrentMenu from './currentMenu';
 import { registerGObjectClass } from '@utils/gjs';
-import { PopupMenu } from 'resource:///org/gnome/shell/ui/popupMenu.js';
+import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
 const debug = logger('indicator');
 
@@ -35,7 +35,7 @@ export default class Indicator extends PanelMenu.Button {
 
     constructor(path: string, uuid: string) {
         super(0.5, 'Modern Window Manager Indicator', false);
-        addToStatusArea(this, uuid);
+        Main.panel.addToStatusArea(uuid, this, 1, 'right');
 
         // Bind the "show-indicator" setting to the "visible" property.
         Settings.bind(Settings.SETTING_SHOW_INDICATOR, this, 'visible');
@@ -59,8 +59,7 @@ export default class Indicator extends PanelMenu.Button {
         if (value) {
             const monitor = Main.layoutManager.findMonitorForActor(this);
             const scalingFactor = getScalingFactor(monitor?.index || Main.layoutManager.primaryIndex);
-            //@ts-ignore
-            enableScalingFactorSupport(this.menu.box, scalingFactor);
+            enableScalingFactorSupport((this.menu as PopupMenu.PopupMenu).box, scalingFactor);
         }
 
         if (this._currentMenu && this._state === IndicatorState.DEFAULT) {
@@ -70,7 +69,7 @@ export default class Indicator extends PanelMenu.Button {
     }
 
     public enable() {
-        (this.menu as PopupMenu).removeAll();
+        (this.menu as PopupMenu.PopupMenu).removeAll();
         this._currentMenu = new DefaultMenu(this);
 
         // todo

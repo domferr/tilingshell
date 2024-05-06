@@ -10,14 +10,14 @@ export const WINDOW_ANIMATION_TIME = 100;
 
 const debug = logger('tilePreview');
 
-export module TilePreview {
-  export interface ConstructorProperties 
+//export module TilePreview {
+  export interface TilePreviewConstructorProperties 
     extends St.Widget.ConstructorProperties {
         parent: Clutter.Actor;
         rect: Mtk.Rectangle;
         gaps: Clutter.Margin;
   }
-}
+//}
 
 @registerGObjectClass
 export default class TilePreview extends St.Widget {
@@ -26,7 +26,7 @@ export default class TilePreview extends St.Widget {
   
   private _gaps: Clutter.Margin;
 
-  constructor(params: Partial<TilePreview.ConstructorProperties>) {
+  constructor(params: Partial<TilePreviewConstructorProperties>) {
     super(params);
     if (params.parent) params.parent.add_child(this);
     
@@ -42,6 +42,10 @@ export default class TilePreview extends St.Widget {
     this._gaps.right = gaps.right * scalingFactor;
     this._gaps.bottom = gaps.bottom * scalingFactor;
     this._gaps.left = gaps.left * scalingFactor;
+  }
+
+  public get gaps(): Clutter.Margin {
+    return this._gaps;
   }
 
   _init() {

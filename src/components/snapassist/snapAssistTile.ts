@@ -12,6 +12,7 @@ const debug = logger("SnapAssistTile");
 @registerGObjectClass
 export default class SnapAssistTile extends TilePreview {
     protected _tile: Tile;
+    private _styleChangedSignalID: number | undefined;
 
     constructor(params: {
         parent?: Clutter.Actor,
@@ -42,14 +43,13 @@ export default class SnapAssistTile extends TilePreview {
         );
 
         this._applyStyle();
-        const styleChangedSignalID = St.ThemeContext.get_for_stage(global.get_stage()).connect(
-            "changed", 
+        this._styleChangedSignalID = St.ThemeContext.get_for_stage(global.get_stage()).connect(
+            "changed",
             () => { 
                 this._applyStyle(); 
             }
         );
-
-        this.connect("destroy", () => St.ThemeContext.get_for_stage(global.get_stage()).disconnect(styleChangedSignalID));
+        this.connect("destroy", () => this.onDestroy());
     }
     
     _init() {
@@ -72,6 +72,13 @@ export default class SnapAssistTile extends TilePreview {
         } else {
             // apply dark theme
             this.add_style_class_name("dark");
+        }
+    }
+
+    onDestroy(): void {
+        if (this._styleChangedSignalID) {
+            St.ThemeContext.get_for_stage(global.get_stage()).disconnect(this._styleChangedSignalID);
+            this._styleChangedSignalID = undefined;
         }
     }
 }

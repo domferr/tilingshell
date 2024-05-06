@@ -73,7 +73,7 @@ export default class LayoutWidget<TileType extends TilePreview> extends St.Widge
         containerRect: Mtk.Rectangle, 
         innerGaps: Clutter.Margin, 
         outerGaps: Clutter.Margin
-    }>) {
+    }>): boolean {
         var trigger_relayout = this._previews.length === 0;
         if (params?.innerGaps) {
             this._innerGaps = params.innerGaps.copy();
@@ -94,15 +94,21 @@ export default class LayoutWidget<TileType extends TilePreview> extends St.Widge
 
         if (!trigger_relayout) {
             debug("relayout not needed");
-            return;
+            return false;
         }
 
-        this._previews?.forEach((preview) => preview.destroy());
-        this.remove_all_children();
+        this._previews?.forEach((preview) => {
+            if (preview.get_parent() === this) {
+                this.remove_child(preview);
+            }
+            preview.destroy();
+        });
         this._previews = [];
-        if (this._containerRect.width === 0 || this._containerRect.height === 0) return;
+        if (this._containerRect.width === 0 || this._containerRect.height === 0) return true;
 
         this.draw_layout();
         this._previews.forEach((lay) => lay.open());
+
+        return true;
     }
 }

@@ -3,7 +3,7 @@ import Clutter from 'gi://Clutter';
 
 export const createButton = (icon_name: string, text: string) : St.Button => {
     const btn = new St.Button({ 
-        styleClass: "button",
+        styleClass: "message-list-clear-button button",
         canFocus: true,
         xExpand: true,
         child: new St.BoxLayout({
@@ -16,7 +16,7 @@ export const createButton = (icon_name: string, text: string) : St.Button => {
             style: "spacing: 8px",
         })
     });
-    btn.child.add_child(new St.Icon({ iconName: icon_name, iconSize: 16 }));
+    btn.child.add_child(new St.Icon({ iconName: icon_name, iconSize: 16, yAlign: Clutter.ActorAlign.CENTER }));
     btn.child.add_child(new St.Label({ marginBottom: 4, marginTop: 4, text: text, yAlign: Clutter.ActorAlign.CENTER }));
     return btn;
 }

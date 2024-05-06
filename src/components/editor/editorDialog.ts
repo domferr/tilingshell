@@ -19,7 +19,6 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
     private readonly _layoutHeight: number = 72;
     private readonly _layoutWidth: number = 128; // 16:9 ratio. -> (16*layoutHeight) / 9 and then rounded to int
     private readonly _gapsSize: number = 3;
-    private readonly _signals: SignalHandling;
     
     private _layoutsBoxLayout: St.BoxLayout;
 
@@ -31,7 +30,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         legend: boolean
     }) {
         super({
-            destroyOnClose: false,
+            destroyOnClose: true,
             styleClass: 'editor-dialog',
         });
         
@@ -59,9 +58,9 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
 
         if (!params.legend) {
             this._drawLayouts({ layouts: GlobalState.get().layouts, ...params });
-            this._signals.connect(GlobalState.get(), "layouts-changed", () => {
+            /*this._signals.connect(GlobalState.get(), GlobalState.SIGNAL_LAYOUTS_CHANGED, () => {
                 this._drawLayouts({ layouts: GlobalState.get().layouts, ...params });
-            });
+            });*/
         }
 
         this.addButton({
@@ -74,8 +73,6 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         });
 
         if (params.legend) this._makeLegendDialog();
-
-        this.connect("destroy", () => this._signals.disconnect());
     }
 
     private _makeLegendDialog() {
@@ -152,8 +149,8 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         legend.add_child(suggestion1);
         legend.add_child(suggestion2);
         legend.add_child(suggestion3);
-        this._signals.disconnect();
-        this.contentLayout.remove_all_children();
+        
+        this.contentLayout.destroy_all_children();
         this.contentLayout.add_child(new St.Label({
             text: "How to use the editor", 
             xAlign: Clutter.ActorAlign.CENTER, 
@@ -180,7 +177,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         onNewLayout: () => void
     }) {
         const gaps = Settings.get_inner_gaps(1).top > 0 ? this._gapsSize:0
-        this._layoutsBoxLayout.remove_all_children();
+        this._layoutsBoxLayout.destroy_all_children();
         
         params.layouts.forEach((lay, btnInd) => {
             const box = new St.BoxLayout({ 
@@ -195,6 +192,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
                 deleteBtn.child = new St.Icon({ iconName: "edit-delete-symbolic", iconSize: 16 });
                 deleteBtn.connect('clicked', (self) => {
                     params.onDeleteLayout(btnInd, lay);
+                    this._drawLayouts({ ...params, layouts: GlobalState.get().layouts });
                 });
                 box.add_child(deleteBtn);
             }

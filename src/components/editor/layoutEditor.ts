@@ -64,7 +64,6 @@ export default class LayoutEditor extends St.Widget {
     }
 
     public set layout(newLayout: Layout) {
-        debug("set layout");
         // cleanup
         this._sliders.forEach(slider => slider.destroy());
         this._sliders = [];

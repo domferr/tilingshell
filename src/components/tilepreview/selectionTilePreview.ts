@@ -1,5 +1,4 @@
 import { registerGObjectClass } from "@/utils/gjs";
-import Mtk from 'gi://Mtk';
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 import TilePreview from "./tilePreview";
@@ -40,8 +39,8 @@ export default class SelectionTilePreview extends TilePreview {
   close() {
     if (!this._showing) return;
 
-    this._rect.width = 0;
-    this._rect.height = 0;
+    this._rect.width = this.gaps.left + this.gaps.right;
+    this._rect.height = this.gaps.top + this.gaps.bottom;
     super.close();
   }
 }

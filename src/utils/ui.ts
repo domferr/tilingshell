@@ -7,10 +7,6 @@ import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
 
 export const getMonitors = (): Monitor[] => Main.layoutManager.monitors;
 
-export const addToStatusArea = (button: any, uuid: string) => {
-    Main.panel.addToStatusArea(uuid, button, 1, 'right');
-};
-
 export const isPointInsideRect = (point: {x: number, y:number }, rect: Mtk.Rectangle) => {
     return point.x >= rect.x && point.x <= rect.x + rect.width &&
         point.y >= rect.y && point.y <= rect.y + rect.height;
@@ -32,16 +28,16 @@ export const positionRelativeTo = (actor: Clutter.Actor, anchestor: Clutter.Acto
     }
 }
 
-export const buildTileGaps = (tilePos: Mtk.Rectangle, innerMargin: Clutter.Margin, outerMargin: Clutter.Margin, containerRect: Mtk.Rectangle, scalingFactor: number = 1): Clutter.Margin => {
-    const isLeft = tilePos.x === containerRect.x;
-    const isTop = tilePos.y === containerRect.y;
-    const isRight = tilePos.x + tilePos.width === containerRect.x + containerRect.width;
-    const isBottom = tilePos.y + tilePos.height === containerRect.y + containerRect.height;
+export const buildTileGaps = (tilePos: Mtk.Rectangle, innerGaps: Clutter.Margin, outerGaps: Clutter.Margin, container: Mtk.Rectangle, scalingFactor: number = 1): Clutter.Margin => {
+    const isLeft = tilePos.x === container.x;
+    const isTop = tilePos.y === container.y;
+    const isRight = tilePos.x + tilePos.width === container.x + container.width;
+    const isBottom = tilePos.y + tilePos.height === container.y + container.height;
     const margin = new Clutter.Margin();
-    margin.top = (isTop ? outerMargin.top:innerMargin.top/2) * scalingFactor;
-    margin.bottom = (isBottom ? outerMargin.bottom:innerMargin.bottom/2) * scalingFactor;
-    margin.left = (isLeft ? outerMargin.left:innerMargin.left/2) * scalingFactor;
-    margin.right = (isRight ? outerMargin.right:innerMargin.right/2) * scalingFactor;
+    margin.top = (isTop ? outerGaps.top:innerGaps.top/2) * scalingFactor;
+    margin.bottom = (isBottom ? outerGaps.bottom:innerGaps.bottom/2) * scalingFactor;
+    margin.left = (isLeft ? outerGaps.left:innerGaps.left/2) * scalingFactor;
+    margin.right = (isRight ? outerGaps.right:innerGaps.right/2) * scalingFactor;
     return margin;
 }
 

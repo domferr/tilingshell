@@ -39,7 +39,7 @@ export class TilingManager {
     private _movingWindowTimerId: number | null = null;
 
     private readonly _signals: SignalHandling;
-    private readonly _debug: (msg: string) => void;
+    private readonly _debug: (...content: any[]) => void;
 
     /**
      * Constructs a new TilingManager instance.
@@ -242,14 +242,14 @@ export class TilingManager {
             return GLib.SOURCE_CONTINUE;
         }
         
-        let selectionRect = this._tilingLayout.getTileBelow(currPointerPos);
+        let selectionRect = this._tilingLayout.getTileBelow(currPointerPos, changedSpanMultipleTiles && !allowSpanMultipleTiles);
         if (!selectionRect) return GLib.SOURCE_CONTINUE;
-
+        
         selectionRect = selectionRect.copy();
         if (allowSpanMultipleTiles) {
             selectionRect = selectionRect.union(this._selectedTilesPreview.rect);
         }
-        this._tilingLayout.hoverTilesInRect(selectionRect);
+        this._tilingLayout.hoverTilesInRect(selectionRect, !allowSpanMultipleTiles);
 
         this._selectedTilesPreview.gaps = buildTileGaps(
             selectionRect, 
@@ -291,7 +291,7 @@ export class TilingManager {
         if (!this._isPointerInsideThisMonitor()) return;
         
         // abort if there is an invalid selection
-        if (this._selectedTilesPreview.innerWidth === 0 || this._selectedTilesPreview.innerHeight === 0) {
+        if (selectionRect.width <= 0 || selectionRect.height <= 0) {
             return;
         }
         

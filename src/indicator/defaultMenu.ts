@@ -10,6 +10,9 @@ import GlobalState from '@/globalState';
 import CurrentMenu from './currentMenu';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import LayoutButton from './layoutButton';
+import { logger } from '@utils/shell';
+
+const debug = logger("DefaultMenu");
 
 export default class DefaultMenu implements CurrentMenu {
     private readonly _signals: SignalHandling;
@@ -60,6 +63,7 @@ export default class DefaultMenu implements CurrentMenu {
         });
 
         this._signals.connect(Main.layoutManager, 'monitors-changed', () => {
+            debug("monitors-changed")
             this._updateScaling();
         });
     }
@@ -118,7 +122,9 @@ export default class DefaultMenu implements CurrentMenu {
 
     public destroy() {
         this._signals.disconnect();
-        (this._indicator.menu as PopupMenu.PopupMenu).removeAll();
+        this._layoutsButtons.forEach(btn => btn.destroy());
         this._layoutsButtons = [];
+        this._layoutsBoxLayout.destroy();
+        (this._indicator.menu as PopupMenu.PopupMenu).removeAll();
     }
 }
