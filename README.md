@@ -1,5 +1,11 @@
 # Modern Window Manager #
 
+![](https://img.shields.io/github/v/release/domferr/modernwindowmanager)
+![](https://img.shields.io/badge/GNOME-40--46-e04196)
+![](https://img.shields.io/github/downloads/domferr/modernwindowmanager/total)
+![](https://img.shields.io/badge/Built%20with-Typescript-blue)
+![](https://img.shields.io/github/license/domferr/modernwindowmanager)
+
 This is a Gnome Shell extension implementing modern windows tiling system by extending GNOME's default 2 columns to any layout you want! Can be installed on Gnome Shells from **40 to 46** on X11 and Wayland.
 - 🤩 First and only extension that provides Windows 11's **snap assistant**
 - 🖥️🖥️ **multiple monitors support**, even with different scaling factors!
