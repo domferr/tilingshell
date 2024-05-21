@@ -15,10 +15,11 @@ const SIGNAL_WORKAREAS_CHANGED = 'workareas-changed';
 const debug = logger('extension');
 
 export default class MWMExtension extends Extension {
-  private _indicator: Indicator | null = null;
-  private _tilingManagers: TilingManager[] = [];
+  private _indicator: Indicator | null;
+  private _tilingManagers: TilingManager[];
   private _fractionalScalingEnabled: boolean;
-  private _mutterSettings: Gio.Settings | null = null;
+  private _mutterSettings: Gio.Settings | null ;
+  private _dbus: Gio.DBusExportedObject | null;
 
   private readonly _signals: SignalHandling;
 
@@ -26,6 +27,10 @@ export default class MWMExtension extends Extension {
     super(metadata);
     this._signals = new SignalHandling();
     this._fractionalScalingEnabled = false;
+    this._mutterSettings = null;
+    this._tilingManagers = [];
+    this._indicator = null;
+    this._dbus = null;
   }
 
   createIndicator() {
@@ -81,7 +86,21 @@ export default class MWMExtension extends Extension {
 
     this.createIndicator();
 
+    this._dbus = Gio.DBusExportedObject.wrapJSObject(
+      `<node>
+        <interface name="org.gnome.Shell.Extensions.ModernWindowManager">
+          <method name="openLayoutEditor" />
+        </interface>
+      </node>`, 
+      this
+    );
+    this._dbus.export(Gio.DBus.session, '/org/gnome/shell/extensions/ModernWindowManager');
+
     debug('extension is enabled');
+  }
+
+  public openLayoutEditor() {
+    this._indicator?.openLayoutEditor();
   }
 
   private _createTilingManagers() {
@@ -140,6 +159,9 @@ export default class MWMExtension extends Extension {
     GlobalState.destroy();
     this._mutterSettings = null;
     this._fractionalScalingEnabled = false;
+    this._dbus?.flush();
+    this._dbus?.unexport();
+    this._dbus = null;
     debug('extension is disabled');
   }
 }

@@ -27,11 +27,13 @@ enum IndicatorState {
 
 @registerGObjectClass
 export default class Indicator extends PanelMenu.Button {
-    private _layoutEditor: LayoutEditor | null = null;
+    private _layoutEditor: LayoutEditor | null;
+    private _editorDialog: EditorDialog | null;
     //@ts-ignore todo
     private _currentMenu: CurrentMenu;
     private _state: IndicatorState;
     private _enableScaling: boolean;
+    private _path: string;
 
     constructor(path: string, uuid: string) {
         super(0.5, 'Modern Window Manager Indicator', false);
@@ -46,12 +48,19 @@ export default class Indicator extends PanelMenu.Button {
         });
 
         this.add_child(icon);
+        this._layoutEditor = null;
+        this._editorDialog = null;
         this._state = IndicatorState.DEFAULT;
         this._enableScaling = false;
+        this._path = path;
         
         this.connect('destroy', this._onDestroy.bind(this));
     }
 
+    public get path(): string {
+        return this._path;
+    }
+    
     public set enableScaling(value: boolean) {
         if (this._enableScaling === value) return;
         this._enableScaling = value;
@@ -109,7 +118,7 @@ export default class Indicator extends PanelMenu.Button {
         this.menu.toggle();
     }
 
-    public newLayoutOnClick(showLegend: boolean) {        
+    public newLayoutOnClick(showLegendOnly: boolean) {        
         this.menu.close(true);
 
         const newLayout = new Layout([
@@ -120,11 +129,13 @@ export default class Indicator extends PanelMenu.Button {
         if (this._layoutEditor) this._layoutEditor.layout = newLayout;
         else this._layoutEditor = new LayoutEditor(newLayout, Main.layoutManager.monitors[Main.layoutManager.primaryIndex], this._enableScaling);
         this._setState(IndicatorState.CREATE_NEW);
-        if (showLegend) this.openMenu(true);
+        if (showLegendOnly) this.openMenu(true);
     }
 
-    public openMenu(legend: boolean) {        
-        const dialog = new EditorDialog({
+    public openMenu(showLegend: boolean) {
+        if (this._editorDialog) return;
+
+        this._editorDialog = new EditorDialog({
             enableScaling: this._enableScaling,
             onNewLayout: () => {
                 this.newLayoutOnClick(false);
@@ -144,12 +155,16 @@ export default class Indicator extends PanelMenu.Button {
                 
                 this._setState(IndicatorState.EDITING_LAYOUT);
             },
-            legend
+            onClose: () => {
+                this._editorDialog?.destroy();
+                this._editorDialog = null;
+            },
+            legend: showLegend
         });
-        dialog.open();
+        this._editorDialog.open();
     }
 
-    public editLayoutsOnClick() {        
+    public openLayoutEditor() {
         this.openMenu(false);
     }
 
@@ -198,6 +213,7 @@ export default class Indicator extends PanelMenu.Button {
     }
 
     private _onDestroy() {
+        this._editorDialog?.destroy();
         this._layoutEditor?.destroy();
         this._layoutEditor = null;
         this._currentMenu.destroy();

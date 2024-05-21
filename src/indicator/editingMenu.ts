@@ -16,30 +16,30 @@ export default class EditingMenu implements CurrentMenu {
             xExpand: true,
             style: "spacing: 8px"
         });
-        const menuItem = new PopupMenu.PopupBaseMenuItem({ style_class: 'indicator-menu-item' });
 
-        const openMenuBtn = IndicatorUtils.createButton("video-display-symbolic", "Menu");
+        const openMenuBtn = IndicatorUtils.createButton("video-display-symbolic", "Menu  ");
         openMenuBtn.connect('clicked', (self) => this._indicator.openMenu(false) );
         boxLayout.add_child(openMenuBtn);
 
-        const infoMenuBtn = IndicatorUtils.createButton("dialog-question-symbolic", "Info");
+        const infoMenuBtn = IndicatorUtils.createButton("info-symbolic", "Info     ", this._indicator.path);
         infoMenuBtn.connect('clicked', (self) => this._indicator.openMenu(true) );
         boxLayout.add_child(infoMenuBtn);
 
-        const saveBtn = IndicatorUtils.createButton("emblem-ok-symbolic", "Save");
+        const saveBtn = IndicatorUtils.createButton("done-symbolic", "Save    ", this._indicator.path);
         saveBtn.connect('clicked', (self) => {
             this._indicator.menu.toggle();
             this._indicator.saveLayoutOnClick();
         });
         boxLayout.add_child(saveBtn);
 
-        const cancelBtn = IndicatorUtils.createButton("window-close-symbolic", "Cancel");
+        const cancelBtn = IndicatorUtils.createButton("cancel-symbolic", "Cancel", this._indicator.path);
         cancelBtn.connect('clicked', (self) => {
             this._indicator.menu.toggle();
             this._indicator.cancelLayoutOnClick();
         });
         boxLayout.add_child(cancelBtn);
 
+        const menuItem = new PopupMenu.PopupBaseMenuItem({ style_class: 'indicator-menu-item' });
         menuItem.add_child(boxLayout);
 
         //@ts-ignore todo

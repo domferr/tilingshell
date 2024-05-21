@@ -28,7 +28,7 @@
             <description>Internal gaps between tiles in a layout.</description>
         </key>
         <key name="outer-gaps" type="u">
-            <default>16</default>
+            <default>8</default>
             <summary>Outer gaps</summary>
             <description>External gaps between the layout and the monitor borders.</description>
         </key>
@@ -51,6 +51,11 @@
             <default>true</default>
             <summary>Restore window size</summary>
             <description>Restore the windows to their original size when untiled.</description>
+        </key>
+        <key name="resize-complementing-windows" type="b">
+            <default>true</default>
+            <summary>Enable auto-resize of the complementing tiled windows</summary>
+            <description>When a tiled window is resized, auto-resize the other tiled windows near it.</description>
         </key>
     </schema>
 

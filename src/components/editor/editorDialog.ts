@@ -6,7 +6,7 @@ import LayoutButton from '../../indicator/layoutButton';
 import GlobalState from '@/globalState';
 import { logger } from '@/utils/shell';
 import Layout from '@/components/layout/Layout';
-import SignalHandling from '@/signalHandling';
+
 import Tile from '@/components/layout/Tile';
 import * as ModalDialog from 'resource:///org/gnome/shell/ui/modalDialog.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -27,7 +27,8 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         onDeleteLayout: (ind: number, lay: Layout) => void,
         onSelectLayout: (ind: number, lay: Layout) => void,
         onNewLayout: () => void,
-        legend: boolean
+        legend: boolean,
+        onClose: () => void
     }) {
         super({
             destroyOnClose: true,
@@ -39,8 +40,6 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
             const scalingFactor = getScalingFactor(monitor?.index || Main.layoutManager.primaryIndex);
             enableScalingFactorSupport(this, scalingFactor);
         }
-        
-        this._signals = new SignalHandling();
 
         this.contentLayout.add_child(new St.Label({
             text: "Select the layout to edit", 
@@ -67,15 +66,13 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
             label: 'Close',
             default: true,
             key: Clutter.KEY_Escape,
-            action: () => {
-                this.destroy();
-            },
+            action: () => params.onClose(),
         });
 
-        if (params.legend) this._makeLegendDialog();
+        if (params.legend) this._makeLegendDialog({ onClose: params.onClose });
     }
 
-    private _makeLegendDialog() {
+    private _makeLegendDialog(params: { onClose: () => void }) {
         const suggestion1 = new St.BoxLayout({ vertical: false });
         // LEFT-CLICK to split a tile
         suggestion1.add_child(new St.Label({ 
@@ -164,9 +161,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
             label: 'Start editing',
             default: true,
             key: Clutter.KEY_Escape,
-            action: () => {
-                this.destroy();
-            },
+            action: params.onClose,
         });
     }
 
@@ -174,7 +169,8 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         layouts: Layout[],
         onDeleteLayout: (ind: number, lay: Layout) => void,
         onSelectLayout: (ind: number, lay: Layout) => void,
-        onNewLayout: () => void
+        onNewLayout: () => void,
+        onClose: () => void
     }) {
         const gaps = Settings.get_inner_gaps(1).top > 0 ? this._gapsSize:0
         this._layoutsBoxLayout.destroy_all_children();
@@ -188,7 +184,11 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
             this._layoutsBoxLayout.add_child(box);
             const btn = new LayoutButton(box, lay, gaps, this._layoutHeight, this._layoutWidth);
             if (params.layouts.length > 1) {
-                const deleteBtn = new St.Button({xExpand: false, xAlign: Clutter.ActorAlign.CENTER, styleClass: "message-list-clear-button icon-button button delete-layout-button"});
+                const deleteBtn = new St.Button({ 
+                    xExpand: false, 
+                    xAlign: Clutter.ActorAlign.CENTER, 
+                    styleClass: "message-list-clear-button icon-button button delete-layout-button"
+                });
                 deleteBtn.child = new St.Icon({ iconName: "edit-delete-symbolic", iconSize: 16 });
                 deleteBtn.connect('clicked', (self) => {
                     params.onDeleteLayout(btnInd, lay);
@@ -198,7 +198,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
             }
             btn.connect('clicked', (self) => {
                 params.onSelectLayout(btnInd, lay);
-                this._makeLegendDialog();
+                this._makeLegendDialog({ onClose: params.onClose });
             });
             return btn;
         });
@@ -215,7 +215,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         newLayoutBtn.child.add_child(icon);
         newLayoutBtn.connect('clicked', (self) => {
             params.onNewLayout();
-            this._makeLegendDialog();
+            this._makeLegendDialog({ onClose: params.onClose });
         });
     }
 }

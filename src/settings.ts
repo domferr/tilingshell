@@ -17,6 +17,7 @@ export default class Settings {
     static SETTING_LAYOUTS_JSON = 'layouts-json';
     static SETTING_SELECTED_LAYOUTS = 'selected-layouts';
     static SETTING_RESTORE_WINDOW_ORIGINAL_SIZE = 'restore-window-original-size';
+    static SETTING_RESIZE_COMPLEMENTING_WINDOWS = 'resize-complementing-windows';
     
     static initialize(settings: Gio.Settings) {
         if (this._is_initialized) return;
@@ -88,6 +89,10 @@ export default class Settings {
 
     static get_restore_window_original_size() : boolean {
         return this._settings.get_boolean(Settings.SETTING_RESTORE_WINDOW_ORIGINAL_SIZE);
+    }
+
+    static get_resize_complementing_windows(): boolean {
+        return this._settings.get_boolean(Settings.SETTING_RESIZE_COMPLEMENTING_WINDOWS);
     }
 
     static set_last_version_installed(version: number) {

@@ -16,6 +16,7 @@ import TileUtils from '../layout/TileUtils';
 import GlobalState from '@/globalState';
 import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
 import ExtendedWindow from "./extendedWindow";
+import { ResizingManager } from "./resizeManager";
 
 export class TilingManager {
     private readonly _monitor: Monitor;
@@ -23,6 +24,7 @@ export class TilingManager {
     private _selectedTilesPreview: SelectionTilePreview;
     private _snapAssist: SnapAssist;
     private _tilingLayout: TilingLayout;
+    private _resizingManager: ResizingManager;
 
     private _workArea: Mtk.Rectangle;
     private _innerGaps: Clutter.Margin;
@@ -73,6 +75,8 @@ export class TilingManager {
 
         // build the snap assistant
         this._snapAssist = new SnapAssist(global.windowGroup, this._workArea, monitorScalingFactor);
+
+        this._resizingManager = new ResizingManager();
     }
 
     /**
@@ -101,13 +105,19 @@ export class TilingManager {
         });
 
         this._signals.connect(global.display, 'grab-op-begin', (_display: Meta.Display, window: Meta.Window, grabOp: Meta.GrabOp) => {
-            if (grabOp != Meta.GrabOp.MOVING) return;
+            if (grabOp != Meta.GrabOp.MOVING) {
+                this._resizingManager.onWindowResizingBegin(window, grabOp);
+                return;
+            }
 
             this._onWindowGrabBegin(window);
         });
 
         this._signals.connect(global.display, 'grab-op-end', (_display: Meta.Display, window: Meta.Window, grabOp: Meta.GrabOp) => {
-            if (!this._isGrabbingWindow) return;
+            if (!this._isGrabbingWindow) {
+                this._resizingManager.onWindowResizingEnd(window);
+                return;
+            }
 
             this._onWindowGrabEnd(window);
         });
@@ -131,6 +141,7 @@ export class TilingManager {
         this._tilingLayout.destroy();
         this._snapAssist.destroy();
         this._selectedTilesPreview.destroy();
+        this._resizingManager.destroy();
     }
 
     public set workArea(newWorkArea: Mtk.Rectangle) {
@@ -175,10 +186,11 @@ export class TilingManager {
             return GLib.SOURCE_CONTINUE;
         }
 
+        const extWin = window as ExtendedWindow;
+        extWin.isTiled = false;
         // if there is "originalSize" attached, it means the window were tiled and 
         // it is the first time the window is moved. If that's the case, change 
         // window's size to the size it had before it were tiled (the originalSize)
-        const extWin = window as ExtendedWindow;
         if (extWin.originalSize) {
             const newSize = buildRectangle({ 
                 x: window.get_frame_rect().x, 
@@ -296,6 +308,7 @@ export class TilingManager {
         }
         
         (window as ExtendedWindow).originalSize = window.get_frame_rect().copy();
+        (window as ExtendedWindow).isTiled = true;
         this._easeWindowRect(window, selectionRect);
     }
 

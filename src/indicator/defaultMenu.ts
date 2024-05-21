@@ -87,9 +87,9 @@ export default class DefaultMenu implements CurrentMenu {
         });
 
         const editLayoutsBtn = IndicatorUtils.createButton("document-edit-symbolic", "Edit Layouts...");
-        editLayoutsBtn.connect('clicked', (self) => this._indicator.editLayoutsOnClick() );
+        editLayoutsBtn.connect('clicked', (self) => this._indicator.openLayoutEditor() );
         buttonsBoxLayout.add_child(editLayoutsBtn);
-        const newLayoutBtn = IndicatorUtils.createButton("list-add-symbolic", "New Layout...");
+        const newLayoutBtn = IndicatorUtils.createButton("add-symbolic", "New Layout...", this._indicator.path);
         newLayoutBtn.connect('clicked', (self) => this._indicator.newLayoutOnClick(true) );
         buttonsBoxLayout.add_child(newLayoutBtn);
 

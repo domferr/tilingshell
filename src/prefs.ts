@@ -1,5 +1,6 @@
 import Gtk from "gi://Gtk"; // Starting from GNOME 40, the preferences dialog uses GTK4
 import Adw from "gi://Adw";
+import Gio from "gi://Gio";
 import Settings from "./settings";
 import { logger } from "./utils/shell";
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
@@ -102,6 +103,13 @@ export default class MWMExtensionPreferences extends ExtensionPreferences {
         );
         behaviourGroup.add(pressAltRow);
 
+        const resizeComplementingRow = this._buildSwitchRow(
+            Settings.SETTING_RESIZE_COMPLEMENTING_WINDOWS,
+            "Enable auto-resize of the complementing tiled windows",
+            "When a tiled window is resized, auto-resize the other tiled windows near it"
+        );
+        behaviourGroup.add(resizeComplementingRow);
+
         const snapAssistRow = this._buildSwitchRow(
             Settings.SETTING_SNAP_ASSIST,
             "Enable snap assist",
@@ -116,6 +124,14 @@ export default class MWMExtensionPreferences extends ExtensionPreferences {
         });
         prefsPage.add(layoutsGroup);
 
+        const editLayoutsBtn =this._buildButtonRow(
+            "Edit layouts", 
+            "Edit layouts",
+            "Open the layouts editor",
+            () => this._openLayoutEditor()
+        );
+        layoutsGroup.add(editLayoutsBtn);
+
         const resetBtn =this._buildButtonRow(
             "Reset layouts", 
             "Reset layouts",
@@ -125,7 +141,8 @@ export default class MWMExtensionPreferences extends ExtensionPreferences {
                 const layouts = Settings.get_layouts_json();
                 const selected = Settings.get_selected_layouts().map(val => layouts[0].id);
                 Settings.save_selected_layouts_json(selected);
-            }
+            },
+            "destructive-action"
         );
         layoutsGroup.add(resetBtn);
 
@@ -160,8 +177,9 @@ export default class MWMExtensionPreferences extends ExtensionPreferences {
         return adwRow;
     }
 
-    _buildButtonRow(label: string, title: string, subtitle: string, onClick: () => void) {
+    _buildButtonRow(label: string, title: string, subtitle: string, onClick: () => void, styleClass?: string) {
         const btn = Gtk.Button.new_with_label(label);
+        if (styleClass) btn.add_css_class(styleClass);
         btn.connect("clicked", onClick);
         btn.set_vexpand(false);
         btn.set_valign(Gtk.Align.CENTER);
@@ -173,6 +191,28 @@ export default class MWMExtensionPreferences extends ExtensionPreferences {
         adwRow.add_suffix(btn);
 
         return adwRow;
+    }
+
+    _openLayoutEditor() {
+        try {
+            Gio.DBus.session.call_sync(
+                'org.gnome.Shell',
+                '/org/gnome/shell/extensions/ModernWindowManager',
+                'org.gnome.Shell.Extensions.ModernWindowManager',
+                'openLayoutEditor',
+                null,
+                null,
+                Gio.DBusCallFlags.NONE,
+                -1,
+                null
+            );
+        } catch (e) {
+            //@ts-ignore
+            if (e instanceof Gio.DBusError) //@ts-ignore
+                Gio.DBusError.strip_remote_error(e);
+        
+            console.error(e);
+        }
     }
 }
 
