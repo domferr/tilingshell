@@ -46,6 +46,14 @@ The layout is not strict. You can select multiple tiles too! Just hold <kbd>SHIF
 
 [layout_editor.webm](https://github.com/domferr/modernwindowmanager/assets/14203981/c6e05589-69d9-4fa3-a4df-61ee875cf9e1)
 
+### Smart resize ###
+
+You can resize adjacent tiled windows together!
+
+[Resizing tiled windows](https://github.com/domferr/modernwindowmanager/assets/14203981/da4ef97e-cdbb-4981-a8ab-9ca8cd23d63d)
+
+> It can be enabled/disabled from the preferences
+
 ## Installation
 
 Download the latest [release](https://github.com/domferr/modernwindowmanager/releases). Extract the downloaded archive. Copy the folder to `~/.local/share/gnome-shell/extensions` directory. You need to reload GNOME Shell afterwards (e.g. by logging out). Then you can enable the extension:
