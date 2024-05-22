@@ -1,3 +1,5 @@
+<img src="https://raw.githubusercontent.com/domferr/modernwindowmanager/main/logo.svg" align="right" width="76"/>
+
 ![](https://img.shields.io/github/v/release/domferr/modernwindowmanager)
 ![](https://img.shields.io/badge/GNOME-40--46-e04196)
 ![](https://img.shields.io/github/downloads/domferr/modernwindowmanager/total)
