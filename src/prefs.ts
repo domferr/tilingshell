@@ -28,8 +28,8 @@ function buildPrefsWidget(): Gtk.Widget {
     });
 }
 
-export default class MWMExtensionPreferences extends ExtensionPreferences {
-    private readonly NAME = "Modern Window Manager";
+export default class TilingShellExtensionPreferences extends ExtensionPreferences {
+    private readonly NAME = "Tiling Shell";
 
     /**
      * This function is called when the preferences window is first created to fill
@@ -197,8 +197,8 @@ export default class MWMExtensionPreferences extends ExtensionPreferences {
         try {
             Gio.DBus.session.call_sync(
                 'org.gnome.Shell',
-                '/org/gnome/shell/extensions/ModernWindowManager',
-                'org.gnome.Shell.Extensions.ModernWindowManager',
+                '/org/gnome/shell/extensions/TilingShell',
+                'org.gnome.Shell.Extensions.TilingShell',
                 'openLayoutEditor',
                 null,
                 null,

@@ -36,7 +36,7 @@ export default class Indicator extends PanelMenu.Button {
     private _path: string;
 
     constructor(path: string, uuid: string) {
-        super(0.5, 'Modern Window Manager Indicator', false);
+        super(0.5, 'Tiling Shell Indicator', false);
         Main.panel.addToStatusArea(uuid, this, 1, 'right');
 
         // Bind the "show-indicator" setting to the "visible" property.

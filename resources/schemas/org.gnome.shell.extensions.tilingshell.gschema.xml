@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="gnome-shell-extensions">
 
-    <schema path="/org/gnome/shell/extensions/modernwindowmanager/" id="org.gnome.shell.extensions.modernwindowmanager">
+    <schema path="/org/gnome/shell/extensions/tilingshell/" id="org.gnome.shell.extensions.tilingshell">
         <key name="last-version-installed" type="u">
             <default>0</default>
             <summary>Last version installed</summary>
@@ -43,7 +43,7 @@
             <description>The layouts available to the tiling managers and the snap assist.</description>
         </key>
         <key name="selected-layouts" type="as">
-            <default>['0']</default>
+            <default>[]</default>
             <summary>Selected layouts</summary>
             <description>Each monitor's active layout used by the monitor tiling manager.</description>
         </key>

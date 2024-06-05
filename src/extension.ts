@@ -14,7 +14,7 @@ import { Extension, ExtensionMetadata } from 'resource:///org/gnome/shell/extens
 const SIGNAL_WORKAREAS_CHANGED = 'workareas-changed';
 const debug = logger('extension');
 
-export default class MWMExtension extends Extension {
+export default class TilingShellExtension extends Extension {
   private _indicator: Indicator | null;
   private _tilingManagers: TilingManager[];
   private _fractionalScalingEnabled: boolean;
@@ -88,13 +88,13 @@ export default class MWMExtension extends Extension {
 
     this._dbus = Gio.DBusExportedObject.wrapJSObject(
       `<node>
-        <interface name="org.gnome.Shell.Extensions.ModernWindowManager">
+        <interface name="org.gnome.Shell.Extensions.TilingShell">
           <method name="openLayoutEditor" />
         </interface>
       </node>`, 
       this
     );
-    this._dbus.export(Gio.DBus.session, '/org/gnome/shell/extensions/ModernWindowManager');
+    this._dbus.export(Gio.DBus.session, '/org/gnome/shell/extensions/TilingShell');
 
     debug('extension is enabled');
   }

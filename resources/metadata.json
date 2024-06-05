@@ -1,17 +1,18 @@
 {
-  "name": "Modern Window Manager",
-  "description": "Extend Gnome Shell with advanced tiling window management. Supports multiple monitors, windows 11 snap assistant, fancy zones, customised tiling layouts and more.",
-  "uuid": "modernwindowmanager@ferrarodomenico.com",
+  "name": "Tiling Shell",
+  "description": "Extend Gnome Shell with advanced tiling window management. Supports multiple monitors, Windows 11 Snap Assistant, Fancy Zones, customised tiling layouts and more.",
+  "uuid": "tilingshell@ferrarodomenico.com",
   "shell-version": [
-    "40",
-    "41",
     "42",
     "43",
     "44",
     "45",
     "46"
   ],
-  "version": 6,
-  "url": "https://github.com/domferr/modernwindowmanager",
-  "settings-schema": "org.gnome.shell.extensions.modernwindowmanager"
+  "version": 7,
+  "url": "https://github.com/domferr/tilingshell",
+  "settings-schema": "org.gnome.shell.extensions.tilingshell",
+  "donations": {
+    "kofi": "domferr"
+  }
 }

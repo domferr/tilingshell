@@ -29,7 +29,7 @@ Mtk.Rectangle.$gtype = imports.gi.Meta.Rectangle.$gtype;
 
 const extensionFooter = `
 function init(meta) {
-    return new MWMExtension(meta);
+    return new TilingShellExtension(meta);
 }
 `;
 
@@ -48,7 +48,7 @@ function init() {
 }
 
 function fillPreferencesWindow(window) {
-    const prefs = new MWMExtensionPreferences();
+    const prefs = new TilingShellExtensionPreferences();
     prefs.fillPreferencesWindow(window);
 }
 `;
