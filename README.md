@@ -10,6 +10,8 @@
 # Tiling Shell #
 
 This is a Gnome Shell extension implementing modern windows tiling system by extending GNOME's default 2 columns to any layout you want! Can be installed on Gnome Shells from **40 to 46** on X11 and Wayland: the most recent GNOME Shell is supported, and older releases will include all the features and bug fixes!
+
+
 - 🤩 First and only extension that provides Windows 11's **snap assistant**
 - 🖥️🖥️ **multiple monitors support**, even with different scaling factors!
 - ⚙️ Manage, edit, create and delete layouts with a **built-in editor**
@@ -19,6 +21,14 @@ This is a Gnome Shell extension implementing modern windows tiling system by ext
 > This extension also provides all the functionalities of Windows 11 Snap Assistant and Windows PowerToys FancyZones. 
 
 Have issues, you want to suggest a new feature or contribute? Please open a new [issue](https://github.com/domferr/tilingshell/issues)!
+  
+<img src="https://github.com/domferr/tilingshell/blob/main/doc/horiz_summary.jpg" align="center"/>
+
+<div align="center">
+  <a href="https://extensions.gnome.org/extension/7065/tiling-shell/" >
+      <img src="https://img.shields.io/badge/Install%20from-extensions.gnome.org-4A86CF?style=for-the-badge&logo=Gnome&logoColor=white"/>
+  </a>
+</div>
 
 ## Usage ##
 

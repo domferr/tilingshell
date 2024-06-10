@@ -12,7 +12,7 @@ const debug = logger('tilePreview');
 
 //export module TilePreview {
   export interface TilePreviewConstructorProperties 
-    extends St.Widget.ConstructorProperties {
+    extends St.Widget.ConstructorProps {
         parent: Clutter.Actor;
         rect: Mtk.Rectangle;
         gaps: Clutter.Margin;

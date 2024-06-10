@@ -34,7 +34,6 @@ function init(meta) {
 `;
 
 const prefsBanner = `// For GNOME Shell version before 45
-imports.gi.versions.Gtk = '4.0';
 class ExtensionPreferences {
     getSettings() {
         return imports.misc.extensionUtils.getSettings();

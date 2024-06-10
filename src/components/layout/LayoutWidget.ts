@@ -13,7 +13,7 @@ const debug = logger(`LayoutWidget`);
 
 export module LayoutWidget {
     export interface ConstructorProperties
-      extends St.Widget.ConstructorProperties {
+      extends Partial<St.Widget.ConstructorProps> {
           parent: Clutter.Actor;
           layout: Layout;
           innerGaps: Clutter.Margin;

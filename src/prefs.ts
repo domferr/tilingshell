@@ -147,6 +147,9 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         layoutsGroup.add(resetBtn);
 
         window.searchEnabled = true;
+        window.connect('close-request', () => {
+            Settings.destroy();
+        });
     }
 
     _buildSwitchRow(settingsKey: string, title: string, subtitle: string): Adw.ActionRow {
@@ -157,6 +160,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             activatableWidget: gtkSwitch
         });
         adwRow.add_suffix(gtkSwitch);
+        //@ts-ignore
         Settings.bind(settingsKey, gtkSwitch, 'active');
 
         return adwRow;
@@ -172,6 +176,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             activatableWidget: spinBtn
         });
         adwRow.add_suffix(spinBtn);
+        //@ts-ignore
         Settings.bind(settingsKey, spinBtn, 'value');
 
         return adwRow;

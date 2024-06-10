@@ -21,11 +21,11 @@ export default class TilingShellExtension extends Extension {
   private _mutterSettings: Gio.Settings | null ;
   private _dbus: Gio.DBusExportedObject | null;
 
-  private readonly _signals: SignalHandling;
+  private _signals: SignalHandling | null;
 
   constructor(metadata: ExtensionMetadata) {
     super(metadata);
-    this._signals = new SignalHandling();
+    this._signals = null;
     this._fractionalScalingEnabled = false;
     this._mutterSettings = null;
     this._tilingManagers = [];
@@ -67,6 +67,9 @@ export default class TilingShellExtension extends Extension {
   }
 
   enable(): void {
+    if (this._signals) this._signals.disconnect();
+    this._signals = new SignalHandling();
+
     Settings.initialize(this.getSettings());
     this._validateSettings();
 
@@ -111,6 +114,8 @@ export default class TilingShellExtension extends Extension {
   }
 
   private _setupSignals() {
+    if (!this._signals) return;
+
     this._signals.connect(global.display, SIGNAL_WORKAREAS_CHANGED, () => {
       const allMonitors = getMonitors();
       if (this._tilingManagers.length !== allMonitors.length) {
@@ -155,13 +160,15 @@ export default class TilingShellExtension extends Extension {
     this._indicator = null;
     this._tilingManagers.forEach(tm => tm.destroy());
     this._tilingManagers = [];
-    this._signals.disconnect();
+    if (this._signals) this._signals.disconnect();
+    this._signals = null;
     GlobalState.destroy();
     this._mutterSettings = null;
     this._fractionalScalingEnabled = false;
     this._dbus?.flush();
     this._dbus?.unexport();
     this._dbus = null;
+    Settings.destroy();
     debug('extension is disabled');
   }
 }

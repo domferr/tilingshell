@@ -4,7 +4,7 @@ import Layout from './components/layout/Layout';
 import Tile from './components/layout/Tile';
 
 export default class Settings {
-    static _settings: Gio.Settings;
+    static _settings: Gio.Settings | null;
     static _is_initialized: boolean = false;
 
     static SETTING_LAST_VERSION_INSTALLED = 'last-version-installed';
@@ -26,29 +26,37 @@ export default class Settings {
         this._settings = settings;
     }
 
+    static destroy() {
+        if (this._is_initialized) {
+            this._is_initialized = false;
+            this._settings = null;
+        }
+    }
+
     static bind(key: string, object: GObject.Object, property: string): void {
-        this._settings.bind(key, object, property, Gio.SettingsBindFlags.DEFAULT);
+        //@ts-ignore
+        this._settings?.bind(key, object, property, Gio.SettingsBindFlags.DEFAULT);
     }
 
     static get_last_version_installed() : number {
-        return this._settings.get_uint(this.SETTING_LAST_VERSION_INSTALLED);
+        return this._settings?.get_uint(this.SETTING_LAST_VERSION_INSTALLED) || -1;
     }
 
     static get_tiling_system_enabled() : boolean {
-        return this._settings.get_boolean(this.SETTING_TILING_SYSTEM);
+        return this._settings?.get_boolean(this.SETTING_TILING_SYSTEM) || false;
     }
 
     static get_snap_assist_enabled() : boolean {
-        return this._settings.get_boolean(this.SETTING_SNAP_ASSIST);
+        return this._settings?.get_boolean(this.SETTING_SNAP_ASSIST) || false;
     }
 
     static get_show_indicator() : boolean {
-        return this._settings.get_boolean(this.SETTING_SHOW_INDICATOR);
+        return this._settings?.get_boolean(this.SETTING_SHOW_INDICATOR) || true;
     }
 
     static get_inner_gaps(scaleFactor: number = 1) : { top: number, bottom: number, left: number, right: number } {
         // get the gaps settings and scale by scale factor
-        const value = this._settings.get_uint(this.SETTING_INNER_GAPS) * scaleFactor;
+        const value = (this._settings?.get_uint(this.SETTING_INNER_GAPS) || 0)  * scaleFactor;
         return {
             top: value,
             bottom: value,
@@ -59,7 +67,7 @@ export default class Settings {
 
     static get_outer_gaps(scaleFactor: number = 1) : { top: number, bottom: number, left: number, right: number } {
         // get the gaps settings and scale by scale factor
-        const value = this._settings.get_uint(this.SETTING_OUTER_GAPS) * scaleFactor;
+        const value = (this._settings?.get_uint(this.SETTING_OUTER_GAPS) || 0) * scaleFactor;
         return {
             top: value,
             bottom: value,
@@ -69,34 +77,34 @@ export default class Settings {
     }
 
     static get_span_multiple_tiles() : boolean {
-        return this._settings.get_boolean(this.SETTING_SPAN_MULTIPLE_TILES);
+        return this._settings?.get_boolean(this.SETTING_SPAN_MULTIPLE_TILES) || false;
     }
 
     static get_layouts_json() : Layout[] {
         try {
-            const layouts = JSON.parse(this._settings.get_string(this.SETTING_LAYOUTS_JSON) || "[]") as Layout[];
+            const layouts = JSON.parse(this._settings?.get_string(this.SETTING_LAYOUTS_JSON) || "[]") as Layout[];
             if (layouts.length === 0) throw "At least one layout is required";
             return layouts.filter(layout => layout.tiles.length > 0);
         } catch(ex: any) {
             this.reset_layouts_json();
-            return JSON.parse(this._settings.get_string(this.SETTING_LAYOUTS_JSON) || "[]") as Layout[];
+            return JSON.parse(this._settings?.get_string(this.SETTING_LAYOUTS_JSON) || "[]") as Layout[];
         }
     }
 
     static get_selected_layouts() : string[] {
-        return this._settings.get_strv(Settings.SETTING_SELECTED_LAYOUTS);
+        return this._settings?.get_strv(Settings.SETTING_SELECTED_LAYOUTS) || [];
     }
 
     static get_restore_window_original_size() : boolean {
-        return this._settings.get_boolean(Settings.SETTING_RESTORE_WINDOW_ORIGINAL_SIZE);
+        return this._settings?.get_boolean(Settings.SETTING_RESTORE_WINDOW_ORIGINAL_SIZE) || false;
     }
 
     static get_resize_complementing_windows(): boolean {
-        return this._settings.get_boolean(Settings.SETTING_RESIZE_COMPLEMENTING_WINDOWS);
+        return this._settings?.get_boolean(Settings.SETTING_RESIZE_COMPLEMENTING_WINDOWS) || false;
     }
 
     static set_last_version_installed(version: number) {
-        this._settings.set_uint(this.SETTING_LAST_VERSION_INSTALLED, version);
+        this._settings?.set_uint(this.SETTING_LAST_VERSION_INSTALLED, version);
     }
 
     static reset_layouts_json() {
@@ -125,19 +133,19 @@ export default class Settings {
     }
 
     static save_layouts_json(layouts: Layout[]) {
-        this._settings.set_string(this.SETTING_LAYOUTS_JSON, JSON.stringify(layouts));
+        this._settings?.set_string(this.SETTING_LAYOUTS_JSON, JSON.stringify(layouts));
     }
 
     static save_selected_layouts_json(ids: string[]) {
-        this._settings.set_strv(Settings.SETTING_SELECTED_LAYOUTS, ids);
+        this._settings?.set_strv(Settings.SETTING_SELECTED_LAYOUTS, ids);
     }
 
     static connect(key: string, func: (...arg: any[]) => void) : number {
-        return this._settings.connect(`changed::${key}`, func);
+        return this._settings?.connect(`changed::${key}`, func) || -1;
     }
 
     static disconnect(id: number) {
-        this._settings.disconnect(id);
+        this._settings?.disconnect(id);
     }
 }
 

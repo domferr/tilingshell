@@ -40,6 +40,7 @@ export default class Indicator extends PanelMenu.Button {
         Main.panel.addToStatusArea(uuid, this, 1, 'right');
 
         // Bind the "show-indicator" setting to the "visible" property.
+        //@ts-ignore
         Settings.bind(Settings.SETTING_SHOW_INDICATOR, this, 'visible');
 
         const icon = new St.Icon({
