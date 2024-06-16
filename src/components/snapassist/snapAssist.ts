@@ -165,7 +165,8 @@ class SnapAssistContent extends St.BoxLayout {
             }
         }
 
-        const size = this._isEnlarged ? this.height:(this.height/2);
+        const distanceWhenOpen = 8;
+        const size = this._isEnlarged ? (this.height + distanceWhenOpen):(this.height/2);
         const isNear = this.isBetween(this._container.x + this.x - this._activationAreaOffset, currPointerPos.x, this._container.x + this.x + this.width + this._activationAreaOffset)
             && this.isBetween(this._container.y - this._activationAreaOffset, currPointerPos.y, this._container.y + this._enlargedVerticalDistance + size + this._activationAreaOffset);
         

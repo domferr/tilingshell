@@ -35,6 +35,10 @@ function init(meta) {
 
 const prefsBanner = `// For GNOME Shell version before 45
 class ExtensionPreferences {
+    constructor(metadata) {
+        this.metadata = metadata;
+    }
+
     getSettings() {
         return imports.misc.extensionUtils.getSettings();
     }
@@ -47,7 +51,8 @@ function init() {
 }
 
 function fillPreferencesWindow(window) {
-    const prefs = new TilingShellExtensionPreferences();
+    const metadata = imports.misc.extensionUtils.getCurrentExtension().metadata;
+    const prefs = new TilingShellExtensionPreferences(metadata);
     prefs.fillPreferencesWindow(window);
 }
 `;

@@ -7,13 +7,15 @@ export default class Settings {
     static _settings: Gio.Settings | null;
     static _is_initialized: boolean = false;
 
-    static SETTING_LAST_VERSION_INSTALLED = 'last-version-installed';
+    static SETTING_LAST_VERSION_NAME_INSTALLED = 'last-version-name-installed';
     static SETTING_TILING_SYSTEM = 'enable-tiling-system';
+    static SETTING_TILING_SYSTEM_ACTIVATION_KEY = 'tiling-system-activation-key';
     static SETTING_SNAP_ASSIST = 'enable-snap-assist';
     static SETTING_SHOW_INDICATOR = 'show-indicator';
     static SETTING_INNER_GAPS = 'inner-gaps';
     static SETTING_OUTER_GAPS = 'outer-gaps';
     static SETTING_SPAN_MULTIPLE_TILES = 'enable-span-multiple-tiles';
+    static SETTING_SPAN_MULTIPLE_TILES_ACTIVATION_KEY = 'span-multiple-tiles-activation-key';
     static SETTING_LAYOUTS_JSON = 'layouts-json';
     static SETTING_SELECTED_LAYOUTS = 'selected-layouts';
     static SETTING_RESTORE_WINDOW_ORIGINAL_SIZE = 'restore-window-original-size';
@@ -33,13 +35,13 @@ export default class Settings {
         }
     }
 
-    static bind(key: string, object: GObject.Object, property: string): void {
+    static bind(key: string, object: GObject.Object, property: string, flags: Gio.SettingsBindFlags = Gio.SettingsBindFlags.DEFAULT): void {
         //@ts-ignore
-        this._settings?.bind(key, object, property, Gio.SettingsBindFlags.DEFAULT);
+        this._settings?.bind(key, object, property, flags);
     }
 
-    static get_last_version_installed() : number {
-        return this._settings?.get_uint(this.SETTING_LAST_VERSION_INSTALLED) || -1;
+    static get_last_version_installed() : string {
+        return this._settings?.get_string(this.SETTING_LAST_VERSION_NAME_INSTALLED) || "0";
     }
 
     static get_tiling_system_enabled() : boolean {
@@ -51,7 +53,8 @@ export default class Settings {
     }
 
     static get_show_indicator() : boolean {
-        return this._settings?.get_boolean(this.SETTING_SHOW_INDICATOR) || true;
+        if (!this._settings) return true;
+        return this._settings.get_boolean(this.SETTING_SHOW_INDICATOR);
     }
 
     static get_inner_gaps(scaleFactor: number = 1) : { top: number, bottom: number, left: number, right: number } {
@@ -103,8 +106,32 @@ export default class Settings {
         return this._settings?.get_boolean(Settings.SETTING_RESIZE_COMPLEMENTING_WINDOWS) || false;
     }
 
-    static set_last_version_installed(version: number) {
-        this._settings?.set_uint(this.SETTING_LAST_VERSION_INSTALLED, version);
+    static get_tiling_system_activation_key() : ActivationKey {
+        const val = this._settings?.get_strv(this.SETTING_TILING_SYSTEM_ACTIVATION_KEY);
+        if (!val || val.length === 0) return ActivationKey.CTRL;
+        return Number(val[0]);
+    }
+
+    static get_span_multiple_tiles_activation_key() : ActivationKey {
+        const val = this._settings?.get_strv(this.SETTING_SPAN_MULTIPLE_TILES_ACTIVATION_KEY);
+        if (!val || val.length === 0) return ActivationKey.ALT;
+        return Number(val[0]);
+    }
+
+    static set_last_version_installed(version: string) {
+        this._settings?.set_string(this.SETTING_LAST_VERSION_NAME_INSTALLED, version);
+    }
+
+    static set_tiling_system_activation_key(key: ActivationKey) {
+        this._settings?.set_strv(this.SETTING_TILING_SYSTEM_ACTIVATION_KEY, [String(key)]);
+    }
+
+    static set_span_multiple_tiles_activation_key(key: ActivationKey) {
+        this._settings?.set_strv(this.SETTING_SPAN_MULTIPLE_TILES_ACTIVATION_KEY, [String(key)]);
+    }
+
+    static set_show_indicator(value: boolean) {
+        this._settings?.set_boolean(this.SETTING_SHOW_INDICATOR, value);
     }
 
     static reset_layouts_json() {
@@ -149,3 +176,14 @@ export default class Settings {
     }
 }
 
+export enum ActivationKey {
+    CTRL = 0,
+    ALT,
+    SUPER
+}
+
+export const activationKeys = [
+    ActivationKey.CTRL,
+    ActivationKey.ALT,
+    ActivationKey.SUPER
+];

@@ -8,7 +8,7 @@ import Clutter from "gi://Clutter";
 import GLib from "gi://GLib";
 import SnapAssist from '../snapassist/snapAssist';
 import SelectionTilePreview from '../tilepreview/selectionTilePreview';
-import Settings from '@/settings';
+import Settings, { ActivationKey } from '@/settings';
 import SignalHandling from '@/signalHandling';
 import Layout from '../layout/Layout';
 import Tile from '../layout/Tile';
@@ -34,8 +34,8 @@ export class TilingManager {
     private _isGrabbingWindow: boolean;
     private _movingWindowTimerDuration: number = 15;
     private _lastCursorPos: {x: number, y: number} | null = null;
-    private _wasAltPressed: boolean;
-    private _wasCtrlPressed: boolean;
+    private _wasSpanMultipleTilesActivated: boolean;
+    private _wasTilingSystemActivated: boolean;
     private _isSnapAssisting: boolean;
 
     private _movingWindowTimerId: number | null = null;
@@ -49,8 +49,8 @@ export class TilingManager {
      */
     constructor(monitor: Monitor, enableScaling: boolean) {
         this._isGrabbingWindow = false;
-        this._wasAltPressed = false;
-        this._wasCtrlPressed = false;
+        this._wasSpanMultipleTilesActivated = false;
+        this._wasTilingSystemActivated = false;
         this._isSnapAssisting = false;
         this._enableScaling = enableScaling;
         this._monitor = monitor;
@@ -169,6 +169,17 @@ export class TilingManager {
         this._onMovingWindow(window);
     }
 
+    private _activationKeyToNumber(key: ActivationKey) {
+        switch (key) {
+            case ActivationKey.CTRL:
+                return 2//Clutter.ModifierType.CONTROL_MASK
+            case ActivationKey.ALT:
+                return 3//Clutter.ModifierType.MOD1_MASK
+            case ActivationKey.SUPER:
+                return 6//Clutter.ModifierType.SUPER_MASK
+        }
+    }
+
     private _onMovingWindow(window: Meta.Window) {
         // if the window is no longer grabbed, disable handler
         if (!this._isGrabbingWindow) {
@@ -206,24 +217,25 @@ export class TilingManager {
 
         const [x, y, modifier] = global.get_pointer();
         const currPointerPos = { x, y };
-        const isAltPressed = (modifier & Clutter.ModifierType.MOD1_MASK) != 0;
-        const isCtrlPressed = (modifier & Clutter.ModifierType.CONTROL_MASK) != 0;
-        const allowSpanMultipleTiles = Settings.get_span_multiple_tiles() && isAltPressed;
-        const showTilingSystem = Settings.get_tiling_system_enabled() && isCtrlPressed;
+        
+        const isSpanMultiTilesActivated = (modifier & 1 << this._activationKeyToNumber(Settings.get_span_multiple_tiles_activation_key())) != 0;
+        const isTilingSystemActivated = (modifier & 1 << this._activationKeyToNumber(Settings.get_tiling_system_activation_key())) != 0;
+        const allowSpanMultipleTiles = Settings.get_span_multiple_tiles() && isSpanMultiTilesActivated;
+        const showTilingSystem = Settings.get_tiling_system_enabled() && isTilingSystemActivated;
         // ensure we handle window movement only when needed
-        // if the ALT key status is not changed and the mouse is on the same position as before
-        // and the CTRL key status is not changed, we have nothing to do
-        const changedSpanMultipleTiles = Settings.get_span_multiple_tiles() && isAltPressed !== this._wasAltPressed;
-        const changedShowTilingSystem = Settings.get_tiling_system_enabled() && isCtrlPressed !== this._wasCtrlPressed;
+        // if the snap assistant activation key status is not changed and the mouse is on the same position as before
+        // and the tiling system activation key status is not changed, we have nothing to do
+        const changedSpanMultipleTiles = Settings.get_span_multiple_tiles() && isSpanMultiTilesActivated !== this._wasSpanMultipleTilesActivated;
+        const changedShowTilingSystem = Settings.get_tiling_system_enabled() && isTilingSystemActivated !== this._wasTilingSystemActivated;
         if (!changedSpanMultipleTiles && !changedShowTilingSystem && currPointerPos.x === this._lastCursorPos?.x && currPointerPos.y === this._lastCursorPos?.y) {
             return GLib.SOURCE_CONTINUE;
         }
 
         this._lastCursorPos = currPointerPos;
-        this._wasCtrlPressed = isCtrlPressed;
-        this._wasAltPressed = isAltPressed;
+        this._wasTilingSystemActivated = isTilingSystemActivated;
+        this._wasSpanMultipleTilesActivated = isSpanMultiTilesActivated;
 
-        // layout must not be shown if it was disabled or if it is enabled but CTRL key is not pressed
+        // layout must not be shown if it was disabled or if it is enabled but tiling system activation key is not pressed
         // then close it and open snap assist (if enabled)
         if (!showTilingSystem) {
             if (this._tilingLayout.showing) {
@@ -258,7 +270,7 @@ export class TilingManager {
         if (!selectionRect) return GLib.SOURCE_CONTINUE;
         
         selectionRect = selectionRect.copy();
-        if (allowSpanMultipleTiles) {
+        if (allowSpanMultipleTiles && this._selectedTilesPreview.showing) {
             selectionRect = selectionRect.union(this._selectedTilesPreview.rect);
         }
         this._tilingLayout.hoverTilesInRect(selectionRect, !allowSpanMultipleTiles);
@@ -292,8 +304,8 @@ export class TilingManager {
         this._snapAssist.close(true);
         this._lastCursorPos = null;
         
-        const isCtrlPressed = (global.get_pointer()[2] & Clutter.ModifierType.CONTROL_MASK);
-        if (!isCtrlPressed && !this._isSnapAssisting) return;
+        const isTilingSystemActivated = (global.get_pointer()[2] & 1 << this._activationKeyToNumber(Settings.get_tiling_system_activation_key())) != 0;
+        if (!isTilingSystemActivated && !this._isSnapAssisting) return;
         
         // disable snap assistance
         this._isSnapAssisting = false;

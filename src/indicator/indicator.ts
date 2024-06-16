@@ -41,7 +41,7 @@ export default class Indicator extends PanelMenu.Button {
 
         // Bind the "show-indicator" setting to the "visible" property.
         //@ts-ignore
-        Settings.bind(Settings.SETTING_SHOW_INDICATOR, this, 'visible');
+        Settings.bind(Settings.SETTING_SHOW_INDICATOR, this, 'visible', Gio.SettingsBindFlags.GET);
 
         const icon = new St.Icon({
             gicon: Gio.icon_new_for_string(`${path}/icons/indicator-symbolic.svg`),
@@ -205,10 +205,12 @@ export default class Indicator extends PanelMenu.Button {
         switch(newState) {
             case IndicatorState.DEFAULT:
                 this._currentMenu = new DefaultMenu(this);
+                if (!Settings.get_show_indicator()) this.hide();
                 break;
             case IndicatorState.CREATE_NEW:
             case IndicatorState.EDITING_LAYOUT:
                 this._currentMenu = new EditingMenu(this);
+                this.show();
                 break;
         }
     }

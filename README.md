@@ -87,6 +87,12 @@ To enable via the command line you can run
 /usr/bin/gnome-extensions enable tilingshell@ferrarodomenico.com
 ```
 
+To read the logs you can run
+
+```bash
+journalctl --follow /usr/bin/gnome-shell
+```
+
 ### Uninstall Tiling Shell
 
 To uninstall, first disable the extension and then remove it. To disable via the command line you can run 

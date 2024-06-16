@@ -2,8 +2,8 @@
 <schemalist gettext-domain="gnome-shell-extensions">
 
     <schema path="/org/gnome/shell/extensions/tilingshell/" id="org.gnome.shell.extensions.tilingshell">
-        <key name="last-version-installed" type="u">
-            <default>0</default>
+        <key name="last-version-name-installed" type="s">
+            <default>"0"</default>
             <summary>Last version installed</summary>
             <description>Last version installed of this extension.</description>
         </key>
@@ -11,6 +11,11 @@
             <default>true</default>
             <summary>Enable tiling system</summary>
             <description>Hold CTRL while moving a window to tile it.</description>
+        </key>
+        <key name="tiling-system-activation-key" type="as">
+            <default>[]</default>
+            <summary>Tiling system activation key</summary>
+            <description>Which key to hold while moving a window to activate the tiling system.</description>
         </key>
         <key name="enable-snap-assist" type="b">
             <default>true</default>
@@ -36,6 +41,11 @@
             <default>true</default>
             <summary>Span multiple tiles</summary>
             <description>Hold ALT to span multiple tiles.</description>
+        </key>
+        <key name="span-multiple-tiles-activation-key" type="as">
+            <default>[]</default>
+            <summary>Key to span multiple tiles</summary>
+            <description>Which key to hold to span multiple tiles.</description>
         </key>
         <key name="layouts-json" type="s">
             <default>'[]'</default>

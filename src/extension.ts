@@ -42,8 +42,8 @@ export default class TilingShellExtension extends Extension {
   private _validateSettings() {
     // Setting used for compatibility changes if necessary
     // Settings.get_last_version_installed()
-    if (this.metadata.version) {
-      Settings.set_last_version_installed(Number(this.metadata.version));
+    if (this.metadata['version-name']) {
+      Settings.set_last_version_installed(this.metadata['version-name'] || "0");
     }
 
     const selectedLayouts = Settings.get_selected_layouts();

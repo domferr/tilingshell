@@ -19,6 +19,8 @@ export default class SelectionTilePreview extends TilePreview {
       this._recolor();
     });
     this.connect("destroy", () => St.ThemeContext.get_for_stage(global.get_stage()).disconnect(styleChangedSignalID));
+    this._rect.width = this.gaps.left + this.gaps.right;
+    this._rect.height = this.gaps.top + this.gaps.bottom;
   }
 
   _init() {
