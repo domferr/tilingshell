@@ -49,7 +49,7 @@ Click on Tiling Shell's panel indicator and the available layouts will be shown.
 
 ### Select multiple tiles ###
 
-The layout is not strict. You can select multiple tiles too! Just hold <kbd>SHIFT</kbd> while using the tiling system.
+The layout is not strict. You can select multiple tiles too! Just hold <kbd>ALT</kbd> while using the tiling system.
 
 [multiple_selection.webm](https://github.com/domferr/tilingshell/assets/14203981/92b29130-260c-479d-9237-bf5c87427e52)
 
