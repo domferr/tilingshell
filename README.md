@@ -69,11 +69,19 @@ You can resize adjacent tiled windows together!
 
 ## Installation
 
+This extension is published on [extensions.gnome.org](https://extensions.gnome.org/extension/7065/tiling-shell/)! You can install from there or install manually. By installing from [extensions.gnome.org](https://extensions.gnome.org/extension/7065/tiling-shell/) you will always have the latest update.
+
+<div align="center">
+  <a href="https://extensions.gnome.org/extension/7065/tiling-shell/" >
+      <img src="https://img.shields.io/badge/Install%20from-extensions.gnome.org-4A86CF?style=for-the-badge&logo=Gnome&logoColor=white"/>
+  </a>
+</div>
+
+### Install manually
 Download the latest [release](https://github.com/domferr/tilingshell/releases). Extract the downloaded archive. Copy the folder to `~/.local/share/gnome-shell/extensions` directory. You need to reload GNOME Shell afterwards (e.g. by logging out). Then you can enable the extension:
 ```bash
 /usr/bin/gnome-extensions enable tilingshell@ferrarodomenico.com
 ```
-Currently, this extension is not on [extensions.gnome.org](https://extensions.gnome.org/). However, if you are interested we can publish it there. Let us know by opening a new [issue](https://github.com/domferr/tilingshell/issues)!
 
 ### Install via Source
 
