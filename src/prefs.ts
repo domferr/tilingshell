@@ -92,6 +92,13 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         behaviourGroup.add(snapAssistRow);
 
+        const tileNewWindowsRow = this._buildSwitchRow(
+            Settings.SETTING_TILE_NEW_WINDOWS,
+            "Tile New Windows",
+            "Automatically move new windows into empty tiles."
+        );
+        behaviourGroup.add(tileNewWindowsRow);        
+
         const enableTilingSystemRow = this._buildSwitchRow(
             Settings.SETTING_TILING_SYSTEM,
             "Enable Tiling System",

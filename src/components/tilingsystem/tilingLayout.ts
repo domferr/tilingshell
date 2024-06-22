@@ -74,6 +74,10 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
     public get showing(): boolean {
         return this._showing;
     }
+    
+    public get layout(): Layout {
+        return this._layout
+    }
 
     public openBelow(window: Meta.Window) {
         if (this._showing) return;

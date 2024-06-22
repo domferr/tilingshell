@@ -94,7 +94,7 @@ export class TilingManager {
             const layout = GlobalState.get().getSelectedLayoutOfMonitor(this._monitor.index);
             this._tilingLayout.relayout({ layout });
         });
-        
+
         this._signals.connect(Settings, Settings.SETTING_INNER_GAPS, () => {
             this._innerGaps = buildMargin(Settings.get_inner_gaps());
             this._tilingLayout.relayout({ innerGaps: this._innerGaps });
@@ -123,6 +123,18 @@ export class TilingManager {
         });
 
         this._signals.connect(this._snapAssist, "snap-assist", this._onSnapAssist.bind(this));
+
+        this._signals.connect(global.display, 'window-created', (_display: Meta.Display, window: Meta.Window) => {
+
+            if (Settings.get_tile_new_windows_enabled()) {
+                const act = window.get_compositor_private();
+
+                const id = act.connect('first-frame', (_: any) => {
+                    this._onFirstFrame(window)
+                    act.disconnect(id);
+                });
+            }
+        });
     }
 
     public onKeyboardMoveWindow(window: Meta.Window, direction: Meta.Direction) {
@@ -226,7 +238,7 @@ export class TilingManager {
             this._selectedTilesPreview.close();
             this._snapAssist.close(true);
             this._isSnapAssisting = false;
-            
+
             return GLib.SOURCE_CONTINUE;
         }
 
@@ -236,11 +248,11 @@ export class TilingManager {
         // it is the first time the window is moved. If that's the case, change 
         // window's size to the size it had before it were tiled (the originalSize)
         if (extWin.originalSize) {
-            const newSize = buildRectangle({ 
-                x: window.get_frame_rect().x, 
-                y: window.get_frame_rect().y, 
-                width: extWin.originalSize.width, 
-                height: extWin.originalSize.height 
+            const newSize = buildRectangle({
+                x: window.get_frame_rect().x,
+                y: window.get_frame_rect().y,
+                width: extWin.originalSize.width,
+                height: extWin.originalSize.height
             });
             if (Settings.get_restore_window_original_size()) {
                 this._easeWindowRect(window, newSize);
@@ -298,10 +310,10 @@ export class TilingManager {
         if (!changedSpanMultipleTiles && isPointInsideRect(currPointerPos, this._selectedTilesPreview.rect)) {
             return GLib.SOURCE_CONTINUE;
         }
-        
+
         let selectionRect = this._tilingLayout.getTileBelow(currPointerPos, changedSpanMultipleTiles && !allowSpanMultipleTiles);
         if (!selectionRect) return GLib.SOURCE_CONTINUE;
-        
+
         selectionRect = selectionRect.copy();
         if (allowSpanMultipleTiles && this._selectedTilesPreview.showing) {
             selectionRect = selectionRect.union(this._selectedTilesPreview.rect);
@@ -309,9 +321,9 @@ export class TilingManager {
         this._tilingLayout.hoverTilesInRect(selectionRect, !allowSpanMultipleTiles);
 
         this._selectedTilesPreview.gaps = buildTileGaps(
-            selectionRect, 
-            this._tilingLayout.innerGaps, 
-            this._tilingLayout.outerGaps, 
+            selectionRect,
+            this._tilingLayout.innerGaps,
+            this._tilingLayout.outerGaps,
             this._workArea,
             this._enableScaling ? getScalingFactorOf(this._tilingLayout)[1]:undefined
         );
@@ -320,7 +332,7 @@ export class TilingManager {
             true,
             selectionRect,
         );
-        
+
         return GLib.SOURCE_CONTINUE;
     }
 
@@ -341,23 +353,86 @@ export class TilingManager {
         
         const isTilingSystemActivated = this._activationKeyStatus(global.get_pointer()[2], Settings.get_tiling_system_activation_key());
         if (!isTilingSystemActivated && !this._isSnapAssisting) return;
-        
+
         // disable snap assistance
         this._isSnapAssisting = false;
 
         // abort if the pointer is moving on another monitor: the user moved
         // the window to another monitor not handled by this tiling manager
         if (!this._isPointerInsideThisMonitor()) return;
-        
+
         // abort if there is an invalid selection
         if (selectionRect.width <= 0 || selectionRect.height <= 0) {
             return;
         }
-        
+
         (window as ExtendedWindow).originalSize = window.get_frame_rect().copy();
         (window as ExtendedWindow).isTiled = true;
         this._easeWindowRect(window, selectionRect);
     }
+
+    private _findVacantTile() {
+
+        const otherTiledWindows = this._resizingManager.getWindows().filter(otherWindow =>
+            otherWindow && (otherWindow as ExtendedWindow).isTiled && !otherWindow.minimized);
+
+        const tiles = this._tilingLayout.layout.tiles
+
+        const vacantTile = tiles.find((tile) => {
+            const tileRect = TileUtils.apply_props(tile, this._workArea);
+
+            const overlapping_windows = otherTiledWindows.find((otherTiledWindow) => {
+                const otherWindowRect = otherTiledWindow.get_frame_rect()
+                return tileRect.overlap(otherWindowRect)
+            })
+
+            return !overlapping_windows
+        })
+
+        return vacantTile
+    }
+
+    private _isTileable(window: Meta.Window) {
+            return (
+                // checks adjusted from https://github.com/pop-os/shell/blob/cfa0c55e84b7ce339e5ce83832f76fee17e99d51/src/window.ts#L326
+                window.windowType == Meta.WindowType.NORMAL &&
+                // Transient windows are most likely dialogs
+                window.get_transient_for() == null &&
+                // If a window lacks a class, it's probably a web browser dialog
+                window.wmClass !== null
+            )
+
+    }
+
+    private _onFirstFrame(window: Meta.Window) {
+
+        if (!this._isTileable(window)) { return; }
+
+        const vacantTile = this._findVacantTile()
+
+        if (!vacantTile) { return }
+
+        const scaledRect = TileUtils.apply_props(vacantTile, this._workArea);
+
+        const gaps = buildTileGaps(
+            scaledRect,
+            this._tilingLayout.innerGaps,
+            this._tilingLayout.outerGaps,
+            this._workArea,
+            this._enableScaling ? getScalingFactorOf(this._tilingLayout)[1] : undefined
+        );
+
+        scaledRect.x += gaps.left;
+        scaledRect.y += gaps.top;
+        scaledRect.width -= gaps.right + gaps.left;
+        scaledRect.height -= gaps.bottom + gaps.top;
+
+        (window as ExtendedWindow).originalSize = window.get_frame_rect().copy();
+        (window as ExtendedWindow).isTiled = true;
+
+        this._easeWindowRect(window, scaledRect);
+    }
+
 
     private _easeWindowRect(window: Meta.Window, destRect: Mtk.Rectangle) {
         // apply animations when tiling the window
@@ -371,7 +446,7 @@ export class TilingManager {
             window.get_frame_rect().copy(),
             Meta.SizeChange.UNMAXIMIZE
         );
-        
+
         // move and resize the window to the current selection
         window.move_to_monitor(this._monitor.index);
         window.move_resize_frame(
@@ -401,11 +476,11 @@ export class TilingManager {
         if (scaledRect.y + scaledRect.height > this._workArea.y + this._workArea.height) {
             scaledRect.height -= scaledRect.y + scaledRect.height - this._workArea.y - this._workArea.height;
         }
-        
+
         this._selectedTilesPreview.gaps = buildTileGaps(
             scaledRect,
-            this._tilingLayout.innerGaps, 
-            this._tilingLayout.outerGaps, 
+            this._tilingLayout.innerGaps,
+            this._tilingLayout.outerGaps,
             this._workArea,
             this._enableScaling ? getScalingFactorOf(this._tilingLayout)[1]:undefined
         ); 

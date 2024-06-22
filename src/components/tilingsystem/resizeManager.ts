@@ -21,7 +21,7 @@ export class ResizingManager {
 
     /** From Gnome Shell: https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/main/js/ui/altTab.js#L53
      */
-    private _getWindows(): Meta.Window[] {
+    public getWindows(): Meta.Window[] {
         const workspace = global.workspaceManager.get_active_workspace();
         // We ignore skip-taskbar windows in switchers, but if they are attached
         // to their parent, their position in the MRU list may be more appropriate
@@ -71,7 +71,7 @@ export class ResizingManager {
         }
         if (!verticalSide[0] && !horizontalSide[0]) return;
         
-        const otherTiledWindows = this._getWindows().filter(otherWindow => 
+        const otherTiledWindows = this.getWindows().filter(otherWindow => 
             otherWindow && (otherWindow as ExtendedWindow).isTiled && otherWindow !== window && !otherWindow.minimized);
         if (otherTiledWindows.length === 0) return;
         

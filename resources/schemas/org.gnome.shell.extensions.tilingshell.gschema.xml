@@ -22,6 +22,11 @@
             <summary>Enable snap assist</summary>
             <description>Move the window on top of the screen to snap assist it.</description>
         </key>
+        <key name="tile-new-windows" type="b">
+            <default>false</default>
+            <summary>Tile New Windows</summary>
+            <description>Automatically move new windows into empty tiles.</description>
+        </key>        
         <key name="show-indicator" type="b">
             <default>true</default>
             <summary>Shows indicator</summary>

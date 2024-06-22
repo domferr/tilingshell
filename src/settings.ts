@@ -20,6 +20,7 @@ export default class Settings {
     static SETTING_SELECTED_LAYOUTS = 'selected-layouts';
     static SETTING_RESTORE_WINDOW_ORIGINAL_SIZE = 'restore-window-original-size';
     static SETTING_RESIZE_COMPLEMENTING_WINDOWS = 'resize-complementing-windows';
+    static SETTING_TILE_NEW_WINDOWS = 'tile-new-windows';
 
     static SETTING_MOVE_WINDOW_RIGHT = 'move-window-right';
     static SETTING_MOVE_WINDOW_LEFT = 'move-window-left';
@@ -55,6 +56,10 @@ export default class Settings {
 
     static get_snap_assist_enabled() : boolean {
         return this._settings?.get_boolean(this.SETTING_SNAP_ASSIST) || false;
+    }
+
+    static get_tile_new_windows_enabled() : boolean {
+        return this._settings?.get_boolean(this.SETTING_TILE_NEW_WINDOWS) || false
     }
 
     static get_show_indicator() : boolean {
