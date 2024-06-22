@@ -160,6 +160,7 @@ export default class Indicator extends PanelMenu.Button {
                 this._editorDialog?.destroy();
                 this._editorDialog = null;
             },
+            path: this._path,
             legend: showLegend
         });
         this._editorDialog.open();

@@ -283,4 +283,46 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
 
         return [true, results];
     }
+
+    public getNearestTile(source: Mtk.Rectangle, direction: Meta.Direction): Mtk.Rectangle | undefined {
+        let previewFound: DynamicTilePreview | undefined = undefined;
+        let bestDistance = -1;
+
+        for (let i = 0; i < this._previews.length; i++) {
+            const preview = this._previews[i];
+            const euclideanDistance = ((preview.x - source.x) * (preview.x - source.x)) 
+                + ((preview.y - source.y) * (preview.y - source.y));
+
+            switch (direction) {
+                case Meta.Direction.RIGHT:
+                    if (preview.x <= source.x) continue;
+                    break;
+                case Meta.Direction.LEFT:
+                    if (preview.x >= source.x) continue;
+                    break;
+                case Meta.Direction.BOTTOM:
+                    if (preview.y <= source.y + source.height) continue;
+                    break;
+                case Meta.Direction.TOP:
+                    if (preview.y >= source.y) continue;
+                    break;
+                default:
+                    continue;
+            }
+
+            if (!previewFound || euclideanDistance < bestDistance) {
+                previewFound = preview;
+                bestDistance = euclideanDistance;
+            }
+        }
+        
+        if (!previewFound) return undefined;
+        
+        return buildRectangle({ 
+            x: previewFound.innerX,
+            y: previewFound.innerY,
+            width: previewFound.innerWidth,
+            height: previewFound.innerHeight
+        });
+    }
 }

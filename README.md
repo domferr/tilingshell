@@ -11,18 +11,11 @@
 
 This is a Gnome Shell extension implementing modern windows tiling system by extending GNOME's default 2 columns to any layout you want! Can be installed on Gnome Shells from **40 to 46** on X11 and Wayland: the most recent GNOME Shell is supported, and older releases will include all the features and bug fixes!
 
-
 - 🤩 First and only extension that provides Windows 11's **snap assistant**
 - 🖥️🖥️ **multiple monitors support**, even with different scaling factors!
 - ⚙️ Manage, edit, create and delete layouts with a **built-in editor**
 - 💡 Layouts are not strict, you can **span multiple tiles** if you want
 - 🚀 Automatically sets the same UI of your GNOME theme, for a **seamless integration**!
-
-> This extension also provides all the functionalities of Windows 11 Snap Assistant and Windows PowerToys FancyZones. 
-
-Have issues, you want to suggest a new feature or contribute? Please open a new [issue](https://github.com/domferr/tilingshell/issues)!
-  
-<img src="https://github.com/domferr/tilingshell/blob/main/doc/horiz_summary.jpg" align="center"/>
 
 <div align="center">
   <a href="https://extensions.gnome.org/extension/7065/tiling-shell/" >
@@ -30,12 +23,18 @@ Have issues, you want to suggest a new feature or contribute? Please open a new 
   </a>
 </div>
 
+<img src="https://github.com/domferr/tilingshell/blob/main/doc/horiz_summary.jpg" align="center"/>
+
+Have issues, you want to suggest a new feature or contribute? Please open a new [issue](https://github.com/domferr/tilingshell/issues)!
+
 ## Usage ##
 
 ### Tiling System ###
 When grabbing and moving a window, press <kbd>CTRL</kbd> key to show the tiling layout. When moving on a tile, it will highlight. Ungrab the window to place that window on the highlighted tile.
 
 [tiling_system.webm](https://github.com/domferr/tilingshell/assets/14203981/a45ec416-ad39-458d-9b9f-cddce8b25666)
+
+> This extension and the tiling system also implements Windows PowerToys FancyZones!
 
 ### Snap Assistant ###
 When grabbing and moving a window, the snap assistant will be available on top of the screen. Move the window near it to activate the snap assistant. While still grabbing the window, move your mouse to the tile you are interested in. By stopping grabbing the window will be tiled to the selected tile!
@@ -49,7 +48,7 @@ Click on Tiling Shell's panel indicator and the available layouts will be shown.
 
 ### Select multiple tiles ###
 
-The layout is not strict. You can select multiple tiles too! Just hold <kbd>SHIFT</kbd> while using the tiling system.
+The layout is not strict. You can select multiple tiles too! Just hold <kbd>ALT</kbd> while using the tiling system (you can choose another key from the preferences).
 
 [multiple_selection.webm](https://github.com/domferr/tilingshell/assets/14203981/92b29130-260c-479d-9237-bf5c87427e52)
 

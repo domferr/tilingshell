@@ -3,6 +3,7 @@ import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 import TilePreview from "./tilePreview";
 import { logger } from "@/utils/shell";
+import BlurTilePreview from "./blurTilePreview";
 
 const debug = logger("SelectionTilePreview");
 
@@ -36,6 +37,9 @@ export default class SelectionTilePreview extends TilePreview {
     this.set_style(`
       background-color: rgba(${backgroundColor.red}, ${backgroundColor.green}, ${backgroundColor.blue}, ${newAlpha / 255}) !important;
     `);
+    /*this.set_style(`
+      background-color: rgba(255, 255, 255, 0.5) !important;
+    `);*/
   }
 
   close() {

@@ -92,7 +92,6 @@ export function buildMargin(params: { top?: number, bottom?: number, left?: numb
 }
 
 export function buildRectangle(params: { x?: number, y?: number, width?: number, height?: number} = {}): Mtk.Rectangle {
-    //@ts-ignore todo
     return new Mtk.Rectangle({ x: params.x || 0, y: params.y || 0, width: params.width || 0, height: params.height || 0 });
 }
 

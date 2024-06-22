@@ -12,14 +12,12 @@ const debug = logger("HoverLine");
 
 @registerGObjectClass
 export default class HoverLine extends St.Widget {
-
     private readonly _hoverTimer: number;
     private readonly _size: number;
-    private readonly _workArea: Mtk.Rectangle;
 
     private _hoveredTile: EditableTilePreview | null;
 
-    constructor(parent: Clutter.Actor, workArea: Mtk.Rectangle) {
+    constructor(parent: Clutter.Actor) {
         super({ styleClass: "hover-line"});
         parent.add_child(this);
         
@@ -27,7 +25,6 @@ export default class HoverLine extends St.Widget {
         
         const [_, scalingFactor] = getScalingFactorOf(this);
         this._size = 16 * scalingFactor;
-        this._workArea = workArea;
 
         this.hide();
 
@@ -51,6 +48,7 @@ export default class HoverLine extends St.Widget {
         this._hoveredTile = tile;
 
         const modifier = Shell.Global.get().get_pointer()[2];
+        
         // split horizontally when CTRL is NOT pressed, split vertically instead
         const splitHorizontally = (modifier & Clutter.ModifierType.CONTROL_MASK) == 0;
         this._drawLine(splitHorizontally, x, y);
@@ -69,7 +67,7 @@ export default class HoverLine extends St.Widget {
         // split horizontally when CTRL is NOT pressed, split vertically instead
         const splitHorizontally = (modifier & Clutter.ModifierType.CONTROL_MASK) == 0;
         
-        this._drawLine(splitHorizontally, x, y);
+        this._drawLine(splitHorizontally, x - (this.get_parent()?.x || 0), y - (this.get_parent()?.y || 0));
 
         return GLib.SOURCE_CONTINUE;
     }
@@ -78,7 +76,7 @@ export default class HoverLine extends St.Widget {
         if (!this._hoveredTile) return;
 
         if (splitHorizontally) {
-            const newX = x - (this._size/2) - this._workArea.x;
+            const newX = x - (this._size/2);
             if (newX < this._hoveredTile.x
                 || newX + this._size > this._hoveredTile.x + this._hoveredTile.width) {
                 return;
@@ -86,7 +84,7 @@ export default class HoverLine extends St.Widget {
             this.set_size(this._size, this._hoveredTile.height);
             this.set_position(newX, this._hoveredTile.y);
         } else {
-            const newY = y - (this._size/2) - this._workArea.y;
+            const newY = y - (this._size/2);
             if (newY < this._hoveredTile.y
                 || newY + this._size > this._hoveredTile.y + this._hoveredTile.height) {
                 return;
@@ -100,5 +98,6 @@ export default class HoverLine extends St.Widget {
 
     private _onDestroy() {
         GLib.Source.remove(this._hoverTimer);
+        this._hoveredTile = null;
     }
 }

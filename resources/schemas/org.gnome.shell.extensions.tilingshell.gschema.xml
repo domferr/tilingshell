@@ -67,6 +67,22 @@
             <summary>Enable auto-resize of the complementing tiled windows</summary>
             <description>When a tiled window is resized, auto-resize the other tiled windows near it.</description>
         </key>
+		<key type="as" name="move-window-right">
+			<default><![CDATA[['<Super>Right']]]></default>
+			<summary>Move focused window to the tile to its right</summary>
+		</key>
+		<key type="as" name="move-window-left">
+			<default><![CDATA[['<Super>Left']]]></default>
+			<summary>Move focused window to the tile to its left</summary>
+		</key>
+		<key type="as" name="move-window-up">
+			<default><![CDATA[['<Super>Up']]]></default>
+			<summary>Move focused window to the tile above</summary>
+		</key>
+		<key type="as" name="move-window-down">
+			<default><![CDATA[['<Super>Down']]]></default>
+			<summary>Move focused window to the tile below</summary>
+		</key>
     </schema>
 
 </schemalist>

@@ -5,6 +5,7 @@ import Meta from 'gi://Meta';
 import Mtk from "gi://Mtk";
 import Settings from "@/settings";
 import Shell from 'gi://Shell';
+import GObject from 'gi://GObject';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { buildMargin, buildRectangle, buildTileGaps, enableScalingFactorSupport, getEventCoords, getScalingFactor, getWindowsOfMonitor } from "@/utils/ui";
 import Layout from "../layout/Layout";
@@ -22,17 +23,18 @@ const debug = logger("LayoutEditor");
 export default class LayoutEditor extends St.Widget {
     private _layout: Layout;
     private _containerRect: Mtk.Rectangle;
-    private _sliders: Slider[];
     private _innerGaps: Clutter.Margin;
     private _outerGaps: Clutter.Margin;
+    private _hoverWidget: HoverLine;
+    private _sliders: Slider[];
 
     private _minimizedWindows: Meta.Window[];
 
-    private readonly _hoverWidget: HoverLine;
-
     constructor(layout: Layout, monitor: Monitor, enableScaling: boolean) {
         super({ styleClass: "layout-editor" });
-        global.windowGroup.add_child(this);
+
+        Main.layoutManager.addChrome(this);
+        global.windowGroup.bind_property("visible", this, "visible", GObject.BindingFlags.DEFAULT);
 
         if (enableScaling) {
             const scalingFactor = getScalingFactor(monitor.index);
@@ -47,16 +49,15 @@ export default class LayoutEditor extends St.Widget {
         this._sliders = [];
         this._containerRect = buildRectangle({ x: 0, y: 0, width: workArea.width, height: workArea.height });
         
-
         this._minimizedWindows = getWindowsOfMonitor(monitor).filter(win => !win.is_hidden());
         this._minimizedWindows.forEach(win => win.can_minimize() && win.minimize());
         
-        this._hoverWidget = new HoverLine(this, workArea.copy());
-
-        this.connect("destroy", this._onDestroy.bind(this));
-
+        this._hoverWidget = new HoverLine(this);
+        
         this._layout = layout;
         this._drawEditor();
+
+        this.connect("destroy", this._onDestroy.bind(this));
     }
 
     public get layout(): Layout {
@@ -65,9 +66,9 @@ export default class LayoutEditor extends St.Widget {
 
     public set layout(newLayout: Layout) {
         // cleanup
-        this._sliders.forEach(slider => slider.destroy());
+        this.destroy_all_children();
         this._sliders = [];
-        this.remove_all_children();
+        this._hoverWidget = new HoverLine(this);
 
         // change layout
         this._layout = newLayout;
@@ -133,19 +134,19 @@ export default class LayoutEditor extends St.Widget {
         const gaps = buildTileGaps(rect, this._innerGaps, this._outerGaps, this._containerRect);
         const editableTile = new EditableTilePreview({ parent: this, tile, containerRect: this._containerRect, rect, gaps });
         editableTile.open();
-        editableTile.connect("clicked", (_, clicked_button: number) => {
+        editableTile.connect("clicked", (tile: EditableTilePreview, clicked_button: number) => {
             // St.ButtonMask.ONE is left click. 3 is right click (but for some reason St.ButtonMask.THREE is equal to 4, so we cannot use it)
             if (clicked_button === St.ButtonMask.ONE) this.splitTile(editableTile);
             else if (clicked_button === 3) this.deleteTile(editableTile);
         });
         editableTile.connect("motion-event", (tile: EditableTilePreview, event: Clutter.Event) => {
             const [stageX, stageY] = getEventCoords(event);
-            this._hoverWidget.handleMouseMove(editableTile, stageX, stageY);
+            this._hoverWidget.handleMouseMove(editableTile, stageX - this.x, stageY - this.y);
             return Clutter.EVENT_PROPAGATE;
         });
-        editableTile.connect("notify::hover", () => {
+        editableTile.connect("notify::hover", (tile: EditableTilePreview) => {
             const [stageX, stageY] = Shell.Global.get().get_pointer();
-            this._hoverWidget.handleMouseMove(editableTile, stageX, stageY);
+            this._hoverWidget.handleMouseMove(editableTile, stageX - this.x, stageY - this.y);
         });
         if (this._sliders.length > 0) this.set_child_below_sibling(editableTile, this._sliders[0]);
         return editableTile;
@@ -249,10 +250,11 @@ export default class LayoutEditor extends St.Widget {
     }
 
     private _onDestroy() {
-        this.remove_all_children();
-        this._sliders.forEach(slider => slider.destroy());
-        this._sliders = [];
         this._minimizedWindows.forEach(win => win.unminimize());
+
+        this.destroy_all_children();
+        this._sliders = [];
+        
         super.destroy();
     }
 }

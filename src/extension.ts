@@ -5,11 +5,14 @@ import { getMonitors } from '@/utils/ui';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { TilingManager } from "@/components/tilingsystem/tilingManager";
 import Gio from 'gi://Gio';
+import Meta from 'gi://Meta';
 import Settings from '@/settings';
 import SignalHandling from './signalHandling';
 import GlobalState from './globalState';
 import Indicator from './indicator/indicator';
 import { Extension, ExtensionMetadata } from 'resource:///org/gnome/shell/extensions/extension.js';
+import DBus from './dbus';
+import Keybindings from '@keybindings';
 
 const SIGNAL_WORKAREAS_CHANGED = 'workareas-changed';
 const debug = logger('extension');
@@ -18,19 +21,18 @@ export default class TilingShellExtension extends Extension {
   private _indicator: Indicator | null;
   private _tilingManagers: TilingManager[];
   private _fractionalScalingEnabled: boolean;
-  private _mutterSettings: Gio.Settings | null ;
-  private _dbus: Gio.DBusExportedObject | null;
-
+  private _dbus: DBus | null;
   private _signals: SignalHandling | null;
+  private _keybindings: Keybindings | null;
 
   constructor(metadata: ExtensionMetadata) {
     super(metadata);
     this._signals = null;
     this._fractionalScalingEnabled = false;
-    this._mutterSettings = null;
     this._tilingManagers = [];
     this._indicator = null;
     this._dbus = null;
+    this._keybindings = null;
   }
 
   createIndicator() {
@@ -73,8 +75,7 @@ export default class TilingShellExtension extends Extension {
     Settings.initialize(this.getSettings());
     this._validateSettings();
 
-    this._mutterSettings = new Gio.Settings({ schema: 'org.gnome.mutter' });
-    this._fractionalScalingEnabled = this._isFractionalScalingEnabled();
+    this._fractionalScalingEnabled = this._isFractionalScalingEnabled(new Gio.Settings({ schema: 'org.gnome.mutter' }));
 
     //@ts-ignore
     if (Main.layoutManager._startingUp) {
@@ -86,20 +87,37 @@ export default class TilingShellExtension extends Extension {
       this._createTilingManagers();
       this._setupSignals();
     }
+    
+    if (!this._keybindings) {
+      this._keybindings = new Keybindings();
+      this._keybindings.enable(this.getSettings(), this._onKeyboardMoveWin.bind(this));
+    }
 
     this.createIndicator();
 
-    this._dbus = Gio.DBusExportedObject.wrapJSObject(
-      `<node>
-        <interface name="org.gnome.Shell.Extensions.TilingShell">
-          <method name="openLayoutEditor" />
-        </interface>
-      </node>`, 
-      this
-    );
-    this._dbus.export(Gio.DBus.session, '/org/gnome/shell/extensions/TilingShell');
-
+    if (this._dbus) this._dbus.disable();
+    this._dbus = new DBus();
+    this._dbus.enable();
     debug('extension is enabled');
+  }
+
+  private _onKeyboardMoveWin(display: Meta.Display, direction: Meta.Direction) {
+    const focus_window = display.get_focus_window();
+    if (!focus_window || !focus_window.has_focus() || 
+      (focus_window.get_wm_class() && focus_window.get_wm_class() === 'gjs')) {
+      return;
+    }
+
+    // handle unmaximize of maximized window
+    if (direction === Meta.Direction.DOWN && focus_window.get_maximized()) {
+      focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
+      return;
+    }
+    
+    const monitorTilingManager = this._tilingManagers[focus_window.get_monitor()];
+    if (!monitorTilingManager) return;
+    
+    monitorTilingManager.onKeyboardMoveWindow(focus_window, direction);
   }
 
   public openLayoutEditor() {
@@ -133,42 +151,55 @@ export default class TilingShellExtension extends Extension {
       this._createTilingManagers();
     });
 
-    if (this._mutterSettings) {
-      this._signals.connect(this._mutterSettings, 'changed::experimental-features', () => {
-        if (!this._mutterSettings) return;
+    this._signals.connect(
+      new Gio.Settings({ schema: 'org.gnome.mutter' }), 
+      'changed::experimental-features', 
+      (_mutterSettings: Gio.Settings) => {
+        if (!_mutterSettings) return;
 
-        const fractionalScalingEnabled = this._isFractionalScalingEnabled();
+        const fractionalScalingEnabled = this._isFractionalScalingEnabled(_mutterSettings);
         
         if (this._fractionalScalingEnabled === fractionalScalingEnabled) return;
 
         this._fractionalScalingEnabled = fractionalScalingEnabled;
         this._createTilingManagers();
         if (this._indicator) this._indicator.enableScaling = !this._fractionalScalingEnabled;
-      });
-    }
+      }
+    );
   }
 
-  private _isFractionalScalingEnabled(): boolean {
-    if (!this._mutterSettings) return false;
-
-    return this._mutterSettings.get_strv('experimental-features')
+  private _isFractionalScalingEnabled(_mutterSettings: Gio.Settings): boolean {
+    return _mutterSettings.get_strv('experimental-features')
           .find(feat => feat === "scale-monitor-framebuffer" || feat === "x11-randr-fractional-scaling") != undefined;
   }
 
   disable(): void {
+    // destroy indicator
     this._indicator?.destroy();
     this._indicator = null;
+
+    // destroy tiling managers
     this._tilingManagers.forEach(tm => tm.destroy());
     this._tilingManagers = [];
+
+    // disconnect signals
     if (this._signals) this._signals.disconnect();
     this._signals = null;
-    GlobalState.destroy();
-    this._mutterSettings = null;
-    this._fractionalScalingEnabled = false;
-    this._dbus?.flush();
-    this._dbus?.unexport();
+
+    // disable dbus
+    if (this._dbus) this._dbus.disable();
     this._dbus = null;
+
+    // bring back overridden keybindings
+    if (this._keybindings) this._keybindings.disable();
+    this._keybindings = null;
+
+    // destroy state and settings
+    GlobalState.destroy();
     Settings.destroy();
+
+    this._fractionalScalingEnabled = false;
     debug('extension is disabled');
   }
 }
+

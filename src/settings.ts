@@ -20,6 +20,11 @@ export default class Settings {
     static SETTING_SELECTED_LAYOUTS = 'selected-layouts';
     static SETTING_RESTORE_WINDOW_ORIGINAL_SIZE = 'restore-window-original-size';
     static SETTING_RESIZE_COMPLEMENTING_WINDOWS = 'resize-complementing-windows';
+
+    static SETTING_MOVE_WINDOW_RIGHT = 'move-window-right';
+    static SETTING_MOVE_WINDOW_LEFT = 'move-window-left';
+    static SETTING_MOVE_WINDOW_UP = 'move-window-up';
+    static SETTING_MOVE_WINDOW_DOWN = 'move-window-down';
     
     static initialize(settings: Gio.Settings) {
         if (this._is_initialized) return;
@@ -177,13 +182,8 @@ export default class Settings {
 }
 
 export enum ActivationKey {
+    NONE = -1,
     CTRL = 0,
     ALT,
     SUPER
 }
-
-export const activationKeys = [
-    ActivationKey.CTRL,
-    ActivationKey.ALT,
-    ActivationKey.SUPER
-];

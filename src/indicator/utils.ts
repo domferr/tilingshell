@@ -3,6 +3,17 @@ import Gio from 'gi://Gio';
 import Clutter from 'gi://Clutter';
 
 export const createButton = (iconName: string, text: string, path?: string) : St.Button => {
+    const btn = createIconButton(iconName, path);
+    btn.child.add_child(new St.Label({ 
+        marginBottom: 4, 
+        marginTop: 4, 
+        text: text, 
+        yAlign: Clutter.ActorAlign.CENTER 
+    }));
+    return btn;
+}
+
+export const createIconButton = (iconName: string, path?: string) : St.Button => {
     const btn = new St.Button({ 
         styleClass: "message-list-clear-button button",
         canFocus: true,
@@ -28,6 +39,5 @@ export const createButton = (iconName: string, text: string, path?: string) : St
         icon.iconName = iconName;
     }
     btn.child.add_child(icon);
-    btn.child.add_child(new St.Label({ marginBottom: 4, marginTop: 4, text: text, yAlign: Clutter.ActorAlign.CENTER }));
     return btn;
 }

@@ -74,7 +74,7 @@ export class TilingManager {
         this._selectedTilesPreview = new SelectionTilePreview({ parent: global.windowGroup });
 
         // build the snap assistant
-        this._snapAssist = new SnapAssist(global.windowGroup, this._workArea, monitorScalingFactor);
+        this._snapAssist = new SnapAssist(Main.uiGroup, this._workArea, monitorScalingFactor);
 
         this._resizingManager = new ResizingManager();
     }
@@ -105,11 +105,12 @@ export class TilingManager {
         });
 
         this._signals.connect(global.display, 'grab-op-begin', (_display: Meta.Display, window: Meta.Window, grabOp: Meta.GrabOp) => {
-            if (grabOp != Meta.GrabOp.MOVING) {
+            const moving = (grabOp & ~1024) === 1;
+            if (!moving) {
                 this._resizingManager.onWindowResizingBegin(window, grabOp);
                 return;
             }
-
+            
             this._onWindowGrabBegin(window);
         });
 
@@ -118,15 +119,35 @@ export class TilingManager {
                 this._resizingManager.onWindowResizingEnd(window);
                 return;
             }
-
             this._onWindowGrabEnd(window);
         });
 
-        this._signals.connect(this._snapAssist, "snap-assist",
-            (_: SnapAssist, tile: Tile) => this._onSnapAssist(tile)
-        );
+        this._signals.connect(this._snapAssist, "snap-assist", this._onSnapAssist.bind(this));
     }
 
+    public onKeyboardMoveWindow(window: Meta.Window, direction: Meta.Direction) {
+        const windowRect = window.get_frame_rect().copy();
+        this._debug(`move window x:${windowRect.x} y:${windowRect.y} width:${windowRect.width} height:${windowRect.height}`);
+        const destinationRect = this._tilingLayout.getNearestTile(windowRect, direction);
+        if (!destinationRect) {
+            // handle maximize of window
+            if (direction === Meta.Direction.UP && window.can_maximize()) {
+                window.maximize(Meta.MaximizeFlags.BOTH);
+            }
+            return;
+        }
+        this._debug(`destinationRect x:${destinationRect.x} y:${destinationRect.y} width:${destinationRect.width} height:${destinationRect.height}`);
+
+        if (!(window as ExtendedWindow).isTiled) {
+            (window as ExtendedWindow).originalSize = windowRect;
+        }
+        (window as ExtendedWindow).isTiled = true;
+
+        if (window.get_maximized()) window.unmaximize(Meta.MaximizeFlags.BOTH);
+    
+        this._easeWindowRect(window, destinationRect);
+    }
+    
     /**
      * Destroys the tiling manager and cleans up resources.
      */
@@ -159,6 +180,11 @@ export class TilingManager {
     private _onWindowGrabBegin(window: Meta.Window) {
         if (this._isGrabbingWindow) return;
 
+        /*this._signals.connect(window, 'position-changed', () => {
+            this._selectedTilesPreview.queue_redraw();
+            this._snapAssist.queue_redraw();
+        });*/
+
         this._isGrabbingWindow = true;
         this._movingWindowTimerId = GLib.timeout_add(
             GLib.PRIORITY_DEFAULT_IDLE,
@@ -169,15 +195,22 @@ export class TilingManager {
         this._onMovingWindow(window);
     }
 
-    private _activationKeyToNumber(key: ActivationKey) {
+    private _activationKeyStatus(modifier: number, key: ActivationKey): boolean {
+        if (key === ActivationKey.NONE) return true;
+
+        let val = 2;
         switch (key) {
             case ActivationKey.CTRL:
-                return 2//Clutter.ModifierType.CONTROL_MASK
+                val = 2;//Clutter.ModifierType.CONTROL_MASK
+                break;
             case ActivationKey.ALT:
-                return 3//Clutter.ModifierType.MOD1_MASK
+                val = 3;//Clutter.ModifierType.MOD1_MASK
+                break;
             case ActivationKey.SUPER:
-                return 6//Clutter.ModifierType.SUPER_MASK
+                val = 6;//Clutter.ModifierType.SUPER_MASK
+                break;
         }
+        return (modifier & 1 << val) != 0;
     }
 
     private _onMovingWindow(window: Meta.Window) {
@@ -218,8 +251,8 @@ export class TilingManager {
         const [x, y, modifier] = global.get_pointer();
         const currPointerPos = { x, y };
         
-        const isSpanMultiTilesActivated = (modifier & 1 << this._activationKeyToNumber(Settings.get_span_multiple_tiles_activation_key())) != 0;
-        const isTilingSystemActivated = (modifier & 1 << this._activationKeyToNumber(Settings.get_tiling_system_activation_key())) != 0;
+        const isSpanMultiTilesActivated = this._activationKeyStatus(modifier, Settings.get_span_multiple_tiles_activation_key());
+        const isTilingSystemActivated = this._activationKeyStatus(modifier, Settings.get_tiling_system_activation_key());
         const allowSpanMultipleTiles = Settings.get_span_multiple_tiles() && isSpanMultiTilesActivated;
         const showTilingSystem = Settings.get_tiling_system_enabled() && isTilingSystemActivated;
         // ensure we handle window movement only when needed
@@ -292,6 +325,8 @@ export class TilingManager {
     }
 
     private _onWindowGrabEnd(window: Meta.Window) {
+        //this._signals.disconnect(window);
+
         this._isGrabbingWindow = false;
         this._tilingLayout.close();
         const selectionRect = buildRectangle({
@@ -304,7 +339,7 @@ export class TilingManager {
         this._snapAssist.close(true);
         this._lastCursorPos = null;
         
-        const isTilingSystemActivated = (global.get_pointer()[2] & 1 << this._activationKeyToNumber(Settings.get_tiling_system_activation_key())) != 0;
+        const isTilingSystemActivated = this._activationKeyStatus(global.get_pointer()[2], Settings.get_tiling_system_activation_key());
         if (!isTilingSystemActivated && !this._isSnapAssisting) return;
         
         // disable snap assistance
@@ -348,7 +383,7 @@ export class TilingManager {
         );
     }
 
-    private _onSnapAssist(tile: Tile) {
+    private _onSnapAssist(_: SnapAssist, tile: Tile) {
         // if there isn't a tile hovered, then close selection
         if (tile.width === 0 || tile.height === 0) {
             this._selectedTilesPreview.close();
@@ -374,6 +409,7 @@ export class TilingManager {
             this._workArea,
             this._enableScaling ? getScalingFactorOf(this._tilingLayout)[1]:undefined
         ); 
+        this._selectedTilesPreview.get_parent()?.set_child_above_sibling(this._selectedTilesPreview, null);
         this._selectedTilesPreview.open(true, scaledRect);
         this._isSnapAssisting = true;
     }

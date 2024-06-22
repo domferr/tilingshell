@@ -3,6 +3,7 @@ import Clutter from "gi://Clutter";
 import Meta from "gi://Meta";
 import Mtk from "gi://Mtk";
 import St from "gi://St";
+import Shell from "gi://Shell";
 import { logger } from "@/utils/shell";
 import { MetaInfo } from "gi://GObject";
 import SnapAssistTile from "./snapAssistTile";
@@ -43,7 +44,7 @@ class SnapAssistContent extends St.BoxLayout {
             yAlign: Clutter.ActorAlign.CENTER,
             vertical: false,
             reactive: true,
-            styleClass: "popup-menu-content snap-assistant",
+            styleClass: "popup-menu-content snap-assistant"
         });
         this._container = container;
         this._container.add_child(this);
@@ -52,13 +53,19 @@ class SnapAssistContent extends St.BoxLayout {
         this._snapAssistLayouts = [];
         this._isEnlarged = false;
         this._showing = true;
+        this._bottomPadding = 0;
 
+        /*this._recolor();
+        this._signals.connect(St.ThemeContext.get_for_stage(global.get_stage()), "changed", () => {
+            this.set_style(null);
+            this._recolor();
+        });*/
         const [alreadyScaled, finalScalingFactor] = getScalingFactorOf(this);
-
         this._bottomPadding = (alreadyScaled ? 1:finalScalingFactor) * (this.get_theme_node().get_padding(St.Side.BOTTOM) / (alreadyScaled ? finalScalingFactor:1));
         this.set_style(`
             padding: ${this._bottomPadding}px !important;
         `);
+
         this._setLayouts(GlobalState.get().layouts);
         this._signals.connect(GlobalState.get(), GlobalState.SIGNAL_LAYOUTS_CHANGED, () => {
             this._setLayouts(GlobalState.get().layouts);
@@ -68,6 +75,36 @@ class SnapAssistContent extends St.BoxLayout {
 
         this.close(false);
     }
+    
+    /*_init() {
+        super._init();
+
+        // changes in GNOME 46+
+        // The sigma in Shell.BlurEffect should be replaced by radius. Since the sigma value 
+        // is radius / 2.0, the radius value will be sigma * 2.0.
+        const sigma = 36;
+        this.add_effect(
+            new Shell.BlurEffect({
+                //@ts-ignore
+                sigma: sigma,
+                //radius: sigma * 2,
+                brightness: 1,
+                mode: Shell.BlurMode.BACKGROUND, // blur what is behind the widget
+            }),
+        );
+        this.add_style_class_name("popup-menu-content snap-assistant");
+    }
+
+    private _recolor() {
+        const [alreadyScaled, finalScalingFactor] = getScalingFactorOf(this);
+        this._bottomPadding = (alreadyScaled ? 1:finalScalingFactor) * (this.get_theme_node().get_padding(St.Side.BOTTOM) / (alreadyScaled ? finalScalingFactor:1));
+        const backgroundColor = this.get_theme_node().get_background_color().copy();
+        const alpha = 0.6;
+        this.set_style(`
+            padding: ${this._bottomPadding}px !important;
+            background-color: rgba(${backgroundColor.red}, ${backgroundColor.green}, ${backgroundColor.blue}, ${alpha}) !important;
+        `);
+    }*/
 
     public close(ease: boolean = false) {
         if (!this._showing) return;

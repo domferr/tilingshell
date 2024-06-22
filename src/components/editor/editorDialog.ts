@@ -2,6 +2,7 @@ import Settings from '@/settings';
 import { registerGObjectClass } from '@/utils/gjs';
 import Clutter from "gi://Clutter";
 import St from 'gi://St';
+import Gio from "gi://Gio";
 import LayoutButton from '../../indicator/layoutButton';
 import GlobalState from '@/globalState';
 import { logger } from '@/utils/shell';
@@ -28,7 +29,8 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         onSelectLayout: (ind: number, lay: Layout) => void,
         onNewLayout: () => void,
         legend: boolean,
-        onClose: () => void
+        onClose: () => void,
+        path: string
     }) {
         super({
             destroyOnClose: true,
@@ -69,10 +71,10 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
             action: () => params.onClose(),
         });
 
-        if (params.legend) this._makeLegendDialog({ onClose: params.onClose });
+        if (params.legend) this._makeLegendDialog({ onClose: params.onClose, path: params.path });
     }
 
-    private _makeLegendDialog(params: { onClose: () => void }) {
+    private _makeLegendDialog(params: { onClose: () => void, path: string }) {
         const suggestion1 = new St.BoxLayout({ vertical: false });
         // LEFT-CLICK to split a tile
         suggestion1.add_child(new St.Label({ 
@@ -141,11 +143,36 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
             styleClass: '',
             xExpand: false
         }));
-        
+
+        const suggestion4 = new St.BoxLayout({ vertical: false, xExpand: true, margin_top: 16 });
+        // RIGHT-CLICK to delete a tile
+        /*suggestion4.add_child(new St.Label({ 
+            text: "Use the indicator ", 
+            xAlign: Clutter.ActorAlign.CENTER,
+            yAlign: Clutter.ActorAlign.CENTER,
+            styleClass: '',
+            xExpand: false
+        }));*/
+        suggestion4.add_child(new St.Icon({
+            iconSize: 16, 
+            yAlign: Clutter.ActorAlign.CENTER,
+            gicon: Gio.icon_new_for_string(`${params.path}/icons/indicator-symbolic.svg`),
+            styleClass: 'button kbd',
+            pseudoClass: "active"
+        }));
+        suggestion4.add_child(new St.Label({ 
+            text: " use the indicator button to save or cancel.", 
+            xAlign: Clutter.ActorAlign.CENTER,
+            yAlign: Clutter.ActorAlign.CENTER,
+            styleClass: '',
+            xExpand: false
+        }));
+
         const legend = new St.BoxLayout({ vertical: true, styleClass: "legend" });
         legend.add_child(suggestion1);
         legend.add_child(suggestion2);
         legend.add_child(suggestion3);
+        legend.add_child(suggestion4);
         
         this.contentLayout.destroy_all_children();
         this.contentLayout.add_child(new St.Label({
@@ -170,7 +197,8 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         onDeleteLayout: (ind: number, lay: Layout) => void,
         onSelectLayout: (ind: number, lay: Layout) => void,
         onNewLayout: () => void,
-        onClose: () => void
+        onClose: () => void,
+        path: string
     }) {
         const gaps = Settings.get_inner_gaps(1).top > 0 ? this._gapsSize:0
         this._layoutsBoxLayout.destroy_all_children();
@@ -198,7 +226,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
             }
             btn.connect('clicked', (self) => {
                 params.onSelectLayout(btnInd, lay);
-                this._makeLegendDialog({ onClose: params.onClose });
+                this._makeLegendDialog({ onClose: params.onClose, path: params.path });
             });
             return btn;
         });
@@ -215,7 +243,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         newLayoutBtn.child.add_child(icon);
         newLayoutBtn.connect('clicked', (self) => {
             params.onNewLayout();
-            this._makeLegendDialog({ onClose: params.onClose });
+            this._makeLegendDialog({ onClose: params.onClose, path: params.path });
         });
     }
 }

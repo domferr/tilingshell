@@ -2,7 +2,8 @@ import Gtk from "gi://Gtk"; // Starting from GNOME 40, the preferences dialog us
 import Adw from "gi://Adw";
 import Gio from "gi://Gio";
 import GLib from "gi://GLib";
-import Settings, { ActivationKey, activationKeys } from "./settings";
+import Gdk from "gi://Gdk";
+import Settings, { ActivationKey } from "./settings";
 import { logger } from "./utils/shell";
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 import Layout from "@components/layout/Layout";
@@ -195,7 +196,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         const importLayoutsBtn = this._buildButtonRow(
             "Import layouts", 
             "Import layouts",
-            "Import layouts from a file. The current layouts will be replaced and this operation cannot be reverted",
+            "Import layouts from a file",
             () => {
                 const fc = new Gtk.FileChooserDialog({
                     title: "Select layouts file",
@@ -218,13 +219,13 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                             debug(`Selected path ${file.get_path()}`);
                             const [success, content, etags] = file.load_contents(null);
                             if (success) {
-                                let layouts = JSON.parse(new TextDecoder("utf-8").decode(content)) as Layout[];
-                                if (layouts.length === 0) throw "At least one layout is required";
+                                let importedLayouts = JSON.parse(new TextDecoder("utf-8").decode(content)) as Layout[];
+                                if (importedLayouts.length === 0) throw "At least one layout is required";
                                 
-                                layouts = layouts.filter(layout => layout.tiles.length > 0);
-                                Settings.save_layouts_json(layouts);
-                                const selected = Settings.get_selected_layouts().map(val => layouts[0].id);
-                                Settings.save_selected_layouts_json(selected);
+                                importedLayouts = importedLayouts.filter(layout => layout.tiles.length > 0);
+                                const newLayouts = Settings.get_layouts_json();
+                                newLayouts.push(...importedLayouts);
+                                Settings.save_layouts_json(newLayouts);
                             } else {
                                 debug("Error while opening file");
                             }
@@ -237,8 +238,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 });
 
                 fc.present();
-            },
-            "destructive-action"
+            }
         );
         layoutsGroup.add(importLayoutsBtn);
 
@@ -256,10 +256,16 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         layoutsGroup.add(resetBtn);
         
+        // footer
         const footerGroup = new Adw.PreferencesGroup();
         prefsPage.add(footerGroup);
 
-        // footer
+        const buttons = new Gtk.Box({ hexpand: false, spacing: 8, margin_bottom: 16, halign: Gtk.Align.CENTER });
+        buttons.append(this._buildLinkButton("♥︎ Donate on ko-fi", "https://ko-fi.com/domferr"));
+        buttons.append(this._buildLinkButton("Report a bug", "https://github.com/domferr/tilingshell/issues/new?template=bug_report.md"));
+        buttons.append(this._buildLinkButton("Request a feature", "https://github.com/domferr/tilingshell/issues/new?template=feature_request.md"));
+        footerGroup.add(buttons);
+        
         footerGroup.add(new Gtk.Label({
             label: "Have issues, you want to suggest a new feature or contribute?",
             margin_bottom: 4
@@ -267,19 +273,19 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         footerGroup.add(new Gtk.Label({
             label: "Open a new issue on <a href=\"https://github.com/domferr/tilingshell\">GitHub</a>!",
             useMarkup: true,
-            margin_bottom: 16
+            margin_bottom: 32
         }));
 
-        window.searchEnabled = true;
-        window.connect('close-request', () => {
-            Settings.destroy();
-        });
-        
         if (this.metadata["version-name"]) {
             footerGroup.add(new Gtk.Label({
                 label: `· Tiling Shell v${this.metadata["version-name"]} ·`,
             }));
         }
+       
+        window.searchEnabled = true;
+        window.connect('close-request', () => {
+            Settings.destroy();
+        });
     }
 
     _buildSwitchRow(settingsKey: string, title: string, subtitle: string, suffix?: Gtk.Widget): Adw.ActionRow {
@@ -353,19 +359,37 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
 
     _buildShortcutButton(value: ActivationKey, onSelected: (v: ActivationKey) => void, styleClass?: string) {
         const options = new Gtk.StringList();
+        const activationKeys = [
+            ActivationKey.CTRL,
+            ActivationKey.ALT,
+            ActivationKey.SUPER
+        ];
         activationKeys.forEach(k => options.append(ActivationKey[k]));
+        options.append("(None)");
         const dropdown = new Gtk.DropDown({
             model: options,
             selected: value
         });
-        dropdown.connect("notify::selected-item", (_: Gtk.DropDown) => {
-            const selected = activationKeys[dropdown.get_selected()];
+        dropdown.connect("notify::selected-item", (dd: Gtk.DropDown) => {
+            const index = dd.get_selected();
+            const selected = index < 0 || index >= activationKeys.length ? ActivationKey.NONE:activationKeys[index];
             onSelected(selected);
         });
         if (styleClass) dropdown.add_css_class(styleClass);
         dropdown.set_vexpand(false);
         dropdown.set_valign(Gtk.Align.CENTER);
         return dropdown;
+    }
+
+    _buildLinkButton(label: string, uri: string): Gtk.Button {
+        const btn = new Gtk.Button({
+            label,
+            hexpand: false,
+        });
+        btn.connect("clicked", (_: Gtk.Button) => {
+            Gtk.show_uri(null, uri, Gdk.CURRENT_TIME);
+        });
+        return btn;
     }
 }
 

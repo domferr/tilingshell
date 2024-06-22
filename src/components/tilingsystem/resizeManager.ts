@@ -131,6 +131,10 @@ export class ResizingManager {
         const windowRect = window.get_frame_rect();
         const borderRect = windowRect.copy();
         const innerGaps = Settings.get_inner_gaps();
+        if (innerGaps.top === 0) innerGaps.top = 2;
+        if (innerGaps.bottom === 0) innerGaps.bottom = 2;
+        if (innerGaps.left === 0) innerGaps.left = 2;
+        if (innerGaps.right === 0) innerGaps.right = 2;
         const errorFactor = innerGaps.right * 4;
         switch(side) {
             case St.Side.TOP:
