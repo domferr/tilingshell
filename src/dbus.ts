@@ -14,10 +14,11 @@ export default class DBus {
         this._dbus = null;
     }
 
-    public enable() {
+    public enable(ext: any) {
         if (this._dbus) return;
 
-        this._dbus = Gio.DBusExportedObject.wrapJSObject(node, this);
+        this._dbus = Gio.DBusExportedObject.wrapJSObject(node, ext);
+        this._dbus.export(Gio.DBus.session, '/org/gnome/shell/extensions/TilingShell');
     }
 
     public disable() {

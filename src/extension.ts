@@ -97,7 +97,8 @@ export default class TilingShellExtension extends Extension {
 
     if (this._dbus) this._dbus.disable();
     this._dbus = new DBus();
-    this._dbus.enable();
+    this._dbus.enable(this);
+    
     debug('extension is enabled');
   }
 
