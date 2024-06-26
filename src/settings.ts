@@ -8,6 +8,7 @@ export default class Settings {
     static _is_initialized: boolean = false;
 
     static SETTING_LAST_VERSION_NAME_INSTALLED = 'last-version-name-installed';
+    static SETTING_OVERRIDDEN_SETTINGS = 'overridden-settings';
     static SETTING_TILING_SYSTEM = 'enable-tiling-system';
     static SETTING_TILING_SYSTEM_ACTIVATION_KEY = 'tiling-system-activation-key';
     static SETTING_SNAP_ASSIST = 'enable-snap-assist';
@@ -20,6 +21,9 @@ export default class Settings {
     static SETTING_SELECTED_LAYOUTS = 'selected-layouts';
     static SETTING_RESTORE_WINDOW_ORIGINAL_SIZE = 'restore-window-original-size';
     static SETTING_RESIZE_COMPLEMENTING_WINDOWS = 'resize-complementing-windows';
+    static SETTING_ENABLE_BLUR_SNAP_ASSISTANT = "enable-blur-snap-assistant";
+    static SETTING_ENABLE_BLUR_SELECTED_TILEPREVIEW = "enable-blur-selected-tilepreview";
+    static SETTING_ENABLE_MOVE_KEYBINDINGS = 'enable-move-keybindings';
 
     static SETTING_MOVE_WINDOW_RIGHT = 'move-window-right';
     static SETTING_MOVE_WINDOW_LEFT = 'move-window-left';
@@ -40,21 +44,20 @@ export default class Settings {
         }
     }
 
-    static bind(key: string, object: GObject.Object, property: string, flags: Gio.SettingsBindFlags = Gio.SettingsBindFlags.DEFAULT): void {
-        //@ts-ignore
+    static bind(key: string, object: GObject.Object | any, property: string, flags: Gio.SettingsBindFlags = Gio.SettingsBindFlags.DEFAULT): void {
         this._settings?.bind(key, object, property, flags);
     }
 
     static get_last_version_installed() : string {
-        return this._settings?.get_string(this.SETTING_LAST_VERSION_NAME_INSTALLED) || "0";
+        return this._settings?.get_string(this.SETTING_LAST_VERSION_NAME_INSTALLED) ?? "0";
     }
 
     static get_tiling_system_enabled() : boolean {
-        return this._settings?.get_boolean(this.SETTING_TILING_SYSTEM) || false;
+        return this._settings?.get_boolean(this.SETTING_TILING_SYSTEM) ?? false;
     }
 
     static get_snap_assist_enabled() : boolean {
-        return this._settings?.get_boolean(this.SETTING_SNAP_ASSIST) || false;
+        return this._settings?.get_boolean(this.SETTING_SNAP_ASSIST) ?? false;
     }
 
     static get_show_indicator() : boolean {
@@ -64,7 +67,7 @@ export default class Settings {
 
     static get_inner_gaps(scaleFactor: number = 1) : { top: number, bottom: number, left: number, right: number } {
         // get the gaps settings and scale by scale factor
-        const value = (this._settings?.get_uint(this.SETTING_INNER_GAPS) || 0)  * scaleFactor;
+        const value = (this._settings?.get_uint(this.SETTING_INNER_GAPS) ?? 0)  * scaleFactor;
         return {
             top: value,
             bottom: value,
@@ -75,7 +78,7 @@ export default class Settings {
 
     static get_outer_gaps(scaleFactor: number = 1) : { top: number, bottom: number, left: number, right: number } {
         // get the gaps settings and scale by scale factor
-        const value = (this._settings?.get_uint(this.SETTING_OUTER_GAPS) || 0) * scaleFactor;
+        const value = (this._settings?.get_uint(this.SETTING_OUTER_GAPS) ?? 0) * scaleFactor;
         return {
             top: value,
             bottom: value,
@@ -85,7 +88,7 @@ export default class Settings {
     }
 
     static get_span_multiple_tiles() : boolean {
-        return this._settings?.get_boolean(this.SETTING_SPAN_MULTIPLE_TILES) || false;
+        return this._settings?.get_boolean(this.SETTING_SPAN_MULTIPLE_TILES) ?? false;
     }
 
     static get_layouts_json() : Layout[] {
@@ -104,11 +107,11 @@ export default class Settings {
     }
 
     static get_restore_window_original_size() : boolean {
-        return this._settings?.get_boolean(Settings.SETTING_RESTORE_WINDOW_ORIGINAL_SIZE) || false;
+        return this._settings?.get_boolean(Settings.SETTING_RESTORE_WINDOW_ORIGINAL_SIZE) ?? false;
     }
 
     static get_resize_complementing_windows(): boolean {
-        return this._settings?.get_boolean(Settings.SETTING_RESIZE_COMPLEMENTING_WINDOWS) || false;
+        return this._settings?.get_boolean(Settings.SETTING_RESIZE_COMPLEMENTING_WINDOWS) ?? false;
     }
 
     static get_tiling_system_activation_key() : ActivationKey {
@@ -121,6 +124,22 @@ export default class Settings {
         const val = this._settings?.get_strv(this.SETTING_SPAN_MULTIPLE_TILES_ACTIVATION_KEY);
         if (!val || val.length === 0) return ActivationKey.ALT;
         return Number(val[0]);
+    }
+
+    static get_enable_blur_snap_assistant(): boolean {
+        return this._settings?.get_boolean(this.SETTING_ENABLE_BLUR_SNAP_ASSISTANT) ?? false;
+    }
+
+    static get_enable_blur_selected_tilepreview(): boolean {
+        return this._settings?.get_boolean(this.SETTING_ENABLE_BLUR_SELECTED_TILEPREVIEW) ?? false;
+    }
+
+    static get_enable_move_keybindings(): boolean {
+        return this._settings?.get_boolean(this.SETTING_ENABLE_MOVE_KEYBINDINGS) ?? false;
+    }
+
+    static get_overridden_settings(): string {
+        return this._settings?.get_string(this.SETTING_OVERRIDDEN_SETTINGS) ?? '{}';
     }
 
     static set_last_version_installed(version: string) {
@@ -137,6 +156,26 @@ export default class Settings {
 
     static set_show_indicator(value: boolean) {
         this._settings?.set_boolean(this.SETTING_SHOW_INDICATOR, value);
+    }
+
+    static set_overridden_settings(newVal: string): boolean {
+        return this._settings?.set_string(this.SETTING_OVERRIDDEN_SETTINGS, newVal) ?? false;
+    }
+
+    static set_kb_move_window_right(newVal: string): boolean {
+        return this._settings?.set_strv(this.SETTING_MOVE_WINDOW_RIGHT, [newVal]) ?? false;
+    }
+
+    static set_kb_move_window_left(newVal: string): boolean {
+        return this._settings?.set_strv(this.SETTING_MOVE_WINDOW_LEFT, [newVal]) ?? false;
+    }
+
+    static set_kb_move_window_up(newVal: string): boolean {
+        return this._settings?.set_strv(this.SETTING_MOVE_WINDOW_UP, [newVal]) ?? false;
+    }
+
+    static set_kb_move_window_down(newVal: string): boolean {
+        return this._settings?.set_strv(this.SETTING_MOVE_WINDOW_DOWN, [newVal]) ?? false;
     }
 
     static reset_layouts_json() {
@@ -170,6 +209,22 @@ export default class Settings {
 
     static save_selected_layouts_json(ids: string[]) {
         this._settings?.set_strv(Settings.SETTING_SELECTED_LAYOUTS, ids);
+    }
+
+    static get_kb_move_window_right(): string {
+        return this._settings?.get_strv(this.SETTING_MOVE_WINDOW_RIGHT)[0] ?? '';
+    }
+
+    static get_kb_move_window_left(): string {
+        return this._settings?.get_strv(this.SETTING_MOVE_WINDOW_LEFT)[0] ?? '';
+    }
+
+    static get_kb_move_window_up(): string {
+        return this._settings?.get_strv(this.SETTING_MOVE_WINDOW_UP)[0] ?? '';
+    }
+
+    static get_kb_move_window_down(): string {
+        return this._settings?.get_strv(this.SETTING_MOVE_WINDOW_DOWN)[0] ?? '';
     }
 
     static connect(key: string, func: (...arg: any[]) => void) : number {

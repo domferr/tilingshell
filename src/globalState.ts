@@ -3,12 +3,11 @@ import Layout from "./components/layout/Layout";
 import Settings from "./settings";
 import SignalHandling from "./signalHandling";
 import GObject from "gi://GObject";
-import { MetaInfo } from "gi://GObject";
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 @registerGObjectClass
 export default class GlobalState extends GObject.Object {
-    static metaInfo: MetaInfo = {
+    static metaInfo: GObject.MetaInfo<any, any, any> = {
         Signals: {
             "layouts-changed": { 
                 param_types: []

@@ -2,6 +2,7 @@ import St from 'gi://St';
 import Meta from 'gi://Meta';
 import Clutter from "gi://Clutter";
 import Mtk from "gi://Mtk";
+import Shell from "gi://Shell";
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
 
@@ -29,10 +30,12 @@ export const positionRelativeTo = (actor: Clutter.Actor, anchestor: Clutter.Acto
 }
 
 export const buildTileGaps = (tilePos: Mtk.Rectangle, innerGaps: Clutter.Margin, outerGaps: Clutter.Margin, container: Mtk.Rectangle, scalingFactor: number = 1): Clutter.Margin => {
-    const isLeft = tilePos.x === container.x;
-    const isTop = tilePos.y === container.y;
-    const isRight = tilePos.x + tilePos.width === container.x + container.width;
-    const isBottom = tilePos.y + tilePos.height === container.y + container.height;
+    // compare two values and return true if their are equal with a max error of 2
+    const almostEqual = (first: number, second: number) => Math.abs(first - second) <= 1; 
+    const isLeft = almostEqual(tilePos.x, container.x);
+    const isTop = almostEqual(tilePos.y, container.y);
+    const isRight = almostEqual(tilePos.x + tilePos.width, container.x + container.width);
+    const isBottom = almostEqual(tilePos.y + tilePos.height, container.y + container.height);
     const margin = new Clutter.Margin();
     margin.top = (isTop ? outerGaps.top:innerGaps.top/2) * scalingFactor;
     margin.bottom = (isBottom ? outerGaps.bottom:innerGaps.bottom/2) * scalingFactor;
@@ -98,4 +101,21 @@ export function buildRectangle(params: { x?: number, y?: number, width?: number,
 export function getEventCoords(event: any): number[] {
     //@ts-ignore
     return event.get_coords ? event.get_coords():[event.x, event.y]; // GNOME 40-44
+}
+
+export function buildBlurEffect(sigma: number): Shell.BlurEffect {
+    // changes in GNOME 46+
+    // The sigma in Shell.BlurEffect should be replaced by radius. Since the sigma value 
+    // is radius / 2.0, the radius value will be sigma * 2.0.
+    
+    const effect = new Shell.BlurEffect();
+    effect.set_mode(Shell.BlurMode.BACKGROUND) // blur what is behind the widget
+    effect.set_brightness(1);
+    if (effect.set_radius) {
+      effect.set_radius(sigma * 2);
+    } else {
+      //@ts-ignore
+      effect.set_sigma(sigma);
+    }
+    return effect;
 }

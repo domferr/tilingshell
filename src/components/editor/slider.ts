@@ -6,14 +6,13 @@ import { logger } from "@/utils/shell";
 import Meta from 'gi://Meta';
 import Mtk from 'gi://Mtk';
 import GObject from "gi://GObject";
-import { MetaInfo } from "gi://GObject";
 import { getEventCoords, getScalingFactorOf } from "@utils/ui";
 
 const debug = logger("Slider");
 
 @registerGObjectClass
 export default class Slider extends St.Button {
-    static metaInfo: MetaInfo = {
+    static metaInfo: GObject.MetaInfo<any, any, any> = {
         Signals: {
             "slide": { 
                 param_types: [ GObject.TYPE_INT ] // movement

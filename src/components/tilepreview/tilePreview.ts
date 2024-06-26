@@ -130,14 +130,14 @@ export default class TilePreview extends St.Widget {
     this.open(ease, position);
   }
 
-  public close() {
+  public close(ease: boolean = false) {
     if (!this._showing) return;
 
     this._showing = false;
     // @ts-ignore
     this.ease({
       opacity: 0,
-      duration: WINDOW_ANIMATION_TIME,
+      duration: ease ? WINDOW_ANIMATION_TIME : 0,
       mode: Clutter.AnimationMode.EASE_OUT_QUAD,
       onComplete: () => this.hide(),
     });

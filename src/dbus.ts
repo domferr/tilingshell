@@ -18,7 +18,7 @@ export default class DBus {
         if (this._dbus) return;
 
         this._dbus = Gio.DBusExportedObject.wrapJSObject(node, ext);
-        this._dbus.export(Gio.DBus.session, '/org/gnome/shell/extensions/TilingShell');
+        this._dbus.export(Gio.DBus.session, '/org/gnome/Shell/Extensions/TilingShell');
     }
 
     public disable() {

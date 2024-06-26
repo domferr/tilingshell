@@ -6,14 +6,14 @@ import Tile from "../layout/Tile";
 import Slider from "./slider";
 import TileUtils from "../layout/TileUtils";
 import { logger } from "@/utils/shell";
-import { MetaInfo } from "gi://GObject";
+import GObject from "gi://GObject";
 import { registerGObjectClass } from "@utils/gjs";
 
 const debug = logger("EditableTilePreview");
 
 @registerGObjectClass
 export default class EditableTilePreview extends TilePreview {
-    static metaInfo: MetaInfo = {
+    static metaInfo: GObject.MetaInfo<any, any, any> = {
         Signals: {
             "size-changed": { 
                 //@ts-ignore todo

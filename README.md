@@ -30,7 +30,7 @@ Have issues, you want to suggest a new feature or contribute? Please open a new 
 ## Usage ##
 
 ### Tiling System ###
-When grabbing and moving a window, press <kbd>CTRL</kbd> key to show the tiling layout. When moving on a tile, it will highlight. Ungrab the window to place that window on the highlighted tile.
+When grabbing and moving a window, press <kbd>CTRL</kbd> key to show the tiling layout (you can choose another key from the preferences). When moving on a tile, it will highlight. Ungrab the window to place that window on the highlighted tile.
 
 [tiling_system.webm](https://github.com/domferr/tilingshell/assets/14203981/a45ec416-ad39-458d-9b9f-cddce8b25666)
 
@@ -54,7 +54,9 @@ The layout is not strict. You can select multiple tiles too! Just hold <kbd>ALT<
 
 ### Layout editor ###
 
-> <kbd>LEFT CLICK</kbd> to split a tile. <kbd>LEFT CLICK</kbd> + <kbd>CTRL</kbd> to split a tile _vertically_. <kbd>RIGHT CLICK</kbd> to delete a tile.
+| Split a tile | Split a tile _vertically_ | Delete a tile | Save, close the editor or open the menu |
+|:---:|:---:|:---:|:---:|
+| <kbd>LEFT CLICK</kbd> | <kbd>LEFT CLICK</kbd> + <kbd>CTRL</kbd> | <kbd>RIGHT CLICK</kbd> | Click the Tiling Shell's icon <img src="https://github.com/domferr/tilingshell/assets/14203981/13e27ec1-6a5d-420f-a87f-8f3df0b34c92" width=96 /> on the panel. |
 
 [layout_editor.webm](https://github.com/domferr/tilingshell/assets/14203981/c6e05589-69d9-4fa3-a4df-61ee875cf9e1)
 
@@ -65,6 +67,20 @@ You can resize adjacent tiled windows together!
 [Resizing tiled windows](https://github.com/domferr/tilingshell/assets/14203981/da4ef97e-cdbb-4981-a8ab-9ca8cd23d63d)
 
 > It can be enabled/disabled from the preferences
+
+### Tile using Keyboard ###
+
+Move window through the tiles using keyboard shortcuts (<kbd>SUPER</kbd>+<kbd>←</kbd>/<kbd>↑</kbd>/<kbd>↓</kbd>/<kbd>→</kbd>). They can be customized from the preferences!
+
+[Screencast from 2024-06-18 23-06-56.webm](https://github.com/domferr/tilingshell/assets/14203981/11c966b7-c140-4ecb-b8af-b514ec186ad6)
+
+> It can be enabled/disabled from the preferences
+
+### Edge Tiling ###
+
+You can tile a window by moving it to the edge.
+
+[Screencast from 2024-06-22 22-12-22.webm](https://github.com/domferr/tilingshell/assets/14203981/6e5a2ba9-cd38-44bb-b791-51e41e07f7a0)
 
 ## Installation
 
