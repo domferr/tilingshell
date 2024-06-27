@@ -1,3 +1,4 @@
+import * as metadata from '../../resources/metadata.json';
 import St from 'gi://St';
 import Clutter from 'gi://Clutter';
 import SignalHandling from '@/signalHandling';
@@ -11,11 +12,10 @@ import CurrentMenu from './currentMenu';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import LayoutButton from './layoutButton';
 import { logger } from '@utils/shell';
-import GLib from "gi://GLib";
-import * as metadata from '../../resources/metadata.json';
-import Gio from "gi://Gio";
+import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
 
-const debug = logger('DefaultMenu');
+const debug = logger("DefaultMenu");
 
 export default class DefaultMenu implements CurrentMenu {
     private readonly _signals: SignalHandling;
@@ -36,7 +36,7 @@ export default class DefaultMenu implements CurrentMenu {
             xExpand: true,
             yExpand: true,
             vertical: false, // horizontal box layout
-            styleClass: 'layouts-box-layout'
+            styleClass: "layouts-box-layout"
         });
         
         const layoutsPopupMenu = new PopupMenu.PopupBaseMenuItem({ style_class: 'indicator-menu-item' });
@@ -66,7 +66,7 @@ export default class DefaultMenu implements CurrentMenu {
         });
 
         this._signals.connect(Main.layoutManager, 'monitors-changed', () => {
-            debug('monitors-changed')
+            debug("monitors-changed")
             this._updateScaling();
         });
     }
@@ -112,14 +112,14 @@ export default class DefaultMenu implements CurrentMenu {
             xExpand: true,
             yExpand: true,
             vertical: false, // horizontal box layout
-            styleClass: 'buttons-box-layout'
+            styleClass: "buttons-box-layout"
         });
 
-        const editLayoutsBtn = IndicatorUtils.createButton('document-edit-symbolic', 'Edit Layouts...');
+        const editLayoutsBtn = IndicatorUtils.createButton("document-edit-symbolic", "Edit Layouts...");
         editLayoutsBtn.connect('clicked', (self) => this._indicator.openLayoutEditor() );
         buttonsBoxLayout.add_child(editLayoutsBtn);
 
-        const newLayoutBtn = IndicatorUtils.createButton('add-symbolic', 'New Layout...', this._indicator.path);
+        const newLayoutBtn = IndicatorUtils.createButton("add-symbolic", "New Layout...", this._indicator.path);
         newLayoutBtn.connect('clicked', (self) => this._indicator.newLayoutOnClick(true) );
         buttonsBoxLayout.add_child(newLayoutBtn);
 
