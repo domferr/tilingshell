@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 import Clutter from 'gi://Clutter';
 
 export const createButton = (iconName: string, text: string, path?: string) : St.Button => {
-    const btn = createIconButton(iconName, path);
+    const btn = createIconButton(iconName, !!text, path);
     btn.child.add_child(new St.Label({ 
         marginBottom: 4, 
         marginTop: 4, 
@@ -13,7 +13,7 @@ export const createButton = (iconName: string, text: string, path?: string) : St
     return btn;
 }
 
-export const createIconButton = (iconName: string, path?: string) : St.Button => {
+export const createIconButton = (iconName: string, withSpacing = true, path?: string) : St.Button => {
     const btn = new St.Button({ 
         styleClass: "message-list-clear-button button",
         canFocus: true,
@@ -25,7 +25,7 @@ export const createIconButton = (iconName: string, path?: string) : St.Button =>
             yAlign: Clutter.ActorAlign.CENTER,
             reactive: true,
             xExpand: true,
-            style: "spacing: 8px",
+            style: withSpacing ? "spacing: 8px" : "",
         })
     });
     

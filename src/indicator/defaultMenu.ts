@@ -1,7 +1,7 @@
 import St from 'gi://St';
 import Clutter from 'gi://Clutter';
-import SignalHandling from "@/signalHandling";
-import Indicator from "./indicator";
+import SignalHandling from '@/signalHandling';
+import Indicator from './indicator';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { getScalingFactorOf } from '@/utils/ui';
 import Settings from '@/settings';
@@ -11,8 +11,11 @@ import CurrentMenu from './currentMenu';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import LayoutButton from './layoutButton';
 import { logger } from '@utils/shell';
+import GLib from "gi://GLib";
+import * as metadata from '../../resources/metadata.json';
+import Gio from "gi://Gio";
 
-const debug = logger("DefaultMenu");
+const debug = logger('DefaultMenu');
 
 export default class DefaultMenu implements CurrentMenu {
     private readonly _signals: SignalHandling;
@@ -33,7 +36,7 @@ export default class DefaultMenu implements CurrentMenu {
             xExpand: true,
             yExpand: true,
             vertical: false, // horizontal box layout
-            styleClass: "layouts-box-layout"
+            styleClass: 'layouts-box-layout'
         });
         
         const layoutsPopupMenu = new PopupMenu.PopupBaseMenuItem({ style_class: 'indicator-menu-item' });
@@ -63,7 +66,7 @@ export default class DefaultMenu implements CurrentMenu {
         });
 
         this._signals.connect(Main.layoutManager, 'monitors-changed', () => {
-            debug("monitors-changed")
+            debug('monitors-changed')
             this._updateScaling();
         });
     }
@@ -76,6 +79,32 @@ export default class DefaultMenu implements CurrentMenu {
         this._drawLayouts();
     }
 
+    private _openPreferencesWindow() {
+        try {
+            const dbusOptions = new GLib.Variant('(ssa{sv})', [
+                metadata.uuid,
+                "",
+                null,
+            ]);
+
+            Gio.DBus.session.call(
+                'org.gnome.Shell.Extensions',
+                '/org/gnome/Shell/Extensions',
+                'org.gnome.Shell.Extensions',
+                'OpenExtensionPrefs',
+                dbusOptions,
+                null,
+                Gio.DBusCallFlags.NONE,
+                -1,
+                null
+            );
+
+            (this._indicator.menu as PopupMenu.PopupMenu).close(true);
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     private _buildEditingButtonsRow() {
         const buttonsBoxLayout = new St.BoxLayout({
             xAlign: Clutter.ActorAlign.CENTER,
@@ -83,15 +112,20 @@ export default class DefaultMenu implements CurrentMenu {
             xExpand: true,
             yExpand: true,
             vertical: false, // horizontal box layout
-            styleClass: "buttons-box-layout"
+            styleClass: 'buttons-box-layout'
         });
 
-        const editLayoutsBtn = IndicatorUtils.createButton("document-edit-symbolic", "Edit Layouts...");
+        const editLayoutsBtn = IndicatorUtils.createButton('document-edit-symbolic', 'Edit Layouts...');
         editLayoutsBtn.connect('clicked', (self) => this._indicator.openLayoutEditor() );
         buttonsBoxLayout.add_child(editLayoutsBtn);
-        const newLayoutBtn = IndicatorUtils.createButton("add-symbolic", "New Layout...", this._indicator.path);
+
+        const newLayoutBtn = IndicatorUtils.createButton('add-symbolic', 'New Layout...', this._indicator.path);
         newLayoutBtn.connect('clicked', (self) => this._indicator.newLayoutOnClick(true) );
         buttonsBoxLayout.add_child(newLayoutBtn);
+
+        const settingsBtn = IndicatorUtils.createButton('settings-symbolic', '', this._indicator.path);
+        settingsBtn.connect('clicked', (self) => this._openPreferencesWindow() );
+        buttonsBoxLayout.add_child(settingsBtn);
 
         const buttonsPopupMenu = new PopupMenu.PopupBaseMenuItem({ style_class: 'indicator-menu-item' });
         buttonsPopupMenu.add_child(buttonsBoxLayout);
