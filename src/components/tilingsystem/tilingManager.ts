@@ -6,7 +6,6 @@ import { buildMargin, buildRectangle, buildTileGaps, getScalingFactor, getScalin
 import TilingLayout from "@/components/tilingsystem/tilingLayout";
 import Clutter from "gi://Clutter";
 import GLib from "gi://GLib";
-import Gio from "gi://Gio";
 import SnapAssist from '../snapassist/snapAssist';
 import SelectionTilePreview from '../tilepreview/selectionTilePreview';
 import Settings, { ActivationKey } from '@/settings';
@@ -18,7 +17,6 @@ import GlobalState from '@/globalState';
 import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
 import ExtendedWindow from "./extendedWindow";
 import { ResizingManager } from "./resizeManager";
-import SettingsOverride from "@settingsOverride";
 
 const EDGE_TILING_OFFSET = 15;
 
@@ -357,6 +355,9 @@ export class TilingManager {
     }
 
     private _onWindowGrabEnd(window: Meta.Window) {
+        const { width, height } = this._workArea;
+        const { top, bottom, left, right } = this._tilingLayout.outerGaps;
+
         this._isGrabbingWindow = false;
 
         this._signals.disconnect(window);
@@ -392,10 +393,18 @@ export class TilingManager {
         if (selectionRect.width <= 0 || selectionRect.height <= 0) {
             return;
         }
-        
+
         (window as ExtendedWindow).originalSize = window.get_frame_rect().copy();
         (window as ExtendedWindow).isTiled = true;
-        this._easeWindowRect(window, selectionRect);
+
+        if (
+            (selectionRect.width + left + right) === width &&
+            (selectionRect.height + top + bottom) === height
+        ) {
+            window.maximize(Meta.MaximizeFlags.BOTH);
+        } else {
+            this._easeWindowRect(window, selectionRect);
+        }
     }
 
     private _easeWindowRect(window: Meta.Window, destRect: Mtk.Rectangle) {
