@@ -9,18 +9,36 @@ import ExtendedWindow from "./extendedWindow";
 const debug = logger(`ResizingManager`);
 
 export class ResizingManager {
-    private readonly _signals: SignalHandling;
+    private _signals: SignalHandling | null;
 
     constructor() {
+        this._signals = null;
+    }
+
+    public enable() {
+        if (this._signals) this._signals.disconnect();
         this._signals = new SignalHandling();
+
+        this._signals.connect(global.display, 'grab-op-begin', (_display: Meta.Display, window: Meta.Window, grabOp: Meta.GrabOp) => {
+            const moving = (grabOp & ~1024) === 1;
+            if (moving || !Settings.get_resize_complementing_windows()) return;
+
+            this._onWindowResizingBegin(window, grabOp);
+        });
+
+        this._signals.connect(global.display, 'grab-op-end', (_display: Meta.Display, window: Meta.Window, grabOp: Meta.GrabOp) => {
+            const moving = (grabOp & ~1024) === 1;
+            if (moving) return;
+            
+            this._onWindowResizingEnd(window);
+        });
     }
 
     public destroy() {
-        this._signals.disconnect();
+        if (this._signals) this._signals.disconnect();
     }
 
-    /** From Gnome Shell: https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/main/js/ui/altTab.js#L53
-     */
+    /** From Gnome Shell: https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/main/js/ui/altTab.js#L53 */
     private _getWindows(): Meta.Window[] {
         const workspace = global.workspaceManager.get_active_workspace();
         // We ignore skip-taskbar windows in switchers, but if they are attached
@@ -35,9 +53,8 @@ export class ResizingManager {
         }).filter((w, i, a) => w !== null && !w.skipTaskbar && a.indexOf(w) === i);
     }
 
-    public onWindowResizingBegin(window: Meta.Window, grabOp: Meta.GrabOp) {
-        if (!Settings.get_resize_complementing_windows()) return;
-        if (!window || !(window as ExtendedWindow).isTiled) return;
+    private _onWindowResizingBegin(window: Meta.Window, grabOp: Meta.GrabOp) {
+        if (!window || !(window as ExtendedWindow).isTiled || !this._signals) return;
 
         const verticalSide: [boolean, St.Side] = [false, 0];
         const horizontalSide: [boolean, St.Side] = [false, 0];
@@ -198,8 +215,8 @@ export class ResizingManager {
         return result;
     }
 
-    public onWindowResizingEnd(window: Meta.Window) {
-        this._signals.disconnect(window);
+    private _onWindowResizingEnd(window: Meta.Window) {
+        if (this._signals) this._signals.disconnect(window);
     }
 
     private _onResizingWindow(

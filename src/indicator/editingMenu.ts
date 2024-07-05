@@ -17,7 +17,7 @@ export default class EditingMenu implements CurrentMenu {
             style: "spacing: 8px"
         });
 
-        const openMenuBtn = IndicatorUtils.createButton("video-display-symbolic", "Menu  ");
+        const openMenuBtn = IndicatorUtils.createButton("menu-symbolic", "Menu  ", this._indicator.path);
         openMenuBtn.connect('clicked', (self) => this._indicator.openMenu(false) );
         boxLayout.add_child(openMenuBtn);
 
@@ -25,7 +25,7 @@ export default class EditingMenu implements CurrentMenu {
         infoMenuBtn.connect('clicked', (self) => this._indicator.openMenu(true) );
         boxLayout.add_child(infoMenuBtn);
 
-        const saveBtn = IndicatorUtils.createButton("done-symbolic", "Save    ", this._indicator.path);
+        const saveBtn = IndicatorUtils.createButton("save-symbolic", "Save    ", this._indicator.path);
         saveBtn.connect('clicked', (self) => {
             this._indicator.menu.toggle();
             this._indicator.saveLayoutOnClick();
@@ -42,12 +42,10 @@ export default class EditingMenu implements CurrentMenu {
         const menuItem = new PopupMenu.PopupBaseMenuItem({ style_class: 'indicator-menu-item' });
         menuItem.add_child(boxLayout);
 
-        //@ts-ignore todo
-        this._indicator.menu.addMenuItem(menuItem);
+        (this._indicator.menu as PopupMenu.PopupMenu).addMenuItem(menuItem);
     }
 
     destroy(): void {
-        //@ts-ignore todo
-        this._indicator.menu.removeAll();
+        (this._indicator.menu as PopupMenu.PopupMenu).removeAll();
     }
 }

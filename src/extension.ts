@@ -15,6 +15,7 @@ import { Extension, ExtensionMetadata } from 'resource:///org/gnome/shell/extens
 import DBus from './dbus';
 import KeyBindings from './keybindings';
 import SettingsOverride from '@settingsOverride';
+import { ResizingManager } from '@components/tilingsystem/resizeManager';
 
 const debug = logger('extension');
 
@@ -25,6 +26,7 @@ export default class TilingShellExtension extends Extension {
   private _dbus: DBus | null;
   private _signals: SignalHandling | null;
   private _keybindings: KeyBindings | null;
+  private _resizingManager: ResizingManager | null;
 
   constructor(metadata: ExtensionMetadata) {
     super(metadata);
@@ -34,6 +36,7 @@ export default class TilingShellExtension extends Extension {
     this._indicator = null;
     this._dbus = null;
     this._keybindings = null;
+    this._resizingManager = null;
   }
 
   createIndicator() {
@@ -85,6 +88,15 @@ export default class TilingShellExtension extends Extension {
     if (this._keybindings) this._keybindings.destroy();
     this._keybindings = new KeyBindings(this.getSettings());
 
+    // disable native edge tiling
+    if (Settings.get_active_screen_edges()) {
+      SettingsOverride.get().override(
+        new Gio.Settings({ schema_id: 'org.gnome.mutter' }), 
+        'edge-tiling', 
+        new GLib.Variant('b', false)
+      );
+    }
+
     //@ts-ignore
     if (Main.layoutManager._startingUp) {
       this._signals.connect(Main.layoutManager, 'startup-complete', () => {
@@ -95,19 +107,15 @@ export default class TilingShellExtension extends Extension {
       this._createTilingManagers();
       this._setupSignals();
     }
+    
+    this._resizingManager = new ResizingManager();
+    this._resizingManager.enable();
 
     this.createIndicator();
 
     if (this._dbus) this._dbus.disable();
     this._dbus = new DBus();
     this._dbus.enable(this);
-
-    // disable native edge tiling
-    SettingsOverride.get().override(
-      new Gio.Settings({ schema_id: 'org.gnome.mutter' }), 
-      'edge-tiling', 
-      new GLib.Variant('b', false)
-    );
     
     debug('extension is enabled');
   }
@@ -162,6 +170,17 @@ export default class TilingShellExtension extends Extension {
     if (this._keybindings) {
       this._signals.connect(this._keybindings, 'move-window', this._onKeyboardMoveWin.bind(this));
     }
+
+    this._signals.connect(Settings, Settings.SETTING_ACTIVE_SCREEN_EDGES, () => {
+      // disable native edge tiling
+      const nativeIsActive = !Settings.get_active_screen_edges();
+      
+      SettingsOverride.get().override(
+        new Gio.Settings({ schema_id: 'org.gnome.mutter' }), 
+        'edge-tiling', 
+        new GLib.Variant('b', nativeIsActive)
+      );
+    });
   }
 
   private _onKeyboardMoveWin(kb: KeyBindings, display: Meta.Display, direction: Meta.Direction) {
@@ -190,7 +209,7 @@ export default class TilingShellExtension extends Extension {
 
   disable(): void {
     // bring back overridden keybindings
-    if (this._keybindings) this._keybindings.destroy();
+    this._keybindings?.destroy();
     this._keybindings = null;
 
     // destroy indicator
@@ -202,11 +221,14 @@ export default class TilingShellExtension extends Extension {
     this._tilingManagers = [];
 
     // disconnect signals
-    if (this._signals) this._signals.disconnect();
+    this._signals?.disconnect();
     this._signals = null;
 
+    this._resizingManager?.destroy();
+    this._resizingManager = null;
+
     // disable dbus
-    if (this._dbus) this._dbus.disable();
+    this._dbus?.disable();
     this._dbus = null;
 
     // destroy state and settings

@@ -42,6 +42,13 @@ export default class TilePreview extends St.Widget {
     this._gaps.right = gaps.right * scalingFactor;
     this._gaps.bottom = gaps.bottom * scalingFactor;
     this._gaps.left = gaps.left * scalingFactor;
+
+    if (this._gaps.top === 0 && this._gaps.bottom === 0 
+      && this._gaps.right === 0 && this._gaps.left === 0) {
+        this.remove_style_class_name("custom-tile-preview");
+      } else {
+        this.add_style_class_name("custom-tile-preview");
+      }
   }
 
   public get gaps(): Clutter.Margin {

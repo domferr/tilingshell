@@ -46,7 +46,7 @@ class DynamicTilePreview extends TilePreview {
  * hovered tile.
  */
 @registerGObjectClass
-export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {    
+export default class TilingLayout extends LayoutWidget<DynamicTilePreview> { 
     private _showing: boolean;
 
     constructor(layout: Layout, innerGaps: Clutter.Margin, outerGaps: Clutter.Margin, workarea: Mtk.Rectangle, scalingFactor?: number) {
@@ -287,11 +287,9 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
     public getNearestTile(source: Mtk.Rectangle, direction: Meta.Direction): Mtk.Rectangle | undefined {
         let previewFound: DynamicTilePreview | undefined = undefined;
         let bestDistance = -1;
-
+        
         for (let i = 0; i < this._previews.length; i++) {
             const preview = this._previews[i];
-            const euclideanDistance = ((preview.x - source.x) * (preview.x - source.x)) 
-                + ((preview.y - source.y) * (preview.y - source.y));
 
             switch (direction) {
                 case Meta.Direction.RIGHT:
@@ -301,7 +299,7 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
                     if (preview.x >= source.x) continue;
                     break;
                 case Meta.Direction.BOTTOM:
-                    if (preview.y <= source.y + source.height) continue;
+                    if (preview.y <= source.y) continue;
                     break;
                 case Meta.Direction.TOP:
                     if (preview.y >= source.y) continue;
@@ -310,6 +308,9 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
                     continue;
             }
 
+            const euclideanDistance = ((preview.x - source.x) * (preview.x - source.x)) 
+                + ((preview.y - source.y) * (preview.y - source.y));
+            
             if (!previewFound || euclideanDistance < bestDistance) {
                 previewFound = preview;
                 bestDistance = euclideanDistance;
@@ -325,4 +326,44 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
             height: previewFound.innerHeight
         });
     }
+
+    public getRightmostTile(): Mtk.Rectangle {
+        let previewFound: DynamicTilePreview = this._previews[0];
+        
+        for (let i = 1; i < this._previews.length; i++) {
+            const preview = this._previews[i];
+            if (preview.x + preview.width < previewFound.x + previewFound.width) continue;
+
+            if (preview.x + preview.width > previewFound.x + previewFound.width) previewFound = preview;
+            else if (preview.y < previewFound.y) previewFound = preview;
+
+        }
+        
+        return buildRectangle({ 
+            x: previewFound.innerX,
+            y: previewFound.innerY,
+            width: previewFound.innerWidth,
+            height: previewFound.innerHeight
+        });
+    }
+
+    public getLeftmostTile(): Mtk.Rectangle {
+        let previewFound: DynamicTilePreview = this._previews[0];
+        
+        for (let i = 1; i < this._previews.length; i++) {
+            const preview = this._previews[i];
+            if (preview.x > previewFound.x) continue;
+
+            if (preview.x < previewFound.x) previewFound = preview;
+            else if (preview.y < previewFound.y) previewFound = preview;
+
+        }
+        
+        return buildRectangle({ 
+            x: previewFound.innerX,
+            y: previewFound.innerY,
+            width: previewFound.innerWidth,
+            height: previewFound.innerHeight
+        });
+    }   
 }

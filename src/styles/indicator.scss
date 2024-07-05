@@ -20,3 +20,13 @@
         border-width: calc($snap-assist-tile-border-width / 2);
     }
 }
+
+.default-menu-container {
+    spacing: 16px;
+}
+
+.monitor-layouts-title {
+    //font-family: monospace;
+    @include fontsize(9pt);
+    text-align: center;
+}

@@ -31,7 +31,8 @@ export const createIconButton = (iconName: string, path?: string) : St.Button =>
     
     const icon = new St.Icon({
         iconSize: 16, 
-        yAlign: Clutter.ActorAlign.CENTER 
+        yAlign: Clutter.ActorAlign.CENTER,
+        style: "padding: 6px"
     });
     if (path) {
         icon.gicon = Gio.icon_new_for_string(`${path}/icons/${iconName}.svg`);

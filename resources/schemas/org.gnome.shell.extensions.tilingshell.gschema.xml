@@ -87,6 +87,16 @@
             <summary>Overridden settings</summary>
             <description>The settings that are overridden and their old value.</description>
         </key>
+        <key name="active-screen-edges" type="b">
+            <default>true</default>
+            <summary>Active Screen Edges</summary>
+            <description>Drag windows against the top, left and right screen edges to resize them.</description>
+        </key>
+        <key name="top-edge-maximize" type="b">
+            <default>false</default>
+            <summary>Drag agains top edge to maximize window</summary>
+            <description>Drag windows against the top edge to maximize them</description>
+        </key>
 
 		<key type="as" name="move-window-right">
 			<default><![CDATA[['<Super>Right']]]></default>

@@ -145,14 +145,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         }));
 
         const suggestion4 = new St.BoxLayout({ vertical: false, xExpand: true, margin_top: 16 });
-        // RIGHT-CLICK to delete a tile
-        /*suggestion4.add_child(new St.Label({ 
-            text: "Use the indicator ", 
-            xAlign: Clutter.ActorAlign.CENTER,
-            yAlign: Clutter.ActorAlign.CENTER,
-            styleClass: '',
-            xExpand: false
-        }));*/
+        // use indicator to save or cancel
         suggestion4.add_child(new St.Icon({
             iconSize: 16, 
             yAlign: Clutter.ActorAlign.CENTER,
@@ -217,7 +210,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
                     xAlign: Clutter.ActorAlign.CENTER, 
                     styleClass: "message-list-clear-button icon-button button delete-layout-button"
                 });
-                deleteBtn.child = new St.Icon({ iconName: "edit-delete-symbolic", iconSize: 16 });
+                deleteBtn.child = new St.Icon({ gicon: Gio.icon_new_for_string(`${params.path}/icons/delete-symbolic.svg`), iconSize: 16 });
                 deleteBtn.connect('clicked', (self) => {
                     params.onDeleteLayout(btnInd, lay);
                     this._drawLayouts({ ...params, layouts: GlobalState.get().layouts });
@@ -238,7 +231,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         });
         this._layoutsBoxLayout.add_child(box);
         const newLayoutBtn = new LayoutButton(box, new Layout([new Tile({x: 0, y: 0, width: 1, height: 1, groups: []})], "New Layout"), gaps, this._layoutHeight, this._layoutWidth);
-        const icon = new St.Icon({ iconName: "list-add-symbolic", iconSize: 32 });
+        const icon = new St.Icon({ gicon: Gio.icon_new_for_string(`${params.path}/icons/add-symbolic.svg`), iconSize: 32 });
         icon.set_size(newLayoutBtn.child.width, newLayoutBtn.child.height);
         newLayoutBtn.child.add_child(icon);
         newLayoutBtn.connect('clicked', (self) => {

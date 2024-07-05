@@ -4,7 +4,6 @@ import Shell from 'gi://Shell';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import { logger } from '@/utils/shell';
-import { enableScalingFactorSupport, getMonitors, getScalingFactor } from '@/utils/ui';
 import Settings from '@/settings';
 import Layout from '@/components/layout/Layout';
 import Tile from '@/components/layout/Tile';
@@ -29,8 +28,7 @@ enum IndicatorState {
 export default class Indicator extends PanelMenu.Button {
     private _layoutEditor: LayoutEditor | null;
     private _editorDialog: EditorDialog | null;
-    //@ts-ignore todo
-    private _currentMenu: CurrentMenu;
+    private _currentMenu: CurrentMenu | null;
     private _state: IndicatorState;
     private _enableScaling: boolean;
     private _path: string;
@@ -39,8 +37,7 @@ export default class Indicator extends PanelMenu.Button {
         super(0.5, 'Tiling Shell Indicator', false);
         Main.panel.addToStatusArea(uuid, this, 1, 'right');
 
-        // Bind the "show-indicator" setting to the "visible" property.
-        //@ts-ignore
+        // Bind the "show-indicator" setting to the "visible" property
         Settings.bind(Settings.SETTING_SHOW_INDICATOR, this, 'visible', Gio.SettingsBindFlags.GET);
 
         const icon = new St.Icon({
@@ -51,6 +48,7 @@ export default class Indicator extends PanelMenu.Button {
         this.add_child(icon);
         this._layoutEditor = null;
         this._editorDialog = null;
+        this._currentMenu = null;
         this._state = IndicatorState.DEFAULT;
         this._enableScaling = false;
         this._path = path;
@@ -65,22 +63,16 @@ export default class Indicator extends PanelMenu.Button {
     public set enableScaling(value: boolean) {
         if (this._enableScaling === value) return;
         this._enableScaling = value;
-        
-        if (value) {
-            const monitor = Main.layoutManager.findMonitorForActor(this);
-            const scalingFactor = getScalingFactor(monitor?.index || Main.layoutManager.primaryIndex);
-            enableScalingFactorSupport((this.menu as PopupMenu.PopupMenu).box, scalingFactor);
-        }
 
         if (this._currentMenu && this._state === IndicatorState.DEFAULT) {
             this._currentMenu.destroy();
-            this._currentMenu = new DefaultMenu(this);
+            this._currentMenu = new DefaultMenu(this, this._enableScaling);
         }
     }
 
     public enable() {
         (this.menu as PopupMenu.PopupMenu).removeAll();
-        this._currentMenu = new DefaultMenu(this);
+        this._currentMenu = new DefaultMenu(this, this._enableScaling);
 
         // todo
         /*Main.panel.statusArea.appMenu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
@@ -113,9 +105,10 @@ export default class Indicator extends PanelMenu.Button {
         });*/
     }
 
-    public selectLayoutOnClick(layoutToSelect: Layout) {
-        // change the layout of all the monitors
-        Settings.save_selected_layouts_json(getMonitors().map((monitor) => layoutToSelect.id));
+    public selectLayoutOnClick(monitorIndex: number, layoutToSelectId: string) {
+        const selected = Settings.get_selected_layouts();
+        selected[monitorIndex] = layoutToSelectId;
+        Settings.save_selected_layouts_json(selected);
         this.menu.toggle();
     }
 
@@ -202,10 +195,10 @@ export default class Indicator extends PanelMenu.Button {
     private _setState(newState: IndicatorState) {
         if (this._state === newState) return;
         this._state = newState;
-        this._currentMenu.destroy();
+        this._currentMenu?.destroy();
         switch(newState) {
             case IndicatorState.DEFAULT:
-                this._currentMenu = new DefaultMenu(this);
+                this._currentMenu = new DefaultMenu(this, this._enableScaling);
                 if (!Settings.get_show_indicator()) this.hide();
                 break;
             case IndicatorState.CREATE_NEW:
@@ -218,8 +211,9 @@ export default class Indicator extends PanelMenu.Button {
 
     private _onDestroy() {
         this._editorDialog?.destroy();
+        this._editorDialog = null;
         this._layoutEditor?.destroy();
         this._layoutEditor = null;
-        this._currentMenu.destroy();
+        (this.menu as PopupMenu.PopupMenu).removeAll();
     }
 }

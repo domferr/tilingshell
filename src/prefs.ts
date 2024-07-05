@@ -146,6 +146,24 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         behaviourGroup.add(restoreToOriginalSizeRow);
 
+        // Screen Edges section
+        const activeScreenEdgesGroup = new Adw.PreferencesGroup({
+            title: 'Screen Edges',
+            description: 'Drag windows against the top, left and right screen edges to resize them',
+            headerSuffix: new Gtk.Switch({ vexpand: false, valign: Gtk.Align.CENTER })
+        });
+        Settings.bind(Settings.SETTING_ACTIVE_SCREEN_EDGES, activeScreenEdgesGroup.headerSuffix, 'active');
+
+        const topEdgeMaximize = this._buildSwitchRow(
+            Settings.SETTING_TOP_EDGE_MAXIMIZE,
+            "Drag against top edge to maximize window",
+            "Drag windows against the top edge to maximize them"
+        );
+        Settings.bind(Settings.SETTING_ACTIVE_SCREEN_EDGES, topEdgeMaximize, 'sensitive');
+        activeScreenEdgesGroup.add(topEdgeMaximize);
+        
+        prefsPage.add(activeScreenEdgesGroup);
+
         // Layouts section
         const layoutsGroup = new Adw.PreferencesGroup({
             title: 'Layouts',
@@ -280,7 +298,6 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             description: `Use hotkeys to move the focused window through the tiles of the active layout`,
             headerSuffix: new Gtk.Switch({ vexpand: false, valign: Gtk.Align.CENTER })
         });
-        //@ts-ignore
         Settings.bind(Settings.SETTING_ENABLE_MOVE_KEYBINDINGS, keybindingsGroup.headerSuffix, 'active');
         prefsPage.add(keybindingsGroup);
         
@@ -290,6 +307,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             "Move the focused window to the tile on its right",
             (_: any, value: string) => Settings.set_kb_move_window_right(value)
         );
+        Settings.bind(Settings.SETTING_ENABLE_MOVE_KEYBINDINGS, moveRightKB, 'sensitive');
         keybindingsGroup.add(moveRightKB);
         
         const moveLeftKB = this._buildShortcutButtonRow(
@@ -298,6 +316,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             "Move the focused window to the tile on its left",
             (_: any, value: string) => Settings.set_kb_move_window_left(value)
         );
+        Settings.bind(Settings.SETTING_ENABLE_MOVE_KEYBINDINGS, moveLeftKB, 'sensitive');
         keybindingsGroup.add(moveLeftKB);
         
         const moveUpKB = this._buildShortcutButtonRow(
@@ -306,6 +325,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             "Move the focused window to the tile above",
             (_: any, value: string) => Settings.set_kb_move_window_up(value)
         );
+        Settings.bind(Settings.SETTING_ENABLE_MOVE_KEYBINDINGS, moveUpKB, 'sensitive');
         keybindingsGroup.add(moveUpKB);
         
         const moveDownKB = this._buildShortcutButtonRow(
@@ -314,6 +334,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             "Move the focused window to the tile below",
             (_: any, value: string) => Settings.set_kb_move_window_down(value)
         );
+        Settings.bind(Settings.SETTING_ENABLE_MOVE_KEYBINDINGS, moveDownKB, 'sensitive');
         keybindingsGroup.add(moveDownKB);
         
         // footer
@@ -357,7 +378,6 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         });
         if (suffix) adwRow.add_suffix(suffix);
         adwRow.add_suffix(gtkSwitch);
-        //@ts-ignore
         Settings.bind(settingsKey, gtkSwitch, 'active');
 
         return adwRow;
@@ -373,7 +393,6 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             activatableWidget: spinBtn
         });
         adwRow.add_suffix(spinBtn);
-        //@ts-ignore
         Settings.bind(settingsKey, spinBtn, 'value');
 
         return adwRow;
@@ -409,8 +428,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 null
             );
         } catch (e) {
-            //@ts-ignore
-            if (e instanceof Gio.DBusError) //@ts-ignore
+            if (e instanceof Gio.DBusError)
                 Gio.DBusError.strip_remote_error(e);
         
             console.error(e);

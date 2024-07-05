@@ -24,6 +24,8 @@ export default class Settings {
     static SETTING_ENABLE_BLUR_SNAP_ASSISTANT = "enable-blur-snap-assistant";
     static SETTING_ENABLE_BLUR_SELECTED_TILEPREVIEW = "enable-blur-selected-tilepreview";
     static SETTING_ENABLE_MOVE_KEYBINDINGS = 'enable-move-keybindings';
+    static SETTING_ACTIVE_SCREEN_EDGES = 'active-screen-edges';
+    static SETTING_TOP_EDGE_MAXIMIZE = 'top-edge-maximize';
 
     static SETTING_MOVE_WINDOW_RIGHT = 'move-window-right';
     static SETTING_MOVE_WINDOW_LEFT = 'move-window-left';
@@ -140,6 +142,14 @@ export default class Settings {
 
     static get_overridden_settings(): string {
         return this._settings?.get_string(this.SETTING_OVERRIDDEN_SETTINGS) ?? '{}';
+    }
+
+    static get_active_screen_edges(): boolean {
+        return this._settings?.get_boolean(this.SETTING_ACTIVE_SCREEN_EDGES) ?? false;
+    }
+
+    static get_top_edge_maximize(): boolean {
+        return this._settings?.get_boolean(this.SETTING_TOP_EDGE_MAXIMIZE) ?? false;
     }
 
     static set_last_version_installed(version: string) {
