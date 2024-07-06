@@ -1,11 +1,10 @@
-const node = 
-`<node>
+const node = `<node>
     <interface name="org.gnome.Shell.Extensions.TilingShell">
         <method name="openLayoutEditor" />
     </interface>
 </node>`;
 
-import Gio from "gi://Gio";
+import Gio from 'gi://Gio';
 
 export default class DBus {
     private _dbus: Gio.DBusExportedObject | null;
@@ -14,11 +13,14 @@ export default class DBus {
         this._dbus = null;
     }
 
-    public enable(ext: any) {
+    public enable(ext: unknown) {
         if (this._dbus) return;
 
         this._dbus = Gio.DBusExportedObject.wrapJSObject(node, ext);
-        this._dbus.export(Gio.DBus.session, '/org/gnome/Shell/Extensions/TilingShell');
+        this._dbus.export(
+            Gio.DBus.session,
+            '/org/gnome/Shell/Extensions/TilingShell',
+        );
     }
 
     public disable() {

@@ -1,29 +1,29 @@
-import { registerGObjectClass } from "@utils/gjs";
-import Layout from "./components/layout/Layout";
-import Settings from "./settings";
-import SignalHandling from "./signalHandling";
-import GObject from "gi://GObject";
+import { registerGObjectClass } from '@utils/gjs';
+import Layout from '../components/layout/Layout';
+import Settings from '../settings/settings';
+import SignalHandling from './signalHandling';
+import GObject from 'gi://GObject';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 @registerGObjectClass
 export default class GlobalState extends GObject.Object {
-    static metaInfo: GObject.MetaInfo<any, any, any> = {
+    static metaInfo: GObject.MetaInfo<unknown, unknown, unknown> = {
         Signals: {
-            "layouts-changed": { 
-                param_types: []
+            'layouts-changed': {
+                param_types: [],
             },
         },
-        GTypeName: "GlobalState"
-    }
+        GTypeName: 'GlobalState',
+    };
 
-    public static SIGNAL_LAYOUTS_CHANGED = "layouts-changed";
+    public static SIGNAL_LAYOUTS_CHANGED = 'layouts-changed';
 
     private static _instance: GlobalState | null;
-    
+
     private _signals: SignalHandling;
     private _layouts: Layout[];
 
-    static get() : GlobalState {
+    static get(): GlobalState {
         if (!this._instance) this._instance = new GlobalState();
 
         return this._instance;
@@ -48,7 +48,7 @@ export default class GlobalState extends GObject.Object {
         });
     }
 
-    get layouts() : Layout[] {
+    get layouts(): Layout[] {
         return this._layouts;
     }
 
@@ -59,24 +59,32 @@ export default class GlobalState extends GObject.Object {
     }
 
     public deleteLayout(layoutToDelete: Layout) {
-        const layFoundIndex = this._layouts.findIndex(lay => lay.id === layoutToDelete.id);
-        if (layFoundIndex == -1) return;
-        
+        const layFoundIndex = this._layouts.findIndex(
+            (lay) => lay.id === layoutToDelete.id,
+        );
+        if (layFoundIndex === -1) return;
+
         this._layouts.splice(layFoundIndex, 1);
 
         // easy way to trigger a save and emit layouts-changed signal
         this.layouts = this._layouts;
 
         const selectedLayouts = Settings.get_selected_layouts();
-        if (layoutToDelete.id === selectedLayouts[Main.layoutManager.primaryIndex]) {
-            selectedLayouts[Main.layoutManager.primaryIndex] = this._layouts[0].id;
+        if (
+            layoutToDelete.id ===
+            selectedLayouts[Main.layoutManager.primaryIndex]
+        ) {
+            selectedLayouts[Main.layoutManager.primaryIndex] =
+                this._layouts[0].id;
             Settings.save_selected_layouts_json(selectedLayouts);
         }
     }
 
     public editLayout(newLay: Layout) {
-        const layFoundIndex = this._layouts.findIndex(lay => lay.id === newLay.id);
-        if (layFoundIndex == -1) return;
+        const layFoundIndex = this._layouts.findIndex(
+            (lay) => lay.id === newLay.id,
+        );
+        if (layFoundIndex === -1) return;
 
         this._layouts[layFoundIndex] = newLay;
         // easy way to trigger save and signal emission
@@ -91,8 +99,13 @@ export default class GlobalState extends GObject.Object {
 
     public getSelectedLayoutOfMonitor(monitorIndex: number): Layout {
         const selectedLayouts = Settings.get_selected_layouts();
-        if (monitorIndex < 0 || monitorIndex >= selectedLayouts.length) monitorIndex = 0;
-        
-        return this._layouts.find(lay => lay.id === selectedLayouts[monitorIndex]) || this._layouts[0];
+        if (monitorIndex < 0 || monitorIndex >= selectedLayouts.length)
+            monitorIndex = 0;
+
+        return (
+            this._layouts.find(
+                (lay) => lay.id === selectedLayouts[monitorIndex],
+            ) || this._layouts[0]
+        );
     }
 }

@@ -1,3 +1,5 @@
-export default interface CurrentMenu {
+interface CurrentMenu {
     destroy(): void;
 }
+
+export default CurrentMenu;

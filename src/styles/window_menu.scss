@@ -1,0 +1,23 @@
+.window-menu-layout {
+    .snap-assist-tile {
+        border-color: rgba(255, 255, 255, 0.2);
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius-value: $snap-assist-tile-border-radius - 2;
+        border-width: calc($snap-assist-tile-border-width / 2);
+    }
+
+    .snap-assist-tile.dark {
+        border-color: rgba(121, 121, 121, 0.2);
+        background-color: rgba(121, 121, 121, 0.2);
+    }
+
+    .snap-assist-tile:hover {
+        border-color: rgba(255, 255, 255, 0.78);
+        background-color: rgba(255, 255, 255, 0.6);
+    }
+
+    .snap-assist-tile.dark:hover {
+        border-color: rgba(81, 81, 81, 0.78);
+        background-color: rgba(81, 81, 81, 0.6);
+    }
+}

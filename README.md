@@ -29,6 +29,11 @@ Have issues, you want to suggest a new feature or contribute? Please open a new 
 
 ## Usage ##
 
+| [⬇️](#tiling-system) Tiling System | [⬇️](#snap-assistant) Snap Assistant | [⬇️](#select-a-layout) Select a layout | [⬇️](#select-multiple-tiles) Select multiple tiles |
+|:---|:---|:---|:---|
+| [⬇️](#layout-editor) **Layout editor** | [⬇️](#smart-resize) **Smart resize** | [⬇️](#tile-with-keyboard) **Tile with Keyboard** | [⬇️](#edge-tiling) **Edge Tiling** |
+| [⬇️](#tiling-buttons) **Tiling Buttons** |
+
 ### Tiling System ###
 When grabbing and moving a window, press <kbd>CTRL</kbd> key to show the tiling layout (you can choose another key from the preferences). When moving on a tile, it will highlight. Ungrab the window to place that window on the highlighted tile.
 
@@ -36,21 +41,31 @@ When grabbing and moving a window, press <kbd>CTRL</kbd> key to show the tiling 
 
 > This extension and the tiling system also implements Windows PowerToys FancyZones!
 
+<p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
+
 ### Snap Assistant ###
 When grabbing and moving a window, the snap assistant will be available on top of the screen. Move the window near it to activate the snap assistant. While still grabbing the window, move your mouse to the tile you are interested in. By stopping grabbing the window will be tiled to the selected tile!
 
 [snap_assistant.webm](https://github.com/domferr/tilingshell/assets/14203981/33511582-fa92-445e-b1ba-8b08f9a8e43a)
+
+<p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
 
 ### Select a layout ###
 Click on Tiling Shell's panel indicator and the available layouts will be shown. Select the one you prefer by clicking on it. That layout will be applied to every monitor in case you have more than one.
 
 [layout_selection.webm](https://github.com/domferr/tilingshell/assets/14203981/f4956a34-64e3-4c24-b177-8f9b08fcc45c)
 
+
+<p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
+
 ### Select multiple tiles ###
 
 The layout is not strict. You can select multiple tiles too! Just hold <kbd>ALT</kbd> while using the tiling system (you can choose another key from the preferences).
 
 [multiple_selection.webm](https://github.com/domferr/tilingshell/assets/14203981/92b29130-260c-479d-9237-bf5c87427e52)
+
+
+<p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
 
 ### Layout editor ###
 
@@ -60,6 +75,8 @@ The layout is not strict. You can select multiple tiles too! Just hold <kbd>ALT<
 
 [layout_editor.webm](https://github.com/domferr/tilingshell/assets/14203981/c6e05589-69d9-4fa3-a4df-61ee875cf9e1)
 
+<p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
+
 ### Smart resize ###
 
 You can resize adjacent tiled windows together!
@@ -68,7 +85,9 @@ You can resize adjacent tiled windows together!
 
 > It can be enabled/disabled from the preferences
 
-### Tile using Keyboard ###
+<p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
+
+### Tile with Keyboard ###
 
 Move window through the tiles using keyboard shortcuts (<kbd>SUPER</kbd>+<kbd>←</kbd>/<kbd>↑</kbd>/<kbd>↓</kbd>/<kbd>→</kbd>). They can be customized from the preferences!
 
@@ -76,11 +95,23 @@ Move window through the tiles using keyboard shortcuts (<kbd>SUPER</kbd>+<kbd>�
 
 > It can be enabled/disabled from the preferences
 
+<p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
+
 ### Edge Tiling ###
 
 You can tile a window by moving it to the edge.
 
 [Screencast from 2024-06-22 22-12-22.webm](https://github.com/domferr/tilingshell/assets/14203981/6e5a2ba9-cd38-44bb-b791-51e41e07f7a0)
+
+<p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
+
+### Tiling Buttons ###
+
+Right-click on a window to use the auto-tile buttons and the snap assistant from there! The auto-tile buttons allow you to tile to the leftmost or rightmost empty tile, based on your selected layout. The "Move to best tile" button suggests tiling to the nearest empty tile to the center of the screen.
+
+[Screencast from 2024-07-13 18-21-57.webm](https://github.com/user-attachments/assets/8fd79faa-a476-4b55-b79c-6329e4b59519)
+
+<p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
 
 ## Installation
 

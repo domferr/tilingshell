@@ -1,7 +1,10 @@
-import Meta from "gi://Meta";
-import Mtk from "gi://Mtk";
+import Tile from '@components/layout/Tile';
+import Meta from 'gi://Meta';
+import Mtk from 'gi://Mtk';
 
-export default interface ExtendedWindow extends Meta.Window {
+interface ExtendedWindow extends Meta.Window {
     originalSize: Mtk.Rectangle | undefined;
-    isTiled: boolean;
+    assignedTile: Tile | undefined;
 }
+
+export default ExtendedWindow;
