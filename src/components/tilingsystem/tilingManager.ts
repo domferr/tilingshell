@@ -447,17 +447,25 @@ export class TilingManager {
     }
 
     private _easeWindowRect(window: Meta.Window, destRect: Mtk.Rectangle, user_op: boolean = false, force: boolean = false) {
-        // apply animations when tiling the window
         const windowActor = window.get_compositor_private() as Clutter.Actor;
+
+        const beforeRect = window.get_frame_rect();
+        // do not animate the window if it will not move or scale
+        if (destRect.x === beforeRect.x && destRect.y === beforeRect.y 
+            && destRect.width === beforeRect.width && destRect.height === beforeRect.height) {
+            return;
+        }
+
+        // apply animations when tiling the window
         windowActor.remove_all_transitions();
         // @ts-expect-error "Main.wm has the private function _prepareAnimationInfo"
         Main.wm._prepareAnimationInfo(
             global.windowManager,
             windowActor,
-            window.get_frame_rect().copy(),
+            beforeRect.copy(),
             Meta.SizeChange.UNMAXIMIZE
         );
-        
+
         // move and resize the window to the current selection
         window.move_to_monitor(this._monitor.index);
         if (force) window.move_frame(user_op, destRect.x, destRect.y);
@@ -574,7 +582,7 @@ export class TilingManager {
             return;
         }
         if (window.get_maximized()) return;
-
+        
         if (!(window as ExtendedWindow).isTiled) {
             (window as ExtendedWindow).originalSize = window.get_frame_rect().copy();
         }
