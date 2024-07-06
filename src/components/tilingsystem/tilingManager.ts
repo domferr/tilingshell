@@ -541,8 +541,6 @@ export class TilingManager {
     }
 
     public onTileFromWindowMenu(tile: Tile, window: Meta.Window) {
-        this._debug(`onTileFromWindowMenu ${tile.x}x${tile.y}x${tile.width}x${tile.height}`);
-
         // We apply the proportions to get tile size and position relative to the work area 
         const scaledRect = TileUtils.apply_props(tile, this._workArea);
         // ensure the rect doesn't go horizontally beyond the workarea

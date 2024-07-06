@@ -69,7 +69,8 @@ class LayoutTileButtons extends LayoutWidget<SnapAssistTileButton> {
             layout,
             containerRect: buildRectangle({ x: 0, y: 0, width, height }),
             innerGaps: buildMarginOf(gapSize), 
-            outerGaps: new Clutter.Margin()
+            outerGaps: new Clutter.Margin(),
+            styleClass: "window-menu-layout"
         });
         this.relayout();
     }
@@ -128,14 +129,14 @@ export default class OverriddenWindowMenu extends GObject.Object {
     
         //@ts-expect-error "this is not an instance of OverriddenWindowMenu, but it is the WindowMenu itself"
         this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        const layoutsPopupMenu = new PopupMenu.PopupBaseMenuItem({ style_class: "indicator-menu-item" });
+        const layoutsPopupMenu = new PopupMenu.PopupBaseMenuItem({/* style_class: "indicator-menu-item" */});
         const container = new St.BoxLayout({
-            xAlign: Clutter.ActorAlign.FILL,
+            xAlign: Clutter.ActorAlign.START,
             yAlign: Clutter.ActorAlign.CENTER,
             xExpand: true,
             yExpand: true,
             vertical: true,
-            styleClass: "default-menu-container" // to apply the same vertical spacing as the horizontal one
+            style: "spacing: 16px !important"
         });
         layoutsPopupMenu.add_child(container);
         const n_rows = layouts.length / 2;
@@ -146,7 +147,7 @@ export default class OverriddenWindowMenu extends GObject.Object {
                 yAlign: Clutter.ActorAlign.CENTER,
                 xExpand: true,
                 yExpand: true,
-                styleClass: "default-menu-container"
+                style: "spacing: 42px"
             });
             rows.push(box);
             container.add_child(box);
