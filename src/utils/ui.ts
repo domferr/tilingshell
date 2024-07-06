@@ -68,12 +68,11 @@ export const enableScalingFactorSupport = (widget: St.Widget, monitorScalingFact
 }
 
 export function getWindowsOfMonitor(monitor: Monitor): Meta.Window[] {
-    let windows = global.workspaceManager
+    return global.workspaceManager
         .get_active_workspace()
         .list_windows()
         .filter(win => win.get_window_type() === Meta.WindowType.NORMAL
                   && Main.layoutManager.monitors[win.get_monitor()] === monitor);
-    return windows;
 }
 
 export function buildMarginOf(value: number): Clutter.Margin {
@@ -98,8 +97,8 @@ export function buildRectangle(params: { x?: number, y?: number, width?: number,
     return new Mtk.Rectangle({ x: params.x || 0, y: params.y || 0, width: params.width || 0, height: params.height || 0 });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getEventCoords(event: any): number[] {
-    //@ts-ignore
     return event.get_coords ? event.get_coords():[event.x, event.y]; // GNOME 40-44
 }
 
@@ -114,7 +113,7 @@ export function buildBlurEffect(sigma: number): Shell.BlurEffect {
     if (effect.set_radius) {
       effect.set_radius(sigma * 2);
     } else {
-      //@ts-ignore
+      //@ts-expect-error "set_sigma is available in old shell versions (<= 45)"
       effect.set_sigma(sigma);
     }
     return effect;

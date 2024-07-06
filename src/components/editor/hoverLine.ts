@@ -2,13 +2,9 @@ import { registerGObjectClass } from "@/utils/gjs";
 import St from 'gi://St';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
-import Mtk from 'gi://Mtk';
 import Clutter from "gi://Clutter";
 import EditableTilePreview from "./editableTilePreview";
-import { logger } from "@/utils/shell";
 import { getScalingFactorOf } from "@utils/ui";
-
-const debug = logger("HoverLine");
 
 @registerGObjectClass
 export default class HoverLine extends St.Widget {
@@ -23,7 +19,7 @@ export default class HoverLine extends St.Widget {
         
         this._hoveredTile = null;
         
-        const [_, scalingFactor] = getScalingFactorOf(this);
+        const [, scalingFactor] = getScalingFactorOf(this);
         this._size = 16 * scalingFactor;
 
         this.hide();

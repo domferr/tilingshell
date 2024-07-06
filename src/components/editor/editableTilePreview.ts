@@ -5,18 +5,14 @@ import Mtk from "gi://Mtk";
 import Tile from "../layout/Tile";
 import Slider from "./slider";
 import TileUtils from "../layout/TileUtils";
-import { logger } from "@/utils/shell";
 import GObject from "gi://GObject";
 import { registerGObjectClass } from "@utils/gjs";
 
-const debug = logger("EditableTilePreview");
-
 @registerGObjectClass
 export default class EditableTilePreview extends TilePreview {
-    static metaInfo: GObject.MetaInfo<any, any, any> = {
+    static metaInfo: GObject.MetaInfo<unknown, unknown, unknown> = {
         Signals: {
-            "size-changed": { 
-                //@ts-ignore todo
+            "size-changed": {
                 param_types: [ Mtk.Rectangle.$gtype, Mtk.Rectangle.$gtype ] // oldSize, newSize
             },
         },
@@ -121,11 +117,12 @@ export default class EditableTilePreview extends TilePreview {
         this.emit("size-changed", oldSize, newSize);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public connect(id: string, callback: (...args: any[]) => any): number;
     public connect(signal: "size-changed", callback: (_source: this, oldSize: Mtk.Rectangle, newSize: Mtk.Rectangle) => void): number;
     public connect(signal: "notify::hover", callback: (_source: this) => void): number;
     public connect(signal: "clicked", callback: (_source: this, clicked_button: number) => void): number;
-    public connect(signal: string, callback: any): number {
+    public connect(signal: string, callback: never): number {
         if (signal === "clicked" || signal === "notify::hover" || signal === "motion-event") {
             return this._btn.connect(signal, callback);
         }

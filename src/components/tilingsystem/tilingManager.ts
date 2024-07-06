@@ -41,7 +41,7 @@ export class TilingManager {
     private _movingWindowTimerId: number | null = null;
 
     private readonly _signals: SignalHandling;
-    private readonly _debug: (...content: any[]) => void;
+    private readonly _debug: (...content: unknown[]) => void;
 
     /**
      * Constructs a new TilingManager instance.
@@ -111,7 +111,7 @@ export class TilingManager {
             this._onWindowGrabBegin(window, grabOp);
         });
 
-        this._signals.connect(global.display, 'grab-op-end', (_display: Meta.Display, window: Meta.Window, grabOp: Meta.GrabOp) => {
+        this._signals.connect(global.display, 'grab-op-end', (_display: Meta.Display, window: Meta.Window) => {
             if (!this._isGrabbingWindow) return;
             
             this._onWindowGrabEnd(window);
@@ -273,10 +273,10 @@ export class TilingManager {
                 });
                 
                 // restart grab for GNOME 42
-                //@ts-ignore
+                //@ts-expect-error "grab is available on GNOME 42"
                 const restartGrab = global.display.end_grab_op && global.display.begin_grab_op;
                 if (restartGrab) {
-                    //@ts-ignore
+                    //@ts-expect-error "grab is available on GNOME 42"
                     global.display.end_grab_op(global.get_current_time());
                 }
                 // if we restarted the grab, we need to force window movement and to
@@ -287,7 +287,7 @@ export class TilingManager {
                     // must be done now, before begin_grab_op, because begin_grab_op will trigger
                     // _onMovingWindow again, so we will go into infinite loop on restoring the window size
                     extWin.originalSize = undefined;
-                    //@ts-ignore
+                    //@ts-expect-error "grab is available on GNOME 42"
                     global.display.begin_grab_op(
                         window,
                         grabOp,
@@ -446,10 +446,9 @@ export class TilingManager {
 
     private _easeWindowRect(window: Meta.Window, destRect: Mtk.Rectangle, user_op: boolean = false, force: boolean = false) {
         // apply animations when tiling the window
-        const windowActor = window.get_compositor_private();
-        // @ts-ignore
+        const windowActor = window.get_compositor_private() as Clutter.Actor;
         windowActor.remove_all_transitions();
-        // @ts-ignore
+        // @ts-expect-error "Main.wm has the private function _prepareAnimationInfo"
         Main.wm._prepareAnimationInfo(
             global.windowManager,
             windowActor,

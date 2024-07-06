@@ -7,7 +7,7 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 @registerGObjectClass
 export default class GlobalState extends GObject.Object {
-    static metaInfo: GObject.MetaInfo<any, any, any> = {
+    static metaInfo: GObject.MetaInfo<unknown, unknown, unknown> = {
         Signals: {
             "layouts-changed": { 
                 param_types: []

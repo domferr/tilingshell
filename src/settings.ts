@@ -46,6 +46,7 @@ export default class Settings {
         }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     static bind(key: string, object: GObject.Object | any, property: string, flags: Gio.SettingsBindFlags = Gio.SettingsBindFlags.DEFAULT): void {
         this._settings?.bind(key, object, property, flags);
     }
@@ -98,7 +99,7 @@ export default class Settings {
             const layouts = JSON.parse(this._settings?.get_string(this.SETTING_LAYOUTS_JSON) || "[]") as Layout[];
             if (layouts.length === 0) throw "At least one layout is required";
             return layouts.filter(layout => layout.tiles.length > 0);
-        } catch(ex: any) {
+        } catch(ex: unknown) {
             this.reset_layouts_json();
             return JSON.parse(this._settings?.get_string(this.SETTING_LAYOUTS_JSON) || "[]") as Layout[];
         }
@@ -237,7 +238,7 @@ export default class Settings {
         return this._settings?.get_strv(this.SETTING_MOVE_WINDOW_DOWN)[0] ?? '';
     }
 
-    static connect(key: string, func: (...arg: any[]) => void) : number {
+    static connect(key: string, func: (...arg: unknown[]) => void) : number {
         return this._settings?.connect(`changed::${key}`, func) || -1;
     }
 

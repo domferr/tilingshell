@@ -26,6 +26,7 @@ const debug = logger("prefs");
  *
  * @returns {Gtk.Widget} the preferences widget
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function buildPrefsWidget(): Gtk.Widget {
     return new Gtk.Label({
         label: "Preferences",
@@ -217,7 +218,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                                 }
                             );
                         }
-                    } catch (error: any) {
+                    } catch (error: unknown) {
                         debug(error);
                     }
                     
@@ -253,7 +254,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                                 return;
                             }
                             debug(`Selected path ${file.get_path()}`);
-                            const [success, content, etags] = file.load_contents(null);
+                            const [success, content] = file.load_contents(null);
                             if (success) {
                                 let importedLayouts = JSON.parse(new TextDecoder("utf-8").decode(content)) as Layout[];
                                 if (importedLayouts.length === 0) throw "At least one layout is required";
@@ -266,7 +267,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                                 debug("Error while opening file");
                             }
                         }
-                    } catch (error: any) {
+                    } catch (error: unknown) {
                         debug(error);
                     }
                     
@@ -285,7 +286,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             () => {
                 Settings.reset_layouts_json();
                 const layouts = Settings.get_layouts_json();
-                const selected = Settings.get_selected_layouts().map(val => layouts[0].id);
+                const selected = Settings.get_selected_layouts().map(() => layouts[0].id);
                 Settings.save_selected_layouts_json(selected);
             },
             "destructive-action"
@@ -305,7 +306,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             Settings.get_kb_move_window_right(),
             "Move window to right tile",
             "Move the focused window to the tile on its right",
-            (_: any, value: string) => Settings.set_kb_move_window_right(value)
+            (_: unknown, value: string) => Settings.set_kb_move_window_right(value)
         );
         Settings.bind(Settings.SETTING_ENABLE_MOVE_KEYBINDINGS, moveRightKB, 'sensitive');
         keybindingsGroup.add(moveRightKB);
@@ -314,7 +315,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             Settings.get_kb_move_window_left(),
             "Move window to left tile",
             "Move the focused window to the tile on its left",
-            (_: any, value: string) => Settings.set_kb_move_window_left(value)
+            (_: unknown, value: string) => Settings.set_kb_move_window_left(value)
         );
         Settings.bind(Settings.SETTING_ENABLE_MOVE_KEYBINDINGS, moveLeftKB, 'sensitive');
         keybindingsGroup.add(moveLeftKB);
@@ -323,7 +324,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             Settings.get_kb_move_window_up(),
             "Move window to tile above",
             "Move the focused window to the tile above",
-            (_: any, value: string) => Settings.set_kb_move_window_up(value)
+            (_: unknown, value: string) => Settings.set_kb_move_window_up(value)
         );
         Settings.bind(Settings.SETTING_ENABLE_MOVE_KEYBINDINGS, moveUpKB, 'sensitive');
         keybindingsGroup.add(moveUpKB);
@@ -332,7 +333,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             Settings.get_kb_move_window_down(),
             "Move window to tile below",
             "Move the focused window to the tile below",
-            (_: any, value: string) => Settings.set_kb_move_window_down(value)
+            (_: unknown, value: string) => Settings.set_kb_move_window_down(value)
         );
         Settings.bind(Settings.SETTING_ENABLE_MOVE_KEYBINDINGS, moveDownKB, 'sensitive');
         keybindingsGroup.add(moveDownKB);
@@ -464,13 +465,13 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             label,
             hexpand: false,
         });
-        btn.connect("clicked", (_: Gtk.Button) => {
+        btn.connect("clicked", () => {
             Gtk.show_uri(null, uri, Gdk.CURRENT_TIME);
         });
         return btn;
     }
 
-    _buildShortcutButtonRow(shortcut: string, title: string, subtitle: string, onChange: (_: any, value: string) => void, styleClass?: string) {
+    _buildShortcutButtonRow(shortcut: string, title: string, subtitle: string, onChange: (_: unknown, value: string) => void, styleClass?: string) {
         const btn = new ShortcutSettingButton(shortcut);
         if (styleClass) btn.add_css_class(styleClass);
         btn.set_vexpand(false);
@@ -537,9 +538,9 @@ const ShortcutSettingButton = class extends Gtk.Button {
     }
 
     _onActivated(widget: Gtk.Widget) {
-        let ctl = new Gtk.EventControllerKey();
+        const ctl = new Gtk.EventControllerKey();
 
-        let content = new Adw.StatusPage({
+        const content = new Adw.StatusPage({
             title: 'New accelerator…',
             //description: this._description,
             icon_name: 'preferences-desktop-keyboard-shortcuts-symbolic',
@@ -548,7 +549,7 @@ const ShortcutSettingButton = class extends Gtk.Button {
         this._editor = new Adw.Window({
             modal: true,
             hide_on_close: true,
-            //@ts-ignore
+            //@ts-expect-error "widget has get_root function"
             transient_for: widget.get_root(),
             width_request: 480,
             height_request: 320,
@@ -608,7 +609,7 @@ const ShortcutSettingButton = class extends Gtk.Button {
     }
 
     isValidBinding(mask: number, keycode: number, keyval: number) {
-        //@ts-ignore
+        //@ts-expect-error "Gdk has SHIFT_MASK"
         return !(mask === 0 || mask === Gdk.SHIFT_MASK && keycode !== 0 &&
                  ((keyval >= Gdk.KEY_a && keyval <= Gdk.KEY_z) ||
                      (keyval >= Gdk.KEY_A && keyval <= Gdk.KEY_Z) ||
@@ -658,7 +659,6 @@ const ShortcutSettingButton = class extends Gtk.Button {
         // We keep them to the minimum possible scope to catch real errors.
         /* eslint-disable @typescript-eslint/no-unsafe-call */
         /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-        //@ts-ignore
         /*ctx.setLineCap(Cairo.LineCap.SQUARE);
         //@ts-ignore
         ctx.setAntialias(Cairo.Antialias.NONE);

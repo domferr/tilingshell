@@ -3,7 +3,6 @@ import St from 'gi://St';
 import Shell from 'gi://Shell';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
-import { logger } from '@/utils/shell';
 import Settings from '@/settings';
 import Layout from '@/components/layout/Layout';
 import Tile from '@/components/layout/Tile';
@@ -15,8 +14,6 @@ import EditorDialog from '../components/editor/editorDialog';
 import CurrentMenu from './currentMenu';
 import { registerGObjectClass } from '@utils/gjs';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
-
-const debug = logger('indicator');
 
 enum IndicatorState {
     DEFAULT = 1,

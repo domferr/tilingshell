@@ -4,7 +4,6 @@ import Meta from "gi://Meta";
 import Mtk from "gi://Mtk";
 import St from "gi://St";
 import Gio from "gi://Gio";
-import { logger } from "@/utils/shell";
 import GObject from "gi://GObject";
 import SnapAssistTile from "./snapAssistTile";
 import SnapAssistLayout from "./snapAssistLayout";
@@ -18,11 +17,9 @@ import { buildBlurEffect, buildMargin, enableScalingFactorSupport, getScalingFac
 export const SNAP_ASSIST_SIGNAL = 'snap-assist';
 export const SNAP_ASSIST_ANIMATION_TIME = 180;
 
-const debug = logger("snapAssist");
-
 @registerGObjectClass
 class SnapAssistContent extends St.BoxLayout {
-    static metaInfo: GObject.MetaInfo<any, any, any> = {
+    static metaInfo: GObject.MetaInfo<unknown, unknown, unknown> = {
         GTypeName: "SnapAssistContent",
         Properties: {
             'blur': GObject.ParamSpec.boolean(
@@ -126,7 +123,6 @@ class SnapAssistContent extends St.BoxLayout {
         this._isEnlarged = false;
         this.set_x((this._container.width / 2) - (this.width / 2));
         
-        // @ts-ignore
         this.ease({
             y: this._desiredY,
             opacity: 0,
@@ -151,7 +147,6 @@ class SnapAssistContent extends St.BoxLayout {
         this.show();
         
         this._showing = true;
-        // @ts-ignore
         this.ease({
             y: this._desiredY,
             opacity: 255,
@@ -164,7 +159,7 @@ class SnapAssistContent extends St.BoxLayout {
         this._snapAssistLayouts.forEach(lay => lay.destroy());
         this.remove_all_children();
 
-        const [_, scalingFactor] = getScalingFactorOf(this);
+        const [, scalingFactor] = getScalingFactorOf(this);
 
         const inner_gaps = Settings.get_inner_gaps(scalingFactor);
         const layoutGaps = buildMargin({
@@ -209,9 +204,9 @@ class SnapAssistContent extends St.BoxLayout {
     private handleOpening(window: Meta.Window, ease: boolean = false, currPointerPos: {x: number, y: number}) {      
         if (!this._showing) {
             if (this.get_parent() === global.windowGroup) {
-                let windowActor = window.get_compositor_private();
+                const windowActor = window.get_compositor_private() as Clutter.Actor;
                 if (!windowActor) return;
-                global.windowGroup.set_child_above_sibling(this, windowActor as any);
+                global.windowGroup.set_child_above_sibling(this, windowActor);
             }
         }
 
@@ -236,7 +231,7 @@ class SnapAssistContent extends St.BoxLayout {
             return changed;
         }
 
-        var newTileHovered: SnapAssistTile | undefined = undefined;
+        let newTileHovered: SnapAssistTile | undefined = undefined;
         for (let index = 0; index < this._snapAssistLayouts.length; index++) {
             const snapAssistLay = this._snapAssistLayouts[index];
             newTileHovered = snapAssistLay.getTileBelow(currPointerPos);
@@ -261,7 +256,7 @@ class SnapAssistContent extends St.BoxLayout {
 
 @registerGObjectClass
 export default class SnapAssist extends St.Widget {
-    static metaInfo: GObject.MetaInfo<any, any, any> = {
+    static metaInfo: GObject.MetaInfo<unknown, unknown, unknown> = {
         GTypeName: "SnapAssist",
         Signals: {
             "snap-assist": { 

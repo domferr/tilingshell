@@ -11,8 +11,8 @@ import { registerGObjectClass } from "@utils/gjs";
 
 const debug = logger(`LayoutWidget`);
 
-export module LayoutWidget {
-    export interface ConstructorProperties
+//export module LayoutWidget {
+    export interface LayoutWidgetConstructorProperties
       extends Partial<St.Widget.ConstructorProps> {
           parent: Clutter.Actor;
           layout: Layout;
@@ -21,7 +21,7 @@ export module LayoutWidget {
           containerRect: Mtk.Rectangle;
           scalingFactor?: number;
     }
-}
+//}
 
 // A widget to draw a layout
 @registerGObjectClass
@@ -32,7 +32,7 @@ export default class LayoutWidget<TileType extends TilePreview> extends St.Widge
     protected _innerGaps: Clutter.Margin;
     protected _outerGaps: Clutter.Margin;
 
-    constructor(params: LayoutWidget.ConstructorProperties) {
+    constructor(params: LayoutWidgetConstructorProperties) {
         super({ styleClass: params.styleClass || "" });
         params.parent.add_child(this);
         if (params.scalingFactor) this.scalingFactor = params.scalingFactor;
@@ -64,7 +64,8 @@ export default class LayoutWidget<TileType extends TilePreview> extends St.Widge
         });
     }
 
-    protected buildTile(parent: Clutter.Actor, rect: Mtk.Rectangle, margin: Clutter.Margin, tile: Tile): TileType {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    protected buildTile(_parent: Clutter.Actor, _rect: Mtk.Rectangle, _margin: Clutter.Margin, _tile: Tile): TileType {
         throw("This class shouldn't be instantiated but it should be extended instead");
     }
 
@@ -74,7 +75,7 @@ export default class LayoutWidget<TileType extends TilePreview> extends St.Widge
         innerGaps: Clutter.Margin, 
         outerGaps: Clutter.Margin
     }>): boolean {
-        var trigger_relayout = this._previews.length === 0;
+        let trigger_relayout = this._previews.length === 0;
         if (params?.innerGaps) {
             this._innerGaps = params.innerGaps.copy();
             trigger_relayout = true;

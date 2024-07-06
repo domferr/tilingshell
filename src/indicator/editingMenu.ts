@@ -18,22 +18,22 @@ export default class EditingMenu implements CurrentMenu {
         });
 
         const openMenuBtn = IndicatorUtils.createButton("menu-symbolic", "Menu  ", this._indicator.path);
-        openMenuBtn.connect('clicked', (self) => this._indicator.openMenu(false) );
+        openMenuBtn.connect('clicked', () => this._indicator.openMenu(false) );
         boxLayout.add_child(openMenuBtn);
 
         const infoMenuBtn = IndicatorUtils.createButton("info-symbolic", "Info     ", this._indicator.path);
-        infoMenuBtn.connect('clicked', (self) => this._indicator.openMenu(true) );
+        infoMenuBtn.connect('clicked', () => this._indicator.openMenu(true) );
         boxLayout.add_child(infoMenuBtn);
 
         const saveBtn = IndicatorUtils.createButton("save-symbolic", "Save    ", this._indicator.path);
-        saveBtn.connect('clicked', (self) => {
+        saveBtn.connect('clicked', () => {
             this._indicator.menu.toggle();
             this._indicator.saveLayoutOnClick();
         });
         boxLayout.add_child(saveBtn);
 
         const cancelBtn = IndicatorUtils.createButton("cancel-symbolic", "Cancel", this._indicator.path);
-        cancelBtn.connect('clicked', (self) => {
+        cancelBtn.connect('clicked', () => {
             this._indicator.menu.toggle();
             this._indicator.cancelLayoutOnClick();
         });

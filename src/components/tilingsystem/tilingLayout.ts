@@ -1,5 +1,4 @@
 import Meta from 'gi://Meta';
-import { logger } from "@/utils/shell";
 import { registerGObjectClass } from "@/utils/gjs";
 import Mtk from 'gi://Mtk';
 import Clutter from 'gi://Clutter';
@@ -8,8 +7,6 @@ import LayoutWidget from '../layout/LayoutWidget';
 import Layout from '../layout/Layout';
 import Tile from '../layout/Tile';
 import { buildRectangle, buildTileGaps } from '@utils/ui';
-
-const debug = logger('tilingLayout');
 
 @registerGObjectClass
 class DynamicTilePreview extends TilePreview {
@@ -67,7 +64,8 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
         this.hide();
     }
 
-    protected buildTile(parent: Clutter.Actor, rect: Mtk.Rectangle, gaps: Clutter.Margin, tile?: Tile): DynamicTilePreview {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    protected buildTile(parent: Clutter.Actor, rect: Mtk.Rectangle, gaps: Clutter.Margin, _tile?: Tile): DynamicTilePreview {
         return new DynamicTilePreview({ parent, rect, gaps }, true);
     }
 
@@ -78,22 +76,22 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
     public openBelow(window: Meta.Window) {
         if (this._showing) return;
         
-        let windowActor = window.get_compositor_private();
+        const windowActor = window.get_compositor_private() as Clutter.Actor;
         if (!windowActor)
             return;
 
-        global.windowGroup.set_child_below_sibling(this, windowActor as any);
+        global.windowGroup.set_child_below_sibling(this, windowActor);
         this.open();
     }
 
     public openAbove(window: Meta.Window) {
         if (this._showing) return;
 
-        let windowActor = window.get_compositor_private();
+        const windowActor = window.get_compositor_private() as Clutter.Actor;
         if (!windowActor)
             return;
 
-        global.windowGroup.set_child_above_sibling(this, windowActor as any);
+        global.windowGroup.set_child_above_sibling(this, windowActor);
         this.open();
     }
 
@@ -102,7 +100,7 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
         
         this.show();
         this._showing = true;
-        // @ts-ignore
+        
         this.ease({
             x: this.x,
             y: this.y,
@@ -116,7 +114,7 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
         if (!this._showing) return;
         
         this._showing = false;
-        // @ts-ignore
+        
         this.ease({
             opacity: 0,
             duration: ease ? WINDOW_ANIMATION_TIME:0,

@@ -1,4 +1,4 @@
 export const logger =
     (prefix: string) =>
-        (...content: any[]): void =>
+        (...content: unknown[]): void =>
             console.log("[tilingshell]",`[${prefix}]`, ...content);

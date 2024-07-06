@@ -1,8 +1,5 @@
 node_modules/
-lib/
 dist/
-tmp/
-test/*.js
-templates/
+dist_legacy/
 *.js
 */*.js

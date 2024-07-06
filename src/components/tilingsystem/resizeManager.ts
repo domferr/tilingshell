@@ -1,12 +1,9 @@
 import Meta from "gi://Meta";
 import Mtk from "gi://Mtk";
 import St from "gi://St";
-import { logger } from "@/utils/shell";
 import SignalHandling from "@signalHandling";
 import Settings from "@settings";
 import ExtendedWindow from "./extendedWindow";
-
-const debug = logger(`ResizingManager`);
 
 export class ResizingManager {
     private _signals: SignalHandling | null;
@@ -44,11 +41,10 @@ export class ResizingManager {
         // We ignore skip-taskbar windows in switchers, but if they are attached
         // to their parent, their position in the MRU list may be more appropriate
         // than the parent; so start with the complete list ...
-        let windows = global.display.get_tab_list(Meta.TabList.NORMAL_ALL, workspace);
         // ... map windows to their parent where appropriate ...
-        //@ts-ignore
-        return windows.map(w => {
-            return w.is_attached_dialog() ? w.get_transient_for() : w;
+        return global.display.get_tab_list(Meta.TabList.NORMAL_ALL, workspace).map(w => {
+            const transient = w.get_transient_for();
+            return w.is_attached_dialog() && transient !== null ? transient:w;
         // ... and filter out skip-taskbar windows and duplicates
         }).filter((w, i, a) => w !== null && !w.skipTaskbar && a.indexOf(w) === i);
     }
@@ -182,6 +178,7 @@ export class ResizingManager {
         const newRemainingWindows: Set<Meta.Window> = new Set();
         remainingWindows.forEach(otherWin => {
             const otherWinRect = otherWin.get_frame_rect();
+            // eslint-disable-next-line prefer-const
             let [hasIntersection, intersection] = otherWin.get_frame_rect().intersect(borderRect);
             switch (side) {
                 case St.Side.RIGHT:

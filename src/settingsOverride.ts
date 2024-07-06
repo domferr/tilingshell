@@ -1,9 +1,6 @@
 import Settings from '@settings';
-import { logger } from '@utils/shell';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-
-const debug = logger("SettingsOverride");
 
 export default class SettingsOverride {
     // map schema_id with map of keys and old values
@@ -41,6 +38,7 @@ export default class SettingsOverride {
     }
     */
     private _overriddenKeysToJSON(): string {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const obj: any = {};
         this._overriddenKeys.forEach((override, schemaId) => {
             obj[schemaId] = {};
@@ -53,6 +51,7 @@ export default class SettingsOverride {
 
     private _jsonToOverriddenKeys(json: string): Map<string, Map<string, GLib.Variant>> {
         const result: Map<string, Map<string, GLib.Variant>> = new Map();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const obj: any = JSON.parse(json);
         
         for (const schemaId in obj) {
@@ -80,7 +79,7 @@ export default class SettingsOverride {
         }
         
         const oldValue = schemaMap.has(keyToOverride) ? schemaMap.get(keyToOverride):giosettings.get_value(keyToOverride);
-        //@ts-ignore
+        //@ts-expect-error "Variant has a type which is not known here"
         const res = giosettings.set_value(keyToOverride, newValue);
         if (!res) {
             return null;
@@ -105,7 +104,7 @@ export default class SettingsOverride {
         const oldValue = overridden.get(keyToOverride);
         if (!oldValue) return null;
 
-        //@ts-ignore
+        //@ts-expect-error "Variant has an unkown type"
         const res = giosettings.set_value(keyToOverride, oldValue);
 
         if (res) {
@@ -123,7 +122,7 @@ export default class SettingsOverride {
         if (!overridden) return;
 
         overridden.forEach((oldValue: GLib.Variant, key: string) => {
-            //@ts-ignore
+            //@ts-expect-error "Variant has an unkown type"
             const done = giosettings.set_value(key, oldValue);
             if (done) {
                 overridden.delete(key);

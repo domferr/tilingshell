@@ -73,11 +73,11 @@ function convertImports(text) {
     // drop import of ExtensionPreferences class
     text = text.replaceAll('import { ExtensionPreferences } from "resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js";', "");
 
-    const regexExportExtension = new RegExp('export {((.|\n)*)(.+) as default((.|\n)*)};', 'gm');
+    const regexExportExtension = new RegExp(`export {((.|\n)*)(.+) as default((.|\n)*)};`, 'gm');
     text = text.replaceAll(regexExportExtension, "");
 
     // replace import Source from "gi://Source" with const Source = imports.gi.Source;
-    const regexGi = new RegExp('import (.+) from \\"gi:\\\/\\\/(.+)\\"', 'gm');
+    const regexGi = new RegExp('import (.+) from \\"gi:\\/\\/(.+)\\"', 'gm');
     text = text.replaceAll(regexGi, (match, imported, module) => {
         if (module.indexOf("Mtk") >= 0) {
             // remove first occurrence of Mtk.
@@ -90,7 +90,7 @@ function convertImports(text) {
     });
 
     // replace import * as Source from "resource:///org/gnome/shell/path/to/source.js"; with const Source = imports.path.to.Source;
-    const regexResource = new RegExp('import \\* as (.+) from \\"resource:\\\/\\\/\\\/org\\\/gnome\\\/shell\\\/(.+)\\.js\\"', 'gm');
+    const regexResource = new RegExp('import \\* as (.+) from \\"resource:\\/\\/\\/org\\/gnome\\/shell\\/(.+)\\.js\\"', 'gm');
     text = text.replaceAll(regexResource, (match, imported, module) => `const ${imported} = imports.${module.replace('/', '.')}`);
 
     return text;

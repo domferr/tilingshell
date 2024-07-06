@@ -14,7 +14,7 @@ export default class DBus {
         this._dbus = null;
     }
 
-    public enable(ext: any) {
+    public enable(ext: unknown) {
         if (this._dbus) return;
 
         this._dbus = Gio.DBusExportedObject.wrapJSObject(node, ext);

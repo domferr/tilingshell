@@ -4,10 +4,7 @@ import Tile from "../layout/Tile";
 import Clutter from "gi://Clutter";
 import Mtk from 'gi://Mtk';
 import St from 'gi://St';
-import { logger } from "@utils/shell";
 import { getScalingFactorOf } from "@utils/ui";
-
-const debug = logger("SnapAssistTile");
 
 @registerGObjectClass
 export default class SnapAssistTile extends TilePreview {
@@ -63,7 +60,7 @@ export default class SnapAssistTile extends TilePreview {
 
     _applyStyle() {
         // the tile will be light or dark, following the text color
-        const [hasColor, { red, green, blue, alpha}] = this.get_theme_node().lookup_color("color", true);
+        const [hasColor, { red, green, blue }] = this.get_theme_node().lookup_color("color", true);
         if (!hasColor) return;
         // if the text color is light, apply light theme, otherwise apply dark theme 
         if ((red*0.299 + green*0.587 + blue*0.114) > 186) {

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import GObject from 'gi://GObject';
 
 // Taken from https://github.com/material-shell/material-shell/blob/main/src/utils/gjs.ts

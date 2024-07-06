@@ -16,12 +16,15 @@
     "dev:wayland": "npm run build && npm run install:extension && npm run wayland-session"
   },
   "devDependencies": {
+    "@eslint/js": "^9.6.0",
     "esbuild": "^0.20.2",
     "esbuild-sass-plugin": "^3.2.0",
-    "eslint": "^9.1.0",
+    "eslint": "^9.6.0",
     "glob": "^10.3.12",
-    "prettier": "^2.7.1",
-    "typescript": "^5.4.5"
+    "globals": "^15.8.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.15.0"
   },
   "dependencies": {
     "@girs/gjs": "^3.3.0",

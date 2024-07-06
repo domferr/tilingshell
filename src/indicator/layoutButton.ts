@@ -37,7 +37,7 @@ export default class LayoutButton extends St.Button {
 
         parent.add_child(this);
 
-        const [_, scalingFactor] = getScalingFactorOf(this);
+        const scalingFactor = getScalingFactorOf(this)[1];
 
         this.child = new St.Widget(); // the child is just a container
         new LayoutButtonWidget(this.child, layout, gapSize, height * scalingFactor, width * scalingFactor);

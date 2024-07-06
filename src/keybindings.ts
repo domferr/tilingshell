@@ -14,7 +14,7 @@ const debug = logger("KeyBindings");
 
 @registerGObjectClass
 export default class KeyBindings extends GObject.Object {    
-    static metaInfo: GObject.MetaInfo<any, any, any> = {
+    static metaInfo: GObject.MetaInfo<unknown, unknown, unknown> = {
         GTypeName: "KeyBindings",
         Signals: {
             'move-window': { 

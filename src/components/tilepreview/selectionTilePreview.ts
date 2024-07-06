@@ -3,16 +3,13 @@ import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 import Gio from 'gi://Gio';
 import TilePreview from "./tilePreview";
-import { logger } from "@/utils/shell";
 import Settings from "@settings";
 import GObject from "gi://GObject";
 import { buildBlurEffect } from "@utils/ui";
 
-const debug = logger("SelectionTilePreview");
-
 @registerGObjectClass
 export default class SelectionTilePreview extends TilePreview {
-  static metaInfo: GObject.MetaInfo<any, any, any> = {
+  static metaInfo: GObject.MetaInfo<unknown, unknown, unknown> = {
     GTypeName: "SelectionTilePreview",
     Properties: {
         'blur': GObject.ParamSpec.boolean(

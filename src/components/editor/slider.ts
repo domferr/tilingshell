@@ -2,17 +2,14 @@ import { registerGObjectClass } from "@/utils/gjs";
 import Clutter from "gi://Clutter";
 import St from 'gi://St';
 import EditableTilePreview from "./editableTilePreview";
-import { logger } from "@/utils/shell";
 import Meta from 'gi://Meta';
 import Mtk from 'gi://Mtk';
 import GObject from "gi://GObject";
 import { getEventCoords, getScalingFactorOf } from "@utils/ui";
 
-const debug = logger("Slider");
-
 @registerGObjectClass
 export default class Slider extends St.Button {
-    static metaInfo: GObject.MetaInfo<any, any, any> = {
+    static metaInfo: GObject.MetaInfo<unknown, unknown, unknown> = {
         Signals: {
             "slide": { 
                 param_types: [ GObject.TYPE_INT ] // movement
@@ -26,6 +23,7 @@ export default class Slider extends St.Button {
     private readonly _signals: Map<EditableTilePreview, number[]>;
 
     private _dragging: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private _grab: any;
     private _horizontalDir: boolean;
     private _lastEventCoord: { x: number, y: number } | null;
@@ -49,7 +47,7 @@ export default class Slider extends St.Button {
 
         this._groupId = groupId;
         this._horizontalDir = horizontal;
-        const [_, scalingFactor] = getScalingFactorOf(this);
+        const [, scalingFactor] = getScalingFactorOf(this);
         this._scalingFactor = scalingFactor;
         this.set_width(this.desiredWidth);
         this.set_height(this.desiredHeight);
@@ -249,7 +247,7 @@ export default class Slider extends St.Button {
         this._dragging = true;
         global.display.set_cursor(this.preferredCursor);
 
-        //@ts-ignore todo
+        //@ts-expect-error "global.stage has grab function"
         this._grab = global.stage.grab(this);
         
         const [stageX, stageY] = getEventCoords(event);

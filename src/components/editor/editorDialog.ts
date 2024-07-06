@@ -5,15 +5,12 @@ import St from 'gi://St';
 import Gio from "gi://Gio";
 import LayoutButton from '../../indicator/layoutButton';
 import GlobalState from '@/globalState';
-import { logger } from '@/utils/shell';
 import Layout from '@/components/layout/Layout';
 
 import Tile from '@/components/layout/Tile';
 import * as ModalDialog from 'resource:///org/gnome/shell/ui/modalDialog.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { enableScalingFactorSupport, getScalingFactor } from '@utils/ui';
-
-const debug = logger('EditorDialog');
 
 @registerGObjectClass
 export default class EditorDialog extends ModalDialog.ModalDialog {
@@ -211,13 +208,13 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
                     styleClass: "message-list-clear-button icon-button button delete-layout-button"
                 });
                 deleteBtn.child = new St.Icon({ gicon: Gio.icon_new_for_string(`${params.path}/icons/delete-symbolic.svg`), iconSize: 16 });
-                deleteBtn.connect('clicked', (self) => {
+                deleteBtn.connect('clicked', () => {
                     params.onDeleteLayout(btnInd, lay);
                     this._drawLayouts({ ...params, layouts: GlobalState.get().layouts });
                 });
                 box.add_child(deleteBtn);
             }
-            btn.connect('clicked', (self) => {
+            btn.connect('clicked', () => {
                 params.onSelectLayout(btnInd, lay);
                 this._makeLegendDialog({ onClose: params.onClose, path: params.path });
             });
@@ -234,7 +231,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         const icon = new St.Icon({ gicon: Gio.icon_new_for_string(`${params.path}/icons/add-symbolic.svg`), iconSize: 32 });
         icon.set_size(newLayoutBtn.child.width, newLayoutBtn.child.height);
         newLayoutBtn.child.add_child(icon);
-        newLayoutBtn.connect('clicked', (self) => {
+        newLayoutBtn.connect('clicked', () => {
             params.onNewLayout();
             this._makeLegendDialog({ onClose: params.onClose, path: params.path });
         });

@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ObjectWithSignals = { connect: (...args: any[]) => number, disconnect: (id: number) => void }
 
 export default class SignalHandling {
@@ -8,7 +9,7 @@ export default class SignalHandling {
         this._signalsIds = {};
     }
 
-    public connect(obj: ObjectWithSignals, key: string, fun: (...args: any[]) => void) {
+    public connect(obj: ObjectWithSignals, key: string, fun: (...args: never[]) => void) {
         const signalId = obj.connect(key, fun);
         this._signalsIds[key] = { id: signalId, obj: obj };
     }

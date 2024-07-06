@@ -12,12 +12,9 @@ import Layout from "../layout/Layout";
 import TileUtils from "../layout/TileUtils";
 import Slider from "./slider";
 import EditableTilePreview from "./editableTilePreview";
-import { logger } from "@/utils/shell";
 import Tile from "../layout/Tile";
 import HoverLine from "./hoverLine";
 import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
-
-const debug = logger("LayoutEditor");
 
 @registerGObjectClass
 export default class LayoutEditor extends St.Widget {
@@ -134,17 +131,17 @@ export default class LayoutEditor extends St.Widget {
         const gaps = buildTileGaps(rect, this._innerGaps, this._outerGaps, this._containerRect);
         const editableTile = new EditableTilePreview({ parent: this, tile, containerRect: this._containerRect, rect, gaps });
         editableTile.open();
-        editableTile.connect("clicked", (tile: EditableTilePreview, clicked_button: number) => {
+        editableTile.connect("clicked", (_, clicked_button: number) => {
             // St.ButtonMask.ONE is left click. 3 is right click (but for some reason St.ButtonMask.THREE is equal to 4, so we cannot use it)
             if (clicked_button === St.ButtonMask.ONE) this.splitTile(editableTile);
             else if (clicked_button === 3) this.deleteTile(editableTile);
         });
-        editableTile.connect("motion-event", (tile: EditableTilePreview, event: Clutter.Event) => {
+        editableTile.connect("motion-event", (_, event: Clutter.Event) => {
             const [stageX, stageY] = getEventCoords(event);
             this._hoverWidget.handleMouseMove(editableTile, stageX - this.x, stageY - this.y);
             return Clutter.EVENT_PROPAGATE;
         });
-        editableTile.connect("notify::hover", (tile: EditableTilePreview) => {
+        editableTile.connect("notify::hover", () => {
             const [stageX, stageY] = Shell.Global.get().get_pointer();
             this._hoverWidget.handleMouseMove(editableTile, stageX - this.x, stageY - this.y);
         });

@@ -1,6 +1,5 @@
 import { buildRectangle, isPointInsideRect } from "@utils/ui";
 import Mtk from "gi://Mtk";
-import St from "gi://St";
 import Settings from "@settings";
 
 const EDGE_TILING_OFFSET = 16;

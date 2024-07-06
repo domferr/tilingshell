@@ -2,13 +2,10 @@ import St from 'gi://St';
 import Meta from 'gi://Meta';
 import Mtk from "gi://Mtk";
 import { registerGObjectClass } from "@/utils/gjs";
-import { logger } from "@/utils/shell";
 import Clutter from 'gi://Clutter';
 import { buildRectangle, getScalingFactorOf } from '@utils/ui';
 
 export const WINDOW_ANIMATION_TIME = 100;
-
-const debug = logger('tilePreview');
 
 //export module TilePreview {
   export interface TilePreviewConstructorProperties 
@@ -37,7 +34,7 @@ export default class TilePreview extends St.Widget {
   }
 
   public set gaps(gaps: Clutter.Margin) {
-    const [_, scalingFactor] = getScalingFactorOf(this);
+    const [, scalingFactor] = getScalingFactorOf(this);
     this._gaps.top = gaps.top * scalingFactor;
     this._gaps.right = gaps.right * scalingFactor;
     this._gaps.bottom = gaps.bottom * scalingFactor;
@@ -95,7 +92,6 @@ export default class TilePreview extends St.Widget {
     this._showing = true;
     this.show();
     if (fadeInMove) {
-      // @ts-ignore
       this.ease({
         x: this.innerX,
         y: this.innerY,
@@ -108,7 +104,6 @@ export default class TilePreview extends St.Widget {
     } else {
       this.set_position(this.innerX, this.innerY);
       this.set_size(this.innerWidth, this.innerHeight);
-      // @ts-ignore
       this.ease({
         opacity: 255,
         duration: ease ? WINDOW_ANIMATION_TIME : 0,
@@ -119,9 +114,9 @@ export default class TilePreview extends St.Widget {
 
   public openBelow(window: Meta.Window, ease: boolean = false, position?: Mtk.Rectangle) {
     if (this.get_parent() === global.windowGroup) {
-      let windowActor = window.get_compositor_private();
+      const windowActor = window.get_compositor_private() as Clutter.Actor;
       if (!windowActor) return;
-      global.windowGroup.set_child_below_sibling(this, windowActor as any);
+      global.windowGroup.set_child_below_sibling(this, windowActor);
     }
 
     this.open(ease, position);
@@ -129,9 +124,9 @@ export default class TilePreview extends St.Widget {
 
   public openAbove(window: Meta.Window, ease: boolean = false, position?: Mtk.Rectangle) {
     if (this.get_parent() === global.windowGroup) {
-      let windowActor = window.get_compositor_private();
+      const windowActor = window.get_compositor_private() as Clutter.Actor;
       if (!windowActor) return;
-      global.windowGroup.set_child_above_sibling(this, windowActor as any);
+      global.windowGroup.set_child_above_sibling(this, windowActor);
     }
 
     this.open(ease, position);
@@ -141,7 +136,6 @@ export default class TilePreview extends St.Widget {
     if (!this._showing) return;
 
     this._showing = false;
-    // @ts-ignore
     this.ease({
       opacity: 0,
       duration: ease ? WINDOW_ANIMATION_TIME : 0,

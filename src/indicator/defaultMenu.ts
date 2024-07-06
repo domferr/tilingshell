@@ -21,7 +21,7 @@ const debug = logger("DefaultMenu");
 
 @registerGObjectClass
 class LayoutsRow extends St.BoxLayout {
-    static metaInfo: GObject.MetaInfo<any, any, any> = {
+    static metaInfo: GObject.MetaInfo<unknown, unknown, unknown> = {
         GTypeName: "LayoutsRow",
         Signals: {
             "selected-layout": { 
@@ -68,7 +68,7 @@ class LayoutsRow extends St.BoxLayout {
 
         this._layoutsButtons = layouts.map((lay, ind) => {
             const btn = new LayoutButton(this._layoutsBox, lay, hasGaps ? 2:0, layoutHeight, layoutWidth);
-            btn.connect('clicked', (self) => !btn.checked && this.emit("selected-layout", lay.id));
+            btn.connect('clicked', () => !btn.checked && this.emit("selected-layout", lay.id));
             if (ind === selectedIndex) btn.set_checked(true);
             return btn;
         });
@@ -185,7 +185,7 @@ export default class DefaultMenu implements CurrentMenu {
             proc.communicate_utf8_async(null, null, (pr: Gio.Subprocess | null, res: Gio.AsyncResult) => {
                 if (!pr) return;
       
-                const [_, stdout, stderr] = pr.communicate_utf8_finish(res);
+                const [, stdout, stderr] = pr.communicate_utf8_finish(res);
                 if (pr.get_successful()) {
                     debug(stdout);
                     const monitorsDetails = JSON.parse(stdout);
@@ -218,10 +218,10 @@ export default class DefaultMenu implements CurrentMenu {
         });
 
         const editLayoutsBtn = IndicatorUtils.createButton("edit-symbolic", "Edit Layouts...", this._indicator.path);
-        editLayoutsBtn.connect('clicked', (self) => this._indicator.openLayoutEditor() );
+        editLayoutsBtn.connect('clicked', () => this._indicator.openLayoutEditor() );
         buttonsBoxLayout.add_child(editLayoutsBtn);
         const newLayoutBtn = IndicatorUtils.createButton("add-symbolic", "New Layout...", this._indicator.path);
-        newLayoutBtn.connect('clicked', (self) => this._indicator.newLayoutOnClick(true) );
+        newLayoutBtn.connect('clicked', () => this._indicator.newLayoutOnClick(true) );
         buttonsBoxLayout.add_child(newLayoutBtn);
 
         const buttonsPopupMenu = new PopupMenu.PopupBaseMenuItem({ style_class: 'indicator-menu-item' });

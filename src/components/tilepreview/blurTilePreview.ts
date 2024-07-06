@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { registerGObjectClass } from "@/utils/gjs";
 import Shell from "gi://Shell";
 import TilePreview from "./tilePreview";
