@@ -17,6 +17,7 @@ import GlobalState from '@/globalState';
 import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
 import ExtendedWindow from "./extendedWindow";
 import EdgeTilingManager from "./edgeTilingManager";
+import TilePreview from "@components/tilepreview/tilePreview";
 
 export class TilingManager {
     private readonly _monitor: Monitor;
@@ -120,19 +121,19 @@ export class TilingManager {
         this._signals.connect(this._snapAssist, "snap-assist", this._onSnapAssist.bind(this));
     }
 
-    public onKeyboardMoveWindow(window: Meta.Window, direction: Meta.Direction) {
+    public onKeyboardMoveWindow(window: Meta.Window, direction: Meta.DisplayDirection) {
         let destinationRect: Mtk.Rectangle | undefined = undefined;
         if (window.get_maximized()) {
             switch (direction) {
-                case Meta.Direction.DOWN:
+                case Meta.DisplayDirection.DOWN:
                     window.unmaximize(Meta.MaximizeFlags.BOTH);
                     return;
-                case Meta.Direction.UP:
+                case Meta.DisplayDirection.UP:
                     return;
-                case Meta.Direction.LEFT:
+                case Meta.DisplayDirection.LEFT:
                     destinationRect = this._tilingLayout.getLeftmostTile();
                     break;
-                case Meta.Direction.RIGHT:
+                case Meta.DisplayDirection.RIGHT:
                     destinationRect = this._tilingLayout.getRightmostTile();
                     break;
             }
@@ -145,7 +146,7 @@ export class TilingManager {
 
         if (!destinationRect) {
             // handle maximize of window
-            if (direction === Meta.Direction.UP && window.can_maximize()) {
+            if (direction === Meta.DisplayDirection.UP && window.can_maximize()) {
                 window.maximize(Meta.MaximizeFlags.BOTH);
             }
             return;
@@ -438,10 +439,11 @@ export class TilingManager {
         if (selectionRect.width <= 0 || selectionRect.height <= 0) {
             return;
         }
-        
+        if (window.get_maximized()) return;
+
         (window as ExtendedWindow).originalSize = window.get_frame_rect().copy();
         (window as ExtendedWindow).isTiled = true;
-        if (!window.get_maximized()) this._easeWindowRect(window, selectionRect);
+        this._easeWindowRect(window, selectionRect);
     }
 
     private _easeWindowRect(window: Meta.Window, destRect: Mtk.Rectangle, user_op: boolean = false, force: boolean = false) {
@@ -536,5 +538,49 @@ export class TilingManager {
             true,
             edgeTile,
         );
+    }
+
+    public onTileFromWindowMenu(tile: Tile, window: Meta.Window) {
+        this._debug(`onTileFromWindowMenu ${tile.x}x${tile.y}x${tile.width}x${tile.height}`);
+
+        // We apply the proportions to get tile size and position relative to the work area 
+        const scaledRect = TileUtils.apply_props(tile, this._workArea);
+        // ensure the rect doesn't go horizontally beyond the workarea
+        if (scaledRect.x + scaledRect.width > this._workArea.x + this._workArea.width) {
+            scaledRect.width -= scaledRect.x + scaledRect.width - this._workArea.x - this._workArea.width;
+        }
+        // ensure the rect doesn't go vertically beyond the workarea
+        if (scaledRect.y + scaledRect.height > this._workArea.y + this._workArea.height) {
+            scaledRect.height -= scaledRect.y + scaledRect.height - this._workArea.y - this._workArea.height;
+        }
+
+        const dummyPreview = new TilePreview({ parent: global.windowGroup, rect: scaledRect });
+        dummyPreview.gaps = buildTileGaps(
+            scaledRect,
+            this._tilingLayout.innerGaps, 
+            this._tilingLayout.outerGaps,
+            this._workArea,
+            this._enableScaling ? getScalingFactorOf(this._tilingLayout)[1]:undefined
+        );
+
+        const destinationRect = buildRectangle({
+            x: dummyPreview.innerX,
+            y: dummyPreview.innerY,
+            width: dummyPreview.innerWidth,
+            height: dummyPreview.innerHeight
+        });
+        dummyPreview.destroy();
+        
+        // abort if there is an invalid selection
+        if (destinationRect.width <= 0 || destinationRect.height <= 0) {
+            return;
+        }
+        if (window.get_maximized()) return;
+
+        if (!(window as ExtendedWindow).isTiled) {
+            (window as ExtendedWindow).originalSize = window.get_frame_rect().copy();
+        }
+        (window as ExtendedWindow).isTiled = true;
+        this._easeWindowRect(window, destinationRect);
     }
 }

@@ -126,7 +126,7 @@ export default class LayoutEditor extends St.Widget {
             tiles.forEach((editable) => slider.addTile(editable));
         });
     }
-    
+
     private _buildEditableTile(tile: Tile, rect: Mtk.Rectangle) : EditableTilePreview {
         const gaps = buildTileGaps(rect, this._innerGaps, this._outerGaps, this._containerRect);
         const editableTile = new EditableTilePreview({ parent: this, tile, containerRect: this._containerRect, rect, gaps });

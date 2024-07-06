@@ -16,6 +16,8 @@ import DBus from './dbus';
 import KeyBindings from './keybindings';
 import SettingsOverride from '@settingsOverride';
 import { ResizingManager } from '@components/tilingsystem/resizeManager';
+import OverriddenWindowMenu from '@overriddenWindowMenu';
+import Tile from '@components/layout/Tile';
 
 const debug = logger('extension');
 
@@ -97,7 +99,6 @@ export default class TilingShellExtension extends Extension {
       );
     }
 
-    //@ts-ignore
     if (Main.layoutManager._startingUp) {
       this._signals.connect(Main.layoutManager, 'startup-complete', () => {
         this._createTilingManagers();
@@ -116,6 +117,13 @@ export default class TilingShellExtension extends Extension {
     if (this._dbus) this._dbus.disable();
     this._dbus = new DBus();
     this._dbus.enable(this);
+
+    OverriddenWindowMenu.enable();
+    OverriddenWindowMenu.get().connect("tile-clicked", (_, tile: Tile, window: Meta.Window) => {
+      const monitorIndex = window.get_monitor();
+      const manager = this._tilingManagers[monitorIndex];
+      if (manager) manager.onTileFromWindowMenu(tile, window);
+    });
     
     debug('extension is enabled');
   }
@@ -183,7 +191,7 @@ export default class TilingShellExtension extends Extension {
     });
   }
 
-  private _onKeyboardMoveWin(kb: KeyBindings, display: Meta.Display, direction: Meta.Direction) {
+  private _onKeyboardMoveWin(kb: KeyBindings, display: Meta.Display, direction: Meta.DisplayDirection) {
     const focus_window = display.get_focus_window();
     if (!focus_window || !focus_window.has_focus() || 
       (focus_window.get_wm_class() && focus_window.get_wm_class() === 'gjs')) {
@@ -191,7 +199,7 @@ export default class TilingShellExtension extends Extension {
     }
 
     // handle unmaximize of maximized window
-    if (direction === Meta.Direction.DOWN && focus_window.get_maximized()) {
+    if (direction === Meta.DisplayDirection.DOWN && focus_window.get_maximized()) {
       focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
       return;
     }
@@ -200,6 +208,8 @@ export default class TilingShellExtension extends Extension {
     if (!monitorTilingManager) return;
     
     monitorTilingManager.onKeyboardMoveWindow(focus_window, direction);
+    
+   //const neighborMonitorIndex = display.get_monitor_neighbor_index(focus_window.get_monitor(), direction);
   }
 
   private _isFractionalScalingEnabled(_mutterSettings: Gio.Settings): boolean {
@@ -242,6 +252,8 @@ export default class TilingShellExtension extends Extension {
     );
 
     this._fractionalScalingEnabled = false;
+
+    OverriddenWindowMenu.disable();
     debug('extension is disabled');
   }
 }
