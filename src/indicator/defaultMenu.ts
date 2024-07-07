@@ -179,18 +179,8 @@ export default class DefaultMenu implements CurrentMenu {
             // Since Gdk.Monitor has monitor's name but we can't import Gdk into gnome-shell, we run a gjs code in a subprocess.
             // This code will just get all the monitors, printing into JSON format to stdout each monitor's name and geometry.
             // If we are successfull, we parse the stdout of the subprocess and update monitor's name 
-            const importsCode = imports && imports.gi ? `imports.gi.versions.Gtk = "4.0"; const { Gtk, Gdk } = imports.gi;`:`import Gtk from 'gi://Gtk?version=4.0'; import Gdk from 'gi://Gdk?version=4.0;';`
-            const code = `${importsCode}
-            Gtk.init();
-            const monitors = Gdk.Display.get_default().get_monitors();
-            const details = [];
-            for (const m of monitors) {
-                const { x, y, width, height } = m.get_geometry();
-                details.push({ name: m.get_description(), x, y, width, height });
-            }
-
-            print(JSON.stringify(details));`;
-            const proc = Gio.Subprocess.new(["gjs", "-c", code], Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_PIPE);
+            const proc = Gio.Subprocess.new(["gjs", "-m", `${this._indicator.path}/monitorDescription.js`], 
+                Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_PIPE);
             
             proc.communicate_utf8_async(null, null, (pr: Gio.Subprocess | null, res: Gio.AsyncResult) => {
                 if (!pr) return;
