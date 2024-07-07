@@ -17,14 +17,14 @@ export class ResizingManager {
         this._signals = new SignalHandling();
 
         this._signals.connect(global.display, 'grab-op-begin', (_display: Meta.Display, window: Meta.Window, grabOp: Meta.GrabOp) => {
-            const moving = (grabOp & ~1024) === 1;
+            const moving = grabOp === Meta.GrabOp.KEYBOARD_MOVING || grabOp === Meta.GrabOp.MOVING;
             if (moving || !Settings.get_resize_complementing_windows()) return;
 
-            this._onWindowResizingBegin(window, grabOp);
+            this._onWindowResizingBegin(window, grabOp & ~1024);
         });
 
         this._signals.connect(global.display, 'grab-op-end', (_display: Meta.Display, window: Meta.Window, grabOp: Meta.GrabOp) => {
-            const moving = (grabOp & ~1024) === 1;
+            const moving = grabOp === Meta.GrabOp.KEYBOARD_MOVING || grabOp === Meta.GrabOp.MOVING;
             if (moving) return;
             
             this._onWindowResizingEnd(window);
@@ -58,12 +58,18 @@ export class ResizingManager {
             case Meta.GrabOp.RESIZING_N:
             case Meta.GrabOp.RESIZING_NE:
             case Meta.GrabOp.RESIZING_NW:
+            case Meta.GrabOp.KEYBOARD_RESIZING_N:
+            case Meta.GrabOp.KEYBOARD_RESIZING_NE:
+            case Meta.GrabOp.KEYBOARD_RESIZING_NW:
                 verticalSide[0] = true;
                 verticalSide[1] = St.Side.TOP;
                 break;
             case Meta.GrabOp.RESIZING_S:
             case Meta.GrabOp.RESIZING_SE:
             case Meta.GrabOp.RESIZING_SW:
+            case Meta.GrabOp.KEYBOARD_RESIZING_S:
+            case Meta.GrabOp.KEYBOARD_RESIZING_SE:
+            case Meta.GrabOp.KEYBOARD_RESIZING_SW:
                 verticalSide[0] = true;
                 verticalSide[1] = St.Side.BOTTOM;
                 break;
@@ -72,12 +78,18 @@ export class ResizingManager {
             case Meta.GrabOp.RESIZING_E:
             case Meta.GrabOp.RESIZING_NE:
             case Meta.GrabOp.RESIZING_SE:
+            case Meta.GrabOp.KEYBOARD_RESIZING_E:
+            case Meta.GrabOp.KEYBOARD_RESIZING_NE:
+            case Meta.GrabOp.KEYBOARD_RESIZING_SE:
                 horizontalSide[0] = true;
                 horizontalSide[1] = St.Side.RIGHT;
                 break;
             case Meta.GrabOp.RESIZING_W:
             case Meta.GrabOp.RESIZING_NW:
             case Meta.GrabOp.RESIZING_SW:
+            case Meta.GrabOp.KEYBOARD_RESIZING_W:
+            case Meta.GrabOp.KEYBOARD_RESIZING_NW:
+            case Meta.GrabOp.KEYBOARD_RESIZING_SW:
                 horizontalSide[0] = true;
                 horizontalSide[1] = St.Side.LEFT;
                 break;

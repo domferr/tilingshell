@@ -121,15 +121,15 @@ export class TilingManager {
         this._signals.connect(this._snapAssist, "snap-assist", this._onSnapAssist.bind(this));
     }
 
-    public onKeyboardMoveWindow(window: Meta.Window, direction: Meta.DisplayDirection) {
+    public onKeyboardMoveWindow(window: Meta.Window, direction: Meta.DisplayDirection): boolean {
         let destinationRect: Mtk.Rectangle | undefined = undefined;
         if (window.get_maximized()) {
             switch (direction) {
                 case Meta.DisplayDirection.DOWN:
                     window.unmaximize(Meta.MaximizeFlags.BOTH);
-                    return;
+                    return true;
                 case Meta.DisplayDirection.UP:
-                    return;
+                    return false;
                 case Meta.DisplayDirection.LEFT:
                     destinationRect = this._tilingLayout.getLeftmostTile();
                     break;
@@ -139,17 +139,20 @@ export class TilingManager {
             }
         }
 
+        // find the nearest tile
         const windowRect = window.get_frame_rect().copy();        
         if (!destinationRect) {
             destinationRect = this._tilingLayout.getNearestTile(windowRect, direction);
         }
 
+        // there isn't a tile near the window 
         if (!destinationRect) {
             // handle maximize of window
             if (direction === Meta.DisplayDirection.UP && window.can_maximize()) {
                 window.maximize(Meta.MaximizeFlags.BOTH);
+                return true;
             }
-            return;
+            return false;
         }
 
         if (!(window as ExtendedWindow).isTiled && !window.get_maximized()) {
@@ -159,7 +162,8 @@ export class TilingManager {
 
         if (window.get_maximized()) window.unmaximize(Meta.MaximizeFlags.BOTH);
     
-        this._easeWindowRect(window, destinationRect);
+        this._easeWindowRect(window, destinationRect, true);
+        return true;
     }
         
     /**

@@ -199,7 +199,7 @@ export default class TilingShellExtension extends Extension {
     }
 
     // handle unmaximize of maximized window
-    if (direction === Meta.DisplayDirection.DOWN && focus_window.get_maximized()) {
+    if (focus_window.get_maximized() && direction === Meta.DisplayDirection.DOWN) {
       focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
       return;
     }
@@ -207,9 +207,29 @@ export default class TilingShellExtension extends Extension {
     const monitorTilingManager = this._tilingManagers[focus_window.get_monitor()];
     if (!monitorTilingManager) return;
     
-    monitorTilingManager.onKeyboardMoveWindow(focus_window, direction);
+    const success = monitorTilingManager.onKeyboardMoveWindow(focus_window, direction);
+    if (success) return;
     
-   //const neighborMonitorIndex = display.get_monitor_neighbor_index(focus_window.get_monitor(), direction);
+    const neighborMonitorIndex = display.get_monitor_neighbor_index(focus_window.get_monitor(), direction);
+    const neighborTilingManager = this._tilingManagers[neighborMonitorIndex];
+    if (!neighborTilingManager) return;
+    
+    //@ts-expect-error "Main.wm has skipNextEffect function"
+    Main.wm.skipNextEffect(focus_window.get_compositor_private());
+    focus_window.move_to_monitor(neighborMonitorIndex);
+
+    // if the window is maximized, direction is UP and there is a monitor above, minimize the window
+    if (focus_window.get_maximized() && direction === Meta.DisplayDirection.UP) {
+      //@ts-expect-error "Main.wm has skipNextEffect function"
+      Main.wm.skipNextEffect(focus_window.get_compositor_private());
+      focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
+    }
+    
+    //@ts-expect-error "Main.wm has skipNextEffect function"
+    Main.wm.skipNextEffect(focus_window.get_compositor_private());
+    focus_window.move_to_monitor(neighborMonitorIndex);
+    
+    neighborTilingManager.onKeyboardMoveWindow(focus_window, direction);
   }
 
   private _isFractionalScalingEnabled(_mutterSettings: Gio.Settings): boolean {

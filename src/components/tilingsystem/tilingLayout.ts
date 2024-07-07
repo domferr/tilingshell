@@ -291,16 +291,16 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
 
             switch (direction) {
                 case Meta.DisplayDirection.RIGHT:
-                    if (preview.x <= source.x) continue;
+                    if (preview.x <= source.x + source.width) continue;
                     break;
                 case Meta.DisplayDirection.LEFT:
-                    if (preview.x >= source.x) continue;
+                    if (preview.x + preview.width >= source.x) continue;
                     break;
                 case Meta.DisplayDirection.DOWN:
-                    if (preview.y <= source.y) continue;
+                    if (preview.y <= source.y + source.height) continue;
                     break;
                 case Meta.DisplayDirection.UP:
-                    if (preview.y >= source.y) continue;
+                    if (preview.y + preview.height >= source.y) continue;
                     break;
                 default:
                     continue;

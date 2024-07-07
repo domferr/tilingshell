@@ -50,10 +50,10 @@ export default class KeyBindings extends GObject.Object {
             schema_id: 'org.gnome.mutter.keybindings'
         });
         this._overrideKeyBinding(Settings.SETTING_MOVE_WINDOW_RIGHT, (display: Meta.Display) => {
-            this.emit('move-window', display, Meta.Direction.RIGHT);
+            this.emit('move-window', display, Meta.DisplayDirection.RIGHT);
         }, extensionSettings, mutterKeybindings, "toggle-tiled-right");
         this._overrideKeyBinding(Settings.SETTING_MOVE_WINDOW_LEFT, (display: Meta.Display) => {
-            this.emit('move-window', display, Meta.Direction.LEFT);
+            this.emit('move-window', display, Meta.DisplayDirection.LEFT);
         }, extensionSettings, mutterKeybindings, "toggle-tiled-left");
 
         // Disable native keybindings for Super + Up/Down
@@ -61,10 +61,10 @@ export default class KeyBindings extends GObject.Object {
             schema_id: 'org.gnome.desktop.wm.keybindings'
         });
         this._overrideKeyBinding(Settings.SETTING_MOVE_WINDOW_UP, (display: Meta.Display) => {
-            this.emit('move-window', display, Meta.Direction.UP);
+            this.emit('move-window', display, Meta.DisplayDirection.UP);
         }, extensionSettings, desktopWm, "maximize");
         this._overrideKeyBinding(Settings.SETTING_MOVE_WINDOW_DOWN, (display: Meta.Display) => {
-            this.emit('move-window', display, Meta.Direction.DOWN);
+            this.emit('move-window', display, Meta.DisplayDirection.DOWN);
         }, extensionSettings, desktopWm, "unmaximize");
     }
 

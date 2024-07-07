@@ -23,11 +23,15 @@ $snap-assist-tile-border-radius: 6px;
 }
 
 .snap-assist-tile.dark {
-    border-color: #8e8e8e;
-    background-color: #e0e0e0;
+    border-color: rgba(0,0,0,0.3);
+    background-color: rgba(0,0,0,0.12);
+    /*border-color: #8e8e8e;
+    background-color: #e0e0e0;*/
 }
 
 .snap-assist-tile.dark:hover {
-    border-color: #777777;
-    background-color: #a2a2a2;
+    /*border-color: #777777;
+    background-color: #a2a2a2;*/
+    border-color: rgba(0,0,0,0.45);
+    background-color: rgba(0,0,0,0.3);
 }
