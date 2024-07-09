@@ -249,8 +249,9 @@ export default class DefaultMenu implements CurrentMenu {
 
     public destroy() {
         this._signals.disconnect();
+        this._layoutsRows.forEach(lr => lr.destroy());
+        this._layoutsRows = [];
         this._children.forEach(c => c.destroy());
         this._children = [];
-        this._layoutsRows = [];
     }
 }

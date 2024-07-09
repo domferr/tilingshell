@@ -214,6 +214,8 @@ export default class Indicator extends PanelMenu.Button {
         this._editorDialog = null;
         this._layoutEditor?.destroy();
         this._layoutEditor = null;
+        this._currentMenu?.destroy();
+        this._currentMenu = null;
         (this.menu as PopupMenu.PopupMenu).removeAll();
     }
 }
