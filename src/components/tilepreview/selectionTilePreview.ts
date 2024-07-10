@@ -1,46 +1,46 @@
-import { registerGObjectClass } from "@/utils/gjs";
+import Settings from '@settings';
+import { buildBlurEffect } from '@utils/ui';
 import Clutter from 'gi://Clutter';
-import St from 'gi://St';
 import Gio from 'gi://Gio';
-import TilePreview from "./tilePreview";
-import { logger } from "@/utils/shell";
-import Settings from "@settings";
-import GObject from "gi://GObject";
-import { buildBlurEffect } from "@utils/ui";
+import GObject from 'gi://GObject';
+import St from 'gi://St';
 
-const debug = logger("SelectionTilePreview");
+import { registerGObjectClass } from '@/utils/gjs';
+import { logger } from '@/utils/shell';
+
+import TilePreview from './tilePreview';
+
+const debug = logger('SelectionTilePreview');
 
 @registerGObjectClass
 export default class SelectionTilePreview extends TilePreview {
   static metaInfo: GObject.MetaInfo<any, any, any> = {
-    GTypeName: "SelectionTilePreview",
+    GTypeName: 'SelectionTilePreview',
     Properties: {
-        'blur': GObject.ParamSpec.boolean(
-            'blur',
-            'blur',
-            'Enable or disable the blur effect',
-            GObject.ParamFlags.READWRITE,
-            false
-        )
+      blur: GObject.ParamSpec.boolean(
+        'blur',
+        'blur',
+        'Enable or disable the blur effect',
+        GObject.ParamFlags.READWRITE,
+        false,
+      ),
     },
   };
 
   private _blur: boolean;
 
-  constructor(params: {
-    parent: Clutter.Actor
-  }) {
-    super({ parent: params.parent, name: "SelectionTilePreview" });
+  constructor(params: { parent: Clutter.Actor }) {
+    super({ parent: params.parent, name: 'SelectionTilePreview' });
 
     this._blur = false;
-    
-    Settings.bind(Settings.SETTING_ENABLE_BLUR_SELECTED_TILEPREVIEW, this, "blur", Gio.SettingsBindFlags.GET);
+
+    Settings.bind(Settings.SETTING_ENABLE_BLUR_SELECTED_TILEPREVIEW, this, 'blur', Gio.SettingsBindFlags.GET);
 
     this._recolor();
-    const styleChangedSignalID = St.ThemeContext.get_for_stage(global.get_stage()).connect("changed", () => {
+    const styleChangedSignalID = St.ThemeContext.get_for_stage(global.get_stage()).connect('changed', () => {
       this._recolor();
     });
-    this.connect("destroy", () => St.ThemeContext.get_for_stage(global.get_stage()).disconnect(styleChangedSignalID));
+    this.connect('destroy', () => St.ThemeContext.get_for_stage(global.get_stage()).disconnect(styleChangedSignalID));
     this._rect.width = this.gaps.left + this.gaps.right;
     this._rect.height = this.gaps.top + this.gaps.bottom;
   }
@@ -49,22 +49,22 @@ export default class SelectionTilePreview extends TilePreview {
     if (this._blur === value) return;
 
     this._blur = value;
-    this.get_effect("blur")?.set_enabled(value);
-    if (this._blur) this.add_style_class_name("blur-tile-preview");
-    else this.remove_style_class_name("blur-tile-preview");
-    
+    this.get_effect('blur')?.set_enabled(value);
+    if (this._blur) this.add_style_class_name('blur-tile-preview');
+    else this.remove_style_class_name('blur-tile-preview');
+
     this._recolor();
   }
 
   _init() {
     super._init();
-    
+
     const effect = buildBlurEffect(48);
-    effect.set_name("blur");
+    effect.set_name('blur');
     effect.set_enabled(this._blur);
     this.add_effect(effect);
 
-    this.add_style_class_name("selection-tile-preview");
+    this.add_style_class_name('selection-tile-preview');
   }
 
   _recolor() {
