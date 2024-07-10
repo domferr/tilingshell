@@ -13,6 +13,7 @@ import TileUtils from './TileUtils';
 
 const debug = logger('LayoutWidget');
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export module LayoutWidget {
   export interface ConstructorProperties extends Partial<St.Widget.ConstructorProps> {
     parent: Clutter.Actor;
