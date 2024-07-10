@@ -1,35 +1,35 @@
-import St from 'gi://St';
-import Meta from 'gi://Meta';
-import Mtk from "gi://Mtk";
-import { registerGObjectClass } from "@/utils/gjs";
-import { logger } from "@/utils/shell";
-import Clutter from 'gi://Clutter';
 import { buildRectangle, getScalingFactorOf } from '@utils/ui';
+import Clutter from 'gi://Clutter';
+import Meta from 'gi://Meta';
+import Mtk from 'gi://Mtk';
+import St from 'gi://St';
+
+import { registerGObjectClass } from '@/utils/gjs';
+import { logger } from '@/utils/shell';
 
 export const WINDOW_ANIMATION_TIME = 100;
 
 const debug = logger('tilePreview');
 
 //export module TilePreview {
-  export interface TilePreviewConstructorProperties 
-    extends St.Widget.ConstructorProps {
-        parent: Clutter.Actor;
-        rect: Mtk.Rectangle;
-        gaps: Clutter.Margin;
-  }
+export interface TilePreviewConstructorProperties extends St.Widget.ConstructorProps {
+  parent: Clutter.Actor;
+  rect: Mtk.Rectangle;
+  gaps: Clutter.Margin;
+}
 //}
 
 @registerGObjectClass
 export default class TilePreview extends St.Widget {
   protected _rect: Mtk.Rectangle;
   protected _showing: boolean;
-  
+
   private _gaps: Clutter.Margin;
 
   constructor(params: Partial<TilePreviewConstructorProperties>) {
     super(params);
     if (params.parent) params.parent.add_child(this);
-    
+
     this._showing = false;
     this._rect = params.rect || buildRectangle({});
     this._gaps = new Clutter.Margin();
@@ -43,12 +43,11 @@ export default class TilePreview extends St.Widget {
     this._gaps.bottom = gaps.bottom * scalingFactor;
     this._gaps.left = gaps.left * scalingFactor;
 
-    if (this._gaps.top === 0 && this._gaps.bottom === 0 
-      && this._gaps.right === 0 && this._gaps.left === 0) {
-        this.remove_style_class_name("custom-tile-preview");
-      } else {
-        this.add_style_class_name("custom-tile-preview");
-      }
+    if (this._gaps.top === 0 && this._gaps.bottom === 0 && this._gaps.right === 0 && this._gaps.left === 0) {
+      this.remove_style_class_name('custom-tile-preview');
+    } else {
+      this.add_style_class_name('custom-tile-preview');
+    }
   }
 
   public get gaps(): Clutter.Margin {
@@ -87,7 +86,7 @@ export default class TilePreview extends St.Widget {
 
   public open(ease: boolean = false, position?: Mtk.Rectangle) {
     if (position) this._rect = position;
-    
+
     /*debug(
       `open tile -> x: ${this._rect.x}, y: ${this._rect.y}, width: ${this._rect.width}, height: ${this._rect.height}`,
     );*/
@@ -119,7 +118,7 @@ export default class TilePreview extends St.Widget {
 
   public openBelow(window: Meta.Window, ease: boolean = false, position?: Mtk.Rectangle) {
     if (this.get_parent() === global.windowGroup) {
-      let windowActor = window.get_compositor_private();
+      const windowActor = window.get_compositor_private();
       if (!windowActor) return;
       global.windowGroup.set_child_below_sibling(this, windowActor as any);
     }
@@ -129,7 +128,7 @@ export default class TilePreview extends St.Widget {
 
   public openAbove(window: Meta.Window, ease: boolean = false, position?: Mtk.Rectangle) {
     if (this.get_parent() === global.windowGroup) {
-      let windowActor = window.get_compositor_private();
+      const windowActor = window.get_compositor_private();
       if (!windowActor) return;
       global.windowGroup.set_child_above_sibling(this, windowActor as any);
     }
