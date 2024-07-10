@@ -218,15 +218,15 @@ class SnapAssistContent extends St.BoxLayout {
         const wasEnlarged = this._isEnlarged;
         this.handleOpening(window, ease, currPointerPos);
         if (!this._showing || !this._isEnlarged) {
-            if (this._hoveredTile) {
-                this._hoveredTile.set_hover(false);
-            }
+            if (this._hoveredTile) this._hoveredTile.set_hover(false);
+
             this._hoveredTile = undefined;
-            if (wasEnlarged)
+            if (wasEnlarged) {
                 this._container.emit(
                     SNAP_ASSIST_SIGNAL,
                     new Tile({ x: 0, y: 0, width: 0, height: 0, groups: [] }),
                 );
+            }
             return;
         }
 
@@ -287,20 +287,17 @@ class SnapAssistContent extends St.BoxLayout {
     }): boolean {
         if (!this._isEnlarged) {
             const changed = this._hoveredTile !== undefined;
-            if (this._hoveredTile) {
-                this._hoveredTile.set_hover(false);
-            }
+            if (this._hoveredTile) this._hoveredTile.set_hover(false);
+
             this._hoveredTile = undefined;
             return changed;
         }
 
-        let newTileHovered: SnapAssistTile | undefined = undefined;
+        let newTileHovered: SnapAssistTile | undefined;
         for (let index = 0; index < this._snapAssistLayouts.length; index++) {
             const snapAssistLay = this._snapAssistLayouts[index];
             newTileHovered = snapAssistLay.getTileBelow(currPointerPos);
-            if (newTileHovered) {
-                break;
-            }
+            if (newTileHovered) break;
         }
         const tileChanged = newTileHovered !== this._hoveredTile;
         if (tileChanged) {

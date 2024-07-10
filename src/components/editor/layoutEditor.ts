@@ -231,7 +231,7 @@ export default class LayoutEditor extends St.Widget {
         const splitY = (y - this.y) / this._containerRect.height;
         // split horizontally when CTRL is NOT pressed, split vertically instead
         const splitHorizontally =
-            (modifier & Clutter.ModifierType.CONTROL_MASK) == 0;
+            (modifier & Clutter.ModifierType.CONTROL_MASK) === 0;
 
         const prevTile = new Tile({
             x: oldTile.x,

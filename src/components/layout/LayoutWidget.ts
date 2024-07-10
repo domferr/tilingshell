@@ -15,7 +15,7 @@ import { registerGObjectClass } from '@utils/gjs';
 
 const debug = logger('LayoutWidget');
 
-//export module LayoutWidget {
+// export module LayoutWidget {
 export interface LayoutWidgetConstructorProperties
     extends Partial<St.Widget.ConstructorProps> {
     parent: Clutter.Actor;
@@ -25,7 +25,7 @@ export interface LayoutWidgetConstructorProperties
     containerRect: Mtk.Rectangle;
     scalingFactor?: number;
 }
-//}
+// }
 
 // A widget to draw a layout
 @registerGObjectClass
@@ -82,7 +82,9 @@ export default class LayoutWidget<
         _margin: Clutter.Margin,
         _tile: Tile,
     ): TileType {
-        throw "This class shouldn't be instantiated but it should be extended instead";
+        throw new Error(
+            "This class shouldn't be instantiated but it should be extended instead",
+        );
     }
 
     public relayout(
@@ -120,9 +122,8 @@ export default class LayoutWidget<
         }
 
         this._previews?.forEach((preview) => {
-            if (preview.get_parent() === this) {
-                this.remove_child(preview);
-            }
+            if (preview.get_parent() === this) this.remove_child(preview);
+
             preview.destroy();
         });
         this._previews = [];

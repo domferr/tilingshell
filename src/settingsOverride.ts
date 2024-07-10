@@ -14,9 +14,7 @@ export default class SettingsOverride {
     }
 
     static get(): SettingsOverride {
-        if (!this._instance) {
-            this._instance = new SettingsOverride();
-        }
+        if (!this._instance) this._instance = new SettingsOverride();
 
         return this._instance;
     }
@@ -81,18 +79,15 @@ export default class SettingsOverride {
     ): GLib.Variant | null {
         const schemaId = giosettings.schemaId;
         const schemaMap = this._overriddenKeys.get(schemaId) || new Map();
-        if (!this._overriddenKeys.has(schemaId)) {
+        if (!this._overriddenKeys.has(schemaId))
             this._overriddenKeys.set(schemaId, schemaMap);
-        }
 
         const oldValue = schemaMap.has(keyToOverride)
             ? schemaMap.get(keyToOverride)
             : giosettings.get_value(keyToOverride);
-        //@ts-expect-error "Variant has a type which is not known here"
+        // @ts-expect-error "Variant has a type which is not known here"
         const res = giosettings.set_value(keyToOverride, newValue);
-        if (!res) {
-            return null;
-        }
+        if (!res) return null;
 
         if (!schemaMap.has(keyToOverride)) {
             schemaMap.set(keyToOverride, oldValue);
@@ -113,7 +108,7 @@ export default class SettingsOverride {
         const oldValue = overridden.get(keyToOverride);
         if (!oldValue) return null;
 
-        //@ts-expect-error "Variant has an unkown type"
+        // @ts-expect-error "Variant has an unkown type"
         const res = giosettings.set_value(keyToOverride, oldValue);
 
         if (res) {
@@ -132,16 +127,13 @@ export default class SettingsOverride {
         if (!overridden) return;
 
         overridden.forEach((oldValue: GLib.Variant, key: string) => {
-            //@ts-expect-error "Variant has an unkown type"
+            // @ts-expect-error "Variant has an unkown type"
             const done = giosettings.set_value(key, oldValue);
-            if (done) {
-                overridden.delete(key);
-            }
+            if (done) overridden.delete(key);
         });
 
-        if (overridden.size === 0) {
+        if (overridden.size === 0)
             this._overriddenKeys.delete(giosettings.schemaId);
-        }
     }
 
     public restoreAll() {
@@ -151,9 +143,7 @@ export default class SettingsOverride {
             },
         );
 
-        if (this._overriddenKeys.size === 0) {
-            this._overriddenKeys = new Map();
-        }
+        if (this._overriddenKeys.size === 0) this._overriddenKeys = new Map();
 
         Settings.set_overridden_settings(this._overriddenKeysToJSON());
     }

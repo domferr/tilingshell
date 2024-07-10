@@ -63,7 +63,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
                 layouts: GlobalState.get().layouts,
                 ...params,
             });
-            /*this._signals.connect(GlobalState.get(), GlobalState.SIGNAL_LAYOUTS_CHANGED, () => {
+            /* this._signals.connect(GlobalState.get(), GlobalState.SIGNAL_LAYOUTS_CHANGED, () => {
                 this._drawLayouts({ layouts: GlobalState.get().layouts, ...params });
             });*/
         }
@@ -75,11 +75,12 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
             action: () => params.onClose(),
         });
 
-        if (params.legend)
+        if (params.legend) {
             this._makeLegendDialog({
                 onClose: params.onClose,
                 path: params.path,
             });
+        }
     }
 
     private _makeLegendDialog(params: { onClose: () => void; path: string }) {

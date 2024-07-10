@@ -3,6 +3,13 @@ import GObject from 'gi://GObject';
 import Layout from './components/layout/Layout';
 import Tile from './components/layout/Tile';
 
+export enum ActivationKey {
+    NONE = -1,
+    CTRL = 0,
+    ALT,
+    SUPER,
+}
+
 export default class Settings {
     static _settings: Gio.Settings | null;
     static _is_initialized: boolean = false;
@@ -130,7 +137,8 @@ export default class Settings {
             const layouts = JSON.parse(
                 this._settings?.get_string(this.SETTING_LAYOUTS_JSON) || '[]',
             ) as Layout[];
-            if (layouts.length === 0) throw 'At least one layout is required';
+            if (layouts.length === 0)
+                throw new Error('At least one layout is required');
             return layouts.filter((layout) => layout.tiles.length > 0);
         } catch (ex: unknown) {
             this.reset_layouts_json();
@@ -427,11 +435,4 @@ export default class Settings {
     static disconnect(id: number) {
         this._settings?.disconnect(id);
     }
-}
-
-export enum ActivationKey {
-    NONE = -1,
-    CTRL = 0,
-    ALT,
-    SUPER,
 }

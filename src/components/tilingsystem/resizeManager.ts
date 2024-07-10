@@ -227,7 +227,7 @@ export class ResizingManager {
                 borderRect.y -= innerGaps.top + errorFactor;
                 break;
             case St.Side.BOTTOM:
-                borderRect.y = borderRect.y + borderRect.height;
+                borderRect.y += borderRect.height;
                 borderRect.height = innerGaps.bottom + errorFactor;
                 break;
             case St.Side.LEFT:
@@ -235,12 +235,12 @@ export class ResizingManager {
                 borderRect.x -= innerGaps.left + errorFactor;
                 break;
             case St.Side.RIGHT:
-                borderRect.x = borderRect.x + borderRect.width;
+                borderRect.x += borderRect.width;
                 borderRect.width = innerGaps.right + errorFactor;
                 break;
         }
 
-        /*let debugWidget = new St.Widget({ style: "border: solid 1px red; border-radius: 2px; background-color: rgba(255, 255, 255, 0.2);"});
+        /* let debugWidget = new St.Widget({ style: "border: solid 1px red; border-radius: 2px; background-color: rgba(255, 255, 255, 0.2);"});
         debugWidget.set_size(borderRect.width, borderRect.height);
         debugWidget.set_position(borderRect.x, borderRect.y);
         debugWidget.show();
@@ -394,7 +394,7 @@ class WindowClone extends St.Widget {
     constructor(window: Meta.Window) {
         super({ layoutManager: new Clutter.BinLayout(), styleClass: "custom-tile-preview" });
         global.windowGroup.add_child(this);
-        
+
         this._clone = this._createWindowClone(window);
         this.add_child(this._clone);
         const sigma = 36;
@@ -405,7 +405,7 @@ class WindowClone extends St.Widget {
             brightness: 1,
             mode: Shell.BlurMode.ACTOR, // blur the widget
         }));
-        
+
         const box = new St.BoxLayout({
             xAlign: Clutter.ActorAlign.CENTER,
             yAlign: Clutter.ActorAlign.CENTER,
@@ -438,15 +438,15 @@ class WindowClone extends St.Widget {
         //});
         //@ts-ignore
         const actor: Clutter.Actor = window.get_compositor_private();
-        
+
         //@ts-ignore
         let actorContent = actor.paint_to_content(window.get_frame_rect());
-        let actorClone = new St.Widget({ 
+        let actorClone = new St.Widget({
             content: actorContent,
             width: window.get_frame_rect().width,
             height: window.get_frame_rect().height,
-            xExpand: true, 
-            yExpand: true 
+            xExpand: true,
+            yExpand: true
         });
         actorClone.set_offscreen_redirect(Clutter.OffscreenRedirect.ALWAYS);
         return actorClone;

@@ -88,7 +88,7 @@ export default class SelectionTilePreview extends TilePreview {
         this.set_style(`
       background-color: rgba(${backgroundColor.red}, ${backgroundColor.green}, ${backgroundColor.blue}, ${newAlpha / 255}) !important;
     `);
-        /*this.set_style(`
+        /* this.set_style(`
       background-color: rgba(255, 255, 255, 0.5) !important;
     `);*/
     }

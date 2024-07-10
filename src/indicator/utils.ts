@@ -12,7 +12,7 @@ export const createButton = (
         new St.Label({
             marginBottom: 4,
             marginTop: 4,
-            text: text,
+            text,
             yAlign: Clutter.ActorAlign.CENTER,
         }),
     );
@@ -43,11 +43,10 @@ export const createIconButton = (
         yAlign: Clutter.ActorAlign.CENTER,
         style: 'padding: 6px',
     });
-    if (path) {
+    if (path)
         icon.gicon = Gio.icon_new_for_string(`${path}/icons/${iconName}.svg`);
-    } else {
-        icon.iconName = iconName;
-    }
+    else icon.iconName = iconName;
+
     btn.child.add_child(icon);
     return btn;
 };

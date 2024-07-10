@@ -205,15 +205,15 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
                     for (let i = 0; i < rectangles.length; i++) {
                         if (i === maxIndex) continue;
 
-                        const rect = rectangles[i];
+                        const currRect = rectangles[i];
                         const gaps = buildTileGaps(
-                            rect,
+                            currRect,
                             this._innerGaps,
                             this._outerGaps,
                             this._containerRect,
                         );
                         const innerPreview = new DynamicTilePreview(
-                            { parent: this, rect, gaps },
+                            { parent: this, rect: currRect, gaps },
                             false,
                         );
                         innerPreview.open();
@@ -232,29 +232,27 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
                     preview.close();
                     newPreviewsArray.push(preview);
                 }
-            } else {
-                if (reset /*&& !preview.originalRect.intersect(rect)[0]*/) {
-                    if (preview.restore(true)) {
-                        preview.open(true);
-                        newPreviewsArray.push(preview);
-                    } else {
-                        this.remove_child(preview);
-                        preview.destroy();
-                    }
-                } else {
+            } else if (reset /* && !preview.originalRect.intersect(rect)[0]*/) {
+                if (preview.restore(true)) {
                     preview.open(true);
                     newPreviewsArray.push(preview);
+                } else {
+                    this.remove_child(preview);
+                    preview.destroy();
                 }
+            } else {
+                preview.open(true);
+                newPreviewsArray.push(preview);
             }
         });
 
         this._previews = newPreviewsArray;
     }
 
-    /* 
+    /*
         Given the source rectangle (made by A, B, C, D and Hole), subtract the hole and obtain A, B, C and D.
         Edge cases:
-            - The hole may not be inside the source rect (i.e there is no interstaction). 
+            - The hole may not be inside the source rect (i.e there is no interstaction).
             It returns false and an array with the source rectangle only
             - The hole intersects the source rectangle, it returns true and an array with A, B, C and D rectangles.
             Some of A, B, C and D may not be returned if they don't exist
@@ -276,17 +274,13 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
     ): [boolean, Mtk.Rectangle[]] {
         const [hasIntersection, intersection] = sourceRect.intersect(holeRect);
 
-        if (!hasIntersection) {
-            return [false, [sourceRect]];
-        }
+        if (!hasIntersection) return [false, [sourceRect]];
 
-        if (intersection.area() >= sourceRect.area() * 0.98) {
-            return [true, []];
-        }
+        if (intersection.area() >= sourceRect.area() * 0.98) return [true, []];
 
         const results: Mtk.Rectangle[] = [];
 
-        //A
+        // A
         const heightA = intersection.y - sourceRect.y;
         if (heightA > 0) {
             results.push(
@@ -299,7 +293,7 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
             );
         }
 
-        //B
+        // B
         const widthB = intersection.x - sourceRect.x;
         if (widthB > 0 && intersection.height > 0) {
             results.push(
@@ -312,7 +306,7 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
             );
         }
 
-        //C
+        // C
         const widthC =
             sourceRect.x +
             sourceRect.width -
@@ -329,7 +323,7 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
             );
         }
 
-        //D
+        // D
         const heightD =
             sourceRect.y +
             sourceRect.height -
@@ -353,7 +347,7 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
         source: Mtk.Rectangle,
         direction: Meta.DisplayDirection,
     ): Mtk.Rectangle | undefined {
-        let previewFound: DynamicTilePreview | undefined = undefined;
+        let previewFound: DynamicTilePreview | undefined;
         let bestDistance = -1;
 
         for (let i = 0; i < this._previews.length; i++) {

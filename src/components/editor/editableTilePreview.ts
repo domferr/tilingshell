@@ -152,9 +152,9 @@ export default class EditableTilePreview extends TilePreview {
             signal === 'clicked' ||
             signal === 'notify::hover' ||
             signal === 'motion-event'
-        ) {
+        )
             return this._btn.connect(signal, callback);
-        }
+
         return super.connect(signal, callback);
     }
 

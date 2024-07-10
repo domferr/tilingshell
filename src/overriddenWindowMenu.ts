@@ -1,4 +1,4 @@
-//@ts-expect-error "windowMenu exists"
+// @ts-expect-error "windowMenu exists"
 import * as windowMenu from 'resource:///org/gnome/shell/ui/windowMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import St from 'gi://St';
@@ -59,9 +59,8 @@ class SnapAssistTileButton extends SnapAssistTile {
         callback: (_source: this, clicked_button: number) => void,
     ): number;
     public connect(signal: string, callback: never): number {
-        if (signal === 'clicked') {
-            return this._btn.connect(signal, callback);
-        }
+        if (signal === 'clicked') return this._btn.connect(signal, callback);
+
         return super.connect(signal, callback);
     }
 }
@@ -110,13 +109,9 @@ export default class OverriddenWindowMenu extends GObject.Object {
             },
         },
     };
+
     private static _instance: OverriddenWindowMenu | null = null;
-
     private static _old_buildMenu: ((window: Meta.Window) => void) | null;
-
-    constructor() {
-        super();
-    }
 
     static get(): OverriddenWindowMenu {
         if (this._instance === null)
@@ -146,7 +141,7 @@ export default class OverriddenWindowMenu extends GObject.Object {
         const layouts = GlobalState.get().layouts;
         if (layouts.length === 0) return;
 
-        //@ts-expect-error "this is not an instance of OverriddenWindowMenu, but it is the WindowMenu itself"
+        // @ts-expect-error "this is not an instance of OverriddenWindowMenu, but it is the WindowMenu itself"
         this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
         const layoutsPopupMenu = new PopupMenu.PopupBaseMenuItem({
             /* style_class: "indicator-menu-item" */
@@ -173,7 +168,7 @@ export default class OverriddenWindowMenu extends GObject.Object {
             rows.push(box);
             container.add_child(box);
         }
-        //@ts-expect-error "this is not an instance of OverriddenWindowMenu, but it is the WindowMenu itself"
+        // @ts-expect-error "this is not an instance of OverriddenWindowMenu, but it is the WindowMenu itself"
         this.addMenuItem(layoutsPopupMenu);
 
         const hasGaps = Settings.get_inner_gaps(1).top > 0;
@@ -183,7 +178,7 @@ export default class OverriddenWindowMenu extends GObject.Object {
         const owm = OverriddenWindowMenu.get();
         layouts.forEach((lay, ind) => {
             const row = rows[ind % n_rows];
-            //const btn = new LayoutButton(row, lay, hasGaps ? 2:0, layoutHeight, layoutWidth);
+            // const btn = new LayoutButton(row, lay, hasGaps ? 2:0, layoutHeight, layoutWidth);
             const layoutWidget = new LayoutTileButtons(
                 row,
                 lay,

@@ -141,32 +141,26 @@ export default class Slider extends St.Button {
             if (
                 this._minTileCoord !== oldSize.y &&
                 this._maxTileCoord !== oldSize.y + oldSize.height
-            ) {
+            )
                 return;
-            }
 
-            if (this._minTileCoord === oldSize.y) {
+            if (this._minTileCoord === oldSize.y)
                 this._minTileCoord = newSize.y;
-            }
 
-            if (this._maxTileCoord === oldSize.y + oldSize.height) {
+            if (this._maxTileCoord === oldSize.y + oldSize.height)
                 this._maxTileCoord = newSize.y + newSize.height;
-            }
         } else {
             if (
                 this._minTileCoord !== oldSize.x &&
                 this._maxTileCoord !== oldSize.x + oldSize.width
-            ) {
+            )
                 return;
-            }
 
-            if (this._minTileCoord === oldSize.x) {
+            if (this._minTileCoord === oldSize.x)
                 this._minTileCoord = newSize.x;
-            }
 
-            if (this._maxTileCoord === oldSize.x + oldSize.width) {
+            if (this._maxTileCoord === oldSize.x + oldSize.width)
                 this._maxTileCoord = newSize.x + newSize.width;
-            }
         }
 
         this._updatePosition();
@@ -187,9 +181,7 @@ export default class Slider extends St.Button {
             : this.y <= tile.rect.y;
         const array = isNext ? this._nextTiles : this._previousTiles;
         const index = array.indexOf(tile, 0);
-        if (index >= 0) {
-            array.splice(index, 1);
-        }
+        if (index >= 0) array.splice(index, 1);
 
         // remove all the signals related to the tile
         const sig = this._signals.get(tile);
@@ -329,7 +321,7 @@ export default class Slider extends St.Button {
         this._dragging = true;
         global.display.set_cursor(this.preferredCursor);
 
-        //@ts-expect-error "global.stage has grab function"
+        // @ts-expect-error "global.stage has grab function"
         this._grab = global.stage.grab(this);
 
         const [stageX, stageY] = getEventCoords(event);

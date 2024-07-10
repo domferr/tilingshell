@@ -37,9 +37,8 @@ export default class KeyBindings extends GObject.Object {
                 this._setupKeyBindings(extensionSettings);
             },
         );
-        if (Settings.get_enable_move_keybindings()) {
+        if (Settings.get_enable_move_keybindings())
             this._setupKeyBindings(extensionSettings);
-        }
     }
 
     private _setupKeyBindings(extensionSettings: Gio.Settings) {

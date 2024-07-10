@@ -178,7 +178,7 @@ export default class EdgeTilingManager {
         }
 
         // uncomment to show active tile debugging
-        /*global.windowGroup.get_children().filter(c => c.get_name() === "debug")[0]?.destroy();
+        /* global.windowGroup.get_children().filter(c => c.get_name() === "debug")[0]?.destroy();
         const debug = new St.Widget({
             x: this._activeEdgeTile.x,
             y: this._activeEdgeTile.y,

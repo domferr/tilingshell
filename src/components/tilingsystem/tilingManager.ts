@@ -180,7 +180,7 @@ export class TilingManager {
         window: Meta.Window,
         direction: Meta.DisplayDirection,
     ): boolean {
-        let destinationRect: Mtk.Rectangle | undefined = undefined;
+        let destinationRect: Mtk.Rectangle | undefined;
         if (window.get_maximized()) {
             switch (direction) {
                 case Meta.DisplayDirection.DOWN:
@@ -219,9 +219,9 @@ export class TilingManager {
             return false;
         }
 
-        if (!(window as ExtendedWindow).isTiled && !window.get_maximized()) {
+        if (!(window as ExtendedWindow).isTiled && !window.get_maximized())
             (window as ExtendedWindow).originalSize = windowRect;
-        }
+
         (window as ExtendedWindow).isTiled = true;
 
         if (window.get_maximized()) window.unmaximize(Meta.MaximizeFlags.BOTH);
@@ -304,16 +304,16 @@ export class TilingManager {
         let val = 2;
         switch (key) {
             case ActivationKey.CTRL:
-                val = 2; //Clutter.ModifierType.CONTROL_MASK
+                val = 2; // Clutter.ModifierType.CONTROL_MASK
                 break;
             case ActivationKey.ALT:
-                val = 3; //Clutter.ModifierType.MOD1_MASK
+                val = 3; // Clutter.ModifierType.MOD1_MASK
                 break;
             case ActivationKey.SUPER:
-                val = 6; //Clutter.ModifierType.SUPER_MASK
+                val = 6; // Clutter.ModifierType.SUPER_MASK
                 break;
         }
-        return (modifier & (1 << val)) != 0;
+        return (modifier & (1 << val)) !== 0;
     }
 
     private _onMovingWindow(window: Meta.Window, grabOp: number) {
@@ -358,11 +358,11 @@ export class TilingManager {
                 });
 
                 // restart grab for GNOME 42
-                //@ts-expect-error "grab is available on GNOME 42"
                 const restartGrab =
+                    // @ts-expect-error "grab is available on GNOME 42"
                     global.display.end_grab_op && global.display.begin_grab_op;
                 if (restartGrab) {
-                    //@ts-expect-error "grab is available on GNOME 42"
+                    // @ts-expect-error "grab is available on GNOME 42"
                     global.display.end_grab_op(global.get_current_time());
                 }
                 // if we restarted the grab, we need to force window movement and to
@@ -373,7 +373,7 @@ export class TilingManager {
                     // must be done now, before begin_grab_op, because begin_grab_op will trigger
                     // _onMovingWindow again, so we will go into infinite loop on restoring the window size
                     extWin.originalSize = undefined;
-                    //@ts-expect-error "grab is available on GNOME 42"
+                    // @ts-expect-error "grab is available on GNOME 42"
                     global.display.begin_grab_op(
                         window,
                         grabOp,
@@ -418,9 +418,8 @@ export class TilingManager {
             !changedShowTilingSystem &&
             currPointerPos.x === this._lastCursorPos?.x &&
             currPointerPos.y === this._lastCursorPos?.y
-        ) {
+        )
             return GLib.SOURCE_CONTINUE;
-        }
 
         this._lastCursorPos = currPointerPos;
         this._wasTilingSystemActivated = isTilingSystemActivated;
@@ -466,7 +465,7 @@ export class TilingManager {
 
         // we know that the layout must be shown, snap assistant must be closed
         if (!this._tilingLayout.showing) {
-            //this._debug("open layout below grabbed window");
+            // this._debug("open layout below grabbed window");
             this._tilingLayout.openAbove(window);
             this._snapAssist.close(true);
             // close selection tile if we were performing edge-tiling
@@ -485,9 +484,8 @@ export class TilingManager {
         if (
             !changedSpanMultipleTiles &&
             isPointInsideRect(currPointerPos, this._selectedTilesPreview.rect)
-        ) {
+        )
             return GLib.SOURCE_CONTINUE;
-        }
 
         let selectionRect = this._tilingLayout.getTileBelow(
             currPointerPos,
@@ -543,9 +541,9 @@ export class TilingManager {
             !isTilingSystemActivated &&
             !this._isSnapAssisting &&
             !this._edgeTilingManager.isPerformingEdgeTiling()
-        ) {
+        )
             return;
-        }
+
         // disable snap assistance
         this._isSnapAssisting = false;
 
@@ -553,9 +551,9 @@ export class TilingManager {
             this._edgeTilingManager.isPerformingEdgeTiling() &&
             this._edgeTilingManager.needMaximize() &&
             window.can_maximize()
-        ) {
+        )
             window.maximize(Meta.MaximizeFlags.BOTH);
-        }
+
         // disable edge-tiling
         this._edgeTilingManager.abortEdgeTiling();
 
@@ -564,9 +562,8 @@ export class TilingManager {
         if (!this._isPointerInsideThisMonitor()) return;
 
         // abort if there is an invalid selection
-        if (selectionRect.width <= 0 || selectionRect.height <= 0) {
-            return;
-        }
+        if (selectionRect.width <= 0 || selectionRect.height <= 0) return;
+
         if (window.get_maximized()) return;
 
         (window as ExtendedWindow).originalSize = window
@@ -591,9 +588,8 @@ export class TilingManager {
             destRect.y === beforeRect.y &&
             destRect.width === beforeRect.width &&
             destRect.height === beforeRect.height
-        ) {
+        )
             return;
-        }
 
         // apply animations when tiling the window
         windowActor.remove_all_transitions();
@@ -762,9 +758,8 @@ export class TilingManager {
         dummyPreview.destroy();
 
         // abort if there is an invalid selection
-        if (destinationRect.width <= 0 || destinationRect.height <= 0) {
-            return;
-        }
+        if (destinationRect.width <= 0 || destinationRect.height <= 0) return;
+
         if (window.get_maximized()) return;
 
         if (!(window as ExtendedWindow).isTiled) {

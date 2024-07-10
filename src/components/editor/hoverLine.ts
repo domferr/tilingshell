@@ -47,7 +47,7 @@ export default class HoverLine extends St.Widget {
 
         // split horizontally when CTRL is NOT pressed, split vertically instead
         const splitHorizontally =
-            (modifier & Clutter.ModifierType.CONTROL_MASK) == 0;
+            (modifier & Clutter.ModifierType.CONTROL_MASK) === 0;
         this._drawLine(splitHorizontally, x, y);
     }
 
@@ -63,7 +63,7 @@ export default class HoverLine extends St.Widget {
         const [x, y, modifier] = global.get_pointer();
         // split horizontally when CTRL is NOT pressed, split vertically instead
         const splitHorizontally =
-            (modifier & Clutter.ModifierType.CONTROL_MASK) == 0;
+            (modifier & Clutter.ModifierType.CONTROL_MASK) === 0;
 
         this._drawLine(
             splitHorizontally,
@@ -83,9 +83,9 @@ export default class HoverLine extends St.Widget {
                 newX < this._hoveredTile.x ||
                 newX + this._size >
                     this._hoveredTile.x + this._hoveredTile.width
-            ) {
+            )
                 return;
-            }
+
             this.set_size(this._size, this._hoveredTile.height);
             this.set_position(newX, this._hoveredTile.y);
         } else {
@@ -94,9 +94,9 @@ export default class HoverLine extends St.Widget {
                 newY < this._hoveredTile.y ||
                 newY + this._size >
                     this._hoveredTile.y + this._hoveredTile.height
-            ) {
+            )
                 return;
-            }
+
             this.set_size(this._hoveredTile.width, this._size);
             this.set_position(this._hoveredTile.x, newY);
         }

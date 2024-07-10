@@ -16,10 +16,10 @@ export default class SignalHandling {
     public connect(
         obj: ObjectWithSignals,
         key: string,
-        fun: (...args: never[]) => void,
+        fun: (..._args: never[]) => void,
     ) {
         const signalId = obj.connect(key, fun);
-        this._signalsIds[key] = { id: signalId, obj: obj };
+        this._signalsIds[key] = { id: signalId, obj };
     }
 
     public disconnect(): void;

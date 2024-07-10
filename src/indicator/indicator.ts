@@ -79,7 +79,7 @@ export default class Indicator extends PanelMenu.Button {
         this._currentMenu = new DefaultMenu(this, this._enableScaling);
 
         // todo
-        /*Main.panel.statusArea.appMenu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+        /* Main.panel.statusArea.appMenu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
         const layouts = GlobalState.get().layouts;
         const rowsBoxLayout: St.BoxLayout[] = [];
@@ -127,13 +127,15 @@ export default class Indicator extends PanelMenu.Button {
             `${Shell.Global.get().get_current_time()}`,
         );
 
-        if (this._layoutEditor) this._layoutEditor.layout = newLayout;
-        else
+        if (this._layoutEditor) {
+            this._layoutEditor.layout = newLayout;
+        } else {
             this._layoutEditor = new LayoutEditor(
                 newLayout,
                 Main.layoutManager.monitors[Main.layoutManager.primaryIndex],
                 this._enableScaling,
             );
+        }
         this._setState(IndicatorState.CREATE_NEW);
         if (showLegendOnly) this.openMenu(true);
     }
@@ -152,9 +154,8 @@ export default class Indicator extends PanelMenu.Button {
                 if (
                     this._layoutEditor &&
                     this._layoutEditor.layout.id === lay.id
-                ) {
+                )
                     this.cancelLayoutOnClick();
-                }
             },
             onSelectLayout: (ind: number, lay: Layout) => {
                 const layCopy = new Layout(
@@ -171,8 +172,9 @@ export default class Indicator extends PanelMenu.Button {
                     lay.id,
                 );
 
-                if (this._layoutEditor) this._layoutEditor.layout = layCopy;
-                else
+                if (this._layoutEditor) {
+                    this._layoutEditor.layout = layCopy;
+                } else {
                     this._layoutEditor = new LayoutEditor(
                         layCopy,
                         Main.layoutManager.monitors[
@@ -180,6 +182,7 @@ export default class Indicator extends PanelMenu.Button {
                         ],
                         this._enableScaling,
                     );
+                }
 
                 this._setState(IndicatorState.EDITING_LAYOUT);
             },
@@ -205,11 +208,9 @@ export default class Indicator extends PanelMenu.Button {
             return;
         const newLayout = this._layoutEditor.layout;
 
-        if (this._state === IndicatorState.CREATE_NEW) {
+        if (this._state === IndicatorState.CREATE_NEW)
             GlobalState.get().addLayout(newLayout);
-        } else {
-            GlobalState.get().editLayout(newLayout);
-        }
+        else GlobalState.get().editLayout(newLayout);
 
         this.menu.toggle();
 

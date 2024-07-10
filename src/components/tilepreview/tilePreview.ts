@@ -7,14 +7,14 @@ import { buildRectangle, getScalingFactorOf } from '@utils/ui';
 
 export const WINDOW_ANIMATION_TIME = 100;
 
-//export module TilePreview {
+// export module TilePreview {
 export interface TilePreviewConstructorProperties
     extends St.Widget.ConstructorProps {
     parent: Clutter.Actor;
     rect: Mtk.Rectangle;
     gaps: Clutter.Margin;
 }
-//}
+// }
 
 @registerGObjectClass
 export default class TilePreview extends St.Widget {
@@ -45,11 +45,9 @@ export default class TilePreview extends St.Widget {
             this._gaps.bottom === 0 &&
             this._gaps.right === 0 &&
             this._gaps.left === 0
-        ) {
+        )
             this.remove_style_class_name('custom-tile-preview');
-        } else {
-            this.add_style_class_name('custom-tile-preview');
-        }
+        else this.add_style_class_name('custom-tile-preview');
     }
 
     public get gaps(): Clutter.Margin {
@@ -89,7 +87,7 @@ export default class TilePreview extends St.Widget {
     public open(ease: boolean = false, position?: Mtk.Rectangle) {
         if (position) this._rect = position;
 
-        /*debug(
+        /* debug(
       `open tile -> x: ${this._rect.x}, y: ${this._rect.y}, width: ${this._rect.width}, height: ${this._rect.height}`,
     );*/
         const fadeInMove = this._showing;

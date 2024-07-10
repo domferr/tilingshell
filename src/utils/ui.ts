@@ -92,7 +92,7 @@ export const getScalingFactorOf = (widget: St.Widget): [boolean, number] => {
         .lookup_length('monitor-scaling-factor', true);
     if (!hasValue) return [true, 1];
 
-    return [scalingReference != 1, monitorScalingFactor / scalingReference];
+    return [scalingReference !== 1, monitorScalingFactor / scalingReference];
 };
 
 export const enableScalingFactorSupport = (
@@ -166,7 +166,7 @@ export function buildBlurEffect(sigma: number): Shell.BlurEffect {
     if (effect.set_radius) {
         effect.set_radius(sigma * 2);
     } else {
-        //@ts-expect-error "set_sigma is available in old shell versions (<= 45)"
+        // @ts-expect-error "set_sigma is available in old shell versions (<= 45)"
         effect.set_sigma(sigma);
     }
     return effect;

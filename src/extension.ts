@@ -54,9 +54,9 @@ export default class TilingShellExtension extends Extension {
             if (
                 Settings.get_last_version_installed() === '9.0' ||
                 Settings.get_last_version_installed() === '9.1'
-            ) {
+            )
                 KeyBindings.solveV9CompatibilityIssue();
-            }
+
             Settings.set_last_version_installed(
                 this.metadata['version-name'] || '0',
             );
@@ -67,19 +67,16 @@ export default class TilingShellExtension extends Extension {
         const layouts = GlobalState.get().layouts;
 
         if (selectedLayouts.length === 0) selectedLayouts.push(layouts[0].id);
-        while (monitors.length < selectedLayouts.length) {
-            selectedLayouts.pop();
-        }
-        while (monitors.length > selectedLayouts.length) {
+        while (monitors.length < selectedLayouts.length) selectedLayouts.pop();
+
+        while (monitors.length > selectedLayouts.length)
             selectedLayouts.push(selectedLayouts[0]);
-        }
 
         for (let i = 0; i < selectedLayouts.length; i++) {
             if (
                 layouts.findIndex((lay) => lay.id === selectedLayouts[i]) === -1
-            ) {
+            )
                 selectedLayouts[i] = selectedLayouts[0];
-            }
         }
         Settings.save_selected_layouts_json(selectedLayouts);
     }
@@ -192,9 +189,10 @@ export default class TilingShellExtension extends Extension {
 
                 this._fractionalScalingEnabled = fractionalScalingEnabled;
                 this._createTilingManagers();
-                if (this._indicator)
+                if (this._indicator) {
                     this._indicator.enableScaling =
                         !this._fractionalScalingEnabled;
+                }
             },
         );
 
@@ -233,9 +231,8 @@ export default class TilingShellExtension extends Extension {
             !focus_window.has_focus() ||
             (focus_window.get_wm_class() &&
                 focus_window.get_wm_class() === 'gjs')
-        ) {
+        )
             return;
-        }
 
         // handle unmaximize of maximized window
         if (
@@ -264,7 +261,7 @@ export default class TilingShellExtension extends Extension {
             this._tilingManagers[neighborMonitorIndex];
         if (!neighborTilingManager) return;
 
-        //@ts-expect-error "Main.wm has skipNextEffect function"
+        // @ts-expect-error "Main.wm has skipNextEffect function"
         Main.wm.skipNextEffect(focus_window.get_compositor_private());
         focus_window.move_to_monitor(neighborMonitorIndex);
 
@@ -273,12 +270,12 @@ export default class TilingShellExtension extends Extension {
             focus_window.get_maximized() &&
             direction === Meta.DisplayDirection.UP
         ) {
-            //@ts-expect-error "Main.wm has skipNextEffect function"
+            // @ts-expect-error "Main.wm has skipNextEffect function"
             Main.wm.skipNextEffect(focus_window.get_compositor_private());
             focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
         }
 
-        //@ts-expect-error "Main.wm has skipNextEffect function"
+        // @ts-expect-error "Main.wm has skipNextEffect function"
         Main.wm.skipNextEffect(focus_window.get_compositor_private());
         focus_window.move_to_monitor(neighborMonitorIndex);
 
@@ -295,7 +292,7 @@ export default class TilingShellExtension extends Extension {
                     (feat) =>
                         feat === 'scale-monitor-framebuffer' ||
                         feat === 'x11-randr-fractional-scaling',
-                ) != undefined
+                ) !== undefined
         );
     }
 

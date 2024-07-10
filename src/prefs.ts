@@ -9,7 +9,7 @@ import { logger } from './utils/shell';
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 import Layout from '@components/layout/Layout';
 
-/*import Layout from "@/components/layout/Layout";
+/* import Layout from "@/components/layout/Layout";
 import Cairo from "@gi-types/cairo1";*/
 
 const debug = logger('prefs');
@@ -224,7 +224,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                         try {
                             if (response_id === Gtk.ResponseType.OK) {
                                 const file = _source.get_file();
-                                if (!file) throw 'no file selected';
+                                if (!file) throw new Error('no file selected');
 
                                 debug(
                                     `Create file with path ${file.get_path()}`,
@@ -238,9 +238,11 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                                     false,
                                     Gio.FileCreateFlags.REPLACE_DESTINATION,
                                     null,
-                                    (file, res) => {
+                                    (thisFile, res) => {
                                         try {
-                                            file?.replace_contents_finish(res);
+                                            thisFile?.replace_contents_finish(
+                                                res,
+                                            );
                                         } catch (e) {
                                             debug(e);
                                         }
@@ -299,8 +301,11 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                                             content,
                                         ),
                                     ) as Layout[];
-                                    if (importedLayouts.length === 0)
-                                        throw 'At least one layout is required';
+                                    if (importedLayouts.length === 0) {
+                                        throw new Error(
+                                            'At least one layout is required',
+                                        );
+                                    }
 
                                     importedLayouts = importedLayouts.filter(
                                         (layout) => layout.tiles.length > 0,
@@ -484,8 +489,8 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             valign: Gtk.Align.CENTER,
         });
         const adwRow = new Adw.ActionRow({
-            title: title,
-            subtitle: subtitle,
+            title,
+            subtitle,
             activatableWidget: gtkSwitch,
         });
         if (suffix) adwRow.add_suffix(suffix);
@@ -500,8 +505,8 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         spinBtn.set_vexpand(false);
         spinBtn.set_valign(Gtk.Align.CENTER);
         const adwRow = new Adw.ActionRow({
-            title: title,
-            subtitle: subtitle,
+            title,
+            subtitle,
             activatableWidget: spinBtn,
         });
         adwRow.add_suffix(spinBtn);
@@ -523,8 +528,8 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         btn.set_vexpand(false);
         btn.set_valign(Gtk.Align.CENTER);
         const adwRow = new Adw.ActionRow({
-            title: title,
-            subtitle: subtitle,
+            title,
+            subtitle,
             activatableWidget: btn,
         });
         adwRow.add_suffix(btn);
@@ -606,8 +611,8 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         btn.set_vexpand(false);
         btn.set_valign(Gtk.Align.CENTER);
         const adwRow = new Adw.ActionRow({
-            title: title,
-            subtitle: subtitle,
+            title,
+            subtitle,
             activatableWidget: btn,
         });
         adwRow.add_suffix(btn);
@@ -679,14 +684,14 @@ const ShortcutSettingButton = class extends Gtk.Button {
 
         const content = new Adw.StatusPage({
             title: 'New accelerator…',
-            //description: this._description,
+            // description: this._description,
             icon_name: 'preferences-desktop-keyboard-shortcuts-symbolic',
         });
 
         this._editor = new Adw.Window({
             modal: true,
             hide_on_close: true,
-            //@ts-expect-error "widget has get_root function"
+            // @ts-expect-error "widget has get_root function"
             transient_for: widget.get_root(),
             width_request: 480,
             height_request: 320,
@@ -759,9 +764,9 @@ const ShortcutSettingButton = class extends Gtk.Button {
     }
 
     isValidBinding(mask: number, keycode: number, keyval: number) {
-        //@ts-expect-error "Gdk has SHIFT_MASK"
         return !(
             mask === 0 ||
+            // @ts-expect-error "Gdk has SHIFT_MASK"
             (mask === Gdk.SHIFT_MASK &&
                 keycode !== 0 &&
                 ((keyval >= Gdk.KEY_a && keyval <= Gdk.KEY_z) ||
@@ -794,9 +799,9 @@ const ShortcutSettingButton = class extends Gtk.Button {
     }
 };
 
-/*class LayoutWidget extends Gtk.DrawingArea {
+/* class LayoutWidget extends Gtk.DrawingArea {
     private _layout: Layout;
-    
+
     static {
         GObject.registerClass(this);
     }
@@ -814,7 +819,7 @@ const ShortcutSettingButton = class extends Gtk.Button {
         const da = superDa as LayoutWidget;
         const maxHeight = da.get_allocated_height();
         const maxWidth = da.get_allocated_width();
-        
+
         //const color = da.get_style_context().lookup_color("yellow");
         const color = da.get_style_context().get_color();
         //@ts-ignore
@@ -823,7 +828,7 @@ const ShortcutSettingButton = class extends Gtk.Button {
         // We keep them to the minimum possible scope to catch real errors.
         /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/*ctx.setLineCap(Cairo.LineCap.SQUARE);
+/* ctx.setLineCap(Cairo.LineCap.SQUARE);
         //@ts-ignore
         ctx.setAntialias(Cairo.Antialias.NONE);
         //@ts-ignore

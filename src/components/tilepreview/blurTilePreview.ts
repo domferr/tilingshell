@@ -14,9 +14,9 @@ export default class BlurTilePreview extends TilePreview {
         const sigma = 36;
         this.add_effect(
             new Shell.BlurEffect({
-                //@ts-ignore
-                sigma: sigma,
-                //radius: sigma * 2,
+                // @ts-ignore
+                sigma,
+                // radius: sigma * 2,
                 brightness: 1,
                 mode: Shell.BlurMode.BACKGROUND, // blur what is behind the widget
             }),

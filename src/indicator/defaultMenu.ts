@@ -185,9 +185,9 @@ export default class DefaultMenu implements CurrentMenu {
             Settings.SETTING_SELECTED_LAYOUTS,
             () => {
                 this._updateScaling();
-                if (this._layoutsRows.length !== getMonitors().length) {
+                if (this._layoutsRows.length !== getMonitors().length)
                     this._drawLayouts();
-                }
+
                 Settings.get_selected_layouts().forEach((selectedId, index) => {
                     this._layoutsRows[index].selectLayout(selectedId);
                 });
@@ -206,9 +206,8 @@ export default class DefaultMenu implements CurrentMenu {
             enableScalingFactorSupport(this._container, scalingFactor);
 
             this._updateScaling();
-            if (this._layoutsRows.length !== getMonitors().length) {
+            if (this._layoutsRows.length !== getMonitors().length)
                 this._drawLayouts();
-            }
 
             // compute monitors details and update labels asynchronously (if we have successful results...)
             this._computeMonitorsDetails();

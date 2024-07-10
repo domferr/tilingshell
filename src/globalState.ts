@@ -62,7 +62,7 @@ export default class GlobalState extends GObject.Object {
         const layFoundIndex = this._layouts.findIndex(
             (lay) => lay.id === layoutToDelete.id,
         );
-        if (layFoundIndex == -1) return;
+        if (layFoundIndex === -1) return;
 
         this._layouts.splice(layFoundIndex, 1);
 
@@ -84,7 +84,7 @@ export default class GlobalState extends GObject.Object {
         const layFoundIndex = this._layouts.findIndex(
             (lay) => lay.id === newLay.id,
         );
-        if (layFoundIndex == -1) return;
+        if (layFoundIndex === -1) return;
 
         this._layouts[layFoundIndex] = newLay;
         // easy way to trigger save and signal emission

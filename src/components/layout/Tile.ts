@@ -1,7 +1,7 @@
 import GObject from 'gi://GObject';
 
 export default class Tile {
-    //@ts-expect-error "GObject has TYPE_JSOBJECT"
+    // @ts-expect-error "GObject has TYPE_JSOBJECT"
     static $gtype = GObject.TYPE_JSOBJECT;
 
     x: number;
