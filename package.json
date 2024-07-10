@@ -13,16 +13,21 @@
     "clean:package": "rm -rf './dist/tilingshell@ferrarodomenico.com.zip'; rm -rf './dist_legacy/tilingshell@ferrarodomenico.com.zip'",
     "install:extension": "mkdir -p ~/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com && cp ./dist$([ $(gnome-shell --version | grep -o -E '[0-9]+' | head -n 1) -le 44 ] && echo '_legacy')/* ~/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/ -r",
     "wayland-session": "dbus-run-session -- gnome-shell --nested --wayland",
-    "dev:wayland": "npm run build && npm run install:extension && npm run wayland-session"
+    "dev:wayland": "npm run build && npm run install:extension && npm run wayland-session",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prettier:check": "prettier --check \"**/*.{ts,scss}\"",
+    "prettier:fix": "prettier --write \"**/*.{ts,scss}\""
   },
   "devDependencies": {
-    "@eslint/js": "^9.6.0",
     "esbuild": "^0.20.2",
     "esbuild-sass-plugin": "^3.2.0",
-    "eslint": "^9.6.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
     "glob": "^10.3.12",
     "globals": "^15.8.0",
-    "prettier": "^3.2.5",
+    "prettier": "^3.3.2",
     "typescript": "^5.4.5",
     "typescript-eslint": "^7.15.0"
   },

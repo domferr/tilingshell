@@ -1,6 +1,6 @@
-import { buildRectangle, isPointInsideRect } from "@utils/ui";
-import Mtk from "gi://Mtk";
-import Settings from "@settings";
+import { buildRectangle, isPointInsideRect } from '@utils/ui';
+import Mtk from 'gi://Mtk';
+import Settings from '@settings';
 
 const EDGE_TILING_OFFSET = 16;
 const TOP_EDGE_TILING_OFFSET = 8;
@@ -21,7 +21,7 @@ export default class EdgeTilingManager {
 
     // current active zone
     private _activeEdgeTile: Mtk.Rectangle | null;
-    
+
     constructor(initialWorkArea: Mtk.Rectangle) {
         this._workArea = buildRectangle();
         this._topLeft = buildRectangle();
@@ -49,7 +49,8 @@ export default class EdgeTilingManager {
         this._topLeft.width = width;
         this._topLeft.height = height;
 
-        this._topRight.x = this._workArea.x + this._workArea.width - this._topLeft.width;
+        this._topRight.x =
+            this._workArea.x + this._workArea.width - this._topLeft.width;
         this._topRight.y = this._topLeft.y;
         this._topRight.width = width;
         this._topRight.height = height;
@@ -81,23 +82,31 @@ export default class EdgeTilingManager {
     }
 
     public canActivateEdgeTiling(x: number, y: number) {
-        return x <= this._workArea.x + EDGE_TILING_OFFSET 
-            || y <= this._workArea.y + TOP_EDGE_TILING_OFFSET
-            || x >= this._workArea.x + this._workArea.width - EDGE_TILING_OFFSET
-            || y >= this._workArea.y + this._workArea.height - EDGE_TILING_OFFSET;
+        return (
+            x <= this._workArea.x + EDGE_TILING_OFFSET ||
+            y <= this._workArea.y + TOP_EDGE_TILING_OFFSET ||
+            x >= this._workArea.x + this._workArea.width - EDGE_TILING_OFFSET ||
+            y >= this._workArea.y + this._workArea.height - EDGE_TILING_OFFSET
+        );
     }
-    
+
     public isPerformingEdgeTiling(): boolean {
         return this._activeEdgeTile !== null;
     }
 
-    public startEdgeTiling(x: number, y: number): { changed: boolean, rect: Mtk.Rectangle } {
+    public startEdgeTiling(
+        x: number,
+        y: number,
+    ): { changed: boolean; rect: Mtk.Rectangle } {
         const previewRect = buildRectangle();
 
-        if (this._activeEdgeTile && isPointInsideRect({x, y}, this._activeEdgeTile)) {
+        if (
+            this._activeEdgeTile &&
+            isPointInsideRect({ x, y }, this._activeEdgeTile)
+        ) {
             return {
                 changed: false,
-                rect: previewRect
+                rect: previewRect,
             };
         }
 
@@ -107,55 +116,63 @@ export default class EdgeTilingManager {
         previewRect.height = this._workArea.height * QUARTER_PERCENTAGE;
         previewRect.y = this._workArea.y;
         previewRect.x = this._workArea.x;
-        if (isPointInsideRect({x, y}, this._topCenter)) {
+        if (isPointInsideRect({ x, y }, this._topCenter)) {
             previewRect.width = this._workArea.width;
             previewRect.height = this._workArea.height;
 
             this._activeEdgeTile = this._topCenter;
-        // center-left (full edge tile)
-        } else if (isPointInsideRect({x, y}, this._leftCenter)) {
+            // center-left (full edge tile)
+        } else if (isPointInsideRect({ x, y }, this._leftCenter)) {
             previewRect.width = this._workArea.width * QUARTER_PERCENTAGE;
             previewRect.height = this._workArea.height;
 
             this._activeEdgeTile = this._leftCenter;
-        // center-right (full edge tile)
-        } else if (isPointInsideRect({x, y}, this._rightCenter)) {
-            previewRect.x = this._workArea.x + this._workArea.width - previewRect.width;
+            // center-right (full edge tile)
+        } else if (isPointInsideRect({ x, y }, this._rightCenter)) {
+            previewRect.x =
+                this._workArea.x + this._workArea.width - previewRect.width;
             previewRect.width = this._workArea.width * QUARTER_PERCENTAGE;
             previewRect.height = this._workArea.height;
 
             this._activeEdgeTile = this._rightCenter;
-        // left side
-        } else if (x <= this._workArea.x + (this._workArea.width / 2)) {
+            // left side
+        } else if (x <= this._workArea.x + this._workArea.width / 2) {
             // top-left corner
-            if (isPointInsideRect({x, y}, this._topLeft)) {
+            if (isPointInsideRect({ x, y }, this._topLeft)) {
                 this._activeEdgeTile = this._topLeft;
-            // bottom-left corner
-            } else if (isPointInsideRect({x, y}, this._bottomLeft)) {
-                previewRect.y = this._workArea.y + this._workArea.height - previewRect.height;
+                // bottom-left corner
+            } else if (isPointInsideRect({ x, y }, this._bottomLeft)) {
+                previewRect.y =
+                    this._workArea.y +
+                    this._workArea.height -
+                    previewRect.height;
                 this._activeEdgeTile = this._bottomLeft;
-            // bottom-center
+                // bottom-center
             } else {
                 return {
                     changed: false,
-                    rect: previewRect
+                    rect: previewRect,
                 };
             }
-        // right side
+            // right side
         } else {
-            previewRect.x = this._workArea.x + this._workArea.width - previewRect.width;
+            previewRect.x =
+                this._workArea.x + this._workArea.width - previewRect.width;
             // top-right corner
-            if (isPointInsideRect({x, y}, this._topRight)) {
+            if (isPointInsideRect({ x, y }, this._topRight)) {
                 this._activeEdgeTile = this._topRight;
-            // bottom-right corner
-            } else if (isPointInsideRect({x, y}, this._bottomRight)) {
-                previewRect.y = this._workArea.y + this._workArea.height - previewRect.height;
+                // bottom-right corner
+            } else if (isPointInsideRect({ x, y }, this._bottomRight)) {
+                previewRect.y =
+                    this._workArea.y +
+                    this._workArea.height -
+                    previewRect.height;
                 this._activeEdgeTile = this._bottomRight;
-            // bottom-center
+                // bottom-center
             } else {
                 return {
                     changed: false,
-                    rect: previewRect
+                    rect: previewRect,
                 };
             }
         }
@@ -174,14 +191,16 @@ export default class EdgeTilingManager {
 
         return {
             changed: true,
-            rect: previewRect
+            rect: previewRect,
         };
     }
 
     public needMaximize(): boolean {
-        return this._activeEdgeTile !== null 
-            && Settings.get_top_edge_maximize() 
-            && this._activeEdgeTile === this._topCenter;
+        return (
+            this._activeEdgeTile !== null &&
+            Settings.get_top_edge_maximize() &&
+            this._activeEdgeTile === this._topCenter
+        );
     }
 
     public abortEdgeTiling() {

@@ -4,10 +4,10 @@
     // multiplied and divided by 1000 to make up for round() shortcoming
     $em_value: calc($input / $base) * 1.091 * 1000;
     @return calc(round($em_value) / 1000) * 1em;
-}  
+}
 
 // From https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/43.0/data/theme/gnome-shell-sass/_common.scss
-$base_font_size: 11pt;      // font size
+$base_font_size: 11pt; // font size
 $base_padding: to_em(6px); //6px;
 $base_margin: 4px;
 $base_border_radius: 8px; //to_em(8px);
@@ -27,9 +27,9 @@ $base_border_radius: 8px; //to_em(8px);
     @include fontsize(15pt);
 }
 
-@import "tile_preview.scss";
-@import "snap_assist.scss";
-@import "indicator.scss";
-@import "layout_button.scss";
-@import "editor.scss";
-@import "window_menu.scss";
+@import 'tile_preview.scss';
+@import 'snap_assist.scss';
+@import 'indicator.scss';
+@import 'layout_button.scss';
+@import 'editor.scss';
+@import 'window_menu.scss';

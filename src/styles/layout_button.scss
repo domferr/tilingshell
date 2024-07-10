@@ -10,8 +10,8 @@
     border-color: transparent;
 
     .snap-assist-tile {
-        border-color: rgba(255,255,255,0.4);
-        background-color: rgba(255,255,255,0.1);
+        border-color: rgba(255, 255, 255, 0.4);
+        background-color: rgba(255, 255, 255, 0.1);
     }
 
     .snap-assist-tile.dark {
@@ -22,11 +22,11 @@
 
 .layout-button:hover,
 .layout-button:checked {
-    border-color: rgba(255,255,255,0.7);
+    border-color: rgba(255, 255, 255, 0.7);
 
     .snap-assist-tile {
-        border-color: rgba(255,255,255,0.7);
-        background-color: rgba(255,255,255,0.25);
+        border-color: rgba(255, 255, 255, 0.7);
+        background-color: rgba(255, 255, 255, 0.25);
     }
 
     .snap-assist-tile.dark {

@@ -1,7 +1,7 @@
 .window-menu-layout {
     .snap-assist-tile {
-        border-color: rgba(255,255,255,0.55);
-        background-color: rgba(255,255,255,0.2);
+        border-color: rgba(255, 255, 255, 0.55);
+        background-color: rgba(255, 255, 255, 0.2);
         //border-radius-value: $snap-assist-tile-border-radius - 2;
         border-width: calc($snap-assist-tile-border-width / 2);
     }
@@ -12,8 +12,8 @@
     }
 
     .snap-assist-tile:hover {
-        border-color: rgba(255,255,255,0.85);
-        background-color: rgba(255,255,255,0.5);
+        border-color: rgba(255, 255, 255, 0.85);
+        background-color: rgba(255, 255, 255, 0.5);
     }
 
     .snap-assist-tile.dark:hover {
