@@ -113,7 +113,7 @@ class SnapAssistContent extends St.BoxLayout {
     _init() {
         super._init();
 
-        const effect = buildBlurEffect(48);
+        const effect = buildBlurEffect(36);
         effect.set_name('blur');
         effect.set_enabled(this._blur);
         this.add_effect(effect);
@@ -132,7 +132,7 @@ class SnapAssistContent extends St.BoxLayout {
         const backgroundColor = this.get_theme_node()
             .get_background_color()
             .copy();
-        const alpha = this._blur ? 0.6 : backgroundColor.alpha;
+        const alpha = this._blur ? 0.7 : backgroundColor.alpha;
         this.set_style(`
             padding: ${this._bottomPadding}px !important;
             background-color: rgba(${backgroundColor.red}, ${backgroundColor.green}, ${backgroundColor.blue}, ${alpha}) !important;

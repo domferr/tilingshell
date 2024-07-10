@@ -180,7 +180,7 @@ export class TilingManager {
         window: Meta.Window,
         direction: Meta.DisplayDirection,
     ): boolean {
-        let destinationRect: Mtk.Rectangle | undefined;
+        let destination: { rect: Mtk.Rectangle; tile: Tile } | undefined;
         if (window.get_maximized()) {
             switch (direction) {
                 case Meta.DisplayDirection.DOWN:
@@ -189,25 +189,25 @@ export class TilingManager {
                 case Meta.DisplayDirection.UP:
                     return false;
                 case Meta.DisplayDirection.LEFT:
-                    destinationRect = this._tilingLayout.getLeftmostTile();
+                    destination = this._tilingLayout.getLeftmostTile();
                     break;
                 case Meta.DisplayDirection.RIGHT:
-                    destinationRect = this._tilingLayout.getRightmostTile();
+                    destination = this._tilingLayout.getRightmostTile();
                     break;
             }
         }
 
         // find the nearest tile
         const windowRect = window.get_frame_rect().copy();
-        if (!destinationRect) {
-            destinationRect = this._tilingLayout.getNearestTile(
+        if (!destination) {
+            destination = this._tilingLayout.getNearestTile(
                 windowRect,
                 direction,
             );
         }
 
         // there isn't a tile near the window
-        if (!destinationRect) {
+        if (!destination) {
             // handle maximize of window
             if (
                 direction === Meta.DisplayDirection.UP &&
@@ -219,14 +219,16 @@ export class TilingManager {
             return false;
         }
 
-        if (!(window as ExtendedWindow).isTiled && !window.get_maximized())
+        if (!(window as ExtendedWindow).assignedTile && !window.get_maximized())
             (window as ExtendedWindow).originalSize = windowRect;
 
-        (window as ExtendedWindow).isTiled = true;
+        (window as ExtendedWindow).assignedTile = new Tile({
+            ...destination.tile,
+        });
 
         if (window.get_maximized()) window.unmaximize(Meta.MaximizeFlags.BOTH);
 
-        this._easeWindowRect(window, destinationRect, true);
+        this._easeWindowRect(window, destination.rect, true);
         return true;
     }
 
@@ -340,7 +342,7 @@ export class TilingManager {
 
         const [x, y, modifier] = global.get_pointer();
         const extWin = window as ExtendedWindow;
-        extWin.isTiled = false;
+        extWin.assignedTile = undefined;
         // if there is "originalSize" attached, it means the window were tiled and
         // it is the first time the window is moved. If that's the case, change
         // window's size to the size it had before it were tiled (the originalSize)
@@ -523,12 +525,13 @@ export class TilingManager {
 
         this._signals.disconnect(window);
         this._tilingLayout.close();
-        const selectionRect = buildRectangle({
+        const desiredWindowRect = buildRectangle({
             x: this._selectedTilesPreview.innerX,
             y: this._selectedTilesPreview.innerY,
             width: this._selectedTilesPreview.innerWidth,
             height: this._selectedTilesPreview.innerHeight,
         });
+        const selectedTilesRect = this._selectedTilesPreview.rect.copy();
         this._selectedTilesPreview.close(true);
         this._snapAssist.close(true);
         this._lastCursorPos = null;
@@ -562,15 +565,18 @@ export class TilingManager {
         if (!this._isPointerInsideThisMonitor()) return;
 
         // abort if there is an invalid selection
-        if (selectionRect.width <= 0 || selectionRect.height <= 0) return;
+        if (desiredWindowRect.width <= 0 || desiredWindowRect.height <= 0)
+            return;
 
         if (window.get_maximized()) return;
 
         (window as ExtendedWindow).originalSize = window
             .get_frame_rect()
             .copy();
-        (window as ExtendedWindow).isTiled = true;
-        this._easeWindowRect(window, selectionRect);
+        (window as ExtendedWindow).assignedTile = new Tile({
+            ...TileUtils.build_tile(selectedTilesRect, this._workArea),
+        });
+        this._easeWindowRect(window, desiredWindowRect);
     }
 
     private _easeWindowRect(
@@ -735,11 +741,7 @@ export class TilingManager {
                 this._workArea.height;
         }
 
-        const dummyPreview = new TilePreview({
-            parent: global.windowGroup,
-            rect: scaledRect,
-        });
-        dummyPreview.gaps = buildTileGaps(
+        const gaps = buildTileGaps(
             scaledRect,
             this._tilingLayout.innerGaps,
             this._tilingLayout.outerGaps,
@@ -750,24 +752,33 @@ export class TilingManager {
         );
 
         const destinationRect = buildRectangle({
-            x: dummyPreview.innerX,
-            y: dummyPreview.innerY,
-            width: dummyPreview.innerWidth,
-            height: dummyPreview.innerHeight,
+            x: scaledRect.x + gaps.left,
+            y: scaledRect.y + gaps.top,
+            width: scaledRect.width - gaps.left - gaps.right,
+            height: scaledRect.height - gaps.top - gaps.bottom,
         });
-        dummyPreview.destroy();
 
         // abort if there is an invalid selection
         if (destinationRect.width <= 0 || destinationRect.height <= 0) return;
 
         if (window.get_maximized()) return;
 
-        if (!(window as ExtendedWindow).isTiled) {
+        if (!(window as ExtendedWindow).assignedTile) {
             (window as ExtendedWindow).originalSize = window
                 .get_frame_rect()
                 .copy();
         }
-        (window as ExtendedWindow).isTiled = true;
+        (window as ExtendedWindow).assignedTile = new Tile({
+            ...TileUtils.build_tile(
+                buildRectangle({
+                    x: scaledRect.x,
+                    y: scaledRect.y,
+                    width: scaledRect.width,
+                    height: scaledRect.height,
+                }),
+                this._workArea,
+            ),
+        });
         this._easeWindowRect(window, destinationRect);
     }
 }

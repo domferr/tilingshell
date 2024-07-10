@@ -171,3 +171,22 @@ export function buildBlurEffect(sigma: number): Shell.BlurEffect {
     }
     return effect;
 }
+
+/** From Gnome Shell: https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/main/js/ui/altTab.js#L53 */
+export function getWindows(): Meta.Window[] {
+    const workspace = global.workspaceManager.get_active_workspace();
+    // We ignore skip-taskbar windows in switchers, but if they are attached
+    // to their parent, their position in the MRU list may be more appropriate
+    // than the parent; so start with the complete list ...
+    // ... map windows to their parent where appropriate ...
+    return global.display
+        .get_tab_list(Meta.TabList.NORMAL_ALL, workspace)
+        .map((w) => {
+            const transient = w.get_transient_for();
+            return w.is_attached_dialog() && transient !== null ? transient : w;
+            // ... and filter out skip-taskbar windows and duplicates
+        })
+        .filter(
+            (w, i, a) => w !== null && !w.skipTaskbar && a.indexOf(w) === i,
+        );
+}

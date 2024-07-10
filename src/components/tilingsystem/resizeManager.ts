@@ -4,6 +4,7 @@ import St from 'gi://St';
 import SignalHandling from '@signalHandling';
 import Settings from '@settings';
 import ExtendedWindow from './extendedWindow';
+import { getWindows } from '@utils/ui';
 
 export class ResizingManager {
     private _signals: SignalHandling | null;
@@ -56,29 +57,12 @@ export class ResizingManager {
         if (this._signals) this._signals.disconnect();
     }
 
-    /** From Gnome Shell: https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/main/js/ui/altTab.js#L53 */
-    private _getWindows(): Meta.Window[] {
-        const workspace = global.workspaceManager.get_active_workspace();
-        // We ignore skip-taskbar windows in switchers, but if they are attached
-        // to their parent, their position in the MRU list may be more appropriate
-        // than the parent; so start with the complete list ...
-        // ... map windows to their parent where appropriate ...
-        return global.display
-            .get_tab_list(Meta.TabList.NORMAL_ALL, workspace)
-            .map((w) => {
-                const transient = w.get_transient_for();
-                return w.is_attached_dialog() && transient !== null
-                    ? transient
-                    : w;
-                // ... and filter out skip-taskbar windows and duplicates
-            })
-            .filter(
-                (w, i, a) => w !== null && !w.skipTaskbar && a.indexOf(w) === i,
-            );
-    }
-
     private _onWindowResizingBegin(window: Meta.Window, grabOp: Meta.GrabOp) {
-        if (!window || !(window as ExtendedWindow).isTiled || !this._signals)
+        if (
+            !window ||
+            !(window as ExtendedWindow).assignedTile ||
+            !this._signals
+        )
             return;
 
         const verticalSide: [boolean, St.Side] = [false, 0];
@@ -125,10 +109,10 @@ export class ResizingManager {
         }
         if (!verticalSide[0] && !horizontalSide[0]) return;
 
-        const otherTiledWindows = this._getWindows().filter(
+        const otherTiledWindows = getWindows().filter(
             (otherWindow) =>
                 otherWindow &&
-                (otherWindow as ExtendedWindow).isTiled &&
+                (otherWindow as ExtendedWindow).assignedTile &&
                 otherWindow !== window &&
                 !otherWindow.minimized,
         );

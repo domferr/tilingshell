@@ -257,13 +257,6 @@ export default class TilingShellExtension extends Extension {
             focus_window.get_monitor(),
             direction,
         );
-        const neighborTilingManager =
-            this._tilingManagers[neighborMonitorIndex];
-        if (!neighborTilingManager) return;
-
-        // @ts-expect-error "Main.wm has skipNextEffect function"
-        Main.wm.skipNextEffect(focus_window.get_compositor_private());
-        focus_window.move_to_monitor(neighborMonitorIndex);
 
         // if the window is maximized, direction is UP and there is a monitor above, minimize the window
         if (
@@ -278,8 +271,6 @@ export default class TilingShellExtension extends Extension {
         // @ts-expect-error "Main.wm has skipNextEffect function"
         Main.wm.skipNextEffect(focus_window.get_compositor_private());
         focus_window.move_to_monitor(neighborMonitorIndex);
-
-        neighborTilingManager.onKeyboardMoveWindow(focus_window, direction);
     }
 
     private _isFractionalScalingEnabled(

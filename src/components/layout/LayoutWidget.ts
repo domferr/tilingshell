@@ -75,7 +75,6 @@ export default class LayoutWidget<
         });
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     protected buildTile(
         _parent: Clutter.Actor,
         _rect: Mtk.Rectangle,

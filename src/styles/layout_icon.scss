@@ -1,0 +1,18 @@
+.layout-icon {
+    .snap-assist-tile {
+        border-radius-value: $snap-assist-tile-border-radius - 1;
+        border-width: calc($snap-assist-tile-border-width / 2);
+        border-color: rgba(255, 255, 255, 0.2);
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .snap-assist-tile.important {
+        border-color: rgba(255, 255, 255, 0.7);
+        background-color: rgba(255, 255, 255, 0.45);
+    }
+
+    .snap-assist-tile.dark {
+        border-color: #b5b5b5;
+        background-color: #e3e3e3;
+    }
+}

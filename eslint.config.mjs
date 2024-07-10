@@ -42,7 +42,6 @@ export default tseslint.config(
             '@typescript-eslint': tseslint.plugin,
         },
         rules: {
-            'prettier/prettier': 'error',
             /* Allow unused variables starting with underscores */
             'no-unused-vars': 'off',
             '@typescript-eslint/no-unused-vars': [

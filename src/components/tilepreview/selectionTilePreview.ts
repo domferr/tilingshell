@@ -86,11 +86,8 @@ export default class SelectionTilePreview extends TilePreview {
         );
         // The final alpha value is divided by 255 since CSS needs a value from 0 to 1, but ClutterColor expresses alpha from 0 to 255
         this.set_style(`
-      background-color: rgba(${backgroundColor.red}, ${backgroundColor.green}, ${backgroundColor.blue}, ${newAlpha / 255}) !important;
-    `);
-        /* this.set_style(`
-      background-color: rgba(255, 255, 255, 0.5) !important;
-    `);*/
+            background-color: rgba(${backgroundColor.red}, ${backgroundColor.green}, ${backgroundColor.blue}, ${newAlpha / 255}) !important;
+        `);
     }
 
     close(ease: boolean = false) {

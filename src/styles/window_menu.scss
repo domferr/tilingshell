@@ -2,7 +2,7 @@
     .snap-assist-tile {
         border-color: rgba(255, 255, 255, 0.55);
         background-color: rgba(255, 255, 255, 0.2);
-        //border-radius-value: $snap-assist-tile-border-radius - 2;
+        border-radius-value: $snap-assist-tile-border-radius - 2;
         border-width: calc($snap-assist-tile-border-width / 2);
     }
 
