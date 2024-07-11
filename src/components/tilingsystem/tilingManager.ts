@@ -24,7 +24,63 @@ import GlobalState from '@/globalState';
 import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
 import ExtendedWindow from './extendedWindow';
 import EdgeTilingManager from './edgeTilingManager';
-import TilePreview from '@components/tilepreview/tilePreview';
+
+class TouchPointer {
+    private static _instance: TouchPointer | null = null;
+
+    private _x: number;
+    private _y: number;
+    private _windowPos: Mtk.Rectangle;
+    private _touchSignal: number | null;
+
+    private constructor() {
+        this._x = -1;
+        this._y = -1;
+        this._windowPos = buildRectangle();
+        this._touchSignal = null;
+    }
+
+    public static get(): TouchPointer {
+        if (!this._instance) this._instance = new TouchPointer();
+
+        return this._instance;
+    }
+
+    public isTouchDeviceActive(): boolean {
+        return (
+            this._x !== -1 &&
+            this._y !== -1 &&
+            this._windowPos.x !== -1 &&
+            this._windowPos.y !== -1
+        );
+    }
+
+    public onTouchEvent(x: number, y: number) {
+        this._x = x;
+        this._y = y;
+    }
+
+    public updateWindowPosition(newSize: Mtk.Rectangle) {
+        this._windowPos.x = newSize.x;
+        this._windowPos.y = newSize.y;
+    }
+
+    public reset() {
+        this._x = -1;
+        this._y = -1;
+        this._windowPos.x = -1;
+        this._windowPos.y = -1;
+    }
+
+    public get_pointer(window: Meta.Window): [number, number, number] {
+        const currPos = window.get_frame_rect();
+        this._x += currPos.x - this._windowPos.x;
+        this._y += currPos.y - this._windowPos.y;
+        this._windowPos.x = currPos.x;
+        this._windowPos.y = currPos.y;
+        return [this._x, this._y, global.get_pointer()[2]];
+    }
+}
 
 export class TilingManager {
     private readonly _monitor: Monitor;
@@ -267,6 +323,16 @@ export class TilingManager {
     private _onWindowGrabBegin(window: Meta.Window, grabOp: number) {
         if (this._isGrabbingWindow) return;
 
+        TouchPointer.get().updateWindowPosition(window.get_frame_rect());
+        this._signals.connect(
+            global.stage,
+            'touch-event',
+            (_source, event: Clutter.Event) => {
+                const [x, y] = event.get_coords();
+                TouchPointer.get().onTouchEvent(x, y);
+            },
+        );
+
         // workaround for gnome-shell bug https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/2857
         if (
             Settings.get_enable_blur_snap_assistant() ||
@@ -329,7 +395,7 @@ export class TilingManager {
         if (
             !window.allows_resize() ||
             !window.allows_move() ||
-            !this._isPointerInsideThisMonitor()
+            !this._isPointerInsideThisMonitor(window)
         ) {
             this._tilingLayout.close();
             this._selectedTilesPreview.close(true);
@@ -340,7 +406,9 @@ export class TilingManager {
             return GLib.SOURCE_CONTINUE;
         }
 
-        const [x, y, modifier] = global.get_pointer();
+        const [x, y, modifier] = TouchPointer.get().isTouchDeviceActive()
+            ? TouchPointer.get().get_pointer(window)
+            : global.get_pointer();
         const extWin = window as ExtendedWindow;
         extWin.assignedTile = undefined;
         // if there is "originalSize" attached, it means the window were tiled and
@@ -370,6 +438,7 @@ export class TilingManager {
                 // if we restarted the grab, we need to force window movement and to
                 // perform user operation
                 this._easeWindowRect(window, newSize, restartGrab, restartGrab);
+                TouchPointer.get().updateWindowPosition(newSize);
 
                 if (restartGrab) {
                     // must be done now, before begin_grab_op, because begin_grab_op will trigger
@@ -438,10 +507,7 @@ export class TilingManager {
             if (
                 Settings.get_active_screen_edges() &&
                 !this._isSnapAssisting &&
-                this._edgeTilingManager.canActivateEdgeTiling(
-                    global.get_pointer()[0],
-                    global.get_pointer()[1],
-                )
+                this._edgeTilingManager.canActivateEdgeTiling(x, y)
             ) {
                 const { changed, rect } =
                     this._edgeTilingManager.startEdgeTiling(x, y);
@@ -562,7 +628,7 @@ export class TilingManager {
 
         // abort if the pointer is moving on another monitor: the user moved
         // the window to another monitor not handled by this tiling manager
-        if (!this._isPointerInsideThisMonitor()) return;
+        if (!this._isPointerInsideThisMonitor(window)) return;
 
         // abort if there is an invalid selection
         if (desiredWindowRect.width <= 0 || desiredWindowRect.height <= 0)
@@ -672,8 +738,10 @@ export class TilingManager {
      * Checks if pointer is inside the current monitor
      * @returns true if the pointer is inside the current monitor, false otherwise
      */
-    private _isPointerInsideThisMonitor(): boolean {
-        const [x, y] = global.get_pointer();
+    private _isPointerInsideThisMonitor(window: Meta.Window): boolean {
+        const [x, y] = TouchPointer.get().isTouchDeviceActive()
+            ? TouchPointer.get().get_pointer(window)
+            : global.get_pointer();
         return (
             x >= this._monitor.x &&
             x <= this._monitor.x + this._monitor.width &&
