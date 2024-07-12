@@ -31,13 +31,11 @@ class TouchPointer {
     private _x: number;
     private _y: number;
     private _windowPos: Mtk.Rectangle;
-    private _touchSignal: number | null;
 
     private constructor() {
         this._x = -1;
         this._y = -1;
         this._windowPos = buildRectangle();
-        this._touchSignal = null;
     }
 
     public static get(): TouchPointer {
