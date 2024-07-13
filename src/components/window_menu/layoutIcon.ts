@@ -11,7 +11,7 @@ import Clutter from 'gi://Clutter';
 export default class LayoutIcon extends LayoutWidget<SnapAssistTile> {
     constructor(
         parent: Clutter.Actor,
-        importantTilesIndex: Tile[],
+        importantTiles: Tile[],
         tiles: Tile[],
         innerGaps: Clutter.Margin,
         outerGaps: Clutter.Margin,
@@ -38,7 +38,7 @@ export default class LayoutIcon extends LayoutWidget<SnapAssistTile> {
         this.set_x_expand(false);
         this.set_y_expand(false);
 
-        importantTilesIndex.forEach((t) => {
+        importantTiles.forEach((t) => {
             const preview = this._previews.find(
                 (snap) => snap.tile.x === t.x && snap.tile.y === t.y,
             );

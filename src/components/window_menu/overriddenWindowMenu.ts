@@ -214,6 +214,46 @@ export default class OverriddenWindowMenu extends GObject.Object {
             });
             return layoutWidget;
         });
+
+        /* const quarterTiles: [Tile, string][] = [
+            [
+                new Tile({ x: 0, y: 0, width: 0.5, height: 0.5, groups: [] }),
+                'Move to Top Left',
+            ],
+            [
+                new Tile({ x: 0.5, y: 0, width: 0.5, height: 0.5, groups: [] }),
+                'Move to Top Right',
+            ],
+            [
+                new Tile({ x: 0, y: 0.5, width: 0.5, height: 0.5, groups: [] }),
+                'Move to Bottom Left',
+            ],
+            [
+                new Tile({
+                    x: 0.5,
+                    y: 0.5,
+                    width: 0.5,
+                    height: 0.5,
+                    groups: [],
+                }),
+                'Move to Bottom Right',
+            ],
+        ];
+
+        quarterTiles.forEach(([tile, label]) => {
+            const pMenu = new PopupMenu.PopupBaseMenuItem();
+            this.addMenuItem(pMenu);
+            buildMenuWithLayoutIcon(
+                label,
+                pMenu,
+                [tile],
+                [tile],
+                hasGaps ? 2 : 0,
+            );
+            pMenu.connect('activate', () => {
+                owm.emit('tile-clicked', tile, window);
+            });
+        });*/
     }
 }
 
