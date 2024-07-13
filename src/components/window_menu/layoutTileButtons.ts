@@ -24,8 +24,9 @@ export default class LayoutTileButtons extends LayoutWidget<SnapAssistTileButton
             outerGaps: new Clutter.Margin(),
             styleClass: 'window-menu-layout',
         });
-        console.log('LayoutTileButtons');
+
         this.relayout();
+        this._fixFloatingPointErrors();
     }
 
     buildTile(
@@ -34,11 +35,43 @@ export default class LayoutTileButtons extends LayoutWidget<SnapAssistTileButton
         gaps: Clutter.Margin,
         tile: Tile,
     ): SnapAssistTileButton {
-        console.log(`${rect.x} ${rect.y} ${rect.width} ${rect.height}`);
         return new SnapAssistTileButton({ parent, rect, gaps, tile });
     }
 
     public get buttons(): SnapAssistTileButton[] {
         return this._previews;
+    }
+
+    private _fixFloatingPointErrors() {
+        const xMap: Map<number, number> = new Map();
+        const yMap: Map<number, number> = new Map();
+        this._previews.forEach((prev) => {
+            const tile = prev.tile;
+            const newX = xMap.get(tile.x);
+            if (!newX) xMap.set(tile.x, prev.rect.x);
+            const newY = yMap.get(tile.y);
+            if (!newY) yMap.set(tile.y, prev.rect.y);
+
+            if (newX || newY) {
+                prev.open(
+                    false,
+                    buildRectangle({
+                        x: newX ?? prev.rect.x,
+                        y: newY ?? prev.rect.y,
+                        width: prev.rect.width,
+                        height: prev.rect.height,
+                    }),
+                );
+            }
+            xMap.set(
+                tile.x + tile.width,
+                xMap.get(tile.x + tile.width) ?? prev.rect.x + prev.rect.width,
+            );
+            yMap.set(
+                tile.y + tile.height,
+                yMap.get(tile.y + tile.height) ??
+                    prev.rect.y + prev.rect.height,
+            );
+        });
     }
 }

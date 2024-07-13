@@ -87,9 +87,6 @@ export default class TilePreview extends St.Widget {
     public open(ease: boolean = false, position?: Mtk.Rectangle) {
         if (position) this._rect = position;
 
-        /* debug(
-      `open tile -> x: ${this._rect.x}, y: ${this._rect.y}, width: ${this._rect.width}, height: ${this._rect.height}`,
-    );*/
         const fadeInMove = this._showing;
         this._showing = true;
         this.show();
