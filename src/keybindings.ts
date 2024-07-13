@@ -4,9 +4,9 @@ import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
-import Settings from '@settings';
-import SettingsOverride from '@settingsOverride';
-import SignalHandling from '@signalHandling';
+import Settings from '@settings/settings';
+import SettingsOverride from '@settings/settingsOverride';
+import SignalHandling from '@utils/signalHandling';
 import { registerGObjectClass } from '@utils/gjs';
 import { logger } from '@utils/shell';
 

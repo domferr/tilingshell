@@ -3,7 +3,7 @@ import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 import Gio from 'gi://Gio';
 import TilePreview from './tilePreview';
-import Settings from '@settings';
+import Settings from '@settings/settings';
 import GObject from 'gi://GObject';
 import { buildBlurEffect } from '@utils/ui';
 

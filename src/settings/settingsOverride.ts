@@ -1,4 +1,4 @@
-import Settings from '@settings';
+import Settings from '@settings/settings';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 

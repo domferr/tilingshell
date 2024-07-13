@@ -3,7 +3,7 @@ import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 import Meta from 'gi://Meta';
 import Mtk from 'gi://Mtk';
-import Settings from '@/settings';
+import Settings from '@settings/settings';
 import Shell from 'gi://Shell';
 import GObject from 'gi://GObject';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';

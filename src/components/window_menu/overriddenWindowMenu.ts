@@ -6,155 +6,15 @@ import St from 'gi://St';
 import Meta from 'gi://Meta';
 import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
-import Mtk from 'gi://Mtk';
-import GlobalState from '@globalState';
-import Settings from '@settings';
+import GlobalState from '@utils/globalState';
+import Settings from '@settings/settings';
 import { registerGObjectClass } from '@utils/gjs';
-import SnapAssistTile from '@components/snapassist/snapAssistTile';
-import LayoutWidget from '@components/layout/LayoutWidget';
-import Layout from '@components/layout/Layout';
 import Tile from '@components/layout/Tile';
-import {
-    buildMarginOf,
-    buildRectangle,
-    getScalingFactorOf,
-    getWindows,
-} from '@utils/ui';
+import { buildMarginOf, getWindows } from '@utils/ui';
 import ExtendedWindow from '@components/tilingsystem/extendedWindow';
 import TileUtils from '@components/layout/TileUtils';
-
-@registerGObjectClass
-class SnapAssistTileButton extends SnapAssistTile {
-    private readonly _btn: St.Button;
-
-    constructor(params: {
-        parent?: Clutter.Actor;
-        rect?: Mtk.Rectangle;
-        gaps?: Clutter.Margin;
-        tile: Tile;
-    }) {
-        super(params);
-        this._btn = new St.Button({
-            xExpand: true,
-            yExpand: true,
-            trackHover: true,
-        });
-        this.add_child(this._btn);
-        this._btn.set_size(this.innerWidth, this.innerHeight);
-
-        // for some reason this doesn't work: this.bind_property("hover", this._btn, "hover", GObject.BindingFlags.DEFAULT);
-        this._btn.connect('notify::hover', () =>
-            this.set_hover(this._btn.hover),
-        );
-    }
-
-    public get tile(): Tile {
-        return this._tile;
-    }
-
-    public get checked(): boolean {
-        return this._btn.checked;
-    }
-
-    public set_checked(newVal: boolean) {
-        this._btn.set_checked(newVal);
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public connect(id: string, callback: (...args: any[]) => any): number;
-    public connect(
-        signal: 'clicked',
-        callback: (_source: this, clicked_button: number) => void,
-    ): number;
-    public connect(signal: string, callback: never): number {
-        if (signal === 'clicked') return this._btn.connect(signal, callback);
-
-        return super.connect(signal, callback);
-    }
-}
-
-@registerGObjectClass
-class LayoutTileButtons extends LayoutWidget<SnapAssistTileButton> {
-    constructor(
-        parent: Clutter.Actor,
-        layout: Layout,
-        gapSize: number,
-        height: number,
-        width: number,
-    ) {
-        super({
-            parent,
-            layout,
-            containerRect: buildRectangle({ x: 0, y: 0, width, height }),
-            innerGaps: buildMarginOf(gapSize),
-            outerGaps: new Clutter.Margin(),
-            styleClass: 'window-menu-layout',
-        });
-        this.relayout();
-    }
-
-    buildTile(
-        parent: Clutter.Actor,
-        rect: Mtk.Rectangle,
-        gaps: Clutter.Margin,
-        tile: Tile,
-    ): SnapAssistTileButton {
-        return new SnapAssistTileButton({ parent, rect, gaps, tile });
-    }
-
-    public get buttons(): SnapAssistTileButton[] {
-        return this._previews;
-    }
-}
-
-@registerGObjectClass
-class LayoutIcon extends LayoutWidget<SnapAssistTile> {
-    constructor(
-        parent: Clutter.Actor,
-        importantTilesIndex: Tile[],
-        tiles: Tile[],
-        innerGaps: Clutter.Margin,
-        outerGaps: Clutter.Margin,
-        width: number,
-        height: number,
-    ) {
-        super({
-            parent,
-            layout: new Layout(tiles, ''),
-            innerGaps: innerGaps.copy(),
-            outerGaps: outerGaps.copy(),
-            containerRect: buildRectangle(),
-            styleClass: 'layout-icon button',
-        });
-
-        const [, scalingFactor] = getScalingFactorOf(this);
-        width *= scalingFactor;
-        height *= scalingFactor;
-
-        super.relayout({
-            containerRect: buildRectangle({ x: 0, y: 0, width, height }),
-        });
-        this.set_size(width, height);
-        this.set_x_expand(false);
-        this.set_y_expand(false);
-
-        importantTilesIndex.forEach((t) => {
-            const preview = this._previews.find(
-                (snap) => snap.tile.x === t.x && snap.tile.y === t.y,
-            );
-            if (preview) preview.add_style_class_name('important');
-        });
-    }
-
-    buildTile(
-        parent: Clutter.Actor,
-        rect: Mtk.Rectangle,
-        gaps: Clutter.Margin,
-        tile: Tile,
-    ): SnapAssistTile {
-        return new SnapAssistTile({ parent, rect, gaps, tile });
-    }
-}
+import LayoutIcon from './layoutIcon';
+import LayoutTileButtons from './layoutTileButtons';
 
 function buildMenuWithLayoutIcon(
     title: string,
@@ -332,7 +192,7 @@ export default class OverriddenWindowMenu extends GObject.Object {
         // @ts-expect-error "this is not an instance of OverriddenWindowMenu, but it is the WindowMenu itself"
         this.addMenuItem(layoutsPopupMenu);
 
-        const layoutHeight: number = 29;
+        const layoutHeight: number = 30;
         const layoutWidth: number = 52; // 16:9 ratio. -> (16*layoutHeight) / 9 and then rounded to int
         const owm = OverriddenWindowMenu.get();
         layouts.forEach((lay, ind) => {
@@ -356,3 +216,32 @@ export default class OverriddenWindowMenu extends GObject.Object {
         });
     }
 }
+
+/* Main.panel.statusArea.appMenu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
+const layouts = GlobalState.get().layouts;
+const rowsBoxLayout: St.BoxLayout[] = [];
+const layoutsPerRow = 2;
+for (let i = 0; i < layouts.length / layoutsPerRow; i++) {
+    const item = new PopupMenu.PopupBaseMenuItem({ styleClass: 'indicator-menu-item' });
+    const box = new St.BoxLayout({
+        x_align: Clutter.ActorAlign.CENTER,
+        y_align: Clutter.ActorAlign.CENTER,
+        xExpand: true,
+        vertical: false, // horizontal box layout
+        styleClass: "layouts-box-layout",
+    });
+    rowsBoxLayout.push(box);
+    item.add_actor(box);
+    Main.panel.statusArea.appMenu.menu.addMenuItem(item);
+}
+const hasGaps = Settings.get_inner_gaps(1).top > 0;
+
+const layoutHeight: number = 36;
+const layoutWidth: number = 64; // 16:9 ratio. -> (16*layoutHeight) / 9 and then rounded to int
+const layoutsButtons: St.Widget[] = layouts.map((lay, ind) => {
+    const btn = new St.Button({xExpand: false, styleClass: "layout-button button"});
+    btn.child = new LayoutSelectionWidget(lay, hasGaps ? 1:0, 1, layoutHeight, layoutWidth);
+    rowsBoxLayout[Math.floor(ind / layoutsPerRow)].add_child(btn);
+    return btn;
+});*/

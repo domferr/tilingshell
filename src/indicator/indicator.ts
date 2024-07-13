@@ -3,12 +3,12 @@ import St from 'gi://St';
 import Shell from 'gi://Shell';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
-import Settings from '@/settings';
+import Settings from '@settings/settings';
 import Layout from '@/components/layout/Layout';
 import Tile from '@/components/layout/Tile';
 import LayoutEditor from '@/components/editor/layoutEditor';
 import DefaultMenu from './defaultMenu';
-import GlobalState from '@/globalState';
+import GlobalState from '@utils/globalState';
 import EditingMenu from './editingMenu';
 import EditorDialog from '../components/editor/editorDialog';
 import CurrentMenu from './currentMenu';
@@ -77,36 +77,6 @@ export default class Indicator extends PanelMenu.Button {
     public enable() {
         (this.menu as PopupMenu.PopupMenu).removeAll();
         this._currentMenu = new DefaultMenu(this, this._enableScaling);
-
-        // todo
-        /* Main.panel.statusArea.appMenu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-
-        const layouts = GlobalState.get().layouts;
-        const rowsBoxLayout: St.BoxLayout[] = [];
-        const layoutsPerRow = 2;
-        for (let i = 0; i < layouts.length / layoutsPerRow; i++) {
-            const item = new PopupMenu.PopupBaseMenuItem({ styleClass: 'indicator-menu-item' });
-            const box = new St.BoxLayout({
-                x_align: Clutter.ActorAlign.CENTER,
-                y_align: Clutter.ActorAlign.CENTER,
-                xExpand: true,
-                vertical: false, // horizontal box layout
-                styleClass: "layouts-box-layout",
-            });
-            rowsBoxLayout.push(box);
-            item.add_actor(box);
-            Main.panel.statusArea.appMenu.menu.addMenuItem(item);
-        }
-        const hasGaps = Settings.get_inner_gaps(1).top > 0;
-
-        const layoutHeight: number = 36;
-        const layoutWidth: number = 64; // 16:9 ratio. -> (16*layoutHeight) / 9 and then rounded to int
-        const layoutsButtons: St.Widget[] = layouts.map((lay, ind) => {
-            const btn = new St.Button({xExpand: false, styleClass: "layout-button button"});
-            btn.child = new LayoutSelectionWidget(lay, hasGaps ? 1:0, 1, layoutHeight, layoutWidth);
-            rowsBoxLayout[Math.floor(ind / layoutsPerRow)].add_child(btn);
-            return btn;
-        });*/
     }
 
     public selectLayoutOnClick(monitorIndex: number, layoutToSelectId: string) {

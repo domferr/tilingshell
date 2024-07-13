@@ -4,7 +4,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Gdk from 'gi://Gdk';
 import GObject from 'gi://GObject';
-import Settings, { ActivationKey } from './settings';
+import Settings, { ActivationKey } from './settings/settings';
 import { logger } from './utils/shell';
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 import Layout from '@components/layout/Layout';

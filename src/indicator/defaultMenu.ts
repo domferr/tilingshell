@@ -2,7 +2,7 @@ import St from 'gi://St';
 import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 import Gio from 'gi://Gio';
-import SignalHandling from '@/signalHandling';
+import SignalHandling from '@utils/signalHandling';
 import Indicator from './indicator';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {
@@ -11,9 +11,9 @@ import {
     getScalingFactor,
     getScalingFactorOf,
 } from '@/utils/ui';
-import Settings from '@/settings';
+import Settings from '@settings/settings';
 import * as IndicatorUtils from './utils';
-import GlobalState from '@/globalState';
+import GlobalState from '@utils/globalState';
 import CurrentMenu from './currentMenu';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import LayoutButton from './layoutButton';

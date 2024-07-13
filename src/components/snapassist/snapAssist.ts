@@ -9,9 +9,9 @@ import SnapAssistTile from './snapAssistTile';
 import SnapAssistLayout from './snapAssistLayout';
 import Layout from '../layout/Layout';
 import Tile from '../layout/Tile';
-import Settings from '@/settings';
-import GlobalState from '@/globalState';
-import SignalHandling from '@/signalHandling';
+import Settings from '@settings/settings';
+import GlobalState from '@utils/globalState';
+import SignalHandling from '@utils/signalHandling';
 import {
     buildBlurEffect,
     buildMargin,

@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
-import Layout from './components/layout/Layout';
-import Tile from './components/layout/Tile';
+import Layout from '../components/layout/Layout';
+import Tile from '../components/layout/Tile';
 
 export enum ActivationKey {
     NONE = -1,

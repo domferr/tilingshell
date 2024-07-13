@@ -1,8 +1,8 @@
 import Meta from 'gi://Meta';
 import Mtk from 'gi://Mtk';
 import St from 'gi://St';
-import SignalHandling from '@signalHandling';
-import Settings from '@settings';
+import SignalHandling from '@utils/signalHandling';
+import Settings from '@settings/settings';
 import ExtendedWindow from './extendedWindow';
 import { getWindows } from '@utils/ui';
 
