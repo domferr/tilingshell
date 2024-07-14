@@ -127,15 +127,7 @@ export default class TilingShellExtension extends Extension {
         this._dbus = new DBus();
         this._dbus.enable(this);
 
-        OverriddenWindowMenu.enable();
-        OverriddenWindowMenu.get().connect(
-            'tile-clicked',
-            (_, tile: Tile, window: Meta.Window) => {
-                const monitorIndex = window.get_monitor();
-                const manager = this._tilingManagers[monitorIndex];
-                if (manager) manager.onTileFromWindowMenu(tile, window);
-            },
-        );
+        if (Settings.get_override_window_menu()) OverriddenWindowMenu.enable();
 
         debug('extension is enabled');
     }
@@ -216,6 +208,26 @@ export default class TilingShellExtension extends Extension {
                     'edge-tiling',
                     new GLib.Variant('b', nativeIsActive),
                 );
+            },
+        );
+
+        this._signals.connect(
+            Settings,
+            Settings.SETTING_OVERRIDE_WINDOW_MENU,
+            () => {
+                if (Settings.get_override_window_menu())
+                    OverriddenWindowMenu.enable();
+                else OverriddenWindowMenu.disable();
+            },
+        );
+
+        this._signals.connect(
+            OverriddenWindowMenu,
+            'tile-clicked',
+            (_, tile: Tile, window: Meta.Window) => {
+                const monitorIndex = window.get_monitor();
+                const manager = this._tilingManagers[monitorIndex];
+                if (manager) manager.onTileFromWindowMenu(tile, window);
             },
         );
     }
@@ -323,7 +335,7 @@ export default class TilingShellExtension extends Extension {
 
         this._fractionalScalingEnabled = false;
 
-        OverriddenWindowMenu.disable();
+        OverriddenWindowMenu.destroy();
         debug('extension is disabled');
     }
 }

@@ -10,13 +10,17 @@ import GlobalState from '@utils/globalState';
 import Settings from '@settings/settings';
 import { registerGObjectClass } from '@utils/gjs';
 import Tile from '@components/layout/Tile';
-import { buildMarginOf, getWindows } from '@utils/ui';
+import { getWindows } from '@utils/ui';
 import ExtendedWindow from '@components/tilingsystem/extendedWindow';
 import TileUtils from '@components/layout/TileUtils';
-import LayoutIcon from './layoutIcon';
 import LayoutTileButtons from './layoutTileButtons';
+import { buildMarginOf } from '@utils/ui';
+import LayoutIcon from './layoutIcon';
 
-function buildMenuWithLayoutIcon(
+const LAYOUT_ICON_WIDTH = 46;
+const LAYOUT_ICON_HEIGHT = 32;
+
+export function buildMenuWithLayoutIcon(
     title: string,
     popupMenu: PopupMenu.PopupBaseMenuItem,
     importantTiles: Tile[],
@@ -36,8 +40,8 @@ function buildMenuWithLayoutIcon(
         tiles,
         buildMarginOf(innerGaps),
         buildMarginOf(4),
-        46,
-        32,
+        LAYOUT_ICON_WIDTH,
+        LAYOUT_ICON_HEIGHT,
     );
     layoutIcon.set_x_align(Clutter.ActorAlign.END);
 }
@@ -55,6 +59,7 @@ export default class OverriddenWindowMenu extends GObject.Object {
 
     private static _instance: OverriddenWindowMenu | null = null;
     private static _old_buildMenu: ((window: Meta.Window) => void) | null;
+    private static _enabled: boolean = false;
 
     static get(): OverriddenWindowMenu {
         if (this._instance === null)
@@ -63,17 +68,32 @@ export default class OverriddenWindowMenu extends GObject.Object {
     }
 
     static enable() {
+        // if it is already enabled, do not enable again
+        if (this._enabled) return;
+
+        const owm = this.get();
+
         OverriddenWindowMenu._old_buildMenu =
             windowMenu.WindowMenu.prototype._buildMenu;
-        const owm = this.get();
         windowMenu.WindowMenu.prototype._buildMenu = owm.newBuildMenu;
+
+        this._enabled = true;
     }
 
     static disable() {
-        this._instance = null;
+        // if it is not enabled, do not disable
+        if (!this._enabled) return;
+
         windowMenu.WindowMenu.prototype._buildMenu =
             OverriddenWindowMenu._old_buildMenu;
         this._old_buildMenu = null;
+
+        this._enabled = false;
+    }
+
+    static destroy() {
+        this.disable();
+        this._instance = null;
     }
 
     // the function will be treated as a method of class WindowMenu
@@ -127,7 +147,11 @@ export default class OverriddenWindowMenu extends GObject.Object {
                 hasGaps ? 2 : 0,
             );
             vacantPopupMenu.connect('activate', () => {
-                owm.emit('tile-clicked', vacantTiles[middleTileIndex], window);
+                OverriddenWindowMenu.get().emit(
+                    'tile-clicked',
+                    vacantTiles[middleTileIndex],
+                    window,
+                );
             });
         }
 
@@ -143,7 +167,11 @@ export default class OverriddenWindowMenu extends GObject.Object {
                 hasGaps ? 2 : 0,
             );
             vacantLeftPopupMenu.connect('activate', () => {
-                owm.emit('tile-clicked', vacantTiles[0], window);
+                OverriddenWindowMenu.get().emit(
+                    'tile-clicked',
+                    vacantTiles[0],
+                    window,
+                );
             });
 
             const tilesFromRightToLeft = vacantTiles
@@ -160,7 +188,11 @@ export default class OverriddenWindowMenu extends GObject.Object {
                 hasGaps ? 2 : 0,
             );
             vacantRightPopupMenu.connect('activate', () => {
-                owm.emit('tile-clicked', tilesFromRightToLeft[0], window);
+                OverriddenWindowMenu.get().emit(
+                    'tile-clicked',
+                    tilesFromRightToLeft[0],
+                    window,
+                );
             });
         }
 
@@ -194,7 +226,6 @@ export default class OverriddenWindowMenu extends GObject.Object {
 
         const layoutHeight: number = 30;
         const layoutWidth: number = 52; // 16:9 ratio. -> (16*layoutHeight) / 9 and then rounded to int
-        const owm = OverriddenWindowMenu.get();
         layouts.forEach((lay, ind) => {
             const row = rows[Math.floor(ind / layoutsPerRow)];
             const layoutWidget = new LayoutTileButtons(
@@ -208,7 +239,11 @@ export default class OverriddenWindowMenu extends GObject.Object {
             layoutWidget.set_x_align(Clutter.ActorAlign.END);
             layoutWidget.buttons.forEach((btn) => {
                 btn.connect('clicked', () => {
-                    owm.emit('tile-clicked', btn.tile, window);
+                    OverriddenWindowMenu.get().emit(
+                        'tile-clicked',
+                        btn.tile,
+                        window,
+                    );
                     layoutsPopupMenu.activate(Clutter.get_current_event());
                 });
             });
@@ -255,33 +290,12 @@ export default class OverriddenWindowMenu extends GObject.Object {
             });
         });*/
     }
+
+    static connect(key: string, func: (...arg: unknown[]) => void): number {
+        return this.get().connect(key, func) || -1;
+    }
+
+    static disconnect(id: number) {
+        this.get().disconnect(id);
+    }
 }
-
-/* Main.panel.statusArea.appMenu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-
-const layouts = GlobalState.get().layouts;
-const rowsBoxLayout: St.BoxLayout[] = [];
-const layoutsPerRow = 2;
-for (let i = 0; i < layouts.length / layoutsPerRow; i++) {
-    const item = new PopupMenu.PopupBaseMenuItem({ styleClass: 'indicator-menu-item' });
-    const box = new St.BoxLayout({
-        x_align: Clutter.ActorAlign.CENTER,
-        y_align: Clutter.ActorAlign.CENTER,
-        xExpand: true,
-        vertical: false, // horizontal box layout
-        styleClass: "layouts-box-layout",
-    });
-    rowsBoxLayout.push(box);
-    item.add_actor(box);
-    Main.panel.statusArea.appMenu.menu.addMenuItem(item);
-}
-const hasGaps = Settings.get_inner_gaps(1).top > 0;
-
-const layoutHeight: number = 36;
-const layoutWidth: number = 64; // 16:9 ratio. -> (16*layoutHeight) / 9 and then rounded to int
-const layoutsButtons: St.Widget[] = layouts.map((lay, ind) => {
-    const btn = new St.Button({xExpand: false, styleClass: "layout-button button"});
-    btn.child = new LayoutSelectionWidget(lay, hasGaps ? 1:0, 1, layoutHeight, layoutWidth);
-    rowsBoxLayout[Math.floor(ind / layoutsPerRow)].add_child(btn);
-    return btn;
-});*/

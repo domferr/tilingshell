@@ -38,6 +38,7 @@ export default class Settings {
     static SETTING_ENABLE_MOVE_KEYBINDINGS = 'enable-move-keybindings';
     static SETTING_ACTIVE_SCREEN_EDGES = 'active-screen-edges';
     static SETTING_TOP_EDGE_MAXIMIZE = 'top-edge-maximize';
+    static SETTING_OVERRIDE_WINDOW_MENU = 'override-window-menu';
 
     static SETTING_MOVE_WINDOW_RIGHT = 'move-window-right';
     static SETTING_MOVE_WINDOW_LEFT = 'move-window-left';
@@ -225,6 +226,13 @@ export default class Settings {
     static get_top_edge_maximize(): boolean {
         return (
             this._settings?.get_boolean(this.SETTING_TOP_EDGE_MAXIMIZE) ?? false
+        );
+    }
+
+    static get_override_window_menu(): boolean {
+        return (
+            this._settings?.get_boolean(this.SETTING_OVERRIDE_WINDOW_MENU) ??
+            false
         );
     }
 

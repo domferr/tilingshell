@@ -153,6 +153,13 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         behaviourGroup.add(restoreToOriginalSizeRow);
 
+        const overrideWindowMenuRow = this._buildSwitchRow(
+            Settings.SETTING_OVERRIDE_WINDOW_MENU,
+            'Add snap assistant and auto-tile buttons to window menu',
+            'Add snap assistant and auto-tile buttons in the menu that shows up when you right click on a window title',
+        );
+        behaviourGroup.add(overrideWindowMenuRow);
+
         // Screen Edges section
         const activeScreenEdgesGroup = new Adw.PreferencesGroup({
             title: 'Screen Edges',
