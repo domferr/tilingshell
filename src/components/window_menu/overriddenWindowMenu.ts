@@ -131,7 +131,21 @@ export default class OverriddenWindowMenu extends GObject.Object {
         if (vacantTiles.length > 0) {
             vacantTiles.sort((a, b) => a.x - b.x);
 
-            const middleTileIndex = Math.floor(vacantTiles.length / 2);
+            let bestTileIndex = 0;
+            let bestDistance = Math.abs(
+                0.5 -
+                    vacantTiles[bestTileIndex].x +
+                    vacantTiles[bestTileIndex].width / 2,
+            );
+            for (let index = 1; index < vacantTiles.length; index++) {
+                const distance = Math.abs(
+                    0.5 - (vacantTiles[index].x + vacantTiles[index].width / 2),
+                );
+                if (bestDistance > distance) {
+                    bestTileIndex = index;
+                    bestDistance = distance;
+                }
+            }
 
             // @ts-expect-error "this is not an instance of OverriddenWindowMenu, but it is the WindowMenu itself"
             this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
@@ -142,14 +156,14 @@ export default class OverriddenWindowMenu extends GObject.Object {
             buildMenuWithLayoutIcon(
                 'Move to best tile',
                 vacantPopupMenu,
-                [vacantTiles[middleTileIndex]],
+                [vacantTiles[bestTileIndex]],
                 tiles,
                 hasGaps ? 2 : 0,
             );
             vacantPopupMenu.connect('activate', () => {
                 OverriddenWindowMenu.get().emit(
                     'tile-clicked',
-                    vacantTiles[middleTileIndex],
+                    vacantTiles[bestTileIndex],
                     window,
                 );
             });
