@@ -315,8 +315,8 @@ export default class DefaultMenu implements CurrentMenu {
 
         const selectedIdPerMonitor = Settings.get_selected_layouts();
         const monitors = getMonitors();
-        this._layoutsRows = monitors.map((monitor, index) => {
-            const selectedId = selectedIdPerMonitor[index];
+        this._layoutsRows = monitors.map((monitor) => {
+            const selectedId = selectedIdPerMonitor[monitor.index];
             const row = new LayoutsRow(
                 this._container,
                 layouts,
@@ -327,7 +327,10 @@ export default class DefaultMenu implements CurrentMenu {
             row.connect(
                 'selected-layout',
                 (r: LayoutsRow, layoutId: string) => {
-                    this._indicator.selectLayoutOnClick(index, layoutId);
+                    this._indicator.selectLayoutOnClick(
+                        monitor.index,
+                        layoutId,
+                    );
                 },
             );
             return row;
