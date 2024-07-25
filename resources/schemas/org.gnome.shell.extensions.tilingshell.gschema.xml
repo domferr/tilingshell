@@ -102,7 +102,12 @@
             <summary>Add snap assistant and auto-tile buttons to window menu</summary>
             <description>Add snap assistant and auto-tile buttons in the menu that shows up when you right click on a window title.</description>
         </key>
-        
+        <key name="snap-assistant-threshold" type="u">
+            <default>54</default>
+            <summary>Snap Assistant threshold</summary>
+            <description>Snap Assistant's threshold to enlarge, shrink, open and close it.</description>
+        </key>
+
         <!-- keybindings -->
 		<key type="as" name="move-window-right">
 			<default><![CDATA[['<Super>Right']]]></default>

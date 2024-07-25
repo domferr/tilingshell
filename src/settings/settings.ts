@@ -39,6 +39,7 @@ export default class Settings {
     static SETTING_ACTIVE_SCREEN_EDGES = 'active-screen-edges';
     static SETTING_TOP_EDGE_MAXIMIZE = 'top-edge-maximize';
     static SETTING_OVERRIDE_WINDOW_MENU = 'override-window-menu';
+    static SETTING_SNAP_ASSISTANT_THRESHOLD = 'snap-assistant-threshold';
 
     static SETTING_MOVE_WINDOW_RIGHT = 'move-window-right';
     static SETTING_MOVE_WINDOW_LEFT = 'move-window-left';

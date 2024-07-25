@@ -86,6 +86,15 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         });
         appearenceGroup.add(blur);
 
+        const snapAssistantThresholdRow = this._buildSpinButtonRow(
+            Settings.SETTING_SNAP_ASSISTANT_THRESHOLD,
+            'Snap Assistant threshold',
+            'Minimum distance from the Snap Assistant to the pointer to open it',
+            0,
+            512,
+        );
+        appearenceGroup.add(snapAssistantThresholdRow);
+
         blur.add_row(
             this._buildSwitchRow(
                 Settings.SETTING_ENABLE_BLUR_SNAP_ASSISTANT,
@@ -507,8 +516,14 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         return adwRow;
     }
 
-    _buildSpinButtonRow(settingsKey: string, title: string, subtitle: string) {
-        const spinBtn = Gtk.SpinButton.new_with_range(0, 32, 1);
+    _buildSpinButtonRow(
+        settingsKey: string,
+        title: string,
+        subtitle: string,
+        min = 0,
+        max = 32,
+    ) {
+        const spinBtn = Gtk.SpinButton.new_with_range(min, max, 1);
         spinBtn.set_vexpand(false);
         spinBtn.set_valign(Gtk.Align.CENTER);
         const adwRow = new Adw.ActionRow({

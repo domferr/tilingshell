@@ -48,6 +48,8 @@ When grabbing and moving a window, the snap assistant will be available on top o
 
 [snap_assistant.webm](https://github.com/domferr/tilingshell/assets/14203981/33511582-fa92-445e-b1ba-8b08f9a8e43a)
 
+> Snap Assistant's sensibility can be customized from the preferences.
+
 <p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
 
 ### Select a layout ###

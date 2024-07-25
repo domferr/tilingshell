@@ -21,6 +21,9 @@ import {
 
 export const SNAP_ASSIST_SIGNAL = 'snap-assist';
 export const SNAP_ASSIST_ANIMATION_TIME = 180;
+// distance from top when the snap assistant is enlarged
+const ENLARGED_VERTICAL_DISTANCE = 24;
+const GAPS = 4;
 
 @registerGObjectClass
 class SnapAssistContent extends St.BoxLayout {
@@ -34,14 +37,17 @@ class SnapAssistContent extends St.BoxLayout {
                 GObject.ParamFlags.READWRITE,
                 false,
             ),
+            snapAssistantThreshold: GObject.ParamSpec.uint(
+                'snapAssistantThreshold',
+                'snapAssistantThreshold',
+                'Distance from the snap assistant to trigger its opening/closing',
+                GObject.ParamFlags.READWRITE,
+                0,
+                240,
+                16,
+            ),
         },
     };
-
-    // distance from top when the snap assistant is enlarged
-    private readonly _enlargedVerticalDistance = 24;
-    // cursor's max distance from the snap assistant to enlarge it
-    private readonly _activationAreaOffset = 4;
-    private readonly _gaps = 4;
 
     private readonly _container: St.Widget;
 
@@ -52,6 +58,7 @@ class SnapAssistContent extends St.BoxLayout {
     private _hoveredTile: SnapAssistTile | undefined;
     private _bottomPadding: number;
     private _blur: boolean;
+    private _snapAssistantThreshold: number;
 
     constructor(container: St.Widget) {
         super({
@@ -71,11 +78,19 @@ class SnapAssistContent extends St.BoxLayout {
         this._showing = true;
         this._bottomPadding = 0;
         this._blur = false;
+        this._snapAssistantThreshold = 54;
 
         Settings.bind(
             Settings.SETTING_ENABLE_BLUR_SNAP_ASSISTANT,
             this,
             'blur',
+            Gio.SettingsBindFlags.GET,
+        );
+
+        Settings.bind(
+            Settings.SETTING_SNAP_ASSISTANT_THRESHOLD,
+            this,
+            'snapAssistantThreshold',
             Gio.SettingsBindFlags.GET,
         );
 
@@ -102,12 +117,20 @@ class SnapAssistContent extends St.BoxLayout {
         this.close();
     }
 
-    set blur(value: boolean) {
+    private set blur(value: boolean) {
         if (this._blur === value) return;
 
         this._blur = value;
         this.get_effect('blur')?.set_enabled(value);
         this._applyStyle();
+    }
+
+    private set snapAssistantThreshold(value: number) {
+        this._snapAssistantThreshold = value;
+    }
+
+    get showing(): boolean {
+        return this._showing;
     }
 
     _init() {
@@ -159,7 +182,7 @@ class SnapAssistContent extends St.BoxLayout {
 
     private get _desiredY(): number {
         return this._isEnlarged
-            ? this._enlargedVerticalDistance
+            ? ENLARGED_VERTICAL_DISTANCE
             : -this.height + this._bottomPadding;
     }
 
@@ -189,10 +212,10 @@ class SnapAssistContent extends St.BoxLayout {
 
         const inner_gaps = Settings.get_inner_gaps(scalingFactor);
         const layoutGaps = buildMargin({
-            top: inner_gaps.top === 0 ? 0 : this._gaps,
-            bottom: inner_gaps.bottom === 0 ? 0 : this._gaps,
-            left: inner_gaps.left === 0 ? 0 : this._gaps,
-            right: inner_gaps.right === 0 ? 0 : this._gaps,
+            top: inner_gaps.top === 0 ? 0 : GAPS,
+            bottom: inner_gaps.bottom === 0 ? 0 : GAPS,
+            left: inner_gaps.left === 0 ? 0 : GAPS,
+            right: inner_gaps.right === 0 ? 0 : GAPS,
         });
 
         // build the layouts inside the snap assistant. Place a spacer between each layout
@@ -253,27 +276,41 @@ class SnapAssistContent extends St.BoxLayout {
             }
         }
 
-        const distanceWhenOpen = 8;
-        const size = this._isEnlarged
-            ? this.height + distanceWhenOpen
-            : this.height / 2;
+        const size = this._isEnlarged ? this.height : this._bottomPadding;
         const isNear =
             this.isBetween(
-                this._container.x + this.x - this._activationAreaOffset,
+                this._container.x + this.x - this._snapAssistantThreshold,
                 currPointerPos.x,
                 this._container.x +
                     this.x +
                     this.width +
-                    this._activationAreaOffset,
+                    this._snapAssistantThreshold,
             ) &&
             this.isBetween(
-                this._container.y - this._activationAreaOffset,
+                this._container.y - this._snapAssistantThreshold,
                 currPointerPos.y,
                 this._container.y +
-                    this._enlargedVerticalDistance +
                     size +
-                    this._activationAreaOffset,
+                    (this._isEnlarged ? this.y : this._snapAssistantThreshold),
             );
+
+        // uncomment to show activation area debugging
+        /* global.windowGroup
+            .get_children()
+            .filter((c) => c.get_name() === 'debug')[0]
+            ?.destroy();
+        const debug = new St.Widget({
+            x: this._container.x + this.x - this._snapAssistantThreshold,
+            y: this._container.y - this._snapAssistantThreshold,
+            height:
+                size +
+                this._snapAssistantThreshold +
+                (this._isEnlarged ? this.y : this._snapAssistantThreshold),
+            width: this.width + this._snapAssistantThreshold * 2,
+            style: 'border: 2px solid red; border-radius: 16px;',
+            name: 'debug',
+        });
+        global.windowGroup.add_child(debug);*/
 
         if (this._showing && this._isEnlarged === isNear) return;
 

@@ -10,7 +10,11 @@ import GlobalState from '@utils/globalState';
 import Settings from '@settings/settings';
 import { registerGObjectClass } from '@utils/gjs';
 import Tile from '@components/layout/Tile';
-import { getWindows } from '@utils/ui';
+import {
+    enableScalingFactorSupport,
+    getScalingFactor,
+    getWindows,
+} from '@utils/ui';
 import ExtendedWindow from '@components/tilingsystem/extendedWindow';
 import TileUtils from '@components/layout/TileUtils';
 import LayoutTileButtons from './layoutTileButtons';
@@ -126,7 +130,10 @@ export default class OverriddenWindowMenu extends GObject.Object {
             );
         });
 
-        const hasGaps = Settings.get_inner_gaps(1).top > 0;
+        const enableScaling =
+            window.get_monitor() === Main.layoutManager.primaryIndex;
+        const scalingFactor = getScalingFactor(window.get_monitor());
+        const gaps = Settings.get_inner_gaps(1).top > 0 ? 2 : 0;
 
         if (vacantTiles.length > 0) {
             vacantTiles.sort((a, b) => a.x - b.x);
@@ -153,12 +160,15 @@ export default class OverriddenWindowMenu extends GObject.Object {
             const vacantPopupMenu = new PopupMenu.PopupBaseMenuItem();
             // @ts-expect-error "this is not an instance of OverriddenWindowMenu, but it is the WindowMenu itself"
             this.addMenuItem(vacantPopupMenu);
+            if (enableScaling)
+                enableScalingFactorSupport(vacantPopupMenu, scalingFactor);
+
             buildMenuWithLayoutIcon(
                 'Move to best tile',
                 vacantPopupMenu,
                 [vacantTiles[bestTileIndex]],
                 tiles,
-                hasGaps ? 2 : 0,
+                gaps,
             );
             vacantPopupMenu.connect('activate', () => {
                 OverriddenWindowMenu.get().emit(
@@ -173,12 +183,14 @@ export default class OverriddenWindowMenu extends GObject.Object {
             const vacantLeftPopupMenu = new PopupMenu.PopupBaseMenuItem();
             // @ts-expect-error "this is not an instance of OverriddenWindowMenu, but it is the WindowMenu itself"
             this.addMenuItem(vacantLeftPopupMenu);
+            if (enableScaling)
+                enableScalingFactorSupport(vacantLeftPopupMenu, scalingFactor);
             buildMenuWithLayoutIcon(
                 'Move to leftmost tile',
                 vacantLeftPopupMenu,
                 [vacantTiles[0]],
                 tiles,
-                hasGaps ? 2 : 0,
+                gaps,
             );
             vacantLeftPopupMenu.connect('activate', () => {
                 OverriddenWindowMenu.get().emit(
@@ -194,12 +206,14 @@ export default class OverriddenWindowMenu extends GObject.Object {
             const vacantRightPopupMenu = new PopupMenu.PopupBaseMenuItem();
             // @ts-expect-error "this is not an instance of OverriddenWindowMenu, but it is the WindowMenu itself"
             this.addMenuItem(vacantRightPopupMenu);
+            if (enableScaling)
+                enableScalingFactorSupport(vacantRightPopupMenu, scalingFactor);
             buildMenuWithLayoutIcon(
                 'Move to rightmost tile',
                 vacantRightPopupMenu,
                 [tilesFromRightToLeft[0]],
                 tiles,
-                hasGaps ? 2 : 0,
+                gaps,
             );
             vacantRightPopupMenu.connect('activate', () => {
                 OverriddenWindowMenu.get().emit(
@@ -212,7 +226,10 @@ export default class OverriddenWindowMenu extends GObject.Object {
 
         // @ts-expect-error "this is not an instance of OverriddenWindowMenu, but it is the WindowMenu itself"
         this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
         const layoutsPopupMenu = new PopupMenu.PopupBaseMenuItem();
+        // @ts-expect-error "this is not an instance of OverriddenWindowMenu, but it is the WindowMenu itself"
+        this.addMenuItem(layoutsPopupMenu);
         const container = new St.BoxLayout({
             xAlign: Clutter.ActorAlign.START,
             yAlign: Clutter.ActorAlign.CENTER,
@@ -235,8 +252,8 @@ export default class OverriddenWindowMenu extends GObject.Object {
             rows.push(box);
             container.add_child(box);
         }
-        // @ts-expect-error "this is not an instance of OverriddenWindowMenu, but it is the WindowMenu itself"
-        this.addMenuItem(layoutsPopupMenu);
+        if (enableScaling)
+            enableScalingFactorSupport(layoutsPopupMenu, scalingFactor);
 
         const layoutHeight: number = 30;
         const layoutWidth: number = 52; // 16:9 ratio. -> (16*layoutHeight) / 9 and then rounded to int
@@ -245,11 +262,10 @@ export default class OverriddenWindowMenu extends GObject.Object {
             const layoutWidget = new LayoutTileButtons(
                 row,
                 lay,
-                hasGaps ? 2 : 0,
+                gaps,
                 layoutHeight,
                 layoutWidth,
             );
-            layoutWidget.set_size(layoutWidth, layoutHeight);
             layoutWidget.set_x_align(Clutter.ActorAlign.END);
             layoutWidget.buttons.forEach((btn) => {
                 btn.connect('clicked', () => {
@@ -261,7 +277,6 @@ export default class OverriddenWindowMenu extends GObject.Object {
                     layoutsPopupMenu.activate(Clutter.get_current_event());
                 });
             });
-            return layoutWidget;
         });
 
         /* const quarterTiles: [Tile, string][] = [

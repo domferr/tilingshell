@@ -452,10 +452,10 @@ export class TilingManager {
             if (
                 Settings.get_active_screen_edges() &&
                 !this._isSnapAssisting &&
-                this._edgeTilingManager.canActivateEdgeTiling(x, y)
+                this._edgeTilingManager.canActivateEdgeTiling(currPointerPos)
             ) {
                 const { changed, rect } =
-                    this._edgeTilingManager.startEdgeTiling(x, y);
+                    this._edgeTilingManager.startEdgeTiling(currPointerPos);
                 if (changed) this._showEdgeTiling(window, rect, x, y);
                 this._snapAssist.close(true);
             } else {

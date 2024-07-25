@@ -1,7 +1,7 @@
 import Layout from '@components/layout/Layout';
 import LayoutWidget from '@components/layout/LayoutWidget';
 import { registerGObjectClass } from '@utils/gjs';
-import { buildMarginOf, buildRectangle } from '@utils/ui';
+import { buildMarginOf, buildRectangle, getScalingFactorOf } from '@utils/ui';
 import Clutter from 'gi://Clutter';
 import Mtk from 'gi://Mtk';
 import SnapAssistTileButton from '../snapassist/snapAssistTileButton';
@@ -19,13 +19,22 @@ export default class LayoutTileButtons extends LayoutWidget<SnapAssistTileButton
         super({
             parent,
             layout,
-            containerRect: buildRectangle({ x: 0, y: 0, width, height }),
+            containerRect: buildRectangle(),
             innerGaps: buildMarginOf(gapSize),
             outerGaps: new Clutter.Margin(),
             styleClass: 'window-menu-layout',
         });
 
-        this.relayout();
+        const [, scalingFactor] = getScalingFactorOf(this);
+
+        this.relayout({
+            containerRect: buildRectangle({
+                x: 0,
+                y: 0,
+                width: width * scalingFactor,
+                height: height * scalingFactor,
+            }),
+        });
         this._fixFloatingPointErrors();
     }
 
