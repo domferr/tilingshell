@@ -11,7 +11,7 @@ export const getMonitors = (): Monitor[] => Main.layoutManager.monitors;
 export const isPointInsideRect = (
     point: { x: number; y: number },
     rect: Mtk.Rectangle,
-) => {
+): boolean => {
     return (
         point.x >= rect.x &&
         point.x <= rect.x + rect.width &&
@@ -19,6 +19,17 @@ export const isPointInsideRect = (
         point.y <= rect.y + rect.height
     );
 };
+
+export const clampPointInsideRect = (
+    point: { x: number; y: number },
+    rect: Mtk.Rectangle,
+): { x: number; y: number } => {
+    const clamp = (n, min, max) => Math.min(Math.max(n, min), max)
+    return {
+        x: clamp(point.x, rect.x, rect.x + rect.width),
+        y: clamp(point.y, rect.y, rect.y + rect.height),
+    }
+}
 
 export const positionRelativeTo = (
     actor: Clutter.Actor,

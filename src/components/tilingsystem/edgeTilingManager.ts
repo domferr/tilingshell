@@ -1,4 +1,4 @@
-import { buildRectangle, isPointInsideRect } from '@utils/ui';
+import { buildRectangle, isPointInsideRect, clampPointInsideRect } from '@utils/ui';
 import Mtk from 'gi://Mtk';
 import Settings from '@settings/settings';
 
@@ -81,12 +81,14 @@ export default class EdgeTilingManager {
         this._rightCenter.width = this._topRight.width;
     }
 
-    public canActivateEdgeTiling(x: number, y: number) {
+    public canActivateEdgeTiling(
+        pointerPos: { x: number; y: number }
+    ): boolean {
         return (
-            x <= this._workArea.x + EDGE_TILING_OFFSET ||
-            y <= this._workArea.y + TOP_EDGE_TILING_OFFSET ||
-            x >= this._workArea.x + this._workArea.width - EDGE_TILING_OFFSET ||
-            y >= this._workArea.y + this._workArea.height - EDGE_TILING_OFFSET
+            pointer.x <= this._workArea.x + EDGE_TILING_OFFSET ||
+            pointer.y <= this._workArea.y + TOP_EDGE_TILING_OFFSET ||
+            pointer.x >= this._workArea.x + this._workArea.width - EDGE_TILING_OFFSET ||
+            pointer.y >= this._workArea.y + this._workArea.height - EDGE_TILING_OFFSET
         );
     }
 
@@ -95,9 +97,9 @@ export default class EdgeTilingManager {
     }
 
     public startEdgeTiling(
-        x: number,
-        y: number,
+        pointerPos: { x: number; y: number }
     ): { changed: boolean; rect: Mtk.Rectangle } {
+        const { x, y } = clampPointInsideRect(pointerPos, this._workArea)
         const previewRect = buildRectangle();
 
         if (
