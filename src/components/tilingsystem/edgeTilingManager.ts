@@ -85,10 +85,10 @@ export default class EdgeTilingManager {
         pointerPos: { x: number; y: number }
     ): boolean {
         return (
-            pointer.x <= this._workArea.x + EDGE_TILING_OFFSET ||
-            pointer.y <= this._workArea.y + TOP_EDGE_TILING_OFFSET ||
-            pointer.x >= this._workArea.x + this._workArea.width - EDGE_TILING_OFFSET ||
-            pointer.y >= this._workArea.y + this._workArea.height - EDGE_TILING_OFFSET
+            pointerPos.x <= this._workArea.x + EDGE_TILING_OFFSET ||
+            pointerPos.y <= this._workArea.y + TOP_EDGE_TILING_OFFSET ||
+            pointerPos.x >= this._workArea.x + this._workArea.width - EDGE_TILING_OFFSET ||
+            pointerPos.y >= this._workArea.y + this._workArea.height - EDGE_TILING_OFFSET
         );
     }
 
