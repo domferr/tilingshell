@@ -51,12 +51,6 @@ export default class TilingShellExtension extends Extension {
     private _validateSettings() {
         // Setting used for compatibility changes if necessary
         if (this.metadata['version-name']) {
-            if (
-                Settings.get_last_version_installed() === '9.0' ||
-                Settings.get_last_version_installed() === '9.1'
-            )
-                KeyBindings.solveV9CompatibilityIssue();
-
             Settings.set_last_version_installed(
                 this.metadata['version-name'] || '0',
             );
@@ -196,6 +190,8 @@ export default class TilingShellExtension extends Extension {
             );
         }
 
+        // when Tiling Shell's edge-tiling is enabled/disable
+        // then enable/disable native edge-tiling
         this._signals.connect(
             Settings,
             Settings.SETTING_ACTIVE_SCREEN_EDGES,
@@ -211,6 +207,7 @@ export default class TilingShellExtension extends Extension {
             },
         );
 
+        // enable/disable window menu from preferences
         this._signals.connect(
             Settings,
             Settings.SETTING_OVERRIDE_WINDOW_MENU,
@@ -221,6 +218,7 @@ export default class TilingShellExtension extends Extension {
             },
         );
 
+        // tile a window when a tile or a button is clicked from the window menu
         this._signals.connect(
             OverriddenWindowMenu,
             'tile-clicked',

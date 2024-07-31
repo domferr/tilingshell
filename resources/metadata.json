@@ -10,7 +10,7 @@
     "46"
   ],
   "version": 99,
-  "version-name": "12.1",
+  "version-name": "12.2",
   "url": "https://github.com/domferr/tilingshell",
   "settings-schema": "org.gnome.shell.extensions.tilingshell",
   "donations": {

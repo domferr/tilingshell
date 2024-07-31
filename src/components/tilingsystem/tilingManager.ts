@@ -6,7 +6,7 @@ import {
     buildMargin,
     buildRectangle,
     buildTileGaps,
-    getScalingFactor,
+    getMonitorScalingFactor,
     getScalingFactorOf,
     isPointInsideRect,
 } from '@/utils/ui';
@@ -83,7 +83,7 @@ export class TilingManager {
         this._edgeTilingManager = new EdgeTilingManager(this._workArea);
 
         const monitorScalingFactor = this._enableScaling
-            ? getScalingFactor(monitor.index)
+            ? getMonitorScalingFactor(monitor.index)
             : undefined;
         // build the tiling layout
         this._tilingLayout = new TilingLayout(
@@ -103,6 +103,7 @@ export class TilingManager {
         this._snapAssist = new SnapAssist(
             Main.uiGroup,
             this._workArea,
+            this._monitor.index,
             monitorScalingFactor,
         );
     }
@@ -775,24 +776,23 @@ export class TilingManager {
         // abort if there is an invalid selection
         if (destinationRect.width <= 0 || destinationRect.height <= 0) return;
 
-        if (window.get_maximized()) return;
+        const rememberOriginalSize = !window.get_maximized();
+        if (window.get_maximized()) window.unmaximize(Meta.MaximizeFlags.BOTH);
 
-        if (!(window as ExtendedWindow).assignedTile) {
+        if (rememberOriginalSize && !(window as ExtendedWindow).assignedTile) {
             (window as ExtendedWindow).originalSize = window
                 .get_frame_rect()
                 .copy();
         }
-        (window as ExtendedWindow).assignedTile = new Tile({
-            ...TileUtils.build_tile(
-                buildRectangle({
-                    x: scaledRect.x,
-                    y: scaledRect.y,
-                    width: scaledRect.width,
-                    height: scaledRect.height,
-                }),
-                this._workArea,
-            ),
-        });
+        (window as ExtendedWindow).assignedTile = TileUtils.build_tile(
+            buildRectangle({
+                x: scaledRect.x,
+                y: scaledRect.y,
+                width: scaledRect.width,
+                height: scaledRect.height,
+            }),
+            this._workArea,
+        );
         this._easeWindowRect(window, destinationRect);
     }
 }

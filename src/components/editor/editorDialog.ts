@@ -10,7 +10,7 @@ import Layout from '@/components/layout/Layout';
 import Tile from '@/components/layout/Tile';
 import * as ModalDialog from 'resource:///org/gnome/shell/ui/modalDialog.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import { enableScalingFactorSupport, getScalingFactor } from '@utils/ui';
+import { enableScalingFactorSupport, getMonitorScalingFactor } from '@utils/ui';
 
 @registerGObjectClass
 export default class EditorDialog extends ModalDialog.ModalDialog {
@@ -36,7 +36,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
 
         if (params.enableScaling) {
             const monitor = Main.layoutManager.findMonitorForActor(this);
-            const scalingFactor = getScalingFactor(
+            const scalingFactor = getMonitorScalingFactor(
                 monitor?.index || Main.layoutManager.primaryIndex,
             );
             enableScalingFactorSupport(this, scalingFactor);

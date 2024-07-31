@@ -132,20 +132,4 @@ export default class KeyBindings extends GObject.Object {
     public destroy() {
         this._removeKeybindings();
     }
-
-    static solveV9CompatibilityIssue() {
-        const mutterKeybindings = new Gio.Settings({
-            schema_id: 'org.gnome.mutter.keybindings',
-        });
-        mutterKeybindings.reset('toggle-tiled-right');
-        mutterKeybindings.reset('toggle-tiled-left');
-
-        const desktopWm = new Gio.Settings({
-            schema_id: 'org.gnome.desktop.wm.keybindings',
-        });
-        desktopWm.reset('maximize');
-        desktopWm.reset('unmaximize');
-
-        debug('Applied compatibility changes for v9.0/v9.1');
-    }
 }

@@ -16,13 +16,12 @@ import {
     buildBlurEffect,
     buildMargin,
     enableScalingFactorSupport,
+    getMonitorScalingFactor,
     getScalingFactorOf,
 } from '@utils/ui';
 
 export const SNAP_ASSIST_SIGNAL = 'snap-assist';
 export const SNAP_ASSIST_ANIMATION_TIME = 180;
-// distance from top when the snap assistant is enlarged
-const ENLARGED_VERTICAL_DISTANCE = 24;
 const GAPS = 4;
 
 @registerGObjectClass
@@ -59,8 +58,9 @@ class SnapAssistContent extends St.BoxLayout {
     private _bottomPadding: number;
     private _blur: boolean;
     private _snapAssistantThreshold: number;
+    private _monitorIndex: number;
 
-    constructor(container: St.Widget) {
+    constructor(container: St.Widget, monitorIndex: number) {
         super({
             name: 'snap_assist_content',
             xAlign: Clutter.ActorAlign.CENTER,
@@ -78,7 +78,9 @@ class SnapAssistContent extends St.BoxLayout {
         this._showing = true;
         this._bottomPadding = 0;
         this._blur = false;
-        this._snapAssistantThreshold = 54;
+        this._monitorIndex = monitorIndex;
+        this._snapAssistantThreshold =
+            54 * getMonitorScalingFactor(this._monitorIndex);
 
         Settings.bind(
             Settings.SETTING_ENABLE_BLUR_SNAP_ASSISTANT,
@@ -126,7 +128,8 @@ class SnapAssistContent extends St.BoxLayout {
     }
 
     private set snapAssistantThreshold(value: number) {
-        this._snapAssistantThreshold = value;
+        this._snapAssistantThreshold =
+            value * getMonitorScalingFactor(this._monitorIndex);
     }
 
     get showing(): boolean {
@@ -182,7 +185,12 @@ class SnapAssistContent extends St.BoxLayout {
 
     private get _desiredY(): number {
         return this._isEnlarged
-            ? ENLARGED_VERTICAL_DISTANCE
+            ? Math.max(
+                  0,
+                  this._snapAssistantThreshold -
+                      this.height / 2 +
+                      this._bottomPadding,
+              )
             : -this.height + this._bottomPadding;
     }
 
@@ -276,23 +284,20 @@ class SnapAssistContent extends St.BoxLayout {
             }
         }
 
-        const size = this._isEnlarged ? this.height : this._bottomPadding;
+        const height =
+            this.height + (this._isEnlarged ? 0 : this._snapAssistantThreshold);
+        const minY = this._container.y;
+        const maxY = this._container.y + this._desiredY + height;
+        const minX = this._container.x + this.x - this._snapAssistantThreshold;
+        const maxX =
+            this._container.x +
+            this.x +
+            this.width +
+            this._snapAssistantThreshold;
+
         const isNear =
-            this.isBetween(
-                this._container.x + this.x - this._snapAssistantThreshold,
-                currPointerPos.x,
-                this._container.x +
-                    this.x +
-                    this.width +
-                    this._snapAssistantThreshold,
-            ) &&
-            this.isBetween(
-                this._container.y - this._snapAssistantThreshold,
-                currPointerPos.y,
-                this._container.y +
-                    size +
-                    (this._isEnlarged ? this.y : this._snapAssistantThreshold),
-            );
+            this.isBetween(minX, currPointerPos.x, maxX) &&
+            this.isBetween(minY, currPointerPos.y, maxY);
 
         // uncomment to show activation area debugging
         /* global.windowGroup
@@ -300,17 +305,14 @@ class SnapAssistContent extends St.BoxLayout {
             .filter((c) => c.get_name() === 'debug')[0]
             ?.destroy();
         const debug = new St.Widget({
-            x: this._container.x + this.x - this._snapAssistantThreshold,
-            y: this._container.y - this._snapAssistantThreshold,
-            height:
-                size +
-                this._snapAssistantThreshold +
-                (this._isEnlarged ? this.y : this._snapAssistantThreshold),
-            width: this.width + this._snapAssistantThreshold * 2,
-            style: 'border: 2px solid red; border-radius: 16px;',
+            x: minX,
+            y: minY,
+            height: maxY - minY,
+            width: maxX - minX,
+            style: 'border: 2px solid red; border-radius: 8px;',
             name: 'debug',
         });
-        global.windowGroup.add_child(debug);*/
+        global.windowGroup.add_child(debug); */
 
         if (this._showing && this._isEnlarged === isNear) return;
 
@@ -367,6 +369,7 @@ export default class SnapAssist extends St.Widget {
     constructor(
         parent: Clutter.Actor,
         workArea: Mtk.Rectangle,
+        monitorIndex: number,
         scalingFactor?: number,
     ) {
         super();
@@ -375,7 +378,7 @@ export default class SnapAssist extends St.Widget {
         this.set_clip(0, 0, workArea.width, workArea.height);
         if (scalingFactor) enableScalingFactorSupport(this, scalingFactor);
 
-        this._content = new SnapAssistContent(this);
+        this._content = new SnapAssistContent(this, monitorIndex);
     }
 
     public set workArea(newWorkArea: Mtk.Rectangle) {

@@ -12,7 +12,7 @@ import { registerGObjectClass } from '@utils/gjs';
 import Tile from '@components/layout/Tile';
 import {
     enableScalingFactorSupport,
-    getScalingFactor,
+    getMonitorScalingFactor,
     getWindows,
 } from '@utils/ui';
 import ExtendedWindow from '@components/tilingsystem/extendedWindow';
@@ -132,7 +132,7 @@ export default class OverriddenWindowMenu extends GObject.Object {
 
         const enableScaling =
             window.get_monitor() === Main.layoutManager.primaryIndex;
-        const scalingFactor = getScalingFactor(window.get_monitor());
+        const scalingFactor = getMonitorScalingFactor(window.get_monitor());
         const gaps = Settings.get_inner_gaps(1).top > 0 ? 2 : 0;
 
         if (vacantTiles.length > 0) {

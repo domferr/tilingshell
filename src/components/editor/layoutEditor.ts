@@ -13,7 +13,7 @@ import {
     buildTileGaps,
     enableScalingFactorSupport,
     getEventCoords,
-    getScalingFactor,
+    getMonitorScalingFactor,
     getWindowsOfMonitor,
 } from '@/utils/ui';
 import Layout from '../layout/Layout';
@@ -47,7 +47,7 @@ export default class LayoutEditor extends St.Widget {
         );
 
         if (enableScaling) {
-            const scalingFactor = getScalingFactor(monitor.index);
+            const scalingFactor = getMonitorScalingFactor(monitor.index);
             enableScalingFactorSupport(this, scalingFactor);
         }
 

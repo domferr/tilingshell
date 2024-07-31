@@ -4,15 +4,32 @@ import {
     clampPointInsideRect,
 } from '@utils/ui';
 import Mtk from 'gi://Mtk';
+import GObject from 'gi://GObject';
 import Settings from '@settings/settings';
+import { registerGObjectClass } from '@utils/gjs';
 
 const EDGE_TILING_OFFSET = 16;
 const TOP_EDGE_TILING_OFFSET = 8;
 const QUARTER_PERCENTAGE = 0.5;
-const ACTIVATION_PERCENTAGE = 0.4;
 
-export default class EdgeTilingManager {
+@registerGObjectClass
+export default class EdgeTilingManager extends GObject.Object {
+    static metaInfo: GObject.MetaInfo<unknown, unknown, unknown> = {
+        GTypeName: 'EdgeTilingManager',
+        Properties: {
+            quarterActivationPercentage: GObject.ParamSpec.uint(
+                'quarterActivationPercentage',
+                'quarterActivationPercentage',
+                'Threshold to trigger quarter tiling',
+                GObject.ParamFlags.READWRITE,
+                1,
+                50,
+                40,
+            ),
+        },
+    };
     private _workArea: Mtk.Rectangle;
+    private _quarterActivationPercentage: number;
 
     // activation zones
     private _topLeft: Mtk.Rectangle;
@@ -27,6 +44,7 @@ export default class EdgeTilingManager {
     private _activeEdgeTile: Mtk.Rectangle | null;
 
     constructor(initialWorkArea: Mtk.Rectangle) {
+        super();
         this._workArea = buildRectangle();
         this._topLeft = buildRectangle();
         this._topRight = buildRectangle();
@@ -37,6 +55,18 @@ export default class EdgeTilingManager {
         this._rightCenter = buildRectangle();
         this._activeEdgeTile = null;
         this.workarea = initialWorkArea;
+        this._quarterActivationPercentage =
+            Settings.get_quarter_tiling_threshold();
+        Settings.bind(
+            Settings.SETTING_QUARTER_TILING_THRESHOLD,
+            this,
+            'quarterActivationPercentage',
+        );
+    }
+
+    private set quarterActivationPercentage(value: number) {
+        this._quarterActivationPercentage = value / 100;
+        this._updateActivationZones();
     }
 
     public set workarea(newWorkArea: Mtk.Rectangle) {
@@ -45,8 +75,13 @@ export default class EdgeTilingManager {
         this._workArea.width = newWorkArea.width;
         this._workArea.height = newWorkArea.height;
 
-        const width = this._workArea.width * ACTIVATION_PERCENTAGE;
-        const height = this._workArea.height * ACTIVATION_PERCENTAGE;
+        this._updateActivationZones();
+    }
+
+    private _updateActivationZones() {
+        const width = this._workArea.width * this._quarterActivationPercentage;
+        const height =
+            this._workArea.height * this._quarterActivationPercentage;
 
         this._topLeft.x = this._workArea.x;
         this._topLeft.y = this._workArea.y;

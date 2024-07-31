@@ -197,6 +197,24 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         activeScreenEdgesGroup.add(topEdgeMaximize);
 
+        const quarterTiling = this._buildScaleRow(
+            'Quarter tiling activation area',
+            'Activation area to trigger quarter tiling (% of the screen)',
+            (sc: Gtk.Scale) => {
+                Settings.set_quarter_tiling_threshold(sc.get_value());
+            },
+            Settings.get_quarter_tiling_threshold(),
+            1,
+            50,
+            1,
+        );
+        Settings.bind(
+            Settings.SETTING_ACTIVE_SCREEN_EDGES,
+            quarterTiling,
+            'sensitive',
+        );
+        activeScreenEdgesGroup.add(quarterTiling);
+
         prefsPage.add(activeScreenEdgesGroup);
 
         // Layouts section
@@ -641,6 +659,46 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
 
         btn.connect('changed', onChange);
 
+        return adwRow;
+    }
+
+    _buildScaleRow(
+        title: string,
+        subtitle: string,
+        onChange: (scale: Gtk.Scale) => void,
+        initialValue: number,
+        min: number,
+        max: number,
+        step: number,
+        /* styleClass?: string,*/
+    ): Adw.ActionRow {
+        const scale = Gtk.Scale.new_with_range(
+            Gtk.Orientation.HORIZONTAL,
+            min,
+            max,
+            step,
+        );
+        scale.set_value(initialValue);
+        scale.set_vexpand(false);
+        scale.set_valign(Gtk.Align.CENTER);
+        const adwRow = new Adw.ActionRow({
+            title,
+            subtitle,
+            activatableWidget: scale,
+        });
+        scale.connect('value-changed', onChange);
+        scale.set_size_request(150, -1);
+        scale.set_digits(0);
+        scale.set_draw_value(true);
+        /* const controller = new Gtk.EventControllerScroll({
+            propagation_phase: Gtk.PropagationPhase.CAPTURE,
+            flags: Gtk.EventControllerScrollFlags.HORIZONTAL,
+        });
+        controller.connect('scroll', () => {
+            console.debug('ON SCROOOOLL');
+        });
+        adwRow.add_controller(controller);*/
+        adwRow.add_suffix(scale);
         return adwRow;
     }
 }

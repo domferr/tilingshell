@@ -40,6 +40,7 @@ export default class Settings {
     static SETTING_TOP_EDGE_MAXIMIZE = 'top-edge-maximize';
     static SETTING_OVERRIDE_WINDOW_MENU = 'override-window-menu';
     static SETTING_SNAP_ASSISTANT_THRESHOLD = 'snap-assistant-threshold';
+    static SETTING_QUARTER_TILING_THRESHOLD = 'quarter-tiling-threshold';
 
     static SETTING_MOVE_WINDOW_RIGHT = 'move-window-right';
     static SETTING_MOVE_WINDOW_LEFT = 'move-window-left';
@@ -237,6 +238,13 @@ export default class Settings {
         );
     }
 
+    static get_quarter_tiling_threshold(): number {
+        return (
+            this._settings?.get_uint(this.SETTING_QUARTER_TILING_THRESHOLD) ??
+            40
+        );
+    }
+
     static set_last_version_installed(version: string) {
         this._settings?.set_string(
             this.SETTING_LAST_VERSION_NAME_INSTALLED,
@@ -259,6 +267,10 @@ export default class Settings {
 
     static set_show_indicator(value: boolean) {
         this._settings?.set_boolean(this.SETTING_SHOW_INDICATOR, value);
+    }
+
+    static set_quarter_tiling_threshold(value: number) {
+        this._settings?.set_uint(this.SETTING_QUARTER_TILING_THRESHOLD, value);
     }
 
     static set_overridden_settings(newVal: string): boolean {

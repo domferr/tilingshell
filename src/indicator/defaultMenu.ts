@@ -8,7 +8,7 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {
     enableScalingFactorSupport,
     getMonitors,
-    getScalingFactor,
+    getMonitorScalingFactor,
     getScalingFactorOf,
 } from '@/utils/ui';
 import Settings from '@settings/settings';
@@ -162,7 +162,7 @@ export default class DefaultMenu implements CurrentMenu {
             const monitor = Main.layoutManager.findMonitorForActor(
                 this._container,
             );
-            const scalingFactor = getScalingFactor(
+            const scalingFactor = getMonitorScalingFactor(
                 monitor?.index || Main.layoutManager.primaryIndex,
             );
             enableScalingFactorSupport(this._container, scalingFactor);
@@ -200,7 +200,7 @@ export default class DefaultMenu implements CurrentMenu {
             const monitor = Main.layoutManager.findMonitorForActor(
                 this._container,
             );
-            const scalingFactor = getScalingFactor(
+            const scalingFactor = getMonitorScalingFactor(
                 monitor?.index || Main.layoutManager.primaryIndex,
             );
             enableScalingFactorSupport(this._container, scalingFactor);

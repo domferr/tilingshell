@@ -93,7 +93,7 @@ You can resize adjacent tiled windows together!
 
 Move window through the tiles using keyboard shortcuts (<kbd>SUPER</kbd>+<kbd>←</kbd>/<kbd>↑</kbd>/<kbd>↓</kbd>/<kbd>→</kbd>). They can be customized from the preferences!
 
-[Screencast from 2024-06-18 23-06-56.webm](https://github.com/domferr/tilingshell/assets/14203981/11c966b7-c140-4ecb-b8af-b514ec186ad6)
+[Tile with Keyboard Video](https://github.com/user-attachments/assets/6f8dedbb-2733-41d8-8a94-0fa62dffb915)
 
 > It can be enabled/disabled from the preferences
 

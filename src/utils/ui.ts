@@ -24,12 +24,13 @@ export const clampPointInsideRect = (
     point: { x: number; y: number },
     rect: Mtk.Rectangle,
 ): { x: number; y: number } => {
-    const clamp = (n, min, max) => Math.min(Math.max(n, min), max)
+    const clamp = (n: number, min: number, max: number) =>
+        Math.min(Math.max(n, min), max);
     return {
         x: clamp(point.x, rect.x, rect.x + rect.width),
         y: clamp(point.y, rect.y, rect.y + rect.height),
-    }
-}
+    };
+};
 
 export const positionRelativeTo = (
     actor: Clutter.Actor,
@@ -81,7 +82,7 @@ export const buildTileGaps = (
     return margin;
 };
 
-export const getScalingFactor = (monitorIndex: number) => {
+export const getMonitorScalingFactor = (monitorIndex: number) => {
     const scalingFactor = St.ThemeContext.get_for_stage(
         global.get_stage(),
     ).get_scale_factor();

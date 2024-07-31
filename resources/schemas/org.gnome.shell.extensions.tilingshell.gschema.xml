@@ -102,10 +102,15 @@
             <summary>Add snap assistant and auto-tile buttons to window menu</summary>
             <description>Add snap assistant and auto-tile buttons in the menu that shows up when you right click on a window title.</description>
         </key>
-        <key name="snap-assistant-threshold" type="u">
+        <key name="snap-assistant-threshold" type="i">
             <default>54</default>
             <summary>Snap Assistant threshold</summary>
             <description>Snap Assistant's threshold to enlarge, shrink, open and close it.</description>
+        </key>
+        <key name="quarter-tiling-threshold" type="u">
+            <default>40</default>
+            <summary>Quarter tiling threshold</summary>
+            <description>Threshold to trigger quarter tiling.</description>
         </key>
 
         <!-- keybindings -->
