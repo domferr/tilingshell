@@ -114,6 +114,7 @@ class LayoutsRow extends St.BoxLayout {
             y: number;
             height: number;
             width: number;
+            index: number;
         }[],
     ) {
         if (!showMonitorName) this._label.hide();
@@ -124,7 +125,13 @@ class LayoutsRow extends St.BoxLayout {
         );
         if (!details) return;
 
-        this._label.set_text(details.name);
+        if (details.name) {
+            this._label.set_text(
+                `${details?.index !== null ? details.index + 1 : this._monitor.index} - ${details.name}`,
+            );
+        } else {
+            this._label.set_text(`Monitor ${details.index + 1}`);
+        }
     }
 }
 
