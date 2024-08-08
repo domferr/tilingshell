@@ -112,6 +112,21 @@
             <summary>Quarter tiling threshold</summary>
             <description>Threshold to trigger quarter tiling.</description>
         </key>
+        <key name="enable-window-border" type="b">
+            <default>false</default>
+            <summary>Enable window border</summary>
+            <description>Show a border around focused window.</description>
+        </key>
+        <key name="window-border-color" type="s">
+            <default>'#ec5e5e'</default>
+            <summary>Focused window border color</summary>
+            <description>The color of the focused window's border.</description>
+        </key>
+        <key name="window-border-width" type="u">
+            <default>3</default>
+            <summary>Focused window border width</summary>
+            <description>The width of the focused window's border.</description>
+        </key>
 
         <!-- keybindings -->
 		<key type="as" name="move-window-right">
@@ -129,6 +144,30 @@
 		<key type="as" name="move-window-down">
 			<default><![CDATA[['<Super>Down']]]></default>
 			<summary>Move focused window to the tile below</summary>
+		</key>
+		<key type="as" name="span-window-right">
+			<default><![CDATA[['']]]></default>
+			<summary>Span focused window to the tile to its right</summary>
+		</key>
+		<key type="as" name="span-window-left">
+			<default><![CDATA[['']]]></default>
+			<summary>Span focused window to the tile to its left</summary>
+		</key>
+		<key type="as" name="span-window-up">
+			<default><![CDATA[['']]]></default>
+			<summary>Span focused window to the tile above</summary>
+		</key>
+		<key type="as" name="span-window-down">
+			<default><![CDATA[['']]]></default>
+			<summary>Span focused window to the tile below</summary>
+		</key>
+		<key type="as" name="span-window-all-tiles">
+			<default><![CDATA[['']]]></default>
+			<summary>Resize the focused window to span all tiles</summary>
+		</key>
+		<key type="as" name="untile-window">
+			<default><![CDATA[['']]]></default>
+			<summary>Untile the focused window</summary>
 		</key>
     </schema>
 

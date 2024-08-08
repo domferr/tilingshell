@@ -5,8 +5,10 @@ import { getMonitors } from '@/utils/ui';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { TilingManager } from '@/components/tilingsystem/tilingManager';
 import Gio from 'gi://Gio';
+import Shell from 'gi://Shell';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
+import Clutter from 'gi://Clutter';
 import Settings from '@settings/settings';
 import SignalHandling from './utils/signalHandling';
 import GlobalState from './utils/globalState';
@@ -19,6 +21,7 @@ import SettingsOverride from '@settings/settingsOverride';
 import { ResizingManager } from '@components/tilingsystem/resizeManager';
 import OverriddenWindowMenu from '@components/window_menu/overriddenWindowMenu';
 import Tile from '@components/layout/Tile';
+import { WindowBorderManager } from '@components/windowBorderManager';
 
 const debug = logger('extension');
 
@@ -30,6 +33,7 @@ export default class TilingShellExtension extends Extension {
     private _signals: SignalHandling | null;
     private _keybindings: KeyBindings | null;
     private _resizingManager: ResizingManager | null;
+    private _windowBorderManager: WindowBorderManager | null;
 
     constructor(metadata: ExtensionMetadata) {
         super(metadata);
@@ -40,6 +44,7 @@ export default class TilingShellExtension extends Extension {
         this._dbus = null;
         this._keybindings = null;
         this._resizingManager = null;
+        this._windowBorderManager = null;
     }
 
     createIndicator() {
@@ -115,6 +120,10 @@ export default class TilingShellExtension extends Extension {
         this._resizingManager = new ResizingManager();
         this._resizingManager.enable();
 
+        if (this._windowBorderManager) this._windowBorderManager.destroy();
+        this._windowBorderManager = new WindowBorderManager();
+        this._windowBorderManager.enable();
+
         this.createIndicator();
 
         if (this._dbus) this._dbus.disable();
@@ -186,7 +195,39 @@ export default class TilingShellExtension extends Extension {
             this._signals.connect(
                 this._keybindings,
                 'move-window',
-                this._onKeyboardMoveWin.bind(this),
+                (
+                    kb: KeyBindings,
+                    dp: Meta.Display,
+                    dir: Meta.DisplayDirection,
+                ) => {
+                    this._onKeyboardMoveWin(dp, dir, false);
+                },
+            );
+            this._signals.connect(
+                this._keybindings,
+                'span-window',
+                (
+                    kb: KeyBindings,
+                    dp: Meta.Display,
+                    dir: Meta.DisplayDirection,
+                ) => {
+                    this._onKeyboardMoveWin(dp, dir, true);
+                },
+            );
+            this._signals.connect(
+                this._keybindings,
+                'span-window-all-tiles',
+                (kb: KeyBindings, dp: Meta.Display) => {
+                    const window = dp.focus_window;
+                    const monitorIndex = window.get_monitor();
+                    const manager = this._tilingManagers[monitorIndex];
+                    if (manager) manager.onSpanAllTiles(window);
+                },
+            );
+            this._signals.connect(
+                this._keybindings,
+                'untile-window',
+                this._onKeyboardUntileWindow.bind(this),
             );
         }
 
@@ -228,12 +269,90 @@ export default class TilingShellExtension extends Extension {
                 if (manager) manager.onTileFromWindowMenu(tile, window);
             },
         );
+
+        /* todo move maximized to workspace
+        this._signals.connect(
+            global.window_manager,
+            'size-change',
+            this._moveMaximizedToWorkspace.bind(this),
+        );
+
+        this._signals.connect(
+            global.window_manager,
+            'size-changed',
+            this._onSizeChanged.bind(this),
+        );*/
     }
 
+    /* todo private _moveMaximizedToWorkspace(
+        wm: Shell.WM,
+        winActor: Meta.WindowActor,
+        change: Meta.SizeChange,
+    ) {
+        const window = winActor.metaWindow;
+        if (
+            window.wmClass === null ||
+            change !== Meta.SizeChange.MAXIMIZE || // handle maximize changes only
+            window.get_maximized() !== Meta.MaximizeFlags.BOTH || // handle maximized window only
+            window.is_attached_dialog() || // skip dialogs
+            window.is_on_all_workspaces() ||
+            window.windowType !== Meta.WindowType.NORMAL || // handle normal windows only
+            window.wmClass === 'gjs'
+        )
+            return;
+
+        const prevWorkspace = window.get_workspace();
+        // if it is the only window in the workspace, no new workspace is needed
+        if (
+            !prevWorkspace
+                .list_windows()
+                .find(
+                    (otherWin) =>
+                        otherWin !== window &&
+                        otherWin.windowType === Meta.WindowType.NORMAL &&
+                        !otherWin.is_always_on_all_workspaces() &&
+                        otherWin.wmClass !== null &&
+                        otherWin.wmClass !== 'gjs',
+                )
+        )
+            return;
+
+        // disable GNOME default fade out animation
+        // @ts-expect-error Main.wm has "_sizeChangeWindowDone" function
+        Main.wm._sizeChangeWindowDone(global.windowManager, winActor);
+
+        const wasActive = prevWorkspace.active;
+        // create a new workspace, do not focus it
+        const newWorkspace = global.workspace_manager.append_new_workspace(
+            false,
+            global.get_current_time(),
+        );
+        // place the workspace after the current one
+        global.workspace_manager.reorder_workspace(
+            newWorkspace,
+            prevWorkspace.index() + 1,
+        );
+        // queue focus the workspace, focusing the window too. This will trigger workspace slide-in animation
+        if (wasActive) window._queue_focus_ws = newWorkspace;
+    }
+
+    private _onSizeChanged(wm: Shell.WM, winActor: Meta.WindowActor) {
+        const window = winActor.metaWindow;
+
+        if (!window._queue_focus_ws) return;
+        const ws = window._queue_focus_ws;
+        delete window._queue_focus_ws;
+
+        console.log(`_onSizeChanged ${ws}`);
+        // move the window
+        ws.activate_with_focus(window, global.get_current_time());
+        window.change_workspace(ws);
+    }*/
+
     private _onKeyboardMoveWin(
-        kb: KeyBindings,
         display: Meta.Display,
         direction: Meta.DisplayDirection,
+        spanFlag: boolean,
     ) {
         const focus_window = display.get_focus_window();
         if (
@@ -243,6 +362,9 @@ export default class TilingShellExtension extends Extension {
                 focus_window.get_wm_class() === 'gjs')
         )
             return;
+
+        // if the window is maximized, it cannot be spanned
+        if (focus_window.get_maximized() && spanFlag) return;
 
         // handle unmaximize of maximized window
         if (
@@ -260,6 +382,8 @@ export default class TilingShellExtension extends Extension {
         const success = monitorTilingManager.onKeyboardMoveWindow(
             focus_window,
             direction,
+            false,
+            spanFlag,
         );
         if (success) return;
 
@@ -286,7 +410,29 @@ export default class TilingShellExtension extends Extension {
             focus_window,
             direction,
             true,
+            spanFlag,
         );
+    }
+
+    private _onKeyboardUntileWindow(kb: KeyBindings, display: Meta.Display) {
+        const focus_window = display.get_focus_window();
+        if (
+            !focus_window ||
+            !focus_window.has_focus() ||
+            (focus_window.get_wm_class() &&
+                focus_window.get_wm_class() === 'gjs')
+        )
+            return;
+
+        // if the window is maximized, unmaximize it
+        if (focus_window.get_maximized())
+            focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
+
+        const monitorTilingManager =
+            this._tilingManagers[focus_window.get_monitor()];
+        if (!monitorTilingManager) return;
+
+        monitorTilingManager.onUntileWindow(focus_window, true);
     }
 
     private _isFractionalScalingEnabled(
@@ -322,6 +468,9 @@ export default class TilingShellExtension extends Extension {
 
         this._resizingManager?.destroy();
         this._resizingManager = null;
+
+        this._windowBorderManager?.destroy();
+        this._windowBorderManager = null;
 
         // disable dbus
         this._dbus?.disable();

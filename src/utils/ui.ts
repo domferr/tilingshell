@@ -32,25 +32,6 @@ export const clampPointInsideRect = (
     };
 };
 
-export const positionRelativeTo = (
-    actor: Clutter.Actor,
-    anchestor: Clutter.Actor,
-): { x: number; y: number } | undefined => {
-    if (!actor) return undefined;
-    if (actor === anchestor) return { x: actor.x, y: actor.y };
-
-    const parent = actor.get_parent();
-    if (parent === null) return undefined;
-
-    const parentPos = positionRelativeTo(parent, anchestor);
-    if (!parentPos) return undefined;
-
-    return {
-        x: actor.x + parentPos.x,
-        y: actor.y + parentPos.y,
-    };
-};
-
 export const buildTileGaps = (
     tilePos: Mtk.Rectangle,
     innerGaps: Clutter.Margin,
