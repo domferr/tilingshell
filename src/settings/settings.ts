@@ -46,11 +46,11 @@ export default class Settings {
     static SETTING_MOVE_WINDOW_LEFT = 'move-window-left';
     static SETTING_MOVE_WINDOW_UP = 'move-window-up';
     static SETTING_MOVE_WINDOW_DOWN = 'move-window-down';
-
     static SETTING_SPAN_WINDOW_RIGHT = 'span-window-right';
     static SETTING_SPAN_WINDOW_LEFT = 'span-window-left';
     static SETTING_SPAN_WINDOW_UP = 'span-window-up';
     static SETTING_SPAN_WINDOW_DOWN = 'span-window-down';
+    static SETTING_UNTILE_WINDOW = 'untile-window';
 
     static initialize(settings: Gio.Settings) {
         if (this._is_initialized) return;

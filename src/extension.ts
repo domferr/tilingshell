@@ -205,6 +205,11 @@ export default class TilingShellExtension extends Extension {
                     this._onKeyboardMoveWin(dp, dir, true);
                 },
             );
+            this._signals.connect(
+                this._keybindings,
+                'untile-window',
+                this._onKeyboardUntileWindow.bind(this),
+            );
         }
 
         // when Tiling Shell's edge-tiling is enabled/disable
@@ -310,6 +315,27 @@ export default class TilingShellExtension extends Extension {
             true,
             spanFlag,
         );
+    }
+
+    private _onKeyboardUntileWindow(kb: KeyBindings, display: Meta.Display) {
+        const focus_window = display.get_focus_window();
+        if (
+            !focus_window ||
+            !focus_window.has_focus() ||
+            (focus_window.get_wm_class() &&
+                focus_window.get_wm_class() === 'gjs')
+        )
+            return;
+
+        // if the window is maximized, unmaximize it
+        if (focus_window.get_maximized())
+            focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
+
+        const monitorTilingManager =
+            this._tilingManagers[focus_window.get_monitor()];
+        if (!monitorTilingManager) return;
+
+        monitorTilingManager.onUntileWindow(focus_window, true);
     }
 
     private _isFractionalScalingEnabled(

@@ -23,6 +23,9 @@ export default class KeyBindings extends GObject.Object {
             'span-window': {
                 param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, Meta.Direction
             },
+            'untile-window': {
+                param_types: [Meta.Display.$gtype], // Meta.Display
+            },
         },
     };
 
@@ -92,6 +95,15 @@ export default class KeyBindings extends GObject.Object {
             (display: Meta.Display) => {
                 this.emit('span-window', display, Meta.DisplayDirection.DOWN);
             },
+        );
+
+        // untile window with keybinding
+        Main.wm.addKeybinding(
+            Settings.SETTING_UNTILE_WINDOW,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (dp: Meta.Display) => this.emit('untile-window', dp),
         );
     }
 

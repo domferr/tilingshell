@@ -146,6 +146,10 @@
 			<default><![CDATA[['']]]></default>
 			<summary>Span focused window to the tile below</summary>
 		</key>
+		<key type="as" name="untile-window">
+			<default><![CDATA[['']]]></default>
+			<summary>Untile the focused window</summary>
+		</key>
     </schema>
 
 </schemalist>

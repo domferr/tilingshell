@@ -175,6 +175,15 @@ export class TilingManager {
         );
     }
 
+    public onUntileWindow(window: Meta.Window, force: boolean): void {
+        const destination = (window as ExtendedWindow).originalSize;
+        if (!destination) return;
+
+        this._easeWindowRect(window, destination, false, force);
+
+        (window as ExtendedWindow).originalSize = undefined;
+    }
+
     public onKeyboardMoveWindow(
         window: Meta.Window,
         direction: Meta.DisplayDirection,

@@ -502,6 +502,19 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         keybindingsGroup.add(spanDownKB);
 
+        const untileWindowKB = this._buildShortcutButtonRow(
+            Settings.SETTING_UNTILE_WINDOW,
+            this.getSettings(),
+            'Untile focused window',
+            undefined,
+        );
+        Settings.bind(
+            Settings.SETTING_ENABLE_MOVE_KEYBINDINGS,
+            untileWindowKB,
+            'sensitive',
+        );
+        keybindingsGroup.add(untileWindowKB);
+
         // footer
         const footerGroup = new Adw.PreferencesGroup();
         prefsPage.add(footerGroup);
@@ -691,7 +704,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         settingsKey: string,
         gioSettings: Gio.Settings,
         title: string,
-        subtitle: string,
+        subtitle: string | undefined,
         styleClass?: string,
     ) {
         const btn = new ShortcutSettingButton(settingsKey, gioSettings);
@@ -700,9 +713,9 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         btn.set_valign(Gtk.Align.CENTER);
         const adwRow = new Adw.ActionRow({
             title,
-            subtitle,
             activatableWidget: btn,
         });
+        if (subtitle) adwRow.set_subtitle(subtitle);
         adwRow.add_suffix(btn);
 
         return adwRow;
