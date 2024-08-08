@@ -11,6 +11,9 @@ import Layout from '../layout/Layout';
 import Tile from '../layout/Tile';
 import { buildRectangle, buildTileGaps } from '@utils/ui';
 import TileUtils from '@components/layout/TileUtils';
+import { logger } from '@utils/shell';
+
+const debug = logger('TilingLayout');
 
 export interface DynamicTilePreviewConstructorProperties
     extends Partial<TilePreviewConstructorProperties> {
@@ -370,21 +373,28 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
         let previewFound: DynamicTilePreview | undefined;
         let bestDistance = -1;
 
+        debug(
+            `win rect: ${source.x},${source.y},${source.width},${source.height}`,
+        );
+
         for (let i = 0; i < this._previews.length; i++) {
             const preview = this._previews[i];
 
+            debug(
+                `preview: ${preview.innerX},${preview.innerY},${preview.width},${preview.height}`,
+            );
             switch (direction) {
                 case Meta.DisplayDirection.RIGHT:
-                    if (preview.x <= source.x) continue;
+                    if (preview.innerX <= source.x) continue;
                     break;
                 case Meta.DisplayDirection.LEFT:
-                    if (preview.x >= source.x) continue;
+                    if (preview.innerX >= source.x) continue;
                     break;
                 case Meta.DisplayDirection.DOWN:
-                    if (preview.y <= source.y) continue;
+                    if (preview.innerY <= source.y) continue;
                     break;
                 case Meta.DisplayDirection.UP:
-                    if (preview.y >= source.y) continue;
+                    if (preview.innerY >= source.y) continue;
                     break;
                 default:
                     continue;

@@ -35,8 +35,6 @@ export class TilingManager {
     private _edgeTilingManager: EdgeTilingManager;
 
     private _workArea: Mtk.Rectangle;
-    private _innerGaps: Clutter.Margin;
-    private _outerGaps: Clutter.Margin;
     private _enableScaling: boolean;
 
     private _isGrabbingWindow: boolean;
@@ -69,10 +67,6 @@ export class TilingManager {
             monitor.index,
         );
 
-        // handle scale factor of the monitor
-        this._innerGaps = buildMargin(Settings.get_inner_gaps());
-        this._outerGaps = buildMargin(Settings.get_outer_gaps());
-
         // get the monitor's workarea
         this._workArea = Main.layoutManager.getWorkAreaForMonitor(
             this._monitor.index,
@@ -82,14 +76,18 @@ export class TilingManager {
         );
         this._edgeTilingManager = new EdgeTilingManager(this._workArea);
 
+        // handle scale factor of the monitor
+        const innerGaps = buildMargin(Settings.get_inner_gaps());
+        const outerGaps = buildMargin(Settings.get_outer_gaps());
         const monitorScalingFactor = this._enableScaling
             ? getMonitorScalingFactor(monitor.index)
             : undefined;
+
         // build the tiling layout
         this._tilingLayout = new TilingLayout(
             layout,
-            this._innerGaps,
-            this._outerGaps,
+            innerGaps,
+            outerGaps,
             this._workArea,
             monitorScalingFactor,
         );
@@ -137,12 +135,12 @@ export class TilingManager {
         );
 
         this._signals.connect(Settings, Settings.SETTING_INNER_GAPS, () => {
-            this._innerGaps = buildMargin(Settings.get_inner_gaps());
-            this._tilingLayout.relayout({ innerGaps: this._innerGaps });
+            const innerGaps = buildMargin(Settings.get_inner_gaps());
+            this._tilingLayout.relayout({ innerGaps });
         });
         this._signals.connect(Settings, Settings.SETTING_OUTER_GAPS, () => {
-            this._outerGaps = buildMargin(Settings.get_outer_gaps());
-            this._tilingLayout.relayout({ outerGaps: this._outerGaps });
+            const outerGaps = buildMargin(Settings.get_outer_gaps());
+            this._tilingLayout.relayout({ outerGaps });
         });
 
         this._signals.connect(
@@ -177,13 +175,25 @@ export class TilingManager {
         );
     }
 
+    public onUntileWindow(window: Meta.Window, force: boolean): void {
+        const destination = (window as ExtendedWindow).originalSize;
+        if (!destination) return;
+
+        this._easeWindowRect(window, destination, false, force);
+
+        (window as ExtendedWindow).originalSize = undefined;
+    }
+
     public onKeyboardMoveWindow(
         window: Meta.Window,
         direction: Meta.DisplayDirection,
-        force: boolean = false,
+        force: boolean,
+        spanFlag: boolean,
     ): boolean {
         let destination: { rect: Mtk.Rectangle; tile: Tile } | undefined;
         if (window.get_maximized()) {
+            if (spanFlag) return false;
+
             switch (direction) {
                 case Meta.DisplayDirection.DOWN:
                     window.unmaximize(Meta.MaximizeFlags.BOTH);
@@ -200,16 +210,18 @@ export class TilingManager {
         }
 
         // find the nearest tile
-        const windowRect = window.get_frame_rect().copy();
+        const windowRectCopy = window.get_frame_rect().copy();
         if (!destination) {
             destination = this._tilingLayout.getNearestTile(
-                windowRect,
+                windowRectCopy,
                 direction,
             );
         }
 
         // there isn't a tile near the window
         if (!destination) {
+            if (spanFlag) return false;
+
             // handle maximize of window
             if (
                 direction === Meta.DisplayDirection.UP &&
@@ -222,8 +234,17 @@ export class TilingManager {
         }
 
         if (!(window as ExtendedWindow).assignedTile && !window.get_maximized())
-            (window as ExtendedWindow).originalSize = windowRect;
+            (window as ExtendedWindow).originalSize = windowRectCopy;
 
+        if (spanFlag) {
+            destination.rect = destination.rect.union(windowRectCopy);
+            destination.tile = TileUtils.build_tile(
+                destination.rect,
+                this._workArea,
+            );
+        }
+
+        // ensure the assigned tile is a COPY
         (window as ExtendedWindow).assignedTile = new Tile({
             ...destination.tile,
         });
@@ -730,7 +751,7 @@ export class TilingManager {
         this._selectedTilesPreview.openAbove(window, true, edgeTile);
     }
 
-    public onTileFromWindowMenu(tile: Tile, window: Meta.Window) {
+    private _easeWindowRectFromTile(tile: Tile, window: Meta.Window) {
         // We apply the proportions to get tile size and position relative to the work area
         const scaledRect = TileUtils.apply_props(tile, this._workArea);
         // ensure the rect doesn't go horizontally beyond the workarea
@@ -794,5 +815,22 @@ export class TilingManager {
             this._workArea,
         );
         this._easeWindowRect(window, destinationRect);
+    }
+
+    public onTileFromWindowMenu(tile: Tile, window: Meta.Window) {
+        this._easeWindowRectFromTile(tile, window);
+    }
+
+    public onSpanAllTiles(window: Meta.Window) {
+        this._easeWindowRectFromTile(
+            new Tile({
+                x: 0,
+                y: 0,
+                width: 1,
+                height: 1,
+                groups: [],
+            }),
+            window,
+        );
     }
 }

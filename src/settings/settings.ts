@@ -41,11 +41,20 @@ export default class Settings {
     static SETTING_OVERRIDE_WINDOW_MENU = 'override-window-menu';
     static SETTING_SNAP_ASSISTANT_THRESHOLD = 'snap-assistant-threshold';
     static SETTING_QUARTER_TILING_THRESHOLD = 'quarter-tiling-threshold';
+    static SETTING_WINDOW_BORDER_COLOR = 'window-border-color';
+    static SETTING_WINDOW_BORDER_WIDTH = 'window-border-width';
+    static SETTING_ENABLE_WINDOW_BORDER = 'enable-window-border';
 
     static SETTING_MOVE_WINDOW_RIGHT = 'move-window-right';
     static SETTING_MOVE_WINDOW_LEFT = 'move-window-left';
     static SETTING_MOVE_WINDOW_UP = 'move-window-up';
     static SETTING_MOVE_WINDOW_DOWN = 'move-window-down';
+    static SETTING_SPAN_WINDOW_RIGHT = 'span-window-right';
+    static SETTING_SPAN_WINDOW_LEFT = 'span-window-left';
+    static SETTING_SPAN_WINDOW_UP = 'span-window-up';
+    static SETTING_SPAN_WINDOW_DOWN = 'span-window-down';
+    static SETTING_SPAN_WINDOW_ALL_TILES = 'span-window-all-tiles';
+    static SETTING_UNTILE_WINDOW = 'untile-window';
 
     static initialize(settings: Gio.Settings) {
         if (this._is_initialized) return;
@@ -245,6 +254,24 @@ export default class Settings {
         );
     }
 
+    static get_window_border_color(): string {
+        return (
+            this._settings?.get_string(this.SETTING_WINDOW_BORDER_COLOR) ??
+            '#ec5e5e'
+        );
+    }
+
+    static get_window_border_width(): number {
+        return this._settings?.get_uint(this.SETTING_WINDOW_BORDER_WIDTH) ?? 3;
+    }
+
+    static get_enable_window_border(): boolean {
+        return (
+            this._settings?.get_boolean(this.SETTING_ENABLE_WINDOW_BORDER) ??
+            false
+        );
+    }
+
     static set_last_version_installed(version: string) {
         this._settings?.set_string(
             this.SETTING_LAST_VERSION_NAME_INSTALLED,
@@ -279,35 +306,6 @@ export default class Settings {
                 this.SETTING_OVERRIDDEN_SETTINGS,
                 newVal,
             ) ?? false
-        );
-    }
-
-    static set_kb_move_window_right(newVal: string): boolean {
-        return (
-            this._settings?.set_strv(this.SETTING_MOVE_WINDOW_RIGHT, [
-                newVal,
-            ]) ?? false
-        );
-    }
-
-    static set_kb_move_window_left(newVal: string): boolean {
-        return (
-            this._settings?.set_strv(this.SETTING_MOVE_WINDOW_LEFT, [newVal]) ??
-            false
-        );
-    }
-
-    static set_kb_move_window_up(newVal: string): boolean {
-        return (
-            this._settings?.set_strv(this.SETTING_MOVE_WINDOW_UP, [newVal]) ??
-            false
-        );
-    }
-
-    static set_kb_move_window_down(newVal: string): boolean {
-        return (
-            this._settings?.set_strv(this.SETTING_MOVE_WINDOW_DOWN, [newVal]) ??
-            false
         );
     }
 
@@ -429,24 +427,6 @@ export default class Settings {
 
     static save_selected_layouts_json(ids: string[]) {
         this._settings?.set_strv(Settings.SETTING_SELECTED_LAYOUTS, ids);
-    }
-
-    static get_kb_move_window_right(): string {
-        return (
-            this._settings?.get_strv(this.SETTING_MOVE_WINDOW_RIGHT)[0] ?? ''
-        );
-    }
-
-    static get_kb_move_window_left(): string {
-        return this._settings?.get_strv(this.SETTING_MOVE_WINDOW_LEFT)[0] ?? '';
-    }
-
-    static get_kb_move_window_up(): string {
-        return this._settings?.get_strv(this.SETTING_MOVE_WINDOW_UP)[0] ?? '';
-    }
-
-    static get_kb_move_window_down(): string {
-        return this._settings?.get_strv(this.SETTING_MOVE_WINDOW_DOWN)[0] ?? '';
     }
 
     static connect(key: string, func: (...arg: unknown[]) => void): number {

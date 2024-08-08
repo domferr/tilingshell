@@ -80,11 +80,11 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         appearenceGroup.add(outerGapsRow);
 
-        const blur = new Adw.ExpanderRow({
+        const blurRow = new Adw.ExpanderRow({
             title: 'Blur (experimental feature)',
             subtitle: 'Apply blur effect to Snap Assistant and tile previews',
         });
-        appearenceGroup.add(blur);
+        appearenceGroup.add(blurRow);
 
         const snapAssistantThresholdRow = this._buildSpinButtonRow(
             Settings.SETTING_SNAP_ASSISTANT_THRESHOLD,
@@ -95,18 +95,39 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         appearenceGroup.add(snapAssistantThresholdRow);
 
-        blur.add_row(
+        blurRow.add_row(
             this._buildSwitchRow(
                 Settings.SETTING_ENABLE_BLUR_SNAP_ASSISTANT,
                 'Snap Assistant',
                 'Apply blur effect to Snap Assistant',
             ),
         );
-        blur.add_row(
+        blurRow.add_row(
             this._buildSwitchRow(
                 Settings.SETTING_ENABLE_BLUR_SELECTED_TILEPREVIEW,
                 'Selected tile preview',
                 'Apply blur effect to selected tile preview',
+            ),
+        );
+
+        const windowBorderRow = new Adw.ExpanderRow({
+            title: 'Window border',
+            subtitle: 'Show a border around focused window',
+        });
+        appearenceGroup.add(windowBorderRow);
+        windowBorderRow.add_row(
+            this._buildSwitchRow(
+                Settings.SETTING_ENABLE_WINDOW_BORDER,
+                'Enable',
+                'Show a border around focused window',
+            ),
+        );
+        windowBorderRow.add_row(
+            this._buildSpinButtonRow(
+                Settings.SETTING_WINDOW_BORDER_WIDTH,
+                'Width',
+                'The size of the border',
+                1,
             ),
         );
 
@@ -385,7 +406,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         const keybindingsGroup = new Adw.PreferencesGroup({
             title: 'Keybindings',
             description:
-                'Use hotkeys to move the focused window through the tiles of the active layout',
+                'Use hotkeys to perform actions on the focused window across the tiles of the active layout',
             headerSuffix: new Gtk.Switch({
                 vexpand: false,
                 valign: Gtk.Align.CENTER,
@@ -398,61 +419,165 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         prefsPage.add(keybindingsGroup);
 
-        const moveRightKB = this._buildShortcutButtonRow(
-            Settings.get_kb_move_window_right(),
-            'Move window to right tile',
-            'Move the focused window to the tile on its right',
-            (_: unknown, value: string) =>
-                Settings.set_kb_move_window_right(value),
-        );
-        Settings.bind(
-            Settings.SETTING_ENABLE_MOVE_KEYBINDINGS,
-            moveRightKB,
-            'sensitive',
-        );
-        keybindingsGroup.add(moveRightKB);
+        const gioSettings = this.getSettings();
+        const keybindings: [
+            string, // settings key
+            string, // title
+            string | undefined, // subtitle
+            boolean, // is set
+            boolean, // is on main page
+        ][] = [
+            [
+                Settings.SETTING_MOVE_WINDOW_RIGHT, // settings key
+                'Move window to right tile', // title
+                'Move the focused window to the tile on its right', // subtitle
+                false, // is set
+                true, // is on main page
+            ],
+            [
+                Settings.SETTING_MOVE_WINDOW_LEFT,
+                'Move window to left tile',
+                'Move the focused window to the tile on its left',
+                false,
+                true,
+            ],
+            [
+                Settings.SETTING_MOVE_WINDOW_UP,
+                'Move window to tile above',
+                'Move the focused window to the tile above',
+                false,
+                true,
+            ],
+            [
+                Settings.SETTING_MOVE_WINDOW_DOWN,
+                'Move window to tile below',
+                'Move the focused window to the tile below',
+                false,
+                true,
+            ],
+            [
+                Settings.SETTING_SPAN_WINDOW_RIGHT,
+                'Span window to right tile',
+                'Span the focused window to the tile on its right',
+                false,
+                false,
+            ],
+            [
+                Settings.SETTING_SPAN_WINDOW_LEFT,
+                'Span window to left tile',
+                'Span the focused window to the tile on its left',
+                false,
+                false,
+            ],
+            [
+                Settings.SETTING_SPAN_WINDOW_UP,
+                'Span window above',
+                'Span the focused window to the tile above',
+                false,
+                false,
+            ],
+            [
+                Settings.SETTING_SPAN_WINDOW_DOWN,
+                'Span window down',
+                'Span the focused window to the tile below',
+                false,
+                false,
+            ],
+            [
+                Settings.SETTING_SPAN_WINDOW_ALL_TILES,
+                'Span window to all tiles',
+                'Span the focused window to all the tiles',
+                false,
+                false,
+            ],
+            [
+                Settings.SETTING_UNTILE_WINDOW,
+                'Untile focused window',
+                undefined,
+                false,
+                false,
+            ],
+        ];
 
-        const moveLeftKB = this._buildShortcutButtonRow(
-            Settings.get_kb_move_window_left(),
-            'Move window to left tile',
-            'Move the focused window to the tile on its left',
-            (_: unknown, value: string) =>
-                Settings.set_kb_move_window_left(value),
-        );
-        Settings.bind(
-            Settings.SETTING_ENABLE_MOVE_KEYBINDINGS,
-            moveLeftKB,
-            'sensitive',
-        );
-        keybindingsGroup.add(moveLeftKB);
+        // set if the keybinding was set or not by the user
+        for (let i = 0; i < keybindings.length; i++) {
+            keybindings[i][3] =
+                gioSettings.get_strv(keybindings[i][0])[0].length > 0;
+        }
 
-        const moveUpKB = this._buildShortcutButtonRow(
-            Settings.get_kb_move_window_up(),
-            'Move window to tile above',
-            'Move the focused window to the tile above',
-            (_: unknown, value: string) =>
-                Settings.set_kb_move_window_up(value),
-        );
-        Settings.bind(
-            Settings.SETTING_ENABLE_MOVE_KEYBINDINGS,
-            moveUpKB,
-            'sensitive',
-        );
-        keybindingsGroup.add(moveUpKB);
+        // draw keybindings set or not optional
+        keybindings.forEach(
+            ([settingsKey, title, subtitle, isSet, isOnMainPage]) => {
+                if (!isSet && !isOnMainPage) return;
 
-        const moveDownKB = this._buildShortcutButtonRow(
-            Settings.get_kb_move_window_down(),
-            'Move window to tile below',
-            'Move the focused window to the tile below',
-            (_: unknown, value: string) =>
-                Settings.set_kb_move_window_down(value),
+                const row = this._buildShortcutButtonRow(
+                    settingsKey,
+                    gioSettings,
+                    title,
+                    subtitle,
+                );
+
+                Settings.bind(
+                    Settings.SETTING_ENABLE_MOVE_KEYBINDINGS,
+                    row,
+                    'sensitive',
+                );
+                keybindingsGroup.add(row);
+            },
+        );
+        const openKeybindingsDialogRow = new Adw.ActionRow({
+            title: 'View and Customize all the Shortcuts',
+            activatable: true,
+        });
+        openKeybindingsDialogRow.add_suffix(
+            new Gtk.Image({
+                icon_name: 'go-next-symbolic',
+                valign: Gtk.Align.CENTER,
+            }),
         );
         Settings.bind(
             Settings.SETTING_ENABLE_MOVE_KEYBINDINGS,
-            moveDownKB,
+            openKeybindingsDialogRow,
             'sensitive',
         );
-        keybindingsGroup.add(moveDownKB);
+        keybindingsGroup.add(openKeybindingsDialogRow);
+
+        const keybindingsDialog = new Adw.PreferencesWindow({
+            searchEnabled: true,
+            modal: true,
+            hide_on_close: true,
+            transient_for: window,
+            width_request: 480,
+            height_request: 320,
+        });
+        openKeybindingsDialogRow.connect('activated', () =>
+            keybindingsDialog.present(),
+        );
+        const keybindingsPage = new Adw.PreferencesPage({
+            name: 'View and Customize Shortcuts',
+            title: 'View and Customize Shortcuts',
+            iconName: 'dialog-information-symbolic',
+        });
+        keybindingsDialog.add(keybindingsPage);
+        const keybindingsDialogGroup = new Adw.PreferencesGroup();
+        keybindingsPage.add(keybindingsDialogGroup);
+
+        // draw all the keybindings in the dialog
+        keybindings.forEach(([settingsKey, title, subtitle]) => {
+            const row = this._buildShortcutButtonRow(
+                settingsKey,
+                gioSettings,
+                title,
+                subtitle,
+            );
+
+            Settings.bind(
+                Settings.SETTING_ENABLE_MOVE_KEYBINDINGS,
+                row,
+                'sensitive',
+            );
+            keybindingsDialogGroup.add(row);
+        });
 
         // footer
         const footerGroup = new Adw.PreferencesGroup();
@@ -640,24 +765,22 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
     }
 
     _buildShortcutButtonRow(
-        shortcut: string,
+        settingsKey: string,
+        gioSettings: Gio.Settings,
         title: string,
-        subtitle: string,
-        onChange: (_: unknown, value: string) => void,
+        subtitle: string | undefined,
         styleClass?: string,
     ) {
-        const btn = new ShortcutSettingButton(shortcut);
+        const btn = new ShortcutSettingButton(settingsKey, gioSettings);
         if (styleClass) btn.add_css_class(styleClass);
         btn.set_vexpand(false);
         btn.set_valign(Gtk.Align.CENTER);
         const adwRow = new Adw.ActionRow({
             title,
-            subtitle,
             activatableWidget: btn,
         });
+        if (subtitle) adwRow.set_subtitle(subtitle);
         adwRow.add_suffix(btn);
-
-        btn.connect('changed', onChange);
 
         return adwRow;
     }
@@ -690,20 +813,11 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         scale.set_size_request(150, -1);
         scale.set_digits(0);
         scale.set_draw_value(true);
-        /* const controller = new Gtk.EventControllerScroll({
-            propagation_phase: Gtk.PropagationPhase.CAPTURE,
-            flags: Gtk.EventControllerScrollFlags.HORIZONTAL,
-        });
-        controller.connect('scroll', () => {
-            console.debug('ON SCROOOOLL');
-        });
-        adwRow.add_controller(controller);*/
         adwRow.add_suffix(scale);
         return adwRow;
     }
 }
 
-// eslint-disable-next-line no-unused-vars
 const ShortcutSettingButton = class extends Gtk.Button {
     static {
         GObject.registerClass(
@@ -727,9 +841,11 @@ const ShortcutSettingButton = class extends Gtk.Button {
 
     private _editor: Adw.Window | null;
     private _label: Gtk.ShortcutLabel;
-    private shortcut: string;
+    private _shortcut: string;
+    private _settingsKey: string;
+    private _gioSettings: Gio.Settings;
 
-    constructor(value: string) {
+    constructor(settingsKey: string, gioSettings: Gio.Settings) {
         super({
             halign: Gtk.Align.CENTER,
             hexpand: false,
@@ -737,6 +853,9 @@ const ShortcutSettingButton = class extends Gtk.Button {
             has_frame: false,
         });
 
+        this._shortcut = '';
+        this._settingsKey = settingsKey;
+        this._gioSettings = gioSettings;
         this._editor = null;
         this._label = new Gtk.ShortcutLabel({
             disabled_text: 'New accelerator…',
@@ -745,18 +864,23 @@ const ShortcutSettingButton = class extends Gtk.Button {
             vexpand: false,
         });
 
-        this.set_child(this._label);
-
         // Bind signals
         this.connect('clicked', this._onActivated.bind(this));
-        this.shortcut = value;
+        gioSettings.connect(`changed::${settingsKey}`, () => {
+            [this.shortcut] = gioSettings.get_strv(settingsKey);
+            this._label.set_accelerator(this.shortcut);
+        });
+        [this.shortcut] = gioSettings.get_strv(settingsKey);
         this._label.set_accelerator(this.shortcut);
-        this.bind_property(
-            'shortcut',
-            this._label,
-            'accelerator',
-            GObject.BindingFlags.DEFAULT,
-        );
+        this.set_child(this._label);
+    }
+
+    private set shortcut(value: string) {
+        this._shortcut = value;
+    }
+
+    private get shortcut(): string {
+        return this._shortcut;
     }
 
     _onActivated(widget: Gtk.Widget) {
@@ -766,6 +890,7 @@ const ShortcutSettingButton = class extends Gtk.Button {
             title: 'New accelerator…',
             // description: this._description,
             icon_name: 'preferences-desktop-keyboard-shortcuts-symbolic',
+            description: 'Use Backspace to clear',
         });
 
         this._editor = new Adw.Window({
@@ -797,6 +922,12 @@ const ShortcutSettingButton = class extends Gtk.Button {
             return Gdk.EVENT_STOP;
         }
 
+        if (keyval === Gdk.KEY_BackSpace) {
+            this._updateShortcut(''); // Clear
+            this._editor?.close();
+            return Gdk.EVENT_STOP;
+        }
+
         if (
             !this.isValidBinding(mask, keycode, keyval) ||
             !this.isValidAccel(mask, keyval)
@@ -807,18 +938,24 @@ const ShortcutSettingButton = class extends Gtk.Button {
             this._editor?.destroy();
             return Gdk.EVENT_STOP;
         } else {
-            this.shortcut = Gtk.accelerator_name_with_keycode(
+            const val = Gtk.accelerator_name_with_keycode(
                 null,
                 keyval,
                 keycode,
                 mask,
             );
-            this._label.set_accelerator(this.shortcut);
-            this.emit('changed', this.shortcut);
+            this._updateShortcut(val);
         }
 
         this._editor?.destroy();
         return Gdk.EVENT_STOP;
+    }
+
+    private _updateShortcut(val: string): void {
+        this.shortcut = val;
+        this._label.set_accelerator(this.shortcut);
+        this._gioSettings.set_strv(this._settingsKey, [this.shortcut]);
+        this.emit('changed', this.shortcut);
     }
 
     // Functions from https://gitlab.gnome.org/GNOME/gnome-control-center/-/blob/main/panels/keyboard/keyboard-shortcuts.c
