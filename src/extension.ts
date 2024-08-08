@@ -186,7 +186,24 @@ export default class TilingShellExtension extends Extension {
             this._signals.connect(
                 this._keybindings,
                 'move-window',
-                this._onKeyboardMoveWin.bind(this),
+                (
+                    kb: KeyBindings,
+                    dp: Meta.Display,
+                    dir: Meta.DisplayDirection,
+                ) => {
+                    this._onKeyboardMoveWin(dp, dir, false);
+                },
+            );
+            this._signals.connect(
+                this._keybindings,
+                'span-window',
+                (
+                    kb: KeyBindings,
+                    dp: Meta.Display,
+                    dir: Meta.DisplayDirection,
+                ) => {
+                    this._onKeyboardMoveWin(dp, dir, true);
+                },
             );
         }
 
@@ -231,9 +248,9 @@ export default class TilingShellExtension extends Extension {
     }
 
     private _onKeyboardMoveWin(
-        kb: KeyBindings,
         display: Meta.Display,
         direction: Meta.DisplayDirection,
+        spanFlag: boolean,
     ) {
         const focus_window = display.get_focus_window();
         if (
@@ -243,6 +260,9 @@ export default class TilingShellExtension extends Extension {
                 focus_window.get_wm_class() === 'gjs')
         )
             return;
+
+        // if the window is maximized, it cannot be spanned
+        if (focus_window.get_maximized() && spanFlag) return;
 
         // handle unmaximize of maximized window
         if (
@@ -260,6 +280,8 @@ export default class TilingShellExtension extends Extension {
         const success = monitorTilingManager.onKeyboardMoveWindow(
             focus_window,
             direction,
+            false,
+            spanFlag,
         );
         if (success) return;
 
@@ -286,6 +308,7 @@ export default class TilingShellExtension extends Extension {
             focus_window,
             direction,
             true,
+            spanFlag,
         );
     }
 

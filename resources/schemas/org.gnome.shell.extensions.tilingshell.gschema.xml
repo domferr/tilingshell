@@ -130,6 +130,22 @@
 			<default><![CDATA[['<Super>Down']]]></default>
 			<summary>Move focused window to the tile below</summary>
 		</key>
+		<key type="as" name="span-window-right">
+			<default><![CDATA[['']]]></default>
+			<summary>Span focused window to the tile to its right</summary>
+		</key>
+		<key type="as" name="span-window-left">
+			<default><![CDATA[['']]]></default>
+			<summary>Span focused window to the tile to its left</summary>
+		</key>
+		<key type="as" name="span-window-up">
+			<default><![CDATA[['']]]></default>
+			<summary>Span focused window to the tile above</summary>
+		</key>
+		<key type="as" name="span-window-down">
+			<default><![CDATA[['']]]></default>
+			<summary>Span focused window to the tile below</summary>
+		</key>
     </schema>
 
 </schemalist>

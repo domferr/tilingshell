@@ -366,12 +366,26 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
     public getNearestTile(
         source: Mtk.Rectangle,
         direction: Meta.DisplayDirection,
+        // skipTile: Tile | undefined,
     ): { rect: Mtk.Rectangle; tile: Tile } | undefined {
         let previewFound: DynamicTilePreview | undefined;
         let bestDistance = -1;
 
         for (let i = 0; i < this._previews.length; i++) {
             const preview = this._previews[i];
+
+            /* if (
+                skipTile &&
+                preview.tile.x === skipTile.x &&
+                preview.tile.y === skipTile.y &&
+                preview.tile.width === skipTile.width &&
+                preview.tile.height === skipTile.height
+            )
+                continue;*/
+
+            console.log(
+                `nearest preview ${preview.x}x${preview.y} source ${source.x}x${source.y}`,
+            );
 
             switch (direction) {
                 case Meta.DisplayDirection.RIGHT:
@@ -394,6 +408,8 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
                 (preview.x - source.x) * (preview.x - source.x) +
                 (preview.y - source.y) * (preview.y - source.y);
 
+            console.log(`nearest euclideanDistance ${euclideanDistance}`);
+
             if (!previewFound || euclideanDistance < bestDistance) {
                 previewFound = preview;
                 bestDistance = euclideanDistance;
@@ -403,12 +419,7 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
         if (!previewFound) return undefined;
 
         return {
-            rect: buildRectangle({
-                x: previewFound.innerX,
-                y: previewFound.innerY,
-                width: previewFound.innerWidth,
-                height: previewFound.innerHeight,
-            }),
+            rect: previewFound.rect.copy(),
             tile: previewFound.tile,
         };
     }
@@ -427,12 +438,7 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
         }
 
         return {
-            rect: buildRectangle({
-                x: previewFound.innerX,
-                y: previewFound.innerY,
-                width: previewFound.innerWidth,
-                height: previewFound.innerHeight,
-            }),
+            rect: previewFound.rect.copy(),
             tile: previewFound.tile,
         };
     }
@@ -449,12 +455,7 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
         }
 
         return {
-            rect: buildRectangle({
-                x: previewFound.innerX,
-                y: previewFound.innerY,
-                width: previewFound.innerWidth,
-                height: previewFound.innerHeight,
-            }),
+            rect: previewFound.rect.copy(),
             tile: previewFound.tile,
         };
     }

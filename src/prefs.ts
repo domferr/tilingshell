@@ -399,11 +399,10 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         prefsPage.add(keybindingsGroup);
 
         const moveRightKB = this._buildShortcutButtonRow(
-            Settings.get_kb_move_window_right(),
+            Settings.SETTING_MOVE_WINDOW_RIGHT,
+            this.getSettings(),
             'Move window to right tile',
             'Move the focused window to the tile on its right',
-            (_: unknown, value: string) =>
-                Settings.set_kb_move_window_right(value),
         );
         Settings.bind(
             Settings.SETTING_ENABLE_MOVE_KEYBINDINGS,
@@ -413,11 +412,10 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         keybindingsGroup.add(moveRightKB);
 
         const moveLeftKB = this._buildShortcutButtonRow(
-            Settings.get_kb_move_window_left(),
+            Settings.SETTING_MOVE_WINDOW_LEFT,
+            this.getSettings(),
             'Move window to left tile',
             'Move the focused window to the tile on its left',
-            (_: unknown, value: string) =>
-                Settings.set_kb_move_window_left(value),
         );
         Settings.bind(
             Settings.SETTING_ENABLE_MOVE_KEYBINDINGS,
@@ -427,11 +425,10 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         keybindingsGroup.add(moveLeftKB);
 
         const moveUpKB = this._buildShortcutButtonRow(
-            Settings.get_kb_move_window_up(),
+            Settings.SETTING_MOVE_WINDOW_UP,
+            this.getSettings(),
             'Move window to tile above',
             'Move the focused window to the tile above',
-            (_: unknown, value: string) =>
-                Settings.set_kb_move_window_up(value),
         );
         Settings.bind(
             Settings.SETTING_ENABLE_MOVE_KEYBINDINGS,
@@ -441,11 +438,10 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         keybindingsGroup.add(moveUpKB);
 
         const moveDownKB = this._buildShortcutButtonRow(
-            Settings.get_kb_move_window_down(),
+            Settings.SETTING_MOVE_WINDOW_DOWN,
+            this.getSettings(),
             'Move window to tile below',
             'Move the focused window to the tile below',
-            (_: unknown, value: string) =>
-                Settings.set_kb_move_window_down(value),
         );
         Settings.bind(
             Settings.SETTING_ENABLE_MOVE_KEYBINDINGS,
@@ -453,6 +449,58 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             'sensitive',
         );
         keybindingsGroup.add(moveDownKB);
+
+        const spanRightKB = this._buildShortcutButtonRow(
+            Settings.SETTING_SPAN_WINDOW_RIGHT,
+            this.getSettings(),
+            'Span window to right tile',
+            'Span the focused window to the tile on its right',
+        );
+        Settings.bind(
+            Settings.SETTING_ENABLE_MOVE_KEYBINDINGS,
+            spanRightKB,
+            'sensitive',
+        );
+        keybindingsGroup.add(spanRightKB);
+
+        const spanLeftKB = this._buildShortcutButtonRow(
+            Settings.SETTING_SPAN_WINDOW_LEFT,
+            this.getSettings(),
+            'Span window to left tile',
+            'Span the focused window to the tile on its left',
+        );
+        Settings.bind(
+            Settings.SETTING_ENABLE_MOVE_KEYBINDINGS,
+            spanLeftKB,
+            'sensitive',
+        );
+        keybindingsGroup.add(spanLeftKB);
+
+        const spanUpKB = this._buildShortcutButtonRow(
+            Settings.SETTING_SPAN_WINDOW_UP,
+            this.getSettings(),
+            'Span window above',
+            'Span the focused window to the tile above',
+        );
+        Settings.bind(
+            Settings.SETTING_ENABLE_MOVE_KEYBINDINGS,
+            spanUpKB,
+            'sensitive',
+        );
+        keybindingsGroup.add(spanUpKB);
+
+        const spanDownKB = this._buildShortcutButtonRow(
+            Settings.SETTING_SPAN_WINDOW_DOWN,
+            this.getSettings(),
+            'Span window down',
+            'Span the focused window to the tile below',
+        );
+        Settings.bind(
+            Settings.SETTING_ENABLE_MOVE_KEYBINDINGS,
+            spanDownKB,
+            'sensitive',
+        );
+        keybindingsGroup.add(spanDownKB);
 
         // footer
         const footerGroup = new Adw.PreferencesGroup();
@@ -640,13 +688,13 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
     }
 
     _buildShortcutButtonRow(
-        shortcut: string,
+        settingsKey: string,
+        gioSettings: Gio.Settings,
         title: string,
         subtitle: string,
-        onChange: (_: unknown, value: string) => void,
         styleClass?: string,
     ) {
-        const btn = new ShortcutSettingButton(shortcut);
+        const btn = new ShortcutSettingButton(settingsKey, gioSettings);
         if (styleClass) btn.add_css_class(styleClass);
         btn.set_vexpand(false);
         btn.set_valign(Gtk.Align.CENTER);
@@ -656,8 +704,6 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             activatableWidget: btn,
         });
         adwRow.add_suffix(btn);
-
-        btn.connect('changed', onChange);
 
         return adwRow;
     }
@@ -727,9 +773,11 @@ const ShortcutSettingButton = class extends Gtk.Button {
 
     private _editor: Adw.Window | null;
     private _label: Gtk.ShortcutLabel;
-    private shortcut: string;
+    private _shortcut: string;
+    private _settingsKey: string;
+    private _gioSettings: Gio.Settings;
 
-    constructor(value: string) {
+    constructor(settingsKey: string, gioSettings: Gio.Settings) {
         super({
             halign: Gtk.Align.CENTER,
             hexpand: false,
@@ -737,6 +785,9 @@ const ShortcutSettingButton = class extends Gtk.Button {
             has_frame: false,
         });
 
+        this._shortcut = '';
+        this._settingsKey = settingsKey;
+        this._gioSettings = gioSettings;
         this._editor = null;
         this._label = new Gtk.ShortcutLabel({
             disabled_text: 'New accelerator…',
@@ -745,18 +796,25 @@ const ShortcutSettingButton = class extends Gtk.Button {
             vexpand: false,
         });
 
-        this.set_child(this._label);
-
         // Bind signals
         this.connect('clicked', this._onActivated.bind(this));
-        this.shortcut = value;
-        this._label.set_accelerator(this.shortcut);
-        this.bind_property(
+        /* this.bind_property(
             'shortcut',
             this._label,
             'accelerator',
             GObject.BindingFlags.DEFAULT,
-        );
+        );*/
+        [this.shortcut] = gioSettings.get_strv(settingsKey);
+        this._label.set_accelerator(this.shortcut);
+        this.set_child(this._label);
+    }
+
+    private set shortcut(value: string) {
+        this._shortcut = value;
+    }
+
+    private get shortcut(): string {
+        return this._shortcut;
     }
 
     _onActivated(widget: Gtk.Widget) {
@@ -766,6 +824,7 @@ const ShortcutSettingButton = class extends Gtk.Button {
             title: 'New accelerator…',
             // description: this._description,
             icon_name: 'preferences-desktop-keyboard-shortcuts-symbolic',
+            description: 'Use Backspace to clear',
         });
 
         this._editor = new Adw.Window({
@@ -797,6 +856,12 @@ const ShortcutSettingButton = class extends Gtk.Button {
             return Gdk.EVENT_STOP;
         }
 
+        if (keyval === Gdk.KEY_BackSpace) {
+            this._updateShortcut(''); // Clear
+            this._editor?.close();
+            return Gdk.EVENT_STOP;
+        }
+
         if (
             !this.isValidBinding(mask, keycode, keyval) ||
             !this.isValidAccel(mask, keyval)
@@ -807,18 +872,24 @@ const ShortcutSettingButton = class extends Gtk.Button {
             this._editor?.destroy();
             return Gdk.EVENT_STOP;
         } else {
-            this.shortcut = Gtk.accelerator_name_with_keycode(
+            const val = Gtk.accelerator_name_with_keycode(
                 null,
                 keyval,
                 keycode,
                 mask,
             );
-            this._label.set_accelerator(this.shortcut);
-            this.emit('changed', this.shortcut);
+            this._updateShortcut(val);
         }
 
         this._editor?.destroy();
         return Gdk.EVENT_STOP;
+    }
+
+    private _updateShortcut(val: string): void {
+        this.shortcut = val;
+        this._label.set_accelerator(this.shortcut);
+        this._gioSettings.set_strv(this._settingsKey, [this.shortcut]);
+        this.emit('changed', this.shortcut);
     }
 
     // Functions from https://gitlab.gnome.org/GNOME/gnome-control-center/-/blob/main/panels/keyboard/keyboard-shortcuts.c

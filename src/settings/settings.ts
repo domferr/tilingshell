@@ -47,6 +47,11 @@ export default class Settings {
     static SETTING_MOVE_WINDOW_UP = 'move-window-up';
     static SETTING_MOVE_WINDOW_DOWN = 'move-window-down';
 
+    static SETTING_SPAN_WINDOW_RIGHT = 'span-window-right';
+    static SETTING_SPAN_WINDOW_LEFT = 'span-window-left';
+    static SETTING_SPAN_WINDOW_UP = 'span-window-up';
+    static SETTING_SPAN_WINDOW_DOWN = 'span-window-down';
+
     static initialize(settings: Gio.Settings) {
         if (this._is_initialized) return;
 
@@ -282,35 +287,6 @@ export default class Settings {
         );
     }
 
-    static set_kb_move_window_right(newVal: string): boolean {
-        return (
-            this._settings?.set_strv(this.SETTING_MOVE_WINDOW_RIGHT, [
-                newVal,
-            ]) ?? false
-        );
-    }
-
-    static set_kb_move_window_left(newVal: string): boolean {
-        return (
-            this._settings?.set_strv(this.SETTING_MOVE_WINDOW_LEFT, [newVal]) ??
-            false
-        );
-    }
-
-    static set_kb_move_window_up(newVal: string): boolean {
-        return (
-            this._settings?.set_strv(this.SETTING_MOVE_WINDOW_UP, [newVal]) ??
-            false
-        );
-    }
-
-    static set_kb_move_window_down(newVal: string): boolean {
-        return (
-            this._settings?.set_strv(this.SETTING_MOVE_WINDOW_DOWN, [newVal]) ??
-            false
-        );
-    }
-
     static reset_layouts_json() {
         this.save_layouts_json([
             new Layout(
@@ -429,24 +405,6 @@ export default class Settings {
 
     static save_selected_layouts_json(ids: string[]) {
         this._settings?.set_strv(Settings.SETTING_SELECTED_LAYOUTS, ids);
-    }
-
-    static get_kb_move_window_right(): string {
-        return (
-            this._settings?.get_strv(this.SETTING_MOVE_WINDOW_RIGHT)[0] ?? ''
-        );
-    }
-
-    static get_kb_move_window_left(): string {
-        return this._settings?.get_strv(this.SETTING_MOVE_WINDOW_LEFT)[0] ?? '';
-    }
-
-    static get_kb_move_window_up(): string {
-        return this._settings?.get_strv(this.SETTING_MOVE_WINDOW_UP)[0] ?? '';
-    }
-
-    static get_kb_move_window_down(): string {
-        return this._settings?.get_strv(this.SETTING_MOVE_WINDOW_DOWN)[0] ?? '';
     }
 
     static connect(key: string, func: (...arg: unknown[]) => void): number {

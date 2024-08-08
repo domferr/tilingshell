@@ -20,6 +20,9 @@ export default class KeyBindings extends GObject.Object {
             'move-window': {
                 param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, Meta.Direction
             },
+            'span-window': {
+                param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, Meta.Direction
+            },
         },
     };
 
@@ -48,6 +51,51 @@ export default class KeyBindings extends GObject.Object {
     }
 
     private _applyKeybindings(extensionSettings: Gio.Settings) {
+        // Disable native keybindings for Super + Left/Right
+        this._overrideNatives(extensionSettings);
+
+        Main.wm.addKeybinding(
+            Settings.SETTING_SPAN_WINDOW_RIGHT,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('span-window', display, Meta.DisplayDirection.RIGHT);
+            },
+        );
+
+        Main.wm.addKeybinding(
+            Settings.SETTING_SPAN_WINDOW_LEFT,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('span-window', display, Meta.DisplayDirection.LEFT);
+            },
+        );
+
+        Main.wm.addKeybinding(
+            Settings.SETTING_SPAN_WINDOW_UP,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('span-window', display, Meta.DisplayDirection.UP);
+            },
+        );
+
+        Main.wm.addKeybinding(
+            Settings.SETTING_SPAN_WINDOW_DOWN,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('span-window', display, Meta.DisplayDirection.DOWN);
+            },
+        );
+    }
+
+    private _overrideNatives(extensionSettings: Gio.Settings) {
         // Disable native keybindings for Super + Left/Right
         const mutterKeybindings = new Gio.Settings({
             schema_id: 'org.gnome.mutter.keybindings',
@@ -95,14 +143,6 @@ export default class KeyBindings extends GObject.Object {
         );
     }
 
-    private _removeKeybindings() {
-        SettingsOverride.get().restoreAll();
-        Main.wm.removeKeybinding(Settings.SETTING_MOVE_WINDOW_RIGHT);
-        Main.wm.removeKeybinding(Settings.SETTING_MOVE_WINDOW_LEFT);
-        Main.wm.removeKeybinding(Settings.SETTING_MOVE_WINDOW_UP);
-        Main.wm.removeKeybinding(Settings.SETTING_MOVE_WINDOW_DOWN);
-    }
-
     private _overrideKeyBinding(
         name: string,
         handler: Meta.KeyHandlerFunc,
@@ -127,6 +167,14 @@ export default class KeyBindings extends GObject.Object {
             Shell.ActionMode.NORMAL,
             handler,
         );
+    }
+
+    private _removeKeybindings() {
+        SettingsOverride.get().restoreAll();
+        Main.wm.removeKeybinding(Settings.SETTING_MOVE_WINDOW_RIGHT);
+        Main.wm.removeKeybinding(Settings.SETTING_MOVE_WINDOW_LEFT);
+        Main.wm.removeKeybinding(Settings.SETTING_MOVE_WINDOW_UP);
+        Main.wm.removeKeybinding(Settings.SETTING_MOVE_WINDOW_DOWN);
     }
 
     public destroy() {
