@@ -212,10 +212,16 @@ export class TilingManager {
         // find the nearest tile
         const windowRectCopy = window.get_frame_rect().copy();
         if (!destination) {
-            destination = this._tilingLayout.getNearestTile(
-                windowRectCopy,
-                direction,
-            );
+            // if the window is not tiled, find the nearest tile in any direction
+            if (!(window as ExtendedWindow).assignedTile) {
+                destination =
+                    this._tilingLayout.findNearestTile(windowRectCopy);
+            } else {
+                destination = this._tilingLayout.findNearestTileDirection(
+                    windowRectCopy,
+                    direction,
+                );
+            }
         }
 
         // there isn't a tile near the window

@@ -366,36 +366,81 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
         return [true, results];
     }
 
-    public getNearestTile(
+    public findNearestTile(
         source: Mtk.Rectangle,
-        direction: Meta.DisplayDirection,
     ): { rect: Mtk.Rectangle; tile: Tile } | undefined {
         let previewFound: DynamicTilePreview | undefined;
         let bestDistance = -1;
 
+        const sourceCenterX = source.x + source.width / 2;
+        const sourceCenterY = source.y + source.height / 2;
+
         for (let i = 0; i < this._previews.length; i++) {
             const preview = this._previews[i];
 
-            switch (direction) {
-                case Meta.DisplayDirection.RIGHT:
-                    if (preview.innerX <= source.x) continue;
-                    break;
-                case Meta.DisplayDirection.LEFT:
-                    if (preview.innerX >= source.x) continue;
-                    break;
-                case Meta.DisplayDirection.DOWN:
-                    if (preview.innerY <= source.y) continue;
-                    break;
-                case Meta.DisplayDirection.UP:
-                    if (preview.innerY >= source.y) continue;
-                    break;
-                default:
-                    continue;
-            }
+            const previewCenterX = preview.innerX + preview.innerWidth / 2;
+            const previewCenterY = preview.innerY + preview.innerHeight / 2;
 
             const euclideanDistance =
-                (preview.x - source.x) * (preview.x - source.x) +
-                (preview.y - source.y) * (preview.y - source.y);
+                (previewCenterX - sourceCenterX) *
+                    (previewCenterX - sourceCenterX) +
+                (previewCenterY - sourceCenterY) *
+                    (previewCenterY - sourceCenterY);
+
+            if (!previewFound || euclideanDistance < bestDistance) {
+                previewFound = preview;
+                bestDistance = euclideanDistance;
+            }
+        }
+
+        if (!previewFound) return undefined;
+
+        return {
+            rect: buildRectangle({
+                x: previewFound.innerX,
+                y: previewFound.innerY,
+                width: previewFound.innerWidth,
+                height: previewFound.innerHeight,
+            }),
+            tile: previewFound.tile,
+        };
+    }
+
+    public findNearestTileDirection(
+        source: Mtk.Rectangle,
+        direction: Meta.DisplayDirection,
+    ): { rect: Mtk.Rectangle; tile: Tile } | undefined {
+        const sourceCenterX = source.x + source.width / 2;
+        const sourceCenterY = source.y + source.height / 2;
+
+        const filtered = this._previews.filter((preview) => {
+            switch (direction) {
+                case Meta.DisplayDirection.RIGHT:
+                    return preview.x >= source.x + source.width;
+                case Meta.DisplayDirection.LEFT:
+                    return preview.x + preview.width <= source.x;
+                case Meta.DisplayDirection.DOWN:
+                    return preview.y >= source.y + source.height;
+                case Meta.DisplayDirection.UP:
+                    return preview.y + preview.height <= source.y;
+                default:
+                    return false;
+            }
+        });
+
+        let previewFound: DynamicTilePreview | undefined;
+        let bestDistance = -1;
+        for (let i = 0; i < filtered.length; i++) {
+            const preview = filtered[i];
+
+            const previewCenterX = preview.innerX + preview.innerWidth / 2;
+            const previewCenterY = preview.innerY + preview.innerHeight / 2;
+
+            const euclideanDistance =
+                (previewCenterX - sourceCenterX) *
+                    (previewCenterX - sourceCenterX) +
+                (previewCenterY - sourceCenterY) *
+                    (previewCenterY - sourceCenterY);
 
             if (!previewFound || euclideanDistance < bestDistance) {
                 previewFound = preview;
