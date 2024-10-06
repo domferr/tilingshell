@@ -56,6 +56,10 @@ export default class Settings {
     static SETTING_SPAN_WINDOW_ALL_TILES = 'span-window-all-tiles';
     static SETTING_UNTILE_WINDOW = 'untile-window';
     static SETTING_MOVE_WINDOW_CENTER = 'move-window-center';
+    static SETTING_FOCUS_WINDOW_RIGHT = 'focus-window-right';
+    static SETTING_FOCUS_WINDOW_LEFT = 'focus-window-left';
+    static SETTING_FOCUS_WINDOW_UP = 'focus-window-up';
+    static SETTING_FOCUS_WINDOW_DOWN = 'focus-window-down';
 
     static initialize(settings: Gio.Settings) {
         if (this._is_initialized) return;

@@ -32,6 +32,9 @@ export default class KeyBindings extends GObject.Object {
             'move-window-center': {
                 param_types: [Meta.Display.$gtype], // Meta.Display
             },
+            'focus-window': {
+                param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, Meta.Direction
+            },
         },
     };
 
@@ -129,6 +132,46 @@ export default class KeyBindings extends GObject.Object {
             Meta.KeyBindingFlags.NONE,
             Shell.ActionMode.NORMAL,
             (dp: Meta.Display) => this.emit('move-window-center', dp),
+        );
+
+        Main.wm.addKeybinding(
+            Settings.SETTING_FOCUS_WINDOW_RIGHT,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('focus-window', display, Meta.DisplayDirection.RIGHT);
+            },
+        );
+
+        Main.wm.addKeybinding(
+            Settings.SETTING_FOCUS_WINDOW_LEFT,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('focus-window', display, Meta.DisplayDirection.LEFT);
+            },
+        );
+
+        Main.wm.addKeybinding(
+            Settings.SETTING_FOCUS_WINDOW_UP,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('focus-window', display, Meta.DisplayDirection.UP);
+            },
+        );
+
+        Main.wm.addKeybinding(
+            Settings.SETTING_FOCUS_WINDOW_DOWN,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('focus-window', display, Meta.DisplayDirection.DOWN);
+            },
         );
     }
 

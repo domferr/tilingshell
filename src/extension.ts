@@ -236,6 +236,17 @@ export default class TilingShellExtension extends Extension {
                     this._onKeyboardMoveWin(dp, undefined, false);
                 },
             );
+            this._signals.connect(
+                this._keybindings,
+                'focus-window',
+                (
+                    kb: KeyBindings,
+                    dp: Meta.Display,
+                    dir: Meta.DisplayDirection,
+                ) => {
+                    this._onKeyboardFocusWin(dp, dir);
+                },
+            );
         }
 
         // when Tiling Shell's edge-tiling is enabled/disable
@@ -419,6 +430,78 @@ export default class TilingShellExtension extends Extension {
             true,
             spanFlag,
         );
+    }
+
+    private _onKeyboardFocusWin(
+        display: Meta.Display,
+        direction: Meta.DisplayDirection,
+    ) {
+        const focus_window = display.get_focus_window();
+        if (
+            !focus_window ||
+            !focus_window.has_focus() ||
+            (focus_window.get_wm_class() &&
+                focus_window.get_wm_class() === 'gjs')
+        )
+            return;
+
+        let bestWindow: Meta.Window | undefined;
+        let bestWindowDistance = -1;
+
+        const focusWindowRect = focus_window.get_frame_rect();
+        const focusWindowCenterX =
+            focusWindowRect.x + focusWindowRect.width / 2;
+        const focusWindowCenterY =
+            focusWindowRect.y + focusWindowRect.height / 2;
+        focus_window
+            .get_workspace()
+            .list_windows()
+            .filter((win) => {
+                if (
+                    win === focus_window ||
+                    (win.get_wm_class() && win.get_wm_class() === 'gjs') ||
+                    win.minimized
+                )
+                    return false;
+
+                const winRect = win.get_frame_rect();
+                switch (direction) {
+                    case Meta.DisplayDirection.RIGHT:
+                        return winRect.x > focusWindowRect.x;
+                    case Meta.DisplayDirection.LEFT:
+                        return winRect.x < focusWindowRect.x;
+                    case Meta.DisplayDirection.UP:
+                        return winRect.y < focusWindowRect.y;
+                    case Meta.DisplayDirection.DOWN:
+                        return winRect.y > focusWindowRect.y;
+                }
+                return false;
+            })
+            .forEach((win) => {
+                const winRect = win.get_frame_rect();
+                const winCenterX = winRect.x + winRect.width / 2;
+                const winCenterY = winRect.y + winRect.height / 2;
+
+                const euclideanDistance =
+                    (winCenterX - focusWindowCenterX) *
+                        (winCenterX - focusWindowCenterX) +
+                    (winCenterY - focusWindowCenterY) *
+                        (winCenterY - focusWindowCenterY);
+
+                if (
+                    !bestWindow ||
+                    euclideanDistance < bestWindowDistance ||
+                    (euclideanDistance === bestWindowDistance &&
+                        bestWindow.get_frame_rect().y > winRect.y)
+                ) {
+                    bestWindow = win;
+                    bestWindowDistance = euclideanDistance;
+                }
+            });
+
+        if (!bestWindow) return;
+
+        bestWindow.activate(global.get_current_time());
     }
 
     private _onKeyboardUntileWindow(kb: KeyBindings, display: Meta.Display) {

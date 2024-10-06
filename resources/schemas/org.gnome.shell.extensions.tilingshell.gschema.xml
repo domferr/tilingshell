@@ -173,6 +173,22 @@
 			<default><![CDATA[['']]]></default>
 			<summary>Move the focused window to the center of the screen</summary>
 		</key>
+		<key type="as" name="focus-window-right">
+			<default><![CDATA[['']]]></default>
+			<summary>Focus the window to the right the current focused window</summary>
+		</key>
+		<key type="as" name="focus-window-left">
+			<default><![CDATA[['']]]></default>
+			<summary>Focus the window to the left of the current focused window</summary>
+		</key>
+		<key type="as" name="focus-window-up">
+			<default><![CDATA[['']]]></default>
+			<summary>Focus the window above the current focused window</summary>
+		</key>
+		<key type="as" name="focus-window-down">
+			<default><![CDATA[['']]]></default>
+			<summary>Focus the window below the current focused window</summary>
+		</key>
     </schema>
 
 </schemalist>

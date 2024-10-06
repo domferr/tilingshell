@@ -512,6 +512,34 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 false, // is set
                 false, // is on main page
             ],
+            [
+                Settings.SETTING_FOCUS_WINDOW_RIGHT,
+                'Focus window to the right',
+                'Focus the window to the right of the current focused window',
+                false,
+                false,
+            ],
+            [
+                Settings.SETTING_FOCUS_WINDOW_LEFT,
+                'Focus window to the left',
+                'Focus the window to the left of the current focused window',
+                false,
+                false,
+            ],
+            [
+                Settings.SETTING_FOCUS_WINDOW_UP,
+                'Focus window above',
+                'Focus the window above the current focused window',
+                false,
+                false,
+            ],
+            [
+                Settings.SETTING_FOCUS_WINDOW_DOWN,
+                'Focus window below',
+                'Focus the window below the current focused window',
+                false,
+                false,
+            ],
         ];
 
         // set if the keybinding was set or not by the user
