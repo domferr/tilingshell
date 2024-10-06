@@ -130,6 +130,14 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 1,
             ),
         );
+        windowBorderRow.add_row(
+            this._buildColorRow(
+                'Border color',
+                'Choose the color of the border',
+                this._getRGBAFromString(Settings.get_window_border_color()),
+                (val: string) => Settings.set_window_border_color(val),
+            ),
+        );
 
         // Behaviour section
         const behaviourGroup = new Adw.PreferencesGroup({
@@ -497,6 +505,13 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 false,
                 false,
             ],
+            [
+                Settings.SETTING_MOVE_WINDOW_CENTER, // settings key
+                'Move window to the center', // title
+                'Move the focused window to the center of the screen', // subtitle
+                false, // is set
+                false, // is on main page
+            ],
         ];
 
         // set if the keybinding was set or not by the user
@@ -814,6 +829,35 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         scale.set_digits(0);
         scale.set_draw_value(true);
         adwRow.add_suffix(scale);
+        return adwRow;
+    }
+
+    _getRGBAFromString(str: string): Gdk.RGBA {
+        const rgba = new Gdk.RGBA();
+        rgba.parse(str);
+        return rgba;
+    }
+
+    _buildColorRow(
+        title: string,
+        subtitle: string,
+        rgba: Gdk.RGBA,
+        onChange: (s: string) => void,
+    ): Adw.ActionRow {
+        const colorButton = new Gtk.ColorButton({
+            rgba,
+            use_alpha: true,
+            valign: Gtk.Align.CENTER,
+        });
+        colorButton.connect('color-set', () => {
+            onChange(colorButton.get_rgba().to_string());
+        });
+        const adwRow = new Adw.ActionRow({
+            title,
+            subtitle,
+            activatableWidget: colorButton,
+        });
+        adwRow.add_suffix(colorButton);
         return adwRow;
     }
 }

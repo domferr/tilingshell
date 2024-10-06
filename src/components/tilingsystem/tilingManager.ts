@@ -186,7 +186,7 @@ export class TilingManager {
 
     public onKeyboardMoveWindow(
         window: Meta.Window,
-        direction: Meta.DisplayDirection,
+        direction: Meta.DisplayDirection | undefined, // direction is undefined -> move to the center of the screen
         force: boolean,
         spanFlag: boolean,
     ): boolean {
@@ -195,6 +195,9 @@ export class TilingManager {
             if (spanFlag) return false;
 
             switch (direction) {
+                case undefined:
+                    window.unmaximize(Meta.MaximizeFlags.BOTH);
+                    break;
                 case Meta.DisplayDirection.DOWN:
                     window.unmaximize(Meta.MaximizeFlags.BOTH);
                     return true;
@@ -213,7 +216,25 @@ export class TilingManager {
         const windowRectCopy = window.get_frame_rect().copy();
         if (!destination) {
             // if the window is not tiled, find the nearest tile in any direction
-            if (!(window as ExtendedWindow).assignedTile) {
+            if (!direction) {
+                // direction is undefined -> move to the center of the screen
+                const rect = buildRectangle({
+                    x:
+                        this._workArea.x +
+                        this._workArea.width / 2 -
+                        windowRectCopy.width / 2,
+                    y:
+                        this._workArea.y +
+                        this._workArea.height / 2 -
+                        windowRectCopy.height / 2,
+                    width: windowRectCopy.width,
+                    height: windowRectCopy.height,
+                });
+                destination = {
+                    rect,
+                    tile: TileUtils.build_tile(rect, this._workArea),
+                };
+            } else if (!(window as ExtendedWindow).assignedTile) {
                 destination =
                     this._tilingLayout.findNearestTile(windowRectCopy);
             } else {

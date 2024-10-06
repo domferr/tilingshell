@@ -55,6 +55,7 @@ export default class Settings {
     static SETTING_SPAN_WINDOW_DOWN = 'span-window-down';
     static SETTING_SPAN_WINDOW_ALL_TILES = 'span-window-all-tiles';
     static SETTING_UNTILE_WINDOW = 'untile-window';
+    static SETTING_MOVE_WINDOW_CENTER = 'move-window-center';
 
     static initialize(settings: Gio.Settings) {
         if (this._is_initialized) return;
@@ -305,6 +306,15 @@ export default class Settings {
             this._settings?.set_string(
                 this.SETTING_OVERRIDDEN_SETTINGS,
                 newVal,
+            ) ?? false
+        );
+    }
+
+    static set_window_border_color(value: string): boolean {
+        return (
+            this._settings?.set_string(
+                this.SETTING_WINDOW_BORDER_COLOR,
+                value,
             ) ?? false
         );
     }

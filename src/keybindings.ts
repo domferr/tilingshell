@@ -29,6 +29,9 @@ export default class KeyBindings extends GObject.Object {
             'untile-window': {
                 param_types: [Meta.Display.$gtype], // Meta.Display
             },
+            'move-window-center': {
+                param_types: [Meta.Display.$gtype], // Meta.Display
+            },
         },
     };
 
@@ -118,6 +121,15 @@ export default class KeyBindings extends GObject.Object {
             Shell.ActionMode.NORMAL,
             (dp: Meta.Display) => this.emit('untile-window', dp),
         );
+
+        // center the window with keybinding
+        Main.wm.addKeybinding(
+            Settings.SETTING_MOVE_WINDOW_CENTER,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (dp: Meta.Display) => this.emit('move-window-center', dp),
+        );
     }
 
     private _overrideNatives(extensionSettings: Gio.Settings) {
@@ -206,6 +218,7 @@ export default class KeyBindings extends GObject.Object {
         Main.wm.removeKeybinding(Settings.SETTING_SPAN_WINDOW_DOWN);
         Main.wm.removeKeybinding(Settings.SETTING_SPAN_WINDOW_ALL_TILES);
         Main.wm.removeKeybinding(Settings.SETTING_UNTILE_WINDOW);
+        Main.wm.removeKeybinding(Settings.SETTING_MOVE_WINDOW_CENTER);
     }
 
     public destroy() {

@@ -229,6 +229,13 @@ export default class TilingShellExtension extends Extension {
                 'untile-window',
                 this._onKeyboardUntileWindow.bind(this),
             );
+            this._signals.connect(
+                this._keybindings,
+                'move-window-center',
+                (kb: KeyBindings, dp: Meta.Display) => {
+                    this._onKeyboardMoveWin(dp, undefined, false);
+                },
+            );
         }
 
         // when Tiling Shell's edge-tiling is enabled/disable
@@ -351,7 +358,7 @@ export default class TilingShellExtension extends Extension {
 
     private _onKeyboardMoveWin(
         display: Meta.Display,
-        direction: Meta.DisplayDirection,
+        direction: Meta.DisplayDirection | undefined, // undefined means move window to the center
         spanFlag: boolean,
     ) {
         const focus_window = display.get_focus_window();
@@ -385,7 +392,7 @@ export default class TilingShellExtension extends Extension {
             false,
             spanFlag,
         );
-        if (success) return;
+        if (success || !direction) return;
 
         const neighborMonitorIndex = display.get_monitor_neighbor_index(
             focus_window.get_monitor(),
