@@ -8,6 +8,7 @@ import Settings, { ActivationKey } from './settings/settings';
 import { logger } from './utils/shell';
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 import Layout from '@components/layout/Layout';
+import SettingsExport from '@settings/settingsExport';
 
 /* import Layout from "@/components/layout/Layout";
 import Cairo from "@gi-types/cairo1";*/
@@ -578,6 +579,132 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             );
             keybindingsDialogGroup.add(row);
         });
+
+        // Import/export/reset section
+        const importExportGroup = new Adw.PreferencesGroup({
+            title: 'Import/Export/Reset',
+            description: `Import/export/reset the settings of ${this.NAME}`,
+        });
+        prefsPage.add(importExportGroup);
+
+        const exportSettingsBtn = this._buildButtonRow(
+            'Export settings',
+            'Export settings',
+            'Export settings to a file',
+            () => {
+                const fc = new Gtk.FileChooserDialog({
+                    title: 'Export settings',
+                    select_multiple: false,
+                    action: Gtk.FileChooserAction.SAVE,
+                    transient_for: window,
+                });
+                fc.set_current_folder(
+                    Gio.File.new_for_path(GLib.get_home_dir()),
+                );
+                fc.add_button('Cancel', Gtk.ResponseType.CANCEL);
+                fc.add_button('Save', Gtk.ResponseType.OK);
+                fc.connect(
+                    'response',
+                    (_source: Gtk.FileChooserDialog, response_id: number) => {
+                        try {
+                            if (response_id === Gtk.ResponseType.OK) {
+                                const file = _source.get_file();
+                                if (!file) throw new Error('no file selected');
+
+                                debug(
+                                    `Create file with path ${file.get_path()}`,
+                                );
+                                const settingsExport = new SettingsExport();
+                                const content = settingsExport.dconfDump;
+                                file.replace_contents_bytes_async(
+                                    new TextEncoder().encode(content),
+                                    null,
+                                    false,
+                                    Gio.FileCreateFlags.REPLACE_DESTINATION,
+                                    null,
+                                    (thisFile, res) => {
+                                        try {
+                                            thisFile?.replace_contents_finish(
+                                                res,
+                                            );
+                                        } catch (e) {
+                                            debug(e);
+                                        }
+                                    },
+                                );
+                            }
+                        } catch (error: unknown) {
+                            debug(error);
+                        }
+
+                        _source.destroy();
+                    },
+                );
+
+                fc.present();
+            },
+        );
+        importExportGroup.add(exportSettingsBtn);
+
+        const importSettingsBtn = this._buildButtonRow(
+            'Import settings',
+            'Import settings',
+            'Import settings from a file',
+            () => {
+                const fc = new Gtk.FileChooserDialog({
+                    title: 'Select settings export file',
+                    select_multiple: false,
+                    action: Gtk.FileChooserAction.OPEN,
+                    transient_for: window,
+                });
+                fc.set_current_folder(
+                    Gio.File.new_for_path(GLib.get_home_dir()),
+                );
+                fc.add_button('Cancel', Gtk.ResponseType.CANCEL);
+                fc.add_button('Open', Gtk.ResponseType.OK);
+                fc.connect(
+                    'response',
+                    (_source: Gtk.FileChooserDialog, response_id: number) => {
+                        try {
+                            if (response_id === Gtk.ResponseType.OK) {
+                                const file = _source.get_file();
+                                if (!file) {
+                                    _source.destroy();
+                                    return;
+                                }
+                                debug(`Selected path ${file.get_path()}`);
+                                const [success, content] =
+                                    file.load_contents(null);
+                                if (success) {
+                                    const imported = new TextDecoder(
+                                        'utf-8',
+                                    ).decode(content);
+                                    SettingsExport.importFrom(imported);
+                                } else {
+                                    debug('Error while opening file');
+                                }
+                            }
+                        } catch (error: unknown) {
+                            debug(error);
+                        }
+
+                        _source.destroy();
+                    },
+                );
+
+                fc.present();
+            },
+        );
+        importExportGroup.add(importSettingsBtn);
+
+        const resetSettingsBtn = this._buildButtonRow(
+            'Reset settings',
+            'Reset settings',
+            'Bring back the default settings',
+            () => SettingsExport.restoreToDefault(),
+            'destructive-action',
+        );
+        importExportGroup.add(resetSettingsBtn);
 
         // footer
         const footerGroup = new Adw.PreferencesGroup();
