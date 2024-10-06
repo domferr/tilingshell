@@ -8,9 +8,10 @@ import Settings, { ActivationKey } from './settings/settings';
 import { logger } from './utils/shell';
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 import Layout from '@components/layout/Layout';
-
-/* import Layout from "@/components/layout/Layout";
-import Cairo from "@gi-types/cairo1";*/
+import SettingsExport from '@settings/settingsExport';
+import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+// @ts-expect-error "Module exists"
+import * as Config from 'resource:///org/gnome/Shell/Extensions/js/misc/config.js';
 
 const debug = logger('prefs');
 
@@ -34,8 +35,6 @@ function buildPrefsWidget(): Gtk.Widget {
 }
 
 export default class TilingShellExtensionPreferences extends ExtensionPreferences {
-    private readonly NAME = 'Tiling Shell';
-
     /**
      * This function is called when the preferences window is first created to fill
      * the `Adw.PreferencesWindow`.
@@ -47,49 +46,53 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
 
         const prefsPage = new Adw.PreferencesPage({
             name: 'general',
-            title: 'General',
+            title: _('General'),
             iconName: 'dialog-information-symbolic',
         });
         window.add(prefsPage);
 
         // Appearence section
         const appearenceGroup = new Adw.PreferencesGroup({
-            title: 'Appearance',
-            description: `Configure the appearance of ${this.NAME}`,
+            title: _('Appearance'),
+            description: _('Configure the appearance of Tiling Shell'),
         });
         prefsPage.add(appearenceGroup);
 
         const showIndicatorRow = this._buildSwitchRow(
             Settings.SETTING_SHOW_INDICATOR,
-            'Show Indicator',
-            'Whether to show the panel indicator',
+            _('Show Indicator'),
+            _('Whether to show the panel indicator'),
         );
         appearenceGroup.add(showIndicatorRow);
 
         const innerGapsRow = this._buildSpinButtonRow(
             Settings.SETTING_INNER_GAPS,
-            'Inner gaps',
-            'Gaps between windows',
+            _('Inner gaps'),
+            _('Gaps between windows'),
         );
         appearenceGroup.add(innerGapsRow);
 
         const outerGapsRow = this._buildSpinButtonRow(
             Settings.SETTING_OUTER_GAPS,
-            'Outer gaps',
-            'Gaps between a window and the monitor borders',
+            _('Outer gaps'),
+            _('Gaps between a window and the monitor borders'),
         );
         appearenceGroup.add(outerGapsRow);
 
         const blurRow = new Adw.ExpanderRow({
-            title: 'Blur (experimental feature)',
-            subtitle: 'Apply blur effect to Snap Assistant and tile previews',
+            title: _('Blur (experimental feature)'),
+            subtitle: _(
+                'Apply blur effect to Snap Assistant and tile previews',
+            ),
         });
         appearenceGroup.add(blurRow);
 
         const snapAssistantThresholdRow = this._buildSpinButtonRow(
             Settings.SETTING_SNAP_ASSISTANT_THRESHOLD,
-            'Snap Assistant threshold',
-            'Minimum distance from the Snap Assistant to the pointer to open it',
+            _('Snap Assistant threshold'),
+            _(
+                'Minimum distance from the Snap Assistant to the pointer to open it',
+            ),
             0,
             512,
         );
@@ -98,57 +101,89 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         blurRow.add_row(
             this._buildSwitchRow(
                 Settings.SETTING_ENABLE_BLUR_SNAP_ASSISTANT,
-                'Snap Assistant',
-                'Apply blur effect to Snap Assistant',
+                _('Snap Assistant'),
+                _('Apply blur effect to Snap Assistant'),
             ),
         );
         blurRow.add_row(
             this._buildSwitchRow(
                 Settings.SETTING_ENABLE_BLUR_SELECTED_TILEPREVIEW,
-                'Selected tile preview',
-                'Apply blur effect to selected tile preview',
+                _('Selected tile preview'),
+                _('Apply blur effect to selected tile preview'),
             ),
         );
 
         const windowBorderRow = new Adw.ExpanderRow({
-            title: 'Window border',
-            subtitle: 'Show a border around focused window',
+            title: _('Window border'),
+            subtitle: _('Show a border around focused window'),
         });
         appearenceGroup.add(windowBorderRow);
         windowBorderRow.add_row(
             this._buildSwitchRow(
                 Settings.SETTING_ENABLE_WINDOW_BORDER,
-                'Enable',
-                'Show a border around focused window',
+                _('Enable'),
+                _('Show a border around focused window'),
             ),
         );
         windowBorderRow.add_row(
             this._buildSpinButtonRow(
                 Settings.SETTING_WINDOW_BORDER_WIDTH,
-                'Width',
-                'The size of the border',
+                _('Width'),
+                _('The size of the border'),
                 1,
+            ),
+        );
+        windowBorderRow.add_row(
+            this._buildColorRow(
+                _('Border color'),
+                _('Choose the color of the border'),
+                this._getRGBAFromString(Settings.get_window_border_color()),
+                (val: string) => Settings.set_window_border_color(val),
+            ),
+        );
+
+        const animationsRow = new Adw.ExpanderRow({
+            title: _('Animations'),
+            subtitle: _('Customize animations'),
+        });
+        appearenceGroup.add(animationsRow);
+        animationsRow.add_row(
+            this._buildSpinButtonRow(
+                Settings.SETTING_SNAP_ASSISTANT_ANIMATION_TIME,
+                _('Snap assistant animation time'),
+                _('The snap assistant animation time in milliseconds'),
+                0,
+                2000,
+            ),
+        );
+        animationsRow.add_row(
+            this._buildSpinButtonRow(
+                Settings.SETTING_TILE_PREVIEW_ANIMATION_TIME,
+                _('Tiles animation time'),
+                _('The tiles animation time in milliseconds'),
+                0,
+                2000,
             ),
         );
 
         // Behaviour section
         const behaviourGroup = new Adw.PreferencesGroup({
-            title: 'Behaviour',
-            description: `Configure the behaviour of ${this.NAME}`,
+            title: _('Behaviour'),
+            description: _('Configure the behaviour of Tiling Shell'),
         });
         prefsPage.add(behaviourGroup);
 
         const snapAssistRow = this._buildSwitchRow(
             Settings.SETTING_SNAP_ASSIST,
-            'Enable Snap Assistant',
-            'Move the window on top of the screen to snap assist it',
+            _('Enable Snap Assistant'),
+            _('Move the window on top of the screen to snap assist it'),
         );
         behaviourGroup.add(snapAssistRow);
 
         const enableTilingSystemRow = this._buildSwitchRow(
             Settings.SETTING_TILING_SYSTEM,
-            'Enable Tiling System',
-            'Hold the activation key while moving a window to tile it',
+            _('Enable Tiling System'),
+            _('Hold the activation key while moving a window to tile it'),
             this._buildActivationKeysDropDown(
                 Settings.get_tiling_system_activation_key(),
                 (newVal: ActivationKey) =>
@@ -159,8 +194,8 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
 
         const spanMultipleTilesRow = this._buildSwitchRow(
             Settings.SETTING_SPAN_MULTIPLE_TILES,
-            'Span multiple tiles',
-            'Hold the activation key to span multiple tiles',
+            _('Span multiple tiles'),
+            _('Hold the activation key to span multiple tiles'),
             this._buildActivationKeysDropDown(
                 Settings.get_span_multiple_tiles_activation_key(),
                 (newVal: ActivationKey) =>
@@ -171,30 +206,37 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
 
         const resizeComplementingRow = this._buildSwitchRow(
             Settings.SETTING_RESIZE_COMPLEMENTING_WINDOWS,
-            'Enable auto-resize of the complementing tiled windows',
-            'When a tiled window is resized, auto-resize the other tiled windows near it',
+            _('Enable auto-resize of the complementing tiled windows'),
+            _(
+                'When a tiled window is resized, auto-resize the other tiled windows near it',
+            ),
         );
         behaviourGroup.add(resizeComplementingRow);
 
         const restoreToOriginalSizeRow = this._buildSwitchRow(
             Settings.SETTING_RESTORE_WINDOW_ORIGINAL_SIZE,
-            'Restore window size',
-            'Whether to restore the windows to their original size when untiled',
+            _('Restore window size'),
+            _(
+                'Whether to restore the windows to their original size when untiled',
+            ),
         );
         behaviourGroup.add(restoreToOriginalSizeRow);
 
         const overrideWindowMenuRow = this._buildSwitchRow(
             Settings.SETTING_OVERRIDE_WINDOW_MENU,
-            'Add snap assistant and auto-tile buttons to window menu',
-            'Add snap assistant and auto-tile buttons in the menu that shows up when you right click on a window title',
+            _('Add snap assistant and auto-tile buttons to window menu'),
+            _(
+                'Add snap assistant and auto-tile buttons in the menu that shows up when you right click on a window title',
+            ),
         );
         behaviourGroup.add(overrideWindowMenuRow);
 
         // Screen Edges section
         const activeScreenEdgesGroup = new Adw.PreferencesGroup({
-            title: 'Screen Edges',
-            description:
+            title: _('Screen Edges'),
+            description: _(
                 'Drag windows against the top, left and right screen edges to resize them',
+            ),
             headerSuffix: new Gtk.Switch({
                 vexpand: false,
                 valign: Gtk.Align.CENTER,
@@ -208,8 +250,8 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
 
         const topEdgeMaximize = this._buildSwitchRow(
             Settings.SETTING_TOP_EDGE_MAXIMIZE,
-            'Drag against top edge to maximize window',
-            'Drag windows against the top edge to maximize them',
+            _('Drag against top edge to maximize window'),
+            _('Drag windows against the top edge to maximize them'),
         );
         Settings.bind(
             Settings.SETTING_ACTIVE_SCREEN_EDGES,
@@ -219,8 +261,8 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         activeScreenEdgesGroup.add(topEdgeMaximize);
 
         const quarterTiling = this._buildScaleRow(
-            'Quarter tiling activation area',
-            'Activation area to trigger quarter tiling (% of the screen)',
+            _('Quarter tiling activation area'),
+            _('Activation area to trigger quarter tiling (% of the screen)'),
             (sc: Gtk.Scale) => {
                 Settings.set_quarter_tiling_threshold(sc.get_value());
             },
@@ -240,41 +282,36 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
 
         // Layouts section
         const layoutsGroup = new Adw.PreferencesGroup({
-            title: 'Layouts',
-            description: `Configure the layouts of ${this.NAME}`,
+            title: _('Layouts'),
+            description: _('Configure the layouts of Tiling Shell'),
         });
         prefsPage.add(layoutsGroup);
 
         const editLayoutsBtn = this._buildButtonRow(
-            'Edit layouts',
-            'Edit layouts',
-            'Open the layouts editor',
+            _('Edit layouts'),
+            _('Edit layouts'),
+            _('Open the layouts editor'),
             () => this._openLayoutEditor(),
         );
         layoutsGroup.add(editLayoutsBtn);
 
         const exportLayoutsBtn = this._buildButtonRow(
-            'Export layouts',
-            'Export layouts',
-            'Export layouts to a file',
+            _('Export layouts'),
+            _('Export layouts'),
+            _('Export layouts to a file'),
             () => {
-                const fc = new Gtk.FileChooserDialog({
-                    title: 'Export layouts',
-                    select_multiple: false,
-                    action: Gtk.FileChooserAction.SAVE,
-                    transient_for: window,
-                    filter: new Gtk.FileFilter({
+                const fc = this._buildFileChooserDialog(
+                    _('Export layouts'),
+                    Gtk.FileChooserAction.SAVE,
+                    window,
+                    [
+                        [_('Cancel'), Gtk.ResponseType.CANCEL],
+                        [_('Save'), Gtk.ResponseType.OK],
+                    ],
+                    new Gtk.FileFilter({
                         suffixes: ['json'],
                         name: 'JSON',
                     }),
-                });
-                fc.set_current_folder(
-                    Gio.File.new_for_path(GLib.get_home_dir()),
-                );
-                fc.add_button('Cancel', Gtk.ResponseType.CANCEL);
-                fc.add_button('Save', Gtk.ResponseType.OK);
-                fc.connect(
-                    'response',
                     (_source: Gtk.FileChooserDialog, response_id: number) => {
                         try {
                             if (response_id === Gtk.ResponseType.OK) {
@@ -318,27 +355,22 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         layoutsGroup.add(exportLayoutsBtn);
 
         const importLayoutsBtn = this._buildButtonRow(
-            'Import layouts',
-            'Import layouts',
-            'Import layouts from a file',
+            _('Import layouts'),
+            _('Import layouts'),
+            _('Import layouts from a file'),
             () => {
-                const fc = new Gtk.FileChooserDialog({
-                    title: 'Select layouts file',
-                    select_multiple: false,
-                    action: Gtk.FileChooserAction.OPEN,
-                    transient_for: window,
-                    filter: new Gtk.FileFilter({
+                const fc = this._buildFileChooserDialog(
+                    _('Select layouts file'),
+                    Gtk.FileChooserAction.OPEN,
+                    window,
+                    [
+                        [_('Cancel'), Gtk.ResponseType.CANCEL],
+                        [_('Open'), Gtk.ResponseType.OK],
+                    ],
+                    new Gtk.FileFilter({
                         suffixes: ['json'],
                         name: 'JSON',
                     }),
-                });
-                fc.set_current_folder(
-                    Gio.File.new_for_path(GLib.get_home_dir()),
-                );
-                fc.add_button('Cancel', Gtk.ResponseType.CANCEL);
-                fc.add_button('Open', Gtk.ResponseType.OK);
-                fc.connect(
-                    'response',
                     (_source: Gtk.FileChooserDialog, response_id: number) => {
                         try {
                             if (response_id === Gtk.ResponseType.OK) {
@@ -387,9 +419,9 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         layoutsGroup.add(importLayoutsBtn);
 
         const resetBtn = this._buildButtonRow(
-            'Reset layouts',
-            'Reset layouts',
-            'Bring back the default layouts',
+            _('Reset layouts'),
+            _('Reset layouts'),
+            _('Bring back the default layouts'),
             () => {
                 Settings.reset_layouts_json();
                 const layouts = Settings.get_layouts_json();
@@ -404,9 +436,10 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
 
         // Keybindings section
         const keybindingsGroup = new Adw.PreferencesGroup({
-            title: 'Keybindings',
-            description:
-                'Use hotkeys to perform actions on the focused window across the tiles of the active layout',
+            title: _('Keybindings'),
+            description: _(
+                'Use hotkeys to perform actions on the focused window',
+            ),
             headerSuffix: new Gtk.Switch({
                 vexpand: false,
                 valign: Gtk.Align.CENTER,
@@ -429,71 +462,108 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         ][] = [
             [
                 Settings.SETTING_MOVE_WINDOW_RIGHT, // settings key
-                'Move window to right tile', // title
-                'Move the focused window to the tile on its right', // subtitle
+                _('Move window to right tile'), // title
+                _('Move the focused window to the tile on its right'), // subtitle
                 false, // is set
                 true, // is on main page
             ],
             [
                 Settings.SETTING_MOVE_WINDOW_LEFT,
-                'Move window to left tile',
-                'Move the focused window to the tile on its left',
+                _('Move window to left tile'),
+                _('Move the focused window to the tile on its left'),
                 false,
                 true,
             ],
             [
                 Settings.SETTING_MOVE_WINDOW_UP,
-                'Move window to tile above',
-                'Move the focused window to the tile above',
+                _('Move window to tile above'),
+                _('Move the focused window to the tile above'),
                 false,
                 true,
             ],
             [
                 Settings.SETTING_MOVE_WINDOW_DOWN,
-                'Move window to tile below',
-                'Move the focused window to the tile below',
+                _('Move window to tile below'),
+                _('Move the focused window to the tile below'),
                 false,
                 true,
             ],
             [
                 Settings.SETTING_SPAN_WINDOW_RIGHT,
-                'Span window to right tile',
-                'Span the focused window to the tile on its right',
+                _('Span window to right tile'),
+                _('Span the focused window to the tile on its right'),
                 false,
                 false,
             ],
             [
                 Settings.SETTING_SPAN_WINDOW_LEFT,
-                'Span window to left tile',
-                'Span the focused window to the tile on its left',
+                _('Span window to left tile'),
+                _('Span the focused window to the tile on its left'),
                 false,
                 false,
             ],
             [
                 Settings.SETTING_SPAN_WINDOW_UP,
-                'Span window above',
-                'Span the focused window to the tile above',
+                _('Span window above'),
+                _('Span the focused window to the tile above'),
                 false,
                 false,
             ],
             [
                 Settings.SETTING_SPAN_WINDOW_DOWN,
-                'Span window down',
-                'Span the focused window to the tile below',
+                _('Span window down'),
+                _('Span the focused window to the tile below'),
                 false,
                 false,
             ],
             [
                 Settings.SETTING_SPAN_WINDOW_ALL_TILES,
-                'Span window to all tiles',
-                'Span the focused window to all the tiles',
+                _('Span window to all tiles'),
+                _('Span the focused window to all the tiles'),
                 false,
                 false,
             ],
             [
                 Settings.SETTING_UNTILE_WINDOW,
-                'Untile focused window',
+                _('Untile focused window'),
                 undefined,
+                false,
+                false,
+            ],
+            [
+                Settings.SETTING_MOVE_WINDOW_CENTER, // settings key
+                _('Move window to the center'), // title
+                _('Move the focused window to the center of the screen'), // subtitle
+                false, // is set
+                false, // is on main page
+            ],
+            [
+                Settings.SETTING_FOCUS_WINDOW_RIGHT,
+                _('Focus window to the right'),
+                _(
+                    'Focus the window to the right of the current focused window',
+                ),
+                false,
+                false,
+            ],
+            [
+                Settings.SETTING_FOCUS_WINDOW_LEFT,
+                _('Focus window to the left'),
+                _('Focus the window to the left of the current focused window'),
+                false,
+                false,
+            ],
+            [
+                Settings.SETTING_FOCUS_WINDOW_UP,
+                _('Focus window above'),
+                _('Focus the window above the current focused window'),
+                false,
+                false,
+            ],
+            [
+                Settings.SETTING_FOCUS_WINDOW_DOWN,
+                _('Focus window below'),
+                _('Focus the window below the current focused window'),
                 false,
                 false,
             ],
@@ -526,7 +596,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             },
         );
         const openKeybindingsDialogRow = new Adw.ActionRow({
-            title: 'View and Customize all the Shortcuts',
+            title: _('View and Customize all the Shortcuts'),
             activatable: true,
         });
         openKeybindingsDialogRow.add_suffix(
@@ -554,8 +624,8 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             keybindingsDialog.present(),
         );
         const keybindingsPage = new Adw.PreferencesPage({
-            name: 'View and Customize Shortcuts',
-            title: 'View and Customize Shortcuts',
+            name: _('View and Customize Shortcuts'),
+            title: _('View and Customize Shortcuts'),
             iconName: 'dialog-information-symbolic',
         });
         keybindingsDialog.add(keybindingsPage);
@@ -579,6 +649,137 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             keybindingsDialogGroup.add(row);
         });
 
+        // Import/export/reset section
+        const importExportGroup = new Adw.PreferencesGroup({
+            title: _('Import, export and reset'),
+            description: _(
+                'Import, export and reset the settings of Tiling Shell',
+            ),
+        });
+        prefsPage.add(importExportGroup);
+
+        const exportSettingsBtn = this._buildButtonRow(
+            _('Export settings'),
+            _('Export settings'),
+            _('Export settings to a file'),
+            () => {
+                const fc = this._buildFileChooserDialog(
+                    _('Export settings to a text file'),
+                    Gtk.FileChooserAction.SAVE,
+                    window,
+                    [
+                        [_('Cancel'), Gtk.ResponseType.CANCEL],
+                        [_('Save'), Gtk.ResponseType.OK],
+                    ],
+                    new Gtk.FileFilter({
+                        suffixes: ['txt'],
+                        name: 'Text file',
+                    }),
+                    (_source: Gtk.FileChooserDialog, response_id: number) => {
+                        try {
+                            if (response_id === Gtk.ResponseType.OK) {
+                                const file = _source.get_file();
+                                if (!file) throw new Error('no file selected');
+
+                                debug(
+                                    `Create file with path ${file.get_path()}`,
+                                );
+                                const settingsExport = new SettingsExport(
+                                    this.getSettings(),
+                                );
+                                const content = settingsExport.exportToString();
+                                file.replace_contents_bytes_async(
+                                    new TextEncoder().encode(content),
+                                    null,
+                                    false,
+                                    Gio.FileCreateFlags.REPLACE_DESTINATION,
+                                    null,
+                                    (thisFile, res) => {
+                                        try {
+                                            thisFile?.replace_contents_finish(
+                                                res,
+                                            );
+                                        } catch (e) {
+                                            debug(e);
+                                        }
+                                    },
+                                );
+                            }
+                        } catch (error: unknown) {
+                            debug(error);
+                        }
+
+                        _source.destroy();
+                    },
+                );
+
+                fc.present();
+            },
+        );
+        importExportGroup.add(exportSettingsBtn);
+
+        const importSettingsBtn = this._buildButtonRow(
+            _('Import settings'),
+            _('Import settings'),
+            _('Import settings from a file'),
+            () => {
+                const fc = this._buildFileChooserDialog(
+                    _('Select a text file to import from'),
+                    Gtk.FileChooserAction.OPEN,
+                    window,
+                    [
+                        [_('Cancel'), Gtk.ResponseType.CANCEL],
+                        [_('Open'), Gtk.ResponseType.OK],
+                    ],
+                    new Gtk.FileFilter({
+                        suffixes: ['txt'],
+                        name: 'Text file',
+                    }),
+                    (_source: Gtk.FileChooserDialog, response_id: number) => {
+                        try {
+                            if (response_id === Gtk.ResponseType.OK) {
+                                const file = _source.get_file();
+                                if (!file) {
+                                    _source.destroy();
+                                    return;
+                                }
+                                debug(`Selected path ${file.get_path()}`);
+                                const [success, content] =
+                                    file.load_contents(null);
+                                if (success) {
+                                    const imported = new TextDecoder(
+                                        'utf-8',
+                                    ).decode(content);
+                                    const settingsExport = new SettingsExport(
+                                        this.getSettings(),
+                                    );
+                                    settingsExport.importFromString(imported);
+                                } else {
+                                    debug('Error while opening file');
+                                }
+                            }
+                        } catch (error: unknown) {
+                            debug(error);
+                        }
+
+                        _source.destroy();
+                    },
+                );
+
+                fc.present();
+            },
+        );
+        importExportGroup.add(importSettingsBtn);
+
+        const resetSettingsBtn = this._buildButtonRow(
+            _('Reset settings'),
+            _('Reset settings'),
+            _('Bring back the default settings'),
+            () => new SettingsExport(this.getSettings()).restoreToDefault(),
+            'destructive-action',
+        );
+        importExportGroup.add(resetSettingsBtn);
+
         // footer
         const footerGroup = new Adw.PreferencesGroup();
         prefsPage.add(footerGroup);
@@ -591,19 +792,19 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         });
         buttons.append(
             this._buildLinkButton(
-                '♥︎ Donate on ko-fi',
+                `♥︎ ${_('Donate on ko-fi')}`,
                 'https://ko-fi.com/domferr',
             ),
         );
         buttons.append(
             this._buildLinkButton(
-                'Report a bug',
+                _('Report a bug'),
                 'https://github.com/domferr/tilingshell/issues/new?template=bug_report.md',
             ),
         );
         buttons.append(
             this._buildLinkButton(
-                'Request a feature',
+                _('Request a feature'),
                 'https://github.com/domferr/tilingshell/issues/new?template=feature_request.md',
             ),
         );
@@ -611,13 +812,15 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
 
         footerGroup.add(
             new Gtk.Label({
-                label: 'Have issues, you want to suggest a new feature or contribute?',
+                label: _(
+                    'Have issues, you want to suggest a new feature or contribute?',
+                ),
                 margin_bottom: 4,
             }),
         );
         footerGroup.add(
             new Gtk.Label({
-                label: 'Open a new issue on <a href="https://github.com/domferr/tilingshell">GitHub</a>!',
+                label: `${_('Open a new issue on')} <a href="https://github.com/domferr/tilingshell">GitHub</a>!`,
                 useMarkup: true,
                 margin_bottom: 32,
             }),
@@ -815,6 +1018,65 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         scale.set_draw_value(true);
         adwRow.add_suffix(scale);
         return adwRow;
+    }
+
+    _getRGBAFromString(str: string): Gdk.RGBA {
+        const rgba = new Gdk.RGBA();
+        rgba.parse(str);
+        return rgba;
+    }
+
+    _buildColorRow(
+        title: string,
+        subtitle: string,
+        rgba: Gdk.RGBA,
+        onChange: (s: string) => void,
+    ): Adw.ActionRow {
+        const colorButton = new Gtk.ColorButton({
+            rgba,
+            use_alpha: true,
+            valign: Gtk.Align.CENTER,
+        });
+        colorButton.connect('color-set', () => {
+            onChange(colorButton.get_rgba().to_string());
+        });
+        const adwRow = new Adw.ActionRow({
+            title,
+            subtitle,
+            activatableWidget: colorButton,
+        });
+        adwRow.add_suffix(colorButton);
+        return adwRow;
+    }
+
+    _buildFileChooserDialog(
+        title: string,
+        action: Gtk.FileChooserAction,
+        window: Gtk.Window,
+        buttons: [string, Gtk.ResponseType][],
+        filter: Gtk.FileFilter,
+        onResponse: (
+            _source: Gtk.FileChooserDialog,
+            response_id: number,
+        ) => void,
+    ): Gtk.FileChooserDialog {
+        const fc = new Gtk.FileChooserDialog({
+            title,
+            action,
+            select_multiple: false,
+            transientFor: window,
+        });
+        const [major] = Config.PACKAGE_VERSION.split('.').map((s: string) =>
+            Number(s),
+        );
+        // due to a bug, file chooser doesn't open on GNOME 42 when a filter is set
+        // filter is then enabled for GNOME 43+
+        if (major >= 43) fc.set_filter(filter);
+        fc.set_current_folder(Gio.File.new_for_path(GLib.get_home_dir()));
+        buttons.forEach(([name, type]) => fc.add_button(name, type));
+        fc.connect('response', onResponse);
+
+        return fc;
     }
 }
 

@@ -1,14 +1,12 @@
 import './styles/stylesheet.scss';
 
 import { logger } from '@/utils/shell';
-import { getMonitors } from '@/utils/ui';
+import { getMonitors, squaredEuclideanDistance } from '@/utils/ui';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { TilingManager } from '@/components/tilingsystem/tilingManager';
 import Gio from 'gi://Gio';
-import Shell from 'gi://Shell';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
-import Clutter from 'gi://Clutter';
 import Settings from '@settings/settings';
 import SignalHandling from './utils/signalHandling';
 import GlobalState from './utils/globalState';
@@ -229,6 +227,24 @@ export default class TilingShellExtension extends Extension {
                 'untile-window',
                 this._onKeyboardUntileWindow.bind(this),
             );
+            this._signals.connect(
+                this._keybindings,
+                'move-window-center',
+                (kb: KeyBindings, dp: Meta.Display) => {
+                    this._onKeyboardMoveWin(dp, undefined, false);
+                },
+            );
+            this._signals.connect(
+                this._keybindings,
+                'focus-window',
+                (
+                    kb: KeyBindings,
+                    dp: Meta.Display,
+                    dir: Meta.DisplayDirection,
+                ) => {
+                    this._onKeyboardFocusWin(dp, dir);
+                },
+            );
         }
 
         // when Tiling Shell's edge-tiling is enabled/disable
@@ -237,14 +253,25 @@ export default class TilingShellExtension extends Extension {
             Settings,
             Settings.SETTING_ACTIVE_SCREEN_EDGES,
             () => {
-                // disable native edge tiling
-                const nativeIsActive = !Settings.get_active_screen_edges();
-
-                SettingsOverride.get().override(
-                    new Gio.Settings({ schema_id: 'org.gnome.mutter' }),
-                    'edge-tiling',
-                    new GLib.Variant('b', nativeIsActive),
-                );
+                const gioSettings = new Gio.Settings({
+                    schema_id: 'org.gnome.mutter',
+                });
+                if (Settings.get_active_screen_edges()) {
+                    debug('disable native edge tiling');
+                    // disable native edge tiling
+                    SettingsOverride.get().override(
+                        gioSettings,
+                        'edge-tiling',
+                        new GLib.Variant('b', false),
+                    );
+                } else {
+                    // bring back the value of native edge tiling
+                    debug('bring back native edge tiling');
+                    SettingsOverride.get().restoreKey(
+                        gioSettings,
+                        'edge-tiling',
+                    );
+                }
             },
         );
 
@@ -351,7 +378,7 @@ export default class TilingShellExtension extends Extension {
 
     private _onKeyboardMoveWin(
         display: Meta.Display,
-        direction: Meta.DisplayDirection,
+        direction: Meta.DisplayDirection | undefined, // undefined means move window to the center
         spanFlag: boolean,
     ) {
         const focus_window = display.get_focus_window();
@@ -385,7 +412,7 @@ export default class TilingShellExtension extends Extension {
             false,
             spanFlag,
         );
-        if (success) return;
+        if (success || !direction) return;
 
         const neighborMonitorIndex = display.get_monitor_neighbor_index(
             focus_window.get_monitor(),
@@ -412,6 +439,79 @@ export default class TilingShellExtension extends Extension {
             true,
             spanFlag,
         );
+    }
+
+    private _onKeyboardFocusWin(
+        display: Meta.Display,
+        direction: Meta.DisplayDirection,
+    ) {
+        const focus_window = display.get_focus_window();
+        if (
+            !focus_window ||
+            !focus_window.has_focus() ||
+            (focus_window.get_wm_class() &&
+                focus_window.get_wm_class() === 'gjs')
+        )
+            return;
+
+        let bestWindow: Meta.Window | undefined;
+        let bestWindowDistance = -1;
+
+        const focusWindowRect = focus_window.get_frame_rect();
+        const focusWindowCenter = {
+            x: focusWindowRect.x + focusWindowRect.width / 2,
+            y: focusWindowRect.y + focusWindowRect.height / 2,
+        };
+        focus_window
+            .get_workspace()
+            .list_windows()
+            .filter((win) => {
+                if (
+                    win === focus_window ||
+                    (win.get_wm_class() && win.get_wm_class() === 'gjs') ||
+                    win.minimized
+                )
+                    return false;
+
+                const winRect = win.get_frame_rect();
+                switch (direction) {
+                    case Meta.DisplayDirection.RIGHT:
+                        return winRect.x > focusWindowRect.x;
+                    case Meta.DisplayDirection.LEFT:
+                        return winRect.x < focusWindowRect.x;
+                    case Meta.DisplayDirection.UP:
+                        return winRect.y < focusWindowRect.y;
+                    case Meta.DisplayDirection.DOWN:
+                        return winRect.y > focusWindowRect.y;
+                }
+                return false;
+            })
+            .forEach((win) => {
+                const winRect = win.get_frame_rect();
+                const winCenter = {
+                    x: winRect.x + winRect.width / 2,
+                    y: winRect.y + winRect.height / 2,
+                };
+
+                const euclideanDistance = squaredEuclideanDistance(
+                    winCenter,
+                    focusWindowCenter,
+                );
+
+                if (
+                    !bestWindow ||
+                    euclideanDistance < bestWindowDistance ||
+                    (euclideanDistance === bestWindowDistance &&
+                        bestWindow.get_frame_rect().y > winRect.y)
+                ) {
+                    bestWindow = win;
+                    bestWindowDistance = euclideanDistance;
+                }
+            });
+
+        if (!bestWindow) return;
+
+        bestWindow.activate(global.get_current_time());
     }
 
     private _onKeyboardUntileWindow(kb: KeyBindings, display: Meta.Display) {
@@ -476,19 +576,17 @@ export default class TilingShellExtension extends Extension {
         this._dbus?.disable();
         this._dbus = null;
 
+        this._fractionalScalingEnabled = false;
+
+        OverriddenWindowMenu.destroy();
+
+        // restore native edge tiling and all the overridden settings
+        SettingsOverride.destroy();
+
         // destroy state and settings
         GlobalState.destroy();
         Settings.destroy();
 
-        // restore native edge tiling
-        SettingsOverride.get().restoreKey(
-            new Gio.Settings({ schema_id: 'org.gnome.mutter' }),
-            'edge-tiling',
-        );
-
-        this._fractionalScalingEnabled = false;
-
-        OverriddenWindowMenu.destroy();
         debug('extension is disabled');
     }
 }

@@ -44,6 +44,9 @@ export default class Settings {
     static SETTING_WINDOW_BORDER_COLOR = 'window-border-color';
     static SETTING_WINDOW_BORDER_WIDTH = 'window-border-width';
     static SETTING_ENABLE_WINDOW_BORDER = 'enable-window-border';
+    static SETTING_SNAP_ASSISTANT_ANIMATION_TIME =
+        'snap-assistant-animation-time';
+    static SETTING_TILE_PREVIEW_ANIMATION_TIME = 'tile-preview-animation-time';
 
     static SETTING_MOVE_WINDOW_RIGHT = 'move-window-right';
     static SETTING_MOVE_WINDOW_LEFT = 'move-window-left';
@@ -55,6 +58,11 @@ export default class Settings {
     static SETTING_SPAN_WINDOW_DOWN = 'span-window-down';
     static SETTING_SPAN_WINDOW_ALL_TILES = 'span-window-all-tiles';
     static SETTING_UNTILE_WINDOW = 'untile-window';
+    static SETTING_MOVE_WINDOW_CENTER = 'move-window-center';
+    static SETTING_FOCUS_WINDOW_RIGHT = 'focus-window-right';
+    static SETTING_FOCUS_WINDOW_LEFT = 'focus-window-left';
+    static SETTING_FOCUS_WINDOW_UP = 'focus-window-up';
+    static SETTING_FOCUS_WINDOW_DOWN = 'focus-window-down';
 
     static initialize(settings: Gio.Settings) {
         if (this._is_initialized) return;
@@ -89,16 +97,16 @@ export default class Settings {
     }
 
     static get_tiling_system_enabled(): boolean {
-        return this._settings?.get_boolean(this.SETTING_TILING_SYSTEM) ?? false;
+        return this._settings?.get_boolean(this.SETTING_TILING_SYSTEM) ?? true;
     }
 
     static get_snap_assist_enabled(): boolean {
-        return this._settings?.get_boolean(this.SETTING_SNAP_ASSIST) ?? false;
+        return this._settings?.get_boolean(this.SETTING_SNAP_ASSIST) ?? true;
     }
 
     static get_show_indicator(): boolean {
         if (!this._settings) return true;
-        return this._settings.get_boolean(this.SETTING_SHOW_INDICATOR);
+        return this._settings.get_boolean(this.SETTING_SHOW_INDICATOR) ?? true;
     }
 
     static get_inner_gaps(scaleFactor: number = 1): {
@@ -140,7 +148,7 @@ export default class Settings {
     static get_span_multiple_tiles(): boolean {
         return (
             this._settings?.get_boolean(this.SETTING_SPAN_MULTIPLE_TILES) ??
-            false
+            true
         );
     }
 
@@ -170,7 +178,7 @@ export default class Settings {
         return (
             this._settings?.get_boolean(
                 Settings.SETTING_RESTORE_WINDOW_ORIGINAL_SIZE,
-            ) ?? false
+            ) ?? true
         );
     }
 
@@ -178,7 +186,7 @@ export default class Settings {
         return (
             this._settings?.get_boolean(
                 Settings.SETTING_RESIZE_COMPLEMENTING_WINDOWS,
-            ) ?? false
+            ) ?? true
         );
     }
 
@@ -217,7 +225,7 @@ export default class Settings {
     static get_enable_move_keybindings(): boolean {
         return (
             this._settings?.get_boolean(this.SETTING_ENABLE_MOVE_KEYBINDINGS) ??
-            false
+            true
         );
     }
 
@@ -230,7 +238,7 @@ export default class Settings {
     static get_active_screen_edges(): boolean {
         return (
             this._settings?.get_boolean(this.SETTING_ACTIVE_SCREEN_EDGES) ??
-            false
+            true
         );
     }
 
@@ -305,6 +313,26 @@ export default class Settings {
             this._settings?.set_string(
                 this.SETTING_OVERRIDDEN_SETTINGS,
                 newVal,
+            ) ?? false
+        );
+    }
+
+    static set_enable_move_keybindings(value: boolean) {
+        this._settings?.set_boolean(
+            this.SETTING_ENABLE_MOVE_KEYBINDINGS,
+            value,
+        );
+    }
+
+    static set_active_screen_edges(value: boolean) {
+        this._settings?.set_boolean(this.SETTING_ACTIVE_SCREEN_EDGES, value);
+    }
+
+    static set_window_border_color(value: string): boolean {
+        return (
+            this._settings?.set_string(
+                this.SETTING_WINDOW_BORDER_COLOR,
+                value,
             ) ?? false
         );
     }

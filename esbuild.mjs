@@ -29,11 +29,14 @@ Mtk.Rectangle.$gtype = imports.gi.Meta.Rectangle.$gtype;
 
 const extensionFooter = `
 function init(meta) {
+    imports.misc.extensionUtils.initTranslations();
     return new TilingShellExtension(meta);
 }
 `;
 
 const prefsBanner = `// For GNOME Shell version before 45
+const Config = imports.misc.config;
+
 class ExtensionPreferences {
     constructor(metadata) {
         this.metadata = metadata;
@@ -47,7 +50,7 @@ class ExtensionPreferences {
 
 const prefsFooter = `
 function init() {
-
+    imports.misc.extensionUtils.initTranslations();
 }
 
 function fillPreferencesWindow(window) {
@@ -72,6 +75,16 @@ function convertImports(text) {
 
     // drop import of ExtensionPreferences class
     text = text.replaceAll('import { ExtensionPreferences } from "resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js";', "");
+
+    // drop import of Config from preferences
+    text = text.replaceAll('import * as Config from "resource:///org/gnome/Shell/Extensions/js/misc/config.js";', "");
+
+    // replace import of translation related code
+    const regexTranslation = new RegExp(`import {(.*|\n.*)?gettext as _[^from]*[^;]*;`, 'gm');
+    text = text.replaceAll(regexTranslation, "const { gettext: _, ngettext, pgettext } = imports.misc.extensionUtils;");
+
+    // replace import of all translation stuff made in translation.ts
+    //text = text.replaceAll('import { gettext as _, ngettext, pgettext } from "resource:///org/gnome/shell/extensions/extension.js";', "const { gettext: _, ngettext, pgettext } = imports.misc.extensionUtils;");
 
     const regexExportExtension = new RegExp(`export {((.|\n)*)(.+) as default((.|\n)*)};`, 'gm');
     text = text.replaceAll(regexExportExtension, "");

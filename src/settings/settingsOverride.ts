@@ -122,26 +122,29 @@ export default class SettingsOverride {
         return oldValue;
     }
 
-    private _restoreAllKeys(giosettings: Gio.Settings) {
-        const overridden = this._overriddenKeys.get(giosettings.schemaId);
-        if (!overridden) return;
-
-        overridden.forEach((oldValue: GLib.Variant, key: string) => {
-            // @ts-expect-error "Variant has an unkown type"
-            const done = giosettings.set_value(key, oldValue);
-            if (done) overridden.delete(key);
-        });
-
-        if (overridden.size === 0)
-            this._overriddenKeys.delete(giosettings.schemaId);
-    }
-
     public restoreAll() {
+        const schemaToDelete: string[] = [];
         this._overriddenKeys.forEach(
-            (overridden: Map<string, GLib.Variant>, schemaId: string) => {
-                this._restoreAllKeys(new Gio.Settings({ schemaId }));
+            (map: Map<string, GLib.Variant>, schemaId: string) => {
+                const giosettings = new Gio.Settings({ schemaId });
+                const overridden = this._overriddenKeys.get(
+                    giosettings.schemaId,
+                );
+                if (!overridden) return;
+
+                const toDelete: string[] = [];
+                overridden.forEach((oldValue: GLib.Variant, key: string) => {
+                    // @ts-expect-error "Variant has an unkown type"
+                    const done = giosettings.set_value(key, oldValue);
+                    if (done) toDelete.push(key);
+                });
+                toDelete.forEach((key) => overridden.delete(key));
+                if (overridden.size === 0) schemaToDelete.push(schemaId);
             },
         );
+        schemaToDelete.forEach((schemaId) => {
+            this._overriddenKeys.delete(schemaId);
+        });
 
         if (this._overriddenKeys.size === 0) this._overriddenKeys = new Map();
 
