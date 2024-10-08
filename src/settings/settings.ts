@@ -309,6 +309,17 @@ export default class Settings {
         );
     }
 
+    static set_enable_move_keybindings(value: boolean) {
+        this._settings?.set_boolean(
+            this.SETTING_ENABLE_MOVE_KEYBINDINGS,
+            value,
+        );
+    }
+
+    static set_active_screen_edges(value: boolean) {
+        this._settings?.set_boolean(this.SETTING_ACTIVE_SCREEN_EDGES, value);
+    }
+
     static reset_layouts_json() {
         this.save_layouts_json([
             new Layout(

@@ -1,11 +1,12 @@
 import GioUnix from 'gi://Gio';
 import GLib from 'gi://GLib';
+import Settings from '@settings/settings';
 
 const dconfPath = '/org/gnome/shell/extensions/tilingshell/';
 const excludedKeys = [
-    'layouts-json',
-    'last-version-name-installed',
-    'overridden-settings',
+    Settings.SETTING_LAYOUTS_JSON,
+    Settings.SETTING_LAST_VERSION_NAME_INSTALLED,
+    Settings.SETTING_OVERRIDDEN_SETTINGS,
 ];
 
 export default class SettingsExport {
@@ -18,6 +19,10 @@ export default class SettingsExport {
 
     static importFrom(content: string) {
         this.restoreToDefault();
+
+        // Flush overridden settings back into system
+        Settings.set_active_screen_edges(false);
+        Settings.set_enable_move_keybindings(false);
 
         const proc = GioUnix.Subprocess.new(
             ['dconf', 'load', dconfPath],
@@ -52,7 +57,9 @@ export default class SettingsExport {
 
         const keys = list
             .split('\n')
-            .filter((key) => !excludedKeys.includes(key));
+            .filter((key) => key.length > 0 && !excludedKeys.includes(key));
+
+        console.log(keys);
 
         for (const key of keys) {
             const procReset = GioUnix.Subprocess.new(
