@@ -255,14 +255,23 @@ export default class TilingShellExtension extends Extension {
             Settings,
             Settings.SETTING_ACTIVE_SCREEN_EDGES,
             () => {
-                // disable native edge tiling
-                const nativeIsActive = !Settings.get_active_screen_edges();
-
-                SettingsOverride.get().override(
-                    new Gio.Settings({ schema_id: 'org.gnome.mutter' }),
-                    'edge-tiling',
-                    new GLib.Variant('b', nativeIsActive),
-                );
+                const gioSettings = new Gio.Settings({
+                    schema_id: 'org.gnome.mutter',
+                });
+                if (Settings.get_active_screen_edges()) {
+                    // disable native edge tiling
+                    SettingsOverride.get().override(
+                        gioSettings,
+                        'edge-tiling',
+                        new GLib.Variant('b', false),
+                    );
+                } else {
+                    // bring back the value of native edge tiling
+                    SettingsOverride.get().restoreKey(
+                        gioSettings,
+                        'edge-tiling',
+                    );
+                }
             },
         );
 

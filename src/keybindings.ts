@@ -250,7 +250,7 @@ export default class KeyBindings extends GObject.Object {
     }
 
     private _removeKeybindings() {
-        SettingsOverride.get().restoreAll();
+        this._restoreNatives();
         Main.wm.removeKeybinding(Settings.SETTING_MOVE_WINDOW_RIGHT);
         Main.wm.removeKeybinding(Settings.SETTING_MOVE_WINDOW_LEFT);
         Main.wm.removeKeybinding(Settings.SETTING_MOVE_WINDOW_UP);
@@ -262,6 +262,28 @@ export default class KeyBindings extends GObject.Object {
         Main.wm.removeKeybinding(Settings.SETTING_SPAN_WINDOW_ALL_TILES);
         Main.wm.removeKeybinding(Settings.SETTING_UNTILE_WINDOW);
         Main.wm.removeKeybinding(Settings.SETTING_MOVE_WINDOW_CENTER);
+    }
+
+    private _restoreNatives() {
+        // Disable native keybindings for Super + Left/Right
+        const mutterKeybindings = new Gio.Settings({
+            schema_id: 'org.gnome.mutter.keybindings',
+        });
+        SettingsOverride.get().restoreKey(
+            mutterKeybindings,
+            'toggle-tiled-right',
+        );
+        SettingsOverride.get().restoreKey(
+            mutterKeybindings,
+            'toggle-tiled-left',
+        );
+
+        // Disable native keybindings for Super + Up/Down
+        const desktopWm = new Gio.Settings({
+            schema_id: 'org.gnome.desktop.wm.keybindings',
+        });
+        SettingsOverride.get().restoreKey(desktopWm, 'maximize');
+        SettingsOverride.get().restoreKey(desktopWm, 'unmaximize');
     }
 
     public destroy() {
