@@ -614,8 +614,10 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                                 debug(
                                     `Create file with path ${file.get_path()}`,
                                 );
-                                const settingsExport = new SettingsExport();
-                                const content = settingsExport.dconfDump;
+                                const settingsExport = new SettingsExport(
+                                    this.getSettings(),
+                                );
+                                const content = settingsExport.exportToString();
                                 file.replace_contents_bytes_async(
                                     new TextEncoder().encode(content),
                                     null,
@@ -679,7 +681,10 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                                     const imported = new TextDecoder(
                                         'utf-8',
                                     ).decode(content);
-                                    SettingsExport.importFrom(imported);
+                                    const settingsExport = new SettingsExport(
+                                        this.getSettings(),
+                                    );
+                                    settingsExport.importFromString(imported);
                                 } else {
                                     debug('Error while opening file');
                                 }
@@ -701,7 +706,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             'Reset settings',
             'Reset settings',
             'Bring back the default settings',
-            () => SettingsExport.restoreToDefault(),
+            () => new SettingsExport(this.getSettings()).restoreToDefault(),
             'destructive-action',
         );
         importExportGroup.add(resetSettingsBtn);

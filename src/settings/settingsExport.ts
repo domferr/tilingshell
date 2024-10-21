@@ -1,6 +1,7 @@
-import GioUnix from 'gi://Gio';
+import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Settings from '@settings/settings';
+import SettingsOverride from '@settings/settingsOverride';
 
 const dconfPath = '/org/gnome/shell/extensions/tilingshell/';
 const excludedKeys = [
@@ -10,23 +11,23 @@ const excludedKeys = [
 ];
 
 export default class SettingsExport {
-    dconfDump: string;
+    private readonly _gioSettings: Gio.Settings;
 
-    constructor() {
-        this.dconfDump = this.dumpDconf();
-        this.excludeKeys();
+    constructor(gioSettings: Gio.Settings) {
+        this._gioSettings = gioSettings;
     }
 
-    static importFrom(content: string) {
+    exportToString(): string {
+        return this._excludeKeys(this._dumpDconf());
+    }
+
+    importFromString(content: string) {
         this.restoreToDefault();
+        SettingsOverride.get().restoreAll();
 
-        // Flush overridden settings back into system
-        Settings.set_active_screen_edges(false);
-        Settings.set_enable_move_keybindings(false);
-
-        const proc = GioUnix.Subprocess.new(
+        const proc = Gio.Subprocess.new(
             ['dconf', 'load', dconfPath],
-            GioUnix.SubprocessFlags.STDIN_PIPE,
+            Gio.SubprocessFlags.STDIN_PIPE,
         );
 
         const stdin = proc.get_stdin_pipe();
@@ -42,41 +43,17 @@ export default class SettingsExport {
         }
     }
 
-    static restoreToDefault() {
-        const procList = GioUnix.Subprocess.new(
-            ['dconf', 'list', dconfPath],
-            GioUnix.SubprocessFlags.STDOUT_PIPE |
-                GioUnix.SubprocessFlags.STDERR_PIPE,
-        );
-
-        const [, list] = procList.communicate_utf8(null, null);
-        procList.wait(null);
-
-        if (!procList.get_successful())
-            throw new Error('Failed to retrieve dconf keys');
-
-        const keys = list
-            .split('\n')
-            .filter((key) => key.length > 0 && !excludedKeys.includes(key));
-
-        console.log(keys);
-
-        for (const key of keys) {
-            const procReset = GioUnix.Subprocess.new(
-                ['dconf', 'reset', '-f', dconfPath + key],
-                GioUnix.SubprocessFlags.NONE,
-            );
-            procReset.wait(null);
-            if (!procReset.get_successful())
-                throw new Error('Failed to restore to default settings');
-        }
+    restoreToDefault() {
+        this._gioSettings
+            .list_keys()
+            .filter((key) => key.length > 0 && !excludedKeys.includes(key))
+            .forEach((key) => this._gioSettings.reset(key));
     }
 
-    private dumpDconf(): string {
-        const proc = GioUnix.Subprocess.new(
+    private _dumpDconf(): string {
+        const proc = Gio.Subprocess.new(
             ['dconf', 'dump', dconfPath],
-            GioUnix.SubprocessFlags.STDOUT_PIPE |
-                GioUnix.SubprocessFlags.STDERR_PIPE,
+            Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_PIPE,
         );
 
         const [, dump] = proc.communicate_utf8(null, null);
@@ -86,20 +63,14 @@ export default class SettingsExport {
         else throw new Error('Failed to dump dconf');
     }
 
-    private excludeKeys() {
-        if (this.dconfDump.length === 0) return;
+    private _excludeKeys(dconfDump: string) {
+        if (dconfDump.length === 0) throw new Error('Empty dconf dump');
 
         const keyFile = new GLib.KeyFile();
-        const length = new TextEncoder().encode(this.dconfDump).length;
+        const length = new TextEncoder().encode(dconfDump).length;
 
-        if (
-            !keyFile.load_from_data(
-                this.dconfDump,
-                length,
-                GLib.KeyFileFlags.NONE,
-            )
-        )
-            return;
+        if (!keyFile.load_from_data(dconfDump, length, GLib.KeyFileFlags.NONE))
+            throw new Error('Failed to load from dconf dump');
 
         const [key_list] = keyFile.get_keys('/');
 
@@ -108,7 +79,7 @@ export default class SettingsExport {
         });
 
         const [data] = keyFile.to_data();
-        if (data) this.dconfDump = data;
+        if (data) return data;
         else throw new Error('Failed to exclude dconf keys');
     }
 }
