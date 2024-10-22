@@ -11,6 +11,7 @@ import Tile from '@/components/layout/Tile';
 import * as ModalDialog from 'resource:///org/gnome/shell/ui/modalDialog.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { enableScalingFactorSupport, getMonitorScalingFactor } from '@utils/ui';
+import { _ } from '../../translations';
 
 @registerGObjectClass
 export default class EditorDialog extends ModalDialog.ModalDialog {
@@ -44,7 +45,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
 
         this.contentLayout.add_child(
             new St.Label({
-                text: 'Select the layout to edit',
+                text: _('Select the layout to edit'),
                 xAlign: Clutter.ActorAlign.CENTER,
                 xExpand: true,
                 styleClass: 'editor-dialog-title',
@@ -69,7 +70,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         }
 
         this.addButton({
-            label: 'Close',
+            label: _('Close'),
             default: true,
             key: Clutter.KEY_Escape,
             action: () => params.onClose(),
@@ -98,7 +99,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         );
         suggestion1.add_child(
             new St.Label({
-                text: ' to split a tile.',
+                text: ` ${_('to split a tile')}.`,
                 xAlign: Clutter.ActorAlign.CENTER,
                 yAlign: Clutter.ActorAlign.CENTER,
                 styleClass: '',
@@ -139,7 +140,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         );
         suggestion2.add_child(
             new St.Label({
-                text: ' to split a tile vertically.',
+                text: ` ${_('to split a tile vertically')}.`,
                 xAlign: Clutter.ActorAlign.CENTER,
                 yAlign: Clutter.ActorAlign.CENTER,
                 styleClass: '',
@@ -161,7 +162,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         );
         suggestion3.add_child(
             new St.Label({
-                text: ' to delete a tile.',
+                text: ` ${_('to delete a tile')}.`,
                 xAlign: Clutter.ActorAlign.CENTER,
                 yAlign: Clutter.ActorAlign.CENTER,
                 styleClass: '',
@@ -188,7 +189,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         );
         suggestion4.add_child(
             new St.Label({
-                text: ' use the indicator button to save or cancel.',
+                text: ` ${_('use the indicator button to save or cancel')}.`,
                 xAlign: Clutter.ActorAlign.CENTER,
                 yAlign: Clutter.ActorAlign.CENTER,
                 styleClass: '',
@@ -208,7 +209,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         this.contentLayout.destroy_all_children();
         this.contentLayout.add_child(
             new St.Label({
-                text: 'How to use the editor',
+                text: _('How to use the editor'),
                 xAlign: Clutter.ActorAlign.CENTER,
                 xExpand: true,
                 styleClass: 'editor-dialog-title',
@@ -218,7 +219,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
 
         this.clearButtons();
         this.addButton({
-            label: 'Start editing',
+            label: _('Start editing'),
             default: true,
             key: Clutter.KEY_Escape,
             action: params.onClose,

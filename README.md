@@ -1,7 +1,7 @@
 <img src="https://raw.githubusercontent.com/domferr/tilingshell/main/logo.png" align="right" width="76"/>
 
 ![](https://img.shields.io/github/v/release/domferr/tilingshell)
-![](https://img.shields.io/badge/GNOME-42--46-e04196)
+![](https://img.shields.io/badge/GNOME-42--47-e04196)
 ![](https://img.shields.io/github/downloads/domferr/tilingshell/total)
 ![](https://img.shields.io/badge/Built%20with-Typescript-blue)
 ![](https://img.shields.io/github/license/domferr/tilingshell)

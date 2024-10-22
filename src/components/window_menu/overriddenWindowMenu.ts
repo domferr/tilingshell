@@ -20,6 +20,7 @@ import TileUtils from '@components/layout/TileUtils';
 import LayoutTileButtons from './layoutTileButtons';
 import { buildMarginOf } from '@utils/ui';
 import LayoutIcon from './layoutIcon';
+import { _ } from '../../translations';
 
 const LAYOUT_ICON_WIDTH = 46;
 const LAYOUT_ICON_HEIGHT = 32;
@@ -164,7 +165,7 @@ export default class OverriddenWindowMenu extends GObject.Object {
                 enableScalingFactorSupport(vacantPopupMenu, scalingFactor);
 
             buildMenuWithLayoutIcon(
-                'Move to best tile',
+                _('Move to best tile'),
                 vacantPopupMenu,
                 [vacantTiles[bestTileIndex]],
                 tiles,
@@ -186,7 +187,7 @@ export default class OverriddenWindowMenu extends GObject.Object {
             if (enableScaling)
                 enableScalingFactorSupport(vacantLeftPopupMenu, scalingFactor);
             buildMenuWithLayoutIcon(
-                'Move to leftmost tile',
+                _('Move to leftmost tile'),
                 vacantLeftPopupMenu,
                 [vacantTiles[0]],
                 tiles,
@@ -209,7 +210,7 @@ export default class OverriddenWindowMenu extends GObject.Object {
             if (enableScaling)
                 enableScalingFactorSupport(vacantRightPopupMenu, scalingFactor);
             buildMenuWithLayoutIcon(
-                'Move to rightmost tile',
+                _('Move to rightmost tile'),
                 vacantRightPopupMenu,
                 [tilesFromRightToLeft[0]],
                 tiles,

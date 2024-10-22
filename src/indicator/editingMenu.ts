@@ -3,6 +3,7 @@ import Indicator from './indicator';
 import * as IndicatorUtils from './utils';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import CurrentMenu from './currentMenu';
+import { _ } from '../translations';
 
 export default class EditingMenu implements CurrentMenu {
     private readonly _indicator: Indicator;
@@ -19,7 +20,7 @@ export default class EditingMenu implements CurrentMenu {
 
         const openMenuBtn = IndicatorUtils.createButton(
             'menu-symbolic',
-            'Menu  ',
+            _('Menu'),
             this._indicator.path,
         );
         openMenuBtn.connect('clicked', () => this._indicator.openMenu(false));
@@ -27,7 +28,7 @@ export default class EditingMenu implements CurrentMenu {
 
         const infoMenuBtn = IndicatorUtils.createButton(
             'info-symbolic',
-            'Info     ',
+            _('Info'),
             this._indicator.path,
         );
         infoMenuBtn.connect('clicked', () => this._indicator.openMenu(true));
@@ -35,7 +36,7 @@ export default class EditingMenu implements CurrentMenu {
 
         const saveBtn = IndicatorUtils.createButton(
             'save-symbolic',
-            'Save    ',
+            _('Save'),
             this._indicator.path,
         );
         saveBtn.connect('clicked', () => {
@@ -46,7 +47,7 @@ export default class EditingMenu implements CurrentMenu {
 
         const cancelBtn = IndicatorUtils.createButton(
             'cancel-symbolic',
-            'Cancel',
+            _('Cancel'),
             this._indicator.path,
         );
         cancelBtn.connect('clicked', () => {

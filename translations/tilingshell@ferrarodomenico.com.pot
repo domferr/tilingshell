@@ -1,0 +1,455 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-10-22 15:36+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: dist/prefs.js:420
+msgid "General"
+msgstr ""
+
+#: dist/prefs.js:425
+msgid "Appearance"
+msgstr ""
+
+#: dist/prefs.js:426
+msgid "Configure the appearance of Tiling Shell"
+msgstr ""
+
+#: dist/prefs.js:431
+msgid "Show Indicator"
+msgstr ""
+
+#: dist/prefs.js:432
+msgid "Whether to show the panel indicator"
+msgstr ""
+
+#: dist/prefs.js:437
+msgid "Inner gaps"
+msgstr ""
+
+#: dist/prefs.js:438
+msgid "Gaps between windows"
+msgstr ""
+
+#: dist/prefs.js:443
+msgid "Outer gaps"
+msgstr ""
+
+#: dist/prefs.js:444
+msgid "Gaps between a window and the monitor borders"
+msgstr ""
+
+#: dist/prefs.js:448
+msgid "Blur (experimental feature)"
+msgstr ""
+
+#: dist/prefs.js:450
+msgid "Apply blur effect to Snap Assistant and tile previews"
+msgstr ""
+
+#: dist/prefs.js:456
+msgid "Snap Assistant threshold"
+msgstr ""
+
+#: dist/prefs.js:458
+msgid "Minimum distance from the Snap Assistant to the pointer to open it"
+msgstr ""
+
+#: dist/prefs.js:467
+msgid "Snap Assistant"
+msgstr ""
+
+#: dist/prefs.js:468
+msgid "Apply blur effect to Snap Assistant"
+msgstr ""
+
+#: dist/prefs.js:474
+msgid "Selected tile preview"
+msgstr ""
+
+#: dist/prefs.js:475
+msgid "Apply blur effect to selected tile preview"
+msgstr ""
+
+#: dist/prefs.js:479
+msgid "Window border"
+msgstr ""
+
+#: dist/prefs.js:480 dist/prefs.js:487
+msgid "Show a border around focused window"
+msgstr ""
+
+#: dist/prefs.js:486
+msgid "Enable"
+msgstr ""
+
+#: dist/prefs.js:493
+msgid "Width"
+msgstr ""
+
+#: dist/prefs.js:494
+msgid "The size of the border"
+msgstr ""
+
+#: dist/prefs.js:500
+msgid "Border color"
+msgstr ""
+
+#: dist/prefs.js:501
+msgid "Choose the color of the border"
+msgstr ""
+
+#: dist/prefs.js:507
+msgid "Animations"
+msgstr ""
+
+#: dist/prefs.js:508
+msgid "Customize animations"
+msgstr ""
+
+#: dist/prefs.js:514
+msgid "Snap assistant animation time"
+msgstr ""
+
+#: dist/prefs.js:515
+msgid "The snap assistant animation time in milliseconds"
+msgstr ""
+
+#: dist/prefs.js:523
+msgid "Tiles animation time"
+msgstr ""
+
+#: dist/prefs.js:524
+msgid "The tiles animation time in milliseconds"
+msgstr ""
+
+#: dist/prefs.js:530
+msgid "Behaviour"
+msgstr ""
+
+#: dist/prefs.js:531
+msgid "Configure the behaviour of Tiling Shell"
+msgstr ""
+
+#: dist/prefs.js:536
+msgid "Enable Snap Assistant"
+msgstr ""
+
+#: dist/prefs.js:537
+msgid "Move the window on top of the screen to snap assist it"
+msgstr ""
+
+#: dist/prefs.js:542
+msgid "Enable Tiling System"
+msgstr ""
+
+#: dist/prefs.js:543
+msgid "Hold the activation key while moving a window to tile it"
+msgstr ""
+
+#: dist/prefs.js:552
+msgid "Span multiple tiles"
+msgstr ""
+
+#: dist/prefs.js:553
+msgid "Hold the activation key to span multiple tiles"
+msgstr ""
+
+#: dist/prefs.js:562
+msgid "Enable auto-resize of the complementing tiled windows"
+msgstr ""
+
+#: dist/prefs.js:564
+msgid ""
+"When a tiled window is resized, auto-resize the other tiled windows near it"
+msgstr ""
+
+#: dist/prefs.js:570
+msgid "Restore window size"
+msgstr ""
+
+#: dist/prefs.js:572
+msgid "Whether to restore the windows to their original size when untiled"
+msgstr ""
+
+#: dist/prefs.js:578
+msgid "Add snap assistant and auto-tile buttons to window menu"
+msgstr ""
+
+#: dist/prefs.js:580
+msgid ""
+"Add snap assistant and auto-tile buttons in the menu that shows up when you "
+"right click on a window title"
+msgstr ""
+
+#: dist/prefs.js:585
+msgid "Screen Edges"
+msgstr ""
+
+#: dist/prefs.js:587
+msgid ""
+"Drag windows against the top, left and right screen edges to resize them"
+msgstr ""
+
+#: dist/prefs.js:601
+msgid "Drag against top edge to maximize window"
+msgstr ""
+
+#: dist/prefs.js:602
+msgid "Drag windows against the top edge to maximize them"
+msgstr ""
+
+#: dist/prefs.js:611
+msgid "Quarter tiling activation area"
+msgstr ""
+
+#: dist/prefs.js:612
+#, javascript-format
+msgid "Activation area to trigger quarter tiling (% of the screen)"
+msgstr ""
+
+#: dist/prefs.js:629
+msgid "Layouts"
+msgstr ""
+
+#: dist/prefs.js:630
+msgid "Configure the layouts of Tiling Shell"
+msgstr ""
+
+#: dist/prefs.js:634 dist/prefs.js:635
+msgid "Edit layouts"
+msgstr ""
+
+#: dist/prefs.js:636
+msgid "Open the layouts editor"
+msgstr ""
+
+#: dist/prefs.js:641 dist/prefs.js:642 dist/prefs.js:646
+msgid "Export layouts"
+msgstr ""
+
+#: dist/prefs.js:643
+msgid "Export layouts to a file"
+msgstr ""
+
+#: dist/prefs.js:658 dist/prefs.js:719
+msgid "Cancel"
+msgstr ""
+
+#: dist/prefs.js:659
+msgid "Save"
+msgstr ""
+
+#: dist/prefs.js:702 dist/prefs.js:703
+msgid "Import layouts"
+msgstr ""
+
+#: dist/prefs.js:704
+msgid "Import layouts from a file"
+msgstr ""
+
+#: dist/prefs.js:707
+msgid "Select layouts file"
+msgstr ""
+
+#: dist/prefs.js:720
+msgid "Open"
+msgstr ""
+
+#: dist/prefs.js:765 dist/prefs.js:766
+msgid "Reset layouts"
+msgstr ""
+
+#: dist/prefs.js:767
+msgid "Bring back the default layouts"
+msgstr ""
+
+#: dist/prefs.js:780
+msgid "Keybindings"
+msgstr ""
+
+#: dist/prefs.js:782
+msgid "Use hotkeys to perform actions on the focused window"
+msgstr ""
+
+#: dist/prefs.js:800
+msgid "Move window to right tile"
+msgstr ""
+
+#: dist/prefs.js:802
+msgid "Move the focused window to the tile on its right"
+msgstr ""
+
+#: dist/prefs.js:811
+msgid "Move window to left tile"
+msgstr ""
+
+#: dist/prefs.js:812
+msgid "Move the focused window to the tile on its left"
+msgstr ""
+
+#: dist/prefs.js:818
+msgid "Move window to tile above"
+msgstr ""
+
+#: dist/prefs.js:819
+msgid "Move the focused window to the tile above"
+msgstr ""
+
+#: dist/prefs.js:825
+msgid "Move window to tile below"
+msgstr ""
+
+#: dist/prefs.js:826
+msgid "Move the focused window to the tile below"
+msgstr ""
+
+#: dist/prefs.js:832
+msgid "Span window to right tile"
+msgstr ""
+
+#: dist/prefs.js:833
+msgid "Span the focused window to the tile on its right"
+msgstr ""
+
+#: dist/prefs.js:839
+msgid "Span window to left tile"
+msgstr ""
+
+#: dist/prefs.js:840
+msgid "Span the focused window to the tile on its left"
+msgstr ""
+
+#: dist/prefs.js:846
+msgid "Span window above"
+msgstr ""
+
+#: dist/prefs.js:847
+msgid "Span the focused window to the tile above"
+msgstr ""
+
+#: dist/prefs.js:853
+msgid "Span window down"
+msgstr ""
+
+#: dist/prefs.js:854
+msgid "Span the focused window to the tile below"
+msgstr ""
+
+#: dist/prefs.js:860
+msgid "Span window to all tiles"
+msgstr ""
+
+#: dist/prefs.js:861
+msgid "Span the focused window to all the tiles"
+msgstr ""
+
+#: dist/prefs.js:867
+msgid "Untile focused window"
+msgstr ""
+
+#: dist/prefs.js:875
+msgid "Move window to the center"
+msgstr ""
+
+#: dist/prefs.js:877
+msgid "Move the focused window to the center of the screen"
+msgstr ""
+
+#: dist/prefs.js:886
+msgid "Focus window to the right"
+msgstr ""
+
+#: dist/prefs.js:888
+msgid "Focus the window to the right of the current focused window"
+msgstr ""
+
+#: dist/prefs.js:895
+msgid "Focus window to the left"
+msgstr ""
+
+#: dist/prefs.js:896
+msgid "Focus the window to the left of the current focused window"
+msgstr ""
+
+#: dist/prefs.js:902
+msgid "Focus window above"
+msgstr ""
+
+#: dist/prefs.js:903
+msgid "Focus the window above the current focused window"
+msgstr ""
+
+#: dist/prefs.js:909
+msgid "Focus window below"
+msgstr ""
+
+#: dist/prefs.js:910
+msgid "Focus the window below the current focused window"
+msgstr ""
+
+#: dist/prefs.js:937
+msgid "View and Customize all the Shortcuts"
+msgstr ""
+
+#: dist/prefs.js:965 dist/prefs.js:966
+msgid "View and Customize Shortcuts"
+msgstr ""
+
+#: dist/prefs.js:996
+msgid "Donate on ko-fi"
+msgstr ""
+
+#: dist/prefs.js:1002
+msgid "Report a bug"
+msgstr ""
+
+#: dist/prefs.js:1008
+msgid "Request a feature"
+msgstr ""
+
+#: dist/prefs.js:1016
+msgid "Have issues, you want to suggest a new feature or contribute?"
+msgstr ""
+
+#: dist/prefs.js:1023
+msgid "Open a new issue on"
+msgstr ""
+
+#: dist/extension.js:3832
+msgid "to split a tile"
+msgstr ""
+
+#: dist/extension.js:3871
+msgid "to split a tile vertically"
+msgstr ""
+
+#: dist/extension.js:3891
+msgid "to delete a tile"
+msgstr ""
+
+#: dist/extension.js:3916
+msgid "use the indicator button to save or cancel"
+msgstr ""
+
+#: dist/extension.js:3642
+msgid "Edit Layouts"
+msgstr ""
+
+#: dist/extension.js:3652
+msgid "New Layout"
+msgstr ""
