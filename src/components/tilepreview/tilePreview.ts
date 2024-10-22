@@ -4,8 +4,7 @@ import Mtk from 'gi://Mtk';
 import { registerGObjectClass } from '@/utils/gjs';
 import Clutter from 'gi://Clutter';
 import { buildRectangle, getScalingFactorOf } from '@utils/ui';
-
-export const WINDOW_ANIMATION_TIME = 100;
+import GlobalState from '@utils/globalState';
 
 // export module TilePreview {
 export interface TilePreviewConstructorProperties
@@ -97,7 +96,7 @@ export default class TilePreview extends St.Widget {
                 width: this.innerWidth,
                 height: this.innerHeight,
                 opacity: 255,
-                duration: ease ? WINDOW_ANIMATION_TIME : 0,
+                duration: ease ? GlobalState.get().tilePreviewAnimationTime : 0,
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD,
             });
         } else {
@@ -105,7 +104,7 @@ export default class TilePreview extends St.Widget {
             this.set_size(this.innerWidth, this.innerHeight);
             this.ease({
                 opacity: 255,
-                duration: ease ? WINDOW_ANIMATION_TIME : 0,
+                duration: ease ? GlobalState.get().tilePreviewAnimationTime : 0,
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD,
             });
         }
@@ -147,7 +146,7 @@ export default class TilePreview extends St.Widget {
         this._showing = false;
         this.ease({
             opacity: 0,
-            duration: ease ? WINDOW_ANIMATION_TIME : 0,
+            duration: ease ? GlobalState.get().tilePreviewAnimationTime : 0,
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
             onComplete: () => this.hide(),
         });

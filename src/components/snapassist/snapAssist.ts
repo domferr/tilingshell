@@ -21,7 +21,6 @@ import {
 } from '@utils/ui';
 
 export const SNAP_ASSIST_SIGNAL = 'snap-assist';
-export const SNAP_ASSIST_ANIMATION_TIME = 180;
 const GAPS = 4;
 
 @registerGObjectClass
@@ -45,6 +44,15 @@ class SnapAssistContent extends St.BoxLayout {
                 240,
                 16,
             ),
+            snapAssistantAnimationTime: GObject.ParamSpec.uint(
+                'snapAssistantAnimationTime',
+                'snapAssistantAnimationTime',
+                'Animation time in milliseconds',
+                GObject.ParamFlags.READWRITE,
+                0,
+                2000,
+                180,
+            ),
         },
     };
 
@@ -58,6 +66,7 @@ class SnapAssistContent extends St.BoxLayout {
     private _bottomPadding: number;
     private _blur: boolean;
     private _snapAssistantThreshold: number;
+    private _snapAssistantAnimationTime: number;
     private _monitorIndex: number;
 
     constructor(container: St.Widget, monitorIndex: number) {
@@ -78,6 +87,7 @@ class SnapAssistContent extends St.BoxLayout {
         this._showing = true;
         this._bottomPadding = 0;
         this._blur = false;
+        this._snapAssistantAnimationTime = 100;
         this._monitorIndex = monitorIndex;
         this._snapAssistantThreshold =
             54 * getMonitorScalingFactor(this._monitorIndex);
@@ -88,11 +98,16 @@ class SnapAssistContent extends St.BoxLayout {
             'blur',
             Gio.SettingsBindFlags.GET,
         );
-
         Settings.bind(
             Settings.SETTING_SNAP_ASSISTANT_THRESHOLD,
             this,
             'snapAssistantThreshold',
+            Gio.SettingsBindFlags.GET,
+        );
+        Settings.bind(
+            Settings.SETTING_SNAP_ASSISTANT_ANIMATION_TIME,
+            this,
+            'snapAssistantAnimationTime',
             Gio.SettingsBindFlags.GET,
         );
 
@@ -130,6 +145,10 @@ class SnapAssistContent extends St.BoxLayout {
     private set snapAssistantThreshold(value: number) {
         this._snapAssistantThreshold =
             value * getMonitorScalingFactor(this._monitorIndex);
+    }
+
+    private set snapAssistantAnimationTime(value: number) {
+        this._snapAssistantAnimationTime = value;
     }
 
     get showing(): boolean {
@@ -175,7 +194,7 @@ class SnapAssistContent extends St.BoxLayout {
         this.ease({
             y: this._desiredY,
             opacity: 0,
-            duration: ease ? SNAP_ASSIST_ANIMATION_TIME : 0,
+            duration: ease ? this._snapAssistantAnimationTime : 0,
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
             onComplete: () => {
                 this.hide();
@@ -207,7 +226,7 @@ class SnapAssistContent extends St.BoxLayout {
         this.ease({
             y: this._desiredY,
             opacity: 255,
-            duration: ease ? SNAP_ASSIST_ANIMATION_TIME : 0,
+            duration: ease ? this._snapAssistantAnimationTime : 0,
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
         });
     }

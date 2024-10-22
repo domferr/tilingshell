@@ -44,6 +44,9 @@ export default class Settings {
     static SETTING_WINDOW_BORDER_COLOR = 'window-border-color';
     static SETTING_WINDOW_BORDER_WIDTH = 'window-border-width';
     static SETTING_ENABLE_WINDOW_BORDER = 'enable-window-border';
+    static SETTING_SNAP_ASSISTANT_ANIMATION_TIME =
+        'snap-assistant-animation-time';
+    static SETTING_TILE_PREVIEW_ANIMATION_TIME = 'tile-preview-animation-time';
 
     static SETTING_MOVE_WINDOW_RIGHT = 'move-window-right';
     static SETTING_MOVE_WINDOW_LEFT = 'move-window-left';
@@ -55,6 +58,11 @@ export default class Settings {
     static SETTING_SPAN_WINDOW_DOWN = 'span-window-down';
     static SETTING_SPAN_WINDOW_ALL_TILES = 'span-window-all-tiles';
     static SETTING_UNTILE_WINDOW = 'untile-window';
+    static SETTING_MOVE_WINDOW_CENTER = 'move-window-center';
+    static SETTING_FOCUS_WINDOW_RIGHT = 'focus-window-right';
+    static SETTING_FOCUS_WINDOW_LEFT = 'focus-window-left';
+    static SETTING_FOCUS_WINDOW_UP = 'focus-window-up';
+    static SETTING_FOCUS_WINDOW_DOWN = 'focus-window-down';
 
     static initialize(settings: Gio.Settings) {
         if (this._is_initialized) return;
@@ -318,6 +326,15 @@ export default class Settings {
 
     static set_active_screen_edges(value: boolean) {
         this._settings?.set_boolean(this.SETTING_ACTIVE_SCREEN_EDGES, value);
+    }
+
+    static set_window_border_color(value: string): boolean {
+        return (
+            this._settings?.set_string(
+                this.SETTING_WINDOW_BORDER_COLOR,
+                value,
+            ) ?? false
+        );
     }
 
     static reset_layouts_json() {

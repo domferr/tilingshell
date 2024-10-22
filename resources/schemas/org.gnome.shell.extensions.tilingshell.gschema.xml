@@ -127,6 +127,16 @@
             <summary>Focused window border width</summary>
             <description>The width of the focused window's border.</description>
         </key>
+        <key name="snap-assistant-animation-time" type="u">
+            <default>180</default>
+            <summary>Snap assistant animation time (milliseconds)</summary>
+            <description>Animation time in milliseconds of the snap assistant</description>
+        </key>
+        <key name="tile-preview-animation-time" type="u">
+            <default>100</default>
+            <summary>Tile animation time (milliseconds)</summary>
+            <description>Animation time in milliseconds of the tiles</description>
+        </key>
 
         <!-- keybindings -->
 		<key type="as" name="move-window-right">
@@ -168,6 +178,26 @@
 		<key type="as" name="untile-window">
 			<default><![CDATA[['']]]></default>
 			<summary>Untile the focused window</summary>
+		</key>
+		<key type="as" name="move-window-center">
+			<default><![CDATA[['']]]></default>
+			<summary>Move the focused window to the center of the screen</summary>
+		</key>
+		<key type="as" name="focus-window-right">
+			<default><![CDATA[['']]]></default>
+			<summary>Focus the window to the right the current focused window</summary>
+		</key>
+		<key type="as" name="focus-window-left">
+			<default><![CDATA[['']]]></default>
+			<summary>Focus the window to the left of the current focused window</summary>
+		</key>
+		<key type="as" name="focus-window-up">
+			<default><![CDATA[['']]]></default>
+			<summary>Focus the window above the current focused window</summary>
+		</key>
+		<key type="as" name="focus-window-down">
+			<default><![CDATA[['']]]></default>
+			<summary>Focus the window below the current focused window</summary>
 		</key>
     </schema>
 

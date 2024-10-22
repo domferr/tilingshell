@@ -3,17 +3,29 @@ import Layout from '../components/layout/Layout';
 import Settings from '../settings/settings';
 import SignalHandling from './signalHandling';
 import GObject from 'gi://GObject';
+import Gio from 'gi://Gio';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 @registerGObjectClass
 export default class GlobalState extends GObject.Object {
     static metaInfo: GObject.MetaInfo<unknown, unknown, unknown> = {
+        GTypeName: 'GlobalState',
         Signals: {
             'layouts-changed': {
                 param_types: [],
             },
         },
-        GTypeName: 'GlobalState',
+        Properties: {
+            tilePreviewAnimationTime: GObject.ParamSpec.uint(
+                'tilePreviewAnimationTime',
+                'tilePreviewAnimationTime',
+                'Animation time of tile previews in milliseconds',
+                GObject.ParamFlags.READWRITE,
+                0,
+                2000,
+                100,
+            ),
+        },
     };
 
     public static SIGNAL_LAYOUTS_CHANGED = 'layouts-changed';
@@ -22,6 +34,7 @@ export default class GlobalState extends GObject.Object {
 
     private _signals: SignalHandling;
     private _layouts: Layout[];
+    private _tilePreviewAnimationTime: number;
 
     static get(): GlobalState {
         if (!this._instance) this._instance = new GlobalState();
@@ -42,6 +55,13 @@ export default class GlobalState extends GObject.Object {
 
         this._signals = new SignalHandling();
         this._layouts = Settings.get_layouts_json();
+        this._tilePreviewAnimationTime = 100;
+        Settings.bind(
+            Settings.SETTING_TILE_PREVIEW_ANIMATION_TIME,
+            this,
+            'tilePreviewAnimationTime',
+            Gio.SettingsBindFlags.GET,
+        );
         this._signals.connect(Settings, Settings.SETTING_LAYOUTS_JSON, () => {
             this._layouts = Settings.get_layouts_json();
             this.emit(GlobalState.SIGNAL_LAYOUTS_CHANGED);
@@ -107,5 +127,13 @@ export default class GlobalState extends GObject.Object {
                 (lay) => lay.id === selectedLayouts[monitorIndex],
             ) || this._layouts[0]
         );
+    }
+
+    public get tilePreviewAnimationTime(): number {
+        return this._tilePreviewAnimationTime;
+    }
+
+    public set tilePreviewAnimationTime(value: number) {
+        this._tilePreviewAnimationTime = value;
     }
 }

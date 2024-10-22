@@ -29,6 +29,7 @@ Mtk.Rectangle.$gtype = imports.gi.Meta.Rectangle.$gtype;
 
 const extensionFooter = `
 function init(meta) {
+    imports.misc.extensionUtils.initTranslations();
     return new TilingShellExtension(meta);
 }
 `;
@@ -47,7 +48,7 @@ class ExtensionPreferences {
 
 const prefsFooter = `
 function init() {
-
+    imports.misc.extensionUtils.initTranslations();
 }
 
 function fillPreferencesWindow(window) {
@@ -72,6 +73,9 @@ function convertImports(text) {
 
     // drop import of ExtensionPreferences class
     text = text.replaceAll('import { ExtensionPreferences } from "resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js";', "");
+
+    // replace import of all translation stuff made in translation.ts
+    text = text.replaceAll('import { gettext as _, ngettext, pgettext } from "resource:///org/gnome/shell/extensions/extension.js";', "const { gettext: _, ngettext, pgettext } = imports.misc.extensionUtils;");
 
     const regexExportExtension = new RegExp(`export {((.|\n)*)(.+) as default((.|\n)*)};`, 'gm');
     text = text.replaceAll(regexExportExtension, "");
