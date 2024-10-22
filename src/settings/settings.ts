@@ -89,16 +89,16 @@ export default class Settings {
     }
 
     static get_tiling_system_enabled(): boolean {
-        return this._settings?.get_boolean(this.SETTING_TILING_SYSTEM) ?? false;
+        return this._settings?.get_boolean(this.SETTING_TILING_SYSTEM) ?? true;
     }
 
     static get_snap_assist_enabled(): boolean {
-        return this._settings?.get_boolean(this.SETTING_SNAP_ASSIST) ?? false;
+        return this._settings?.get_boolean(this.SETTING_SNAP_ASSIST) ?? true;
     }
 
     static get_show_indicator(): boolean {
         if (!this._settings) return true;
-        return this._settings.get_boolean(this.SETTING_SHOW_INDICATOR);
+        return this._settings.get_boolean(this.SETTING_SHOW_INDICATOR) ?? true;
     }
 
     static get_inner_gaps(scaleFactor: number = 1): {
@@ -140,7 +140,7 @@ export default class Settings {
     static get_span_multiple_tiles(): boolean {
         return (
             this._settings?.get_boolean(this.SETTING_SPAN_MULTIPLE_TILES) ??
-            false
+            true
         );
     }
 
@@ -170,7 +170,7 @@ export default class Settings {
         return (
             this._settings?.get_boolean(
                 Settings.SETTING_RESTORE_WINDOW_ORIGINAL_SIZE,
-            ) ?? false
+            ) ?? true
         );
     }
 
@@ -178,7 +178,7 @@ export default class Settings {
         return (
             this._settings?.get_boolean(
                 Settings.SETTING_RESIZE_COMPLEMENTING_WINDOWS,
-            ) ?? false
+            ) ?? true
         );
     }
 
@@ -217,7 +217,7 @@ export default class Settings {
     static get_enable_move_keybindings(): boolean {
         return (
             this._settings?.get_boolean(this.SETTING_ENABLE_MOVE_KEYBINDINGS) ??
-            false
+            true
         );
     }
 
@@ -230,7 +230,7 @@ export default class Settings {
     static get_active_screen_edges(): boolean {
         return (
             this._settings?.get_boolean(this.SETTING_ACTIVE_SCREEN_EDGES) ??
-            false
+            true
         );
     }
 
