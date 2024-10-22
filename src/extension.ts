@@ -1,7 +1,7 @@
 import './styles/stylesheet.scss';
 
 import { logger } from '@/utils/shell';
-import { getMonitors } from '@/utils/ui';
+import { getMonitors, squaredEuclideanDistance } from '@/utils/ui';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { TilingManager } from '@/components/tilingsystem/tilingManager';
 import Gio from 'gi://Gio';
@@ -456,10 +456,10 @@ export default class TilingShellExtension extends Extension {
         let bestWindowDistance = -1;
 
         const focusWindowRect = focus_window.get_frame_rect();
-        const focusWindowCenterX =
-            focusWindowRect.x + focusWindowRect.width / 2;
-        const focusWindowCenterY =
-            focusWindowRect.y + focusWindowRect.height / 2;
+        const focusWindowCenter = {
+            x: focusWindowRect.x + focusWindowRect.width / 2,
+            y: focusWindowRect.y + focusWindowRect.height / 2,
+        };
         focus_window
             .get_workspace()
             .list_windows()
@@ -486,14 +486,15 @@ export default class TilingShellExtension extends Extension {
             })
             .forEach((win) => {
                 const winRect = win.get_frame_rect();
-                const winCenterX = winRect.x + winRect.width / 2;
-                const winCenterY = winRect.y + winRect.height / 2;
+                const winCenter = {
+                    x: winRect.x + winRect.width / 2,
+                    y: winRect.y + winRect.height / 2,
+                };
 
-                const euclideanDistance =
-                    (winCenterX - focusWindowCenterX) *
-                        (winCenterX - focusWindowCenterX) +
-                    (winCenterY - focusWindowCenterY) *
-                        (winCenterY - focusWindowCenterY);
+                const euclideanDistance = squaredEuclideanDistance(
+                    winCenter,
+                    focusWindowCenter,
+                );
 
                 if (
                     !bestWindow ||

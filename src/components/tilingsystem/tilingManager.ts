@@ -9,6 +9,7 @@ import {
     getMonitorScalingFactor,
     getScalingFactorOf,
     isPointInsideRect,
+    squaredEuclideanDistance,
 } from '@/utils/ui';
 import TilingLayout from '@/components/tilingsystem/tilingLayout';
 import Clutter from 'gi://Clutter';
@@ -26,6 +27,8 @@ import ExtendedWindow from './extendedWindow';
 import EdgeTilingManager from './edgeTilingManager';
 import TouchPointer from './touchPointer';
 
+const MINIMUM_DISTANCE_TO_RESTORE_ORIGINAL_SIZE = 130;
+
 export class TilingManager {
     private readonly _monitor: Monitor;
 
@@ -40,6 +43,7 @@ export class TilingManager {
     private _isGrabbingWindow: boolean;
     private _movingWindowTimerDuration: number = 15;
     private _lastCursorPos: { x: number; y: number } | null = null;
+    private _grabStartPosition: { x: number; y: number } | null = null;
     private _wasSpanMultipleTilesActivated: boolean;
     private _wasTilingSystemActivated: boolean;
     private _isSnapAssisting: boolean;
@@ -405,10 +409,18 @@ export class TilingManager {
             : global.get_pointer();
         const extWin = window as ExtendedWindow;
         extWin.assignedTile = undefined;
+        const currPointerPos = { x, y };
+        if (this._grabStartPosition === null)
+            this._grabStartPosition = { x, y };
+
         // if there is "originalSize" attached, it means the window were tiled and
         // it is the first time the window is moved. If that's the case, change
         // window's size to the size it had before it were tiled (the originalSize)
-        if (extWin.originalSize) {
+        if (
+            extWin.originalSize &&
+            squaredEuclideanDistance(currPointerPos, this._grabStartPosition) >
+                MINIMUM_DISTANCE_TO_RESTORE_ORIGINAL_SIZE
+        ) {
             if (Settings.get_restore_window_original_size()) {
                 const windowRect = window.get_frame_rect();
                 const offsetX = (x - windowRect.x) / windowRect.width;
@@ -453,9 +465,8 @@ export class TilingManager {
                 }
             }
             extWin.originalSize = undefined;
+            this._grabStartPosition = null;
         }
-
-        const currPointerPos = { x, y };
 
         const isSpanMultiTilesActivated = this._activationKeyStatus(
             modifier,
@@ -582,6 +593,7 @@ export class TilingManager {
 
     private _onWindowGrabEnd(window: Meta.Window) {
         this._isGrabbingWindow = false;
+        this._grabStartPosition = null;
 
         this._signals.disconnect(window);
         TouchPointer.get().reset();

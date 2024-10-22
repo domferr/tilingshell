@@ -8,7 +8,11 @@ import TilePreview, {
 import LayoutWidget from '../layout/LayoutWidget';
 import Layout from '../layout/Layout';
 import Tile from '../layout/Tile';
-import { buildRectangle, buildTileGaps } from '@utils/ui';
+import {
+    buildRectangle,
+    buildTileGaps,
+    squaredEuclideanDistance,
+} from '@utils/ui';
 import TileUtils from '@components/layout/TileUtils';
 import { logger } from '@utils/shell';
 import GlobalState from '@utils/globalState';
@@ -371,20 +375,23 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
         let previewFound: DynamicTilePreview | undefined;
         let bestDistance = -1;
 
-        const sourceCenterX = source.x + source.width / 2;
-        const sourceCenterY = source.y + source.height / 2;
+        const sourceCenter = {
+            x: source.x + source.width / 2,
+            y: source.x + source.height / 2,
+        };
 
         for (let i = 0; i < this._previews.length; i++) {
             const preview = this._previews[i];
 
-            const previewCenterX = preview.innerX + preview.innerWidth / 2;
-            const previewCenterY = preview.innerY + preview.innerHeight / 2;
+            const previewCenter = {
+                x: preview.innerX + preview.innerWidth / 2,
+                y: preview.innerY + preview.innerHeight / 2,
+            };
 
-            const euclideanDistance =
-                (previewCenterX - sourceCenterX) *
-                    (previewCenterX - sourceCenterX) +
-                (previewCenterY - sourceCenterY) *
-                    (previewCenterY - sourceCenterY);
+            const euclideanDistance = squaredEuclideanDistance(
+                previewCenter,
+                sourceCenter,
+            );
 
             if (!previewFound || euclideanDistance < bestDistance) {
                 previewFound = preview;
@@ -409,8 +416,10 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
         source: Mtk.Rectangle,
         direction: Meta.DisplayDirection,
     ): { rect: Mtk.Rectangle; tile: Tile } | undefined {
-        const sourceCenterX = source.x + source.width / 2;
-        const sourceCenterY = source.y + source.height / 2;
+        const sourceCenter = {
+            x: source.x + source.width / 2,
+            y: source.x + source.height / 2,
+        };
 
         const filtered = this._previews.filter((preview) => {
             switch (direction) {
@@ -432,14 +441,15 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
         for (let i = 0; i < filtered.length; i++) {
             const preview = filtered[i];
 
-            const previewCenterX = preview.innerX + preview.innerWidth / 2;
-            const previewCenterY = preview.innerY + preview.innerHeight / 2;
+            const previewCenter = {
+                x: preview.innerX + preview.innerWidth / 2,
+                y: preview.innerY + preview.innerHeight / 2,
+            };
 
-            const euclideanDistance =
-                (previewCenterX - sourceCenterX) *
-                    (previewCenterX - sourceCenterX) +
-                (previewCenterY - sourceCenterY) *
-                    (previewCenterY - sourceCenterY);
+            const euclideanDistance = squaredEuclideanDistance(
+                previewCenter,
+                sourceCenter,
+            );
 
             if (!previewFound || euclideanDistance < bestDistance) {
                 previewFound = preview;

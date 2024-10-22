@@ -183,3 +183,13 @@ export function getWindows(): Meta.Window[] {
             (w, i, a) => w !== null && !w.skipTaskbar && a.indexOf(w) === i,
         );
 }
+
+export function squaredEuclideanDistance(
+    pointA: { x: number; y: number },
+    pointB: { x: number; y: number },
+) {
+    return (
+        (pointA.x - pointB.x) * (pointA.x - pointB.x) +
+        (pointA.y - pointB.y) * (pointA.y - pointB.y)
+    );
+}
