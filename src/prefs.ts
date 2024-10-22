@@ -139,6 +139,30 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             ),
         );
 
+        const animationsRow = new Adw.ExpanderRow({
+            title: 'Animations',
+            subtitle: 'Customize animations',
+        });
+        appearenceGroup.add(animationsRow);
+        animationsRow.add_row(
+            this._buildSpinButtonRow(
+                Settings.SETTING_SNAP_ASSISTANT_ANIMATION_TIME,
+                'Snap assistant animation time',
+                'The snap assistant animation time in milliseconds',
+                0,
+                2000,
+            ),
+        );
+        animationsRow.add_row(
+            this._buildSpinButtonRow(
+                Settings.SETTING_TILE_PREVIEW_ANIMATION_TIME,
+                'Tiles animation time',
+                'The tiles animation time in milliseconds',
+                0,
+                2000,
+            ),
+        );
+
         // Behaviour section
         const behaviourGroup = new Adw.PreferencesGroup({
             title: 'Behaviour',

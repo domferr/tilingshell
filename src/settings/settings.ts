@@ -44,6 +44,9 @@ export default class Settings {
     static SETTING_WINDOW_BORDER_COLOR = 'window-border-color';
     static SETTING_WINDOW_BORDER_WIDTH = 'window-border-width';
     static SETTING_ENABLE_WINDOW_BORDER = 'enable-window-border';
+    static SETTING_SNAP_ASSISTANT_ANIMATION_TIME =
+        'snap-assistant-animation-time';
+    static SETTING_TILE_PREVIEW_ANIMATION_TIME = 'tile-preview-animation-time';
 
     static SETTING_MOVE_WINDOW_RIGHT = 'move-window-right';
     static SETTING_MOVE_WINDOW_LEFT = 'move-window-left';

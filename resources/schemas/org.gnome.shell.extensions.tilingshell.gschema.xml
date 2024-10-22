@@ -127,6 +127,16 @@
             <summary>Focused window border width</summary>
             <description>The width of the focused window's border.</description>
         </key>
+        <key name="snap-assistant-animation-time" type="u">
+            <default>180</default>
+            <summary>Snap assistant animation time (milliseconds)</summary>
+            <description>Animation time in milliseconds of the snap assistant</description>
+        </key>
+        <key name="tile-preview-animation-time" type="u">
+            <default>100</default>
+            <summary>Tile animation time (milliseconds)</summary>
+            <description>Animation time in milliseconds of the tiles</description>
+        </key>
 
         <!-- keybindings -->
 		<key type="as" name="move-window-right">

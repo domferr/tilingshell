@@ -3,7 +3,6 @@ import { registerGObjectClass } from '@/utils/gjs';
 import Mtk from 'gi://Mtk';
 import Clutter from 'gi://Clutter';
 import TilePreview, {
-    WINDOW_ANIMATION_TIME,
     TilePreviewConstructorProperties,
 } from '../tilepreview/tilePreview';
 import LayoutWidget from '../layout/LayoutWidget';
@@ -12,6 +11,7 @@ import Tile from '../layout/Tile';
 import { buildRectangle, buildTileGaps } from '@utils/ui';
 import TileUtils from '@components/layout/TileUtils';
 import { logger } from '@utils/shell';
+import GlobalState from '@utils/globalState';
 
 const debug = logger('TilingLayout');
 
@@ -91,7 +91,6 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
         this.hide();
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     protected buildTile(
         parent: Clutter.Actor,
         rect: Mtk.Rectangle,
@@ -135,7 +134,7 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
             x: this.x,
             y: this.y,
             opacity: 255,
-            duration: ease ? WINDOW_ANIMATION_TIME : 0,
+            duration: ease ? GlobalState.get().tilePreviewAnimationTime : 0,
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
         });
     }
@@ -147,7 +146,7 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
 
         this.ease({
             opacity: 0,
-            duration: ease ? WINDOW_ANIMATION_TIME : 0,
+            duration: ease ? GlobalState.get().tilePreviewAnimationTime : 0,
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
             onComplete: () => {
                 this.unhoverAllTiles();
