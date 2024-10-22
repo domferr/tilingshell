@@ -27,15 +27,13 @@ export default class SettingsExport {
 
         const proc = Gio.Subprocess.new(
             ['dconf', 'load', dconfPath],
-            Gio.SubprocessFlags.STDIN_PIPE,
+            Gio.SubprocessFlags.STDIN_PIPE |
+                Gio.SubprocessFlags.STDOUT_PIPE |
+                Gio.SubprocessFlags.STDERR_PIPE,
         );
 
-        const stdin = proc.get_stdin_pipe();
-        if (stdin) {
-            stdin.write(content, null);
-            stdin.close(null);
-            proc.wait(null);
-        }
+        proc.communicate_utf8(content, null);
+
         if (!proc.get_successful()) {
             this.restoreToDefault();
 
@@ -78,7 +76,6 @@ export default class SettingsExport {
         );
 
         const [, dump] = proc.communicate_utf8(null, null);
-        proc.wait(null);
 
         if (proc.get_successful()) return dump;
         else throw new Error('Failed to dump dconf');
