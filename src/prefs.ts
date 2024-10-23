@@ -9,7 +9,7 @@ import { logger } from './utils/shell';
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 import Layout from '@components/layout/Layout';
 import SettingsExport from '@settings/settingsExport';
-import { _ } from './translations';
+import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
 /* import Layout from "@/components/layout/Layout";
 import Cairo from "@gi-types/cairo1";*/
