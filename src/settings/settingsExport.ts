@@ -27,9 +27,7 @@ export default class SettingsExport {
 
         const proc = Gio.Subprocess.new(
             ['dconf', 'load', dconfPath],
-            Gio.SubprocessFlags.STDIN_PIPE |
-                Gio.SubprocessFlags.STDOUT_PIPE |
-                Gio.SubprocessFlags.STDERR_PIPE,
+            Gio.SubprocessFlags.STDIN_PIPE,
         );
 
         proc.communicate_utf8(content, null);
@@ -72,7 +70,7 @@ export default class SettingsExport {
     private _dumpDconf(): string {
         const proc = Gio.Subprocess.new(
             ['dconf', 'dump', dconfPath],
-            Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_PIPE,
+            Gio.SubprocessFlags.STDOUT_PIPE,
         );
 
         const [, dump] = proc.communicate_utf8(null, null);
