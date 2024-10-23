@@ -1,5 +1,6 @@
 // entry point file for all the translation related stuff. It is easier for the build system to
 // work with this file only to support GNOME shells <= 44 (e.g converting the imports)
+// Note: DO NOT import this file from prefs.ts or any preferences related file
 
 // eslint-disable-next-line prettier/prettier
 import { gettext as _, ngettext, pgettext } from 'resource:///org/gnome/shell/extensions/extension.js';
