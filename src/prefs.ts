@@ -672,11 +672,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                     title: _('Export settings to a text file'),
                     select_multiple: false,
                     action: Gtk.FileChooserAction.SAVE,
-                    transient_for: window,
-                    filter: new Gtk.FileFilter({
-                        suffixes: ['txt'],
-                        name: 'Text File',
-                    }),
+                    transientFor: window,
                 });
                 fc.set_current_folder(
                     Gio.File.new_for_path(GLib.get_home_dir()),
@@ -737,11 +733,11 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                     title: _('Select a text file to import from'),
                     select_multiple: false,
                     action: Gtk.FileChooserAction.OPEN,
-                    transient_for: window,
-                    filter: new Gtk.FileFilter({
+                    transientFor: window,
+                    /* filter: new Gtk.FileFilter({
                         suffixes: ['txt'],
                         name: 'Text File',
-                    }),
+                    }),*/
                 });
                 fc.set_current_folder(
                     Gio.File.new_for_path(GLib.get_home_dir()),
