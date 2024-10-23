@@ -23,7 +23,6 @@ export default class SettingsExport {
 
     importFromString(content: string) {
         this.restoreToDefault();
-        SettingsOverride.get().restoreAll();
 
         const proc = Gio.Subprocess.new(
             ['dconf', 'load', dconfPath],
@@ -35,32 +34,16 @@ export default class SettingsExport {
         if (!proc.get_successful()) {
             this.restoreToDefault();
 
-            // Workaround (see below)
-            Settings.set_active_screen_edges(false);
-            Settings.set_active_screen_edges(true);
-            Settings.set_enable_move_keybindings(false);
-            Settings.set_enable_move_keybindings(true);
-
             throw new Error(
                 'Failed to import dconf dump file. Restoring to default...',
             );
         }
-
-        // This is a workaround to ensure `overridden-settings` is populated after import
-        // Discussion: https://github.com/domferr/tilingshell/pull/151#discussion_r1808977733
-        if (Settings.get_enable_move_keybindings()) {
-            console.log('Workaround: enable_move_keybindings...');
-            Settings.set_enable_move_keybindings(false);
-            Settings.set_enable_move_keybindings(true);
-        }
-        if (Settings.get_active_screen_edges()) {
-            console.log('Workaround: active_screen_edges...');
-            Settings.set_active_screen_edges(false);
-            Settings.set_active_screen_edges(true);
-        }
     }
 
     restoreToDefault() {
+        Settings.set_active_screen_edges(false);
+        Settings.set_enable_move_keybindings(false);
+        SettingsOverride.get().restoreAll();
         this._gioSettings
             .list_keys()
             .filter((key) => key.length > 0 && !excludedKeys.includes(key))

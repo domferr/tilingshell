@@ -257,6 +257,7 @@ export default class TilingShellExtension extends Extension {
                     schema_id: 'org.gnome.mutter',
                 });
                 if (Settings.get_active_screen_edges()) {
+                    debug('disable native edge tiling');
                     // disable native edge tiling
                     SettingsOverride.get().override(
                         gioSettings,
@@ -265,6 +266,7 @@ export default class TilingShellExtension extends Extension {
                     );
                 } else {
                     // bring back the value of native edge tiling
+                    debug('bring back native edge tiling');
                     SettingsOverride.get().restoreKey(
                         gioSettings,
                         'edge-tiling',
@@ -574,19 +576,17 @@ export default class TilingShellExtension extends Extension {
         this._dbus?.disable();
         this._dbus = null;
 
+        this._fractionalScalingEnabled = false;
+
+        OverriddenWindowMenu.destroy();
+
+        // restore native edge tiling and all the overridden settings
+        SettingsOverride.destroy();
+
         // destroy state and settings
         GlobalState.destroy();
         Settings.destroy();
 
-        // restore native edge tiling
-        SettingsOverride.get().restoreKey(
-            new Gio.Settings({ schema_id: 'org.gnome.mutter' }),
-            'edge-tiling',
-        );
-
-        this._fractionalScalingEnabled = false;
-
-        OverriddenWindowMenu.destroy();
         debug('extension is disabled');
     }
 }
