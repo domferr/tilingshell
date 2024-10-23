@@ -74,8 +74,13 @@ function convertImports(text) {
     // drop import of ExtensionPreferences class
     text = text.replaceAll('import { ExtensionPreferences } from "resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js";', "");
 
+    // replace import of translation related code
+    //const regexTranslation = new RegExp(`import {\s*gettext as _,\s\\*ngettext,\s*pgettext,?\s}\sfrom\s.*;`, 'gm');
+    const regexTranslation = new RegExp(`import {(.*|\n.*)?gettext as _[^from]*[^;]*;`, 'gm');
+    text = text.replaceAll(regexTranslation, "const { gettext: _, ngettext, pgettext } = imports.misc.extensionUtils;");
+
     // replace import of all translation stuff made in translation.ts
-    text = text.replaceAll('import { gettext as _, ngettext, pgettext } from "resource:///org/gnome/shell/extensions/extension.js";', "const { gettext: _, ngettext, pgettext } = imports.misc.extensionUtils;");
+    //text = text.replaceAll('import { gettext as _, ngettext, pgettext } from "resource:///org/gnome/shell/extensions/extension.js";', "const { gettext: _, ngettext, pgettext } = imports.misc.extensionUtils;");
 
     const regexExportExtension = new RegExp(`export {((.|\n)*)(.+) as default((.|\n)*)};`, 'gm');
     text = text.replaceAll(regexExportExtension, "");
