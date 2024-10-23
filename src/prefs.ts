@@ -658,18 +658,18 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
 
         // Import/export/reset section
         const importExportGroup = new Adw.PreferencesGroup({
-            title: 'Import/Export/Reset',
-            description: `Import/export/reset the settings of ${this.NAME}`,
+            title: _('Import/Export/Reset'),
+            description: _('Import/export/reset the settings of Tiling Shell'),
         });
         prefsPage.add(importExportGroup);
 
         const exportSettingsBtn = this._buildButtonRow(
-            'Export settings',
-            'Export settings',
-            'Export settings to a file',
+            _('Export settings'),
+            _('Export settings'),
+            _('Export settings to a file'),
             () => {
                 const fc = new Gtk.FileChooserDialog({
-                    title: 'Export settings to a text file',
+                    title: _('Export settings to a text file'),
                     select_multiple: false,
                     action: Gtk.FileChooserAction.SAVE,
                     transient_for: window,
@@ -681,8 +681,8 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 fc.set_current_folder(
                     Gio.File.new_for_path(GLib.get_home_dir()),
                 );
-                fc.add_button('Cancel', Gtk.ResponseType.CANCEL);
-                fc.add_button('Save', Gtk.ResponseType.OK);
+                fc.add_button(_('Cancel'), Gtk.ResponseType.CANCEL);
+                fc.add_button(_('Save'), Gtk.ResponseType.OK);
                 fc.connect(
                     'response',
                     (_source: Gtk.FileChooserDialog, response_id: number) => {
@@ -729,12 +729,12 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         importExportGroup.add(exportSettingsBtn);
 
         const importSettingsBtn = this._buildButtonRow(
-            'Import settings',
-            'Import settings',
-            'Import settings from a file',
+            _('Import settings'),
+            _('Import settings'),
+            _('Import settings from a file'),
             () => {
                 const fc = new Gtk.FileChooserDialog({
-                    title: 'Select a text file to import from',
+                    title: _('Select a text file to import from'),
                     select_multiple: false,
                     action: Gtk.FileChooserAction.OPEN,
                     transient_for: window,
@@ -746,8 +746,8 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 fc.set_current_folder(
                     Gio.File.new_for_path(GLib.get_home_dir()),
                 );
-                fc.add_button('Cancel', Gtk.ResponseType.CANCEL);
-                fc.add_button('Open', Gtk.ResponseType.OK);
+                fc.add_button(_('Cancel'), Gtk.ResponseType.CANCEL);
+                fc.add_button(_('Open'), Gtk.ResponseType.OK);
                 fc.connect(
                     'response',
                     (_source: Gtk.FileChooserDialog, response_id: number) => {
@@ -787,9 +787,9 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         importExportGroup.add(importSettingsBtn);
 
         const resetSettingsBtn = this._buildButtonRow(
-            'Reset settings',
-            'Reset settings',
-            'Bring back the default settings',
+            _('Reset settings'),
+            _('Reset settings'),
+            _('Bring back the default settings'),
             () => new SettingsExport(this.getSettings()).restoreToDefault(),
             'destructive-action',
         );
