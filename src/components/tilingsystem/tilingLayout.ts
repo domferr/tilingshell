@@ -2,6 +2,7 @@ import Meta from 'gi://Meta';
 import { registerGObjectClass } from '@/utils/gjs';
 import Mtk from 'gi://Mtk';
 import Clutter from 'gi://Clutter';
+import St from 'gi://St';
 import TilePreview, {
     TilePreviewConstructorProperties,
 } from '../tilepreview/tilePreview';
@@ -11,11 +12,13 @@ import Tile from '../layout/Tile';
 import {
     buildRectangle,
     buildTileGaps,
+    isPointInsideRect,
     squaredEuclideanDistance,
 } from '@utils/ui';
 import TileUtils from '@components/layout/TileUtils';
 import { logger } from '@utils/shell';
 import GlobalState from '@utils/globalState';
+import { KeyBindingsDirection } from '@keybindings';
 
 const debug = logger('TilingLayout');
 
@@ -372,102 +375,104 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
     public findNearestTile(
         source: Mtk.Rectangle,
     ): { rect: Mtk.Rectangle; tile: Tile } | undefined {
-        let previewFound: DynamicTilePreview | undefined;
-        let bestDistance = -1;
-
-        const sourceCenter = {
+        const sourceCoords = {
             x: source.x + source.width / 2,
-            y: source.x + source.height / 2,
+            y: source.y + source.height / 2,
         };
 
+        // uncomment to show debugging
+        /* global.windowGroup
+            .get_children()
+            .filter((c) => c.get_name() === 'debug-kb')[0]
+            ?.destroy();
+        const debugWidget = new St.Widget({
+            x: sourceCoords.x - 8,
+            y: sourceCoords.y - 8,
+            height: 16,
+            width: 16,
+            style: 'border: 2px solid red; border-radius: 8px;',
+            name: 'debug-kb',
+        });
+        global.windowGroup.add_child(debugWidget);*/
+
         for (let i = 0; i < this._previews.length; i++) {
-            const preview = this._previews[i];
-
-            const previewCenter = {
-                x: preview.innerX + preview.innerWidth / 2,
-                y: preview.innerY + preview.innerHeight / 2,
-            };
-
-            const euclideanDistance = squaredEuclideanDistance(
-                previewCenter,
-                sourceCenter,
-            );
-
-            if (!previewFound || euclideanDistance < bestDistance) {
-                previewFound = preview;
-                bestDistance = euclideanDistance;
+            const previewFound = this._previews[i];
+            if (isPointInsideRect(sourceCoords, previewFound.rect)) {
+                return {
+                    rect: buildRectangle({
+                        x: previewFound.innerX,
+                        y: previewFound.innerY,
+                        width: previewFound.innerWidth,
+                        height: previewFound.innerHeight,
+                    }),
+                    tile: previewFound.tile,
+                };
             }
         }
 
-        if (!previewFound) return undefined;
-
-        return {
-            rect: buildRectangle({
-                x: previewFound.innerX,
-                y: previewFound.innerY,
-                width: previewFound.innerWidth,
-                height: previewFound.innerHeight,
-            }),
-            tile: previewFound.tile,
-        };
+        return undefined;
     }
 
     public findNearestTileDirection(
         source: Mtk.Rectangle,
-        direction: Meta.DisplayDirection,
+        direction: KeyBindingsDirection,
     ): { rect: Mtk.Rectangle; tile: Tile } | undefined {
-        const sourceCenter = {
+        if (direction === KeyBindingsDirection.CENTER) return undefined;
+
+        const sourceCoords = {
             x: source.x + source.width / 2,
-            y: source.x + source.height / 2,
+            y: source.y + source.height / 2,
         };
 
-        const filtered = this._previews.filter((preview) => {
-            switch (direction) {
-                case Meta.DisplayDirection.RIGHT:
-                    return preview.x >= source.x + source.width;
-                case Meta.DisplayDirection.LEFT:
-                    return preview.x + preview.width <= source.x;
-                case Meta.DisplayDirection.DOWN:
-                    return preview.y >= source.y + source.height;
-                case Meta.DisplayDirection.UP:
-                    return preview.y + preview.height <= source.y;
-                default:
-                    return false;
-            }
+        // enlarge the side of the direction and search a tile that contains that point
+        const enlarge = 64;
+
+        switch (direction) {
+            case KeyBindingsDirection.RIGHT:
+                sourceCoords.x = source.x + source.width + enlarge;
+                break;
+            case KeyBindingsDirection.LEFT:
+                sourceCoords.x = source.x - enlarge;
+                break;
+            case KeyBindingsDirection.DOWN:
+                sourceCoords.y = source.y + source.height + enlarge;
+                break;
+            case KeyBindingsDirection.UP:
+                sourceCoords.y = source.y - enlarge;
+                break;
+        }
+
+        // uncomment to show debugging
+        /* global.windowGroup
+            .get_children()
+            .filter((c) => c.get_name() === 'debug-kb')[0]
+            ?.destroy();
+        const debugWidget = new St.Widget({
+            x: sourceCoords.x - 8,
+            y: sourceCoords.y - 8,
+            height: 16,
+            width: 16,
+            style: 'border: 2px solid red; border-radius: 8px;',
+            name: 'debug-kb',
         });
+        global.windowGroup.add_child(debugWidget);*/
 
-        let previewFound: DynamicTilePreview | undefined;
-        let bestDistance = -1;
-        for (let i = 0; i < filtered.length; i++) {
-            const preview = filtered[i];
-
-            const previewCenter = {
-                x: preview.innerX + preview.innerWidth / 2,
-                y: preview.innerY + preview.innerHeight / 2,
-            };
-
-            const euclideanDistance = squaredEuclideanDistance(
-                previewCenter,
-                sourceCenter,
-            );
-
-            if (!previewFound || euclideanDistance < bestDistance) {
-                previewFound = preview;
-                bestDistance = euclideanDistance;
+        for (let i = 0; i < this._previews.length; i++) {
+            const previewFound = this._previews[i];
+            if (isPointInsideRect(sourceCoords, previewFound.rect)) {
+                return {
+                    rect: buildRectangle({
+                        x: previewFound.innerX,
+                        y: previewFound.innerY,
+                        width: previewFound.innerWidth,
+                        height: previewFound.innerHeight,
+                    }),
+                    tile: previewFound.tile,
+                };
             }
         }
 
-        if (!previewFound) return undefined;
-
-        return {
-            rect: buildRectangle({
-                x: previewFound.innerX,
-                y: previewFound.innerY,
-                width: previewFound.innerWidth,
-                height: previewFound.innerHeight,
-            }),
-            tile: previewFound.tile,
-        };
+        return undefined;
     }
 
     public getRightmostTile(): { rect: Mtk.Rectangle; tile: Tile } {

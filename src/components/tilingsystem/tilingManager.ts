@@ -26,6 +26,7 @@ import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
 import ExtendedWindow from './extendedWindow';
 import EdgeTilingManager from './edgeTilingManager';
 import TouchPointer from './touchPointer';
+import { KeyBindingsDirection } from '@keybindings';
 
 const MINIMUM_DISTANCE_TO_RESTORE_ORIGINAL_SIZE = 90;
 
@@ -190,27 +191,27 @@ export class TilingManager {
 
     public onKeyboardMoveWindow(
         window: Meta.Window,
-        direction: Meta.DisplayDirection | undefined, // direction is undefined -> move to the center of the screen
+        direction: KeyBindingsDirection,
         force: boolean,
         spanFlag: boolean,
     ): boolean {
         let destination: { rect: Mtk.Rectangle; tile: Tile } | undefined;
-        if (window.get_maximized()) {
-            if (spanFlag) return false;
+        if (spanFlag && window.get_maximized()) return false;
 
+        if (window.get_maximized()) {
             switch (direction) {
-                case undefined:
+                case KeyBindingsDirection.CENTER:
                     window.unmaximize(Meta.MaximizeFlags.BOTH);
                     break;
-                case Meta.DisplayDirection.DOWN:
+                case KeyBindingsDirection.DOWN:
                     window.unmaximize(Meta.MaximizeFlags.BOTH);
                     return true;
-                case Meta.DisplayDirection.UP:
+                case KeyBindingsDirection.UP:
                     return false;
-                case Meta.DisplayDirection.LEFT:
+                case KeyBindingsDirection.LEFT:
                     destination = this._tilingLayout.getLeftmostTile();
                     break;
-                case Meta.DisplayDirection.RIGHT:
+                case KeyBindingsDirection.RIGHT:
                     destination = this._tilingLayout.getRightmostTile();
                     break;
             }
@@ -220,7 +221,7 @@ export class TilingManager {
         const windowRectCopy = window.get_frame_rect().copy();
         if (!destination) {
             // if the window is not tiled, find the nearest tile in any direction
-            if (!direction) {
+            if (direction === KeyBindingsDirection.CENTER) {
                 // direction is undefined -> move to the center of the screen
                 const rect = buildRectangle({
                     x:
@@ -255,7 +256,7 @@ export class TilingManager {
 
             // handle maximize of window
             if (
-                direction === Meta.DisplayDirection.UP &&
+                direction === KeyBindingsDirection.UP &&
                 window.can_maximize()
             ) {
                 window.maximize(Meta.MaximizeFlags.BOTH);
@@ -275,14 +276,14 @@ export class TilingManager {
             );
         }
 
+        if (window.get_maximized()) window.unmaximize(Meta.MaximizeFlags.BOTH);
+
+        this._easeWindowRect(window, destination.rect, false, force);
+
         // ensure the assigned tile is a COPY
         (window as ExtendedWindow).assignedTile = new Tile({
             ...destination.tile,
         });
-
-        if (window.get_maximized()) window.unmaximize(Meta.MaximizeFlags.BOTH);
-
-        this._easeWindowRect(window, destination.rect, false, force);
         return true;
     }
 
