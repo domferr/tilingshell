@@ -16,6 +16,7 @@ import {
 import TileUtils from '@components/layout/TileUtils';
 import { logger } from '@utils/shell';
 import GlobalState from '@utils/globalState';
+import { KeyBindingsDirection } from '@keybindings';
 
 const debug = logger('TilingLayout');
 
@@ -414,8 +415,10 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
 
     public findNearestTileDirection(
         source: Mtk.Rectangle,
-        direction: Meta.DisplayDirection,
+        direction: KeyBindingsDirection,
     ): { rect: Mtk.Rectangle; tile: Tile } | undefined {
+        if (direction === KeyBindingsDirection.CENTER) return undefined;
+
         const sourceCenter = {
             x: source.x + source.width / 2,
             y: source.x + source.height / 2,
@@ -423,13 +426,13 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
 
         const filtered = this._previews.filter((preview) => {
             switch (direction) {
-                case Meta.DisplayDirection.RIGHT:
+                case KeyBindingsDirection.RIGHT:
                     return preview.x >= source.x + source.width;
-                case Meta.DisplayDirection.LEFT:
+                case KeyBindingsDirection.LEFT:
                     return preview.x + preview.width <= source.x;
-                case Meta.DisplayDirection.DOWN:
+                case KeyBindingsDirection.DOWN:
                     return preview.y >= source.y + source.height;
-                case Meta.DisplayDirection.UP:
+                case KeyBindingsDirection.UP:
                     return preview.y + preview.height <= source.y;
                 default:
                     return false;

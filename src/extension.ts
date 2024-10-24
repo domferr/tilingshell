@@ -14,7 +14,7 @@ import Indicator from './indicator/indicator';
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import { ExtensionMetadata } from 'resource:///org/gnome/shell/extensions/extension.js';
 import DBus from './dbus';
-import KeyBindings from './keybindings';
+import KeyBindings, { KeyBindingsDirection } from './keybindings';
 import SettingsOverride from '@settings/settingsOverride';
 import { ResizingManager } from '@components/tilingsystem/resizeManager';
 import OverriddenWindowMenu from '@components/window_menu/overriddenWindowMenu';
@@ -196,7 +196,7 @@ export default class TilingShellExtension extends Extension {
                 (
                     kb: KeyBindings,
                     dp: Meta.Display,
-                    dir: Meta.DisplayDirection,
+                    dir: KeyBindingsDirection,
                 ) => {
                     this._onKeyboardMoveWin(dp, dir, false);
                 },
@@ -207,7 +207,7 @@ export default class TilingShellExtension extends Extension {
                 (
                     kb: KeyBindings,
                     dp: Meta.Display,
-                    dir: Meta.DisplayDirection,
+                    dir: KeyBindingsDirection,
                 ) => {
                     this._onKeyboardMoveWin(dp, dir, true);
                 },
@@ -231,7 +231,11 @@ export default class TilingShellExtension extends Extension {
                 this._keybindings,
                 'move-window-center',
                 (kb: KeyBindings, dp: Meta.Display) => {
-                    this._onKeyboardMoveWin(dp, undefined, false);
+                    this._onKeyboardMoveWin(
+                        dp,
+                        KeyBindingsDirection.CENTER,
+                        false,
+                    );
                 },
             );
             this._signals.connect(
@@ -240,7 +244,7 @@ export default class TilingShellExtension extends Extension {
                 (
                     kb: KeyBindings,
                     dp: Meta.Display,
-                    dir: Meta.DisplayDirection,
+                    dir: KeyBindingsDirection,
                 ) => {
                     this._onKeyboardFocusWin(dp, dir);
                 },
@@ -378,7 +382,7 @@ export default class TilingShellExtension extends Extension {
 
     private _onKeyboardMoveWin(
         display: Meta.Display,
-        direction: Meta.DisplayDirection | undefined, // undefined means move window to the center
+        direction: KeyBindingsDirection,
         spanFlag: boolean,
     ) {
         const focus_window = display.get_focus_window();
@@ -396,7 +400,7 @@ export default class TilingShellExtension extends Extension {
         // handle unmaximize of maximized window
         if (
             focus_window.get_maximized() &&
-            direction === Meta.DisplayDirection.DOWN
+            direction === KeyBindingsDirection.DOWN
         ) {
             focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
             return;
@@ -412,17 +416,30 @@ export default class TilingShellExtension extends Extension {
             false,
             spanFlag,
         );
-        if (success || !direction) return;
+        if (success || direction === KeyBindingsDirection.CENTER) return;
+
+        let displayDirection = Meta.DisplayDirection.DOWN;
+        switch (direction) {
+            case KeyBindingsDirection.LEFT:
+                displayDirection = Meta.DisplayDirection.LEFT;
+                break;
+            case KeyBindingsDirection.RIGHT:
+                displayDirection = Meta.DisplayDirection.RIGHT;
+                break;
+            case KeyBindingsDirection.UP:
+                displayDirection = Meta.DisplayDirection.UP;
+                break;
+        }
 
         const neighborMonitorIndex = display.get_monitor_neighbor_index(
             focus_window.get_monitor(),
-            direction,
+            displayDirection,
         );
 
         // if the window is maximized, direction is UP and there is a monitor above, minimize the window
         if (
             focus_window.get_maximized() &&
-            direction === Meta.DisplayDirection.UP
+            direction === KeyBindingsDirection.UP
         ) {
             // @ts-expect-error "Main.wm has skipNextEffect function"
             Main.wm.skipNextEffect(focus_window.get_compositor_private());
@@ -443,7 +460,7 @@ export default class TilingShellExtension extends Extension {
 
     private _onKeyboardFocusWin(
         display: Meta.Display,
-        direction: Meta.DisplayDirection,
+        direction: KeyBindingsDirection,
     ) {
         const focus_window = display.get_focus_window();
         if (
@@ -475,13 +492,13 @@ export default class TilingShellExtension extends Extension {
 
                 const winRect = win.get_frame_rect();
                 switch (direction) {
-                    case Meta.DisplayDirection.RIGHT:
+                    case KeyBindingsDirection.RIGHT:
                         return winRect.x > focusWindowRect.x;
-                    case Meta.DisplayDirection.LEFT:
+                    case KeyBindingsDirection.LEFT:
                         return winRect.x < focusWindowRect.x;
-                    case Meta.DisplayDirection.UP:
+                    case KeyBindingsDirection.UP:
                         return winRect.y < focusWindowRect.y;
-                    case Meta.DisplayDirection.DOWN:
+                    case KeyBindingsDirection.DOWN:
                         return winRect.y > focusWindowRect.y;
                 }
                 return false;

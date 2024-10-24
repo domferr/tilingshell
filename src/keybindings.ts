@@ -12,6 +12,14 @@ import { logger } from '@utils/shell';
 
 const debug = logger('KeyBindings');
 
+export enum KeyBindingsDirection {
+    CENTER = 1,
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
+}
+
 @registerGObjectClass
 export default class KeyBindings extends GObject.Object {
     static metaInfo: GObject.MetaInfo<unknown, unknown, unknown> = {
@@ -72,7 +80,7 @@ export default class KeyBindings extends GObject.Object {
             Meta.KeyBindingFlags.NONE,
             Shell.ActionMode.NORMAL,
             (display: Meta.Display) => {
-                this.emit('span-window', display, Meta.DisplayDirection.RIGHT);
+                this.emit('span-window', display, KeyBindingsDirection.RIGHT);
             },
         );
 
@@ -82,7 +90,7 @@ export default class KeyBindings extends GObject.Object {
             Meta.KeyBindingFlags.NONE,
             Shell.ActionMode.NORMAL,
             (display: Meta.Display) => {
-                this.emit('span-window', display, Meta.DisplayDirection.LEFT);
+                this.emit('span-window', display, KeyBindingsDirection.LEFT);
             },
         );
 
@@ -92,7 +100,7 @@ export default class KeyBindings extends GObject.Object {
             Meta.KeyBindingFlags.NONE,
             Shell.ActionMode.NORMAL,
             (display: Meta.Display) => {
-                this.emit('span-window', display, Meta.DisplayDirection.UP);
+                this.emit('span-window', display, KeyBindingsDirection.UP);
             },
         );
 
@@ -102,7 +110,7 @@ export default class KeyBindings extends GObject.Object {
             Meta.KeyBindingFlags.NONE,
             Shell.ActionMode.NORMAL,
             (display: Meta.Display) => {
-                this.emit('span-window', display, Meta.DisplayDirection.DOWN);
+                this.emit('span-window', display, KeyBindingsDirection.DOWN);
             },
         );
 
@@ -140,7 +148,7 @@ export default class KeyBindings extends GObject.Object {
             Meta.KeyBindingFlags.NONE,
             Shell.ActionMode.NORMAL,
             (display: Meta.Display) => {
-                this.emit('focus-window', display, Meta.DisplayDirection.RIGHT);
+                this.emit('focus-window', display, KeyBindingsDirection.RIGHT);
             },
         );
 
@@ -150,7 +158,7 @@ export default class KeyBindings extends GObject.Object {
             Meta.KeyBindingFlags.NONE,
             Shell.ActionMode.NORMAL,
             (display: Meta.Display) => {
-                this.emit('focus-window', display, Meta.DisplayDirection.LEFT);
+                this.emit('focus-window', display, KeyBindingsDirection.LEFT);
             },
         );
 
@@ -160,7 +168,7 @@ export default class KeyBindings extends GObject.Object {
             Meta.KeyBindingFlags.NONE,
             Shell.ActionMode.NORMAL,
             (display: Meta.Display) => {
-                this.emit('focus-window', display, Meta.DisplayDirection.UP);
+                this.emit('focus-window', display, KeyBindingsDirection.UP);
             },
         );
 
@@ -170,7 +178,7 @@ export default class KeyBindings extends GObject.Object {
             Meta.KeyBindingFlags.NONE,
             Shell.ActionMode.NORMAL,
             (display: Meta.Display) => {
-                this.emit('focus-window', display, Meta.DisplayDirection.DOWN);
+                this.emit('focus-window', display, KeyBindingsDirection.DOWN);
             },
         );
     }
@@ -183,7 +191,7 @@ export default class KeyBindings extends GObject.Object {
         this._overrideKeyBinding(
             Settings.SETTING_MOVE_WINDOW_RIGHT,
             (display: Meta.Display) => {
-                this.emit('move-window', display, Meta.DisplayDirection.RIGHT);
+                this.emit('move-window', display, KeyBindingsDirection.RIGHT);
             },
             extensionSettings,
             mutterKeybindings,
@@ -192,7 +200,7 @@ export default class KeyBindings extends GObject.Object {
         this._overrideKeyBinding(
             Settings.SETTING_MOVE_WINDOW_LEFT,
             (display: Meta.Display) => {
-                this.emit('move-window', display, Meta.DisplayDirection.LEFT);
+                this.emit('move-window', display, KeyBindingsDirection.LEFT);
             },
             extensionSettings,
             mutterKeybindings,
@@ -206,7 +214,7 @@ export default class KeyBindings extends GObject.Object {
         this._overrideKeyBinding(
             Settings.SETTING_MOVE_WINDOW_UP,
             (display: Meta.Display) => {
-                this.emit('move-window', display, Meta.DisplayDirection.UP);
+                this.emit('move-window', display, KeyBindingsDirection.UP);
             },
             extensionSettings,
             desktopWm,
@@ -215,7 +223,7 @@ export default class KeyBindings extends GObject.Object {
         this._overrideKeyBinding(
             Settings.SETTING_MOVE_WINDOW_DOWN,
             (display: Meta.Display) => {
-                this.emit('move-window', display, Meta.DisplayDirection.DOWN);
+                this.emit('move-window', display, KeyBindingsDirection.DOWN);
             },
             extensionSettings,
             desktopWm,
