@@ -432,32 +432,26 @@ msgid "Import, export and reset"
 msgstr "Importa, esporta e resetta"
 
 #: dist/prefs.js:1176
-#, fuzzy
 msgid "Import, export and reset the settings of Tiling Shell"
 msgstr "Importa, esporta e resetta le impostazioni di Tiling Shell"
 
 #: dist/prefs.js:1181 dist/prefs.js:1182
-#, fuzzy
 msgid "Export settings"
 msgstr "Esporta le impostazioni"
 
 #: dist/prefs.js:1183
-#, fuzzy
 msgid "Export settings to a file"
 msgstr "Esporta le impostazioni in un file"
 
 #: dist/prefs.js:1186
-#, fuzzy
 msgid "Export settings to a text file"
 msgstr "Esporta le impostazioni in un file di testo"
 
 #: dist/prefs.js:1238 dist/prefs.js:1239
-#, fuzzy
 msgid "Import settings"
 msgstr "Importa le impostazioni"
 
 #: dist/prefs.js:1240
-#, fuzzy
 msgid "Import settings from a file"
 msgstr "Importa le impostazioni da un file"
 
