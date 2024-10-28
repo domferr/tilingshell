@@ -1,6 +1,5 @@
 import Tile from '@components/layout/Tile';
-import Meta from 'gi://Meta';
-import Mtk from 'gi://Mtk';
+import { Mtk, Meta } from '@gi';
 
 interface ExtendedWindow extends Meta.Window {
     originalSize: Mtk.Rectangle | undefined;

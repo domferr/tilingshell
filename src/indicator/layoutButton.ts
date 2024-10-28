@@ -1,12 +1,10 @@
-import Clutter from 'gi://Clutter';
-import Mtk from 'gi://Mtk';
+import { St, Clutter, Mtk } from '@gi';
 import LayoutWidget from '@/components/layout/LayoutWidget';
 import SnapAssistTile from '@/components/snapassist/snapAssistTile';
 import Layout from '@/components/layout/Layout';
 import Tile from '@/components/layout/Tile';
 import { buildMarginOf, buildRectangle, getScalingFactorOf } from '@utils/ui';
 import { registerGObjectClass } from '@utils/gjs';
-import St from 'gi://St';
 
 @registerGObjectClass
 class LayoutButtonWidget extends LayoutWidget<SnapAssistTile> {

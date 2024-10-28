@@ -1,6 +1,4 @@
-import St from 'gi://St';
-import Gio from 'gi://Gio';
-import Clutter from 'gi://Clutter';
+import { St, Clutter, Gio } from '@gi';
 
 export const createButton = (
     iconName: string,

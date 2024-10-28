@@ -1,8 +1,6 @@
 import Tile from '@components/layout/Tile';
 import { registerGObjectClass } from '@utils/gjs';
-import St from 'gi://St';
-import Clutter from 'gi://Clutter';
-import Mtk from 'gi://Mtk';
+import { St, Clutter, Mtk } from '@gi';
 import SnapAssistTile from '@components/snapassist/snapAssistTile';
 
 @registerGObjectClass

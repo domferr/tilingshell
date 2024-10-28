@@ -1,8 +1,5 @@
 import { registerGObjectClass } from '@/utils/gjs';
-import St from 'gi://St';
-import GLib from 'gi://GLib';
-import Shell from 'gi://Shell';
-import Clutter from 'gi://Clutter';
+import { GLib, St, Clutter, Shell } from '@gi';
 import EditableTilePreview from './editableTilePreview';
 import { getScalingFactorOf } from '@utils/ui';
 

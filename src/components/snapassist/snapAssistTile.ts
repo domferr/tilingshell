@@ -1,9 +1,7 @@
 import { registerGObjectClass } from '@/utils/gjs';
 import TilePreview from '../tilepreview/tilePreview';
 import Tile from '../layout/Tile';
-import Clutter from 'gi://Clutter';
-import Mtk from 'gi://Mtk';
-import St from 'gi://St';
+import { St, Clutter, Mtk } from '@gi';
 import { getScalingFactorOf } from '@utils/ui';
 
 @registerGObjectClass

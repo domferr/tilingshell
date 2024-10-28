@@ -1,6 +1,4 @@
-import Gio from 'gi://Gio';
-import St from 'gi://St';
-import Shell from 'gi://Shell';
+import { St, Clutter, Shell, Gio } from '@gi';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import Settings from '@settings/settings';
@@ -29,6 +27,7 @@ export default class Indicator extends PanelMenu.Button {
     private _state: IndicatorState;
     private _enableScaling: boolean;
     private _path: string;
+    private _keyPressEvent: number | null;
 
     constructor(path: string, uuid: string) {
         super(0.5, 'Tiling Shell Indicator', false);
@@ -54,6 +53,7 @@ export default class Indicator extends PanelMenu.Button {
         this._editorDialog = null;
         this._currentMenu = null;
         this._state = IndicatorState.DEFAULT;
+        this._keyPressEvent = null;
         this._enableScaling = false;
         this._path = path;
 
@@ -81,8 +81,10 @@ export default class Indicator extends PanelMenu.Button {
 
     public selectLayoutOnClick(monitorIndex: number, layoutToSelectId: string) {
         const selected = Settings.get_selected_layouts();
-        selected[monitorIndex] = layoutToSelectId;
-        Settings.save_selected_layouts_json(selected);
+        selected[global.workspaceManager.get_active_workspace_index()][
+            monitorIndex
+        ] = layoutToSelectId;
+        Settings.save_selected_layouts(selected);
         this.menu.toggle();
     }
 
@@ -213,11 +215,27 @@ export default class Indicator extends PanelMenu.Button {
             case IndicatorState.DEFAULT:
                 this._currentMenu = new DefaultMenu(this, this._enableScaling);
                 if (!Settings.get_show_indicator()) this.hide();
+                if (this._keyPressEvent) {
+                    global.stage.disconnect(this._keyPressEvent);
+                    this._keyPressEvent = null;
+                }
                 break;
             case IndicatorState.CREATE_NEW:
             case IndicatorState.EDITING_LAYOUT:
                 this._currentMenu = new EditingMenu(this);
                 this.show();
+                if (this._keyPressEvent)
+                    global.stage.disconnect(this._keyPressEvent);
+                this._keyPressEvent = global.stage.connect_after(
+                    'key-press-event',
+                    (_, event) => {
+                        const symbol = event.get_key_symbol();
+                        if (symbol === Clutter.KEY_Escape)
+                            this.cancelLayoutOnClick();
+
+                        return Clutter.EVENT_PROPAGATE;
+                    },
+                );
                 break;
         }
     }

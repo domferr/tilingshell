@@ -32,7 +32,7 @@ Have issues, you want to suggest a new feature or contribute? Please open a new 
 | [⬇️](#tiling-system) Tiling System | [⬇️](#snap-assistant) Snap Assistant | [⬇️](#select-a-layout) Select a layout | [⬇️](#select-multiple-tiles) Select multiple tiles |
 |:---|:---|:---|:---|
 | [⬇️](#layout-editor) **Layout editor** | [⬇️](#smart-resize) **Smart resize** | [⬇️](#tile-with-keyboard) **Tile with Keyboard** | [⬇️](#edge-tiling) **Edge Tiling** |
-| [⬇️](#tiling-buttons) **Tiling Buttons** |
+| [⬇️](#tiling-buttons) **Tiling Buttons** | [⬇️](#per-workspace-layout) **Per-workspace layout**
 
 ### Tiling System ###
 When grabbing and moving a window, press <kbd>CTRL</kbd> key to show the tiling layout (you can choose another key from the preferences). When moving on a tile, it will highlight. Ungrab the window to place that window on the highlighted tile.
@@ -115,6 +115,14 @@ Right-click on a window to use the auto-tile buttons and the snap assistant from
 
 <p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
 
+### Per-workspace layout ###
+
+You can select your favorite layout for each workspace of each monitor.
+
+[per-workspace](https://github.com/user-attachments/assets/41226602-5950-47d1-bbf6-3d7ff3e265fb)
+
+<p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
+
 ## Installation
 
 This extension is published on [extensions.gnome.org](https://extensions.gnome.org/extension/7065/tiling-shell/)! You can install from there or install manually. By installing from [extensions.gnome.org](https://extensions.gnome.org/extension/7065/tiling-shell/) you will always have the latest update.
@@ -149,6 +157,11 @@ To read the logs you can run
 journalctl --follow /usr/bin/gnome-shell
 ```
 
+To read the logs of the preferences you can run
+
+```bash
+journalctl -f -o cat /usr/bin/gjs
+```
 ### Uninstall Tiling Shell
 
 To uninstall, first disable the extension and then remove it. To disable via the command line you can run 

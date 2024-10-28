@@ -1,13 +1,11 @@
-import St from 'gi://St';
+import { St, Clutter, Mtk } from '@gi';
 import TilePreview from '../tilepreview/tilePreview';
-import Clutter from 'gi://Clutter';
-import Mtk from 'gi://Mtk';
 import {
     buildRectangle,
     buildTileGaps,
     enableScalingFactorSupport,
 } from '@/utils/ui';
-import { logger } from '@/utils/shell';
+import { logger } from '@utils/logger';
 import Layout from './Layout';
 import Tile from './Tile';
 import TileUtils from './TileUtils';

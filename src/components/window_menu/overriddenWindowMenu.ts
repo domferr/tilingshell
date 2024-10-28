@@ -2,10 +2,7 @@
 import * as windowMenu from 'resource:///org/gnome/shell/ui/windowMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import St from 'gi://St';
-import Meta from 'gi://Meta';
-import Clutter from 'gi://Clutter';
-import GObject from 'gi://GObject';
+import { GObject, St, Clutter, Meta } from '@gi';
 import GlobalState from '@utils/globalState';
 import Settings from '@settings/settings';
 import { registerGObjectClass } from '@utils/gjs';
@@ -121,8 +118,10 @@ export default class OverriddenWindowMenu extends GObject.Object {
                     : undefined;
             })
             .filter((w) => w !== undefined);
+
         const tiles = GlobalState.get().getSelectedLayoutOfMonitor(
             window.get_monitor(),
+            global.workspaceManager.get_active_workspace_index(),
         ).tiles;
         const vacantTiles = tiles.filter((t) => {
             const tileRect = TileUtils.apply_props(t, workArea);

@@ -1,11 +1,6 @@
 import { registerGObjectClass } from '@/utils/gjs';
-import Clutter from 'gi://Clutter';
-import St from 'gi://St';
-import Meta from 'gi://Meta';
-import Mtk from 'gi://Mtk';
+import { GObject, St, Clutter, Mtk, Meta, Shell } from '@gi';
 import Settings from '@settings/settings';
-import Shell from 'gi://Shell';
-import GObject from 'gi://GObject';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {
     buildMargin,

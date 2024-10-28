@@ -1,7 +1,4 @@
-import St from 'gi://St';
-import Clutter from 'gi://Clutter';
-import GObject from 'gi://GObject';
-import Gio from 'gi://Gio';
+import { GObject, St, Clutter, Gio } from '@gi';
 import SignalHandling from '@utils/signalHandling';
 import Indicator from './indicator';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -17,7 +14,7 @@ import GlobalState from '@utils/globalState';
 import CurrentMenu from './currentMenu';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import LayoutButton from './layoutButton';
-import { logger } from '@utils/shell';
+import { logger } from '@utils/logger';
 import { registerGObjectClass } from '@utils/gjs';
 import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
 import Layout from '@components/layout/Layout';
@@ -189,7 +186,25 @@ export default class DefaultMenu implements CurrentMenu {
                 if (this._layoutsRows.length !== getMonitors().length)
                     this._drawLayouts();
 
-                Settings.get_selected_layouts().forEach((selectedId, index) => {
+                getMonitors().forEach((m, index) => {
+                    const selectedId =
+                        Settings.get_selected_layouts()[
+                            global.workspaceManager.get_active_workspace_index()
+                        ][index];
+                    this._layoutsRows[index].selectLayout(selectedId);
+                });
+            },
+        );
+
+        this._signals.connect(
+            global.workspaceManager,
+            'active-workspace-changed',
+            () => {
+                getMonitors().forEach((m, index) => {
+                    const selectedId =
+                        Settings.get_selected_layouts()[
+                            global.workspaceManager.get_active_workspace_index()
+                        ][index];
                     this._layoutsRows[index].selectLayout(selectedId);
                 });
             },
@@ -314,10 +329,11 @@ export default class DefaultMenu implements CurrentMenu {
         this._container.destroy_all_children();
         this._layoutsRows = [];
 
-        const selectedIdPerMonitor = Settings.get_selected_layouts();
+        const selected_layouts = Settings.get_selected_layouts();
+        const ws_index = global.workspaceManager.get_active_workspace_index();
         const monitors = getMonitors();
         this._layoutsRows = monitors.map((monitor) => {
-            const selectedId = selectedIdPerMonitor[monitor.index];
+            const selectedId = selected_layouts[ws_index][monitor.index];
             const row = new LayoutsRow(
                 this._container,
                 layouts,

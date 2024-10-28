@@ -1,10 +1,6 @@
 import { registerGObjectClass } from '@/utils/gjs';
-import Clutter from 'gi://Clutter';
-import St from 'gi://St';
+import { GObject, St, Clutter, Mtk, Meta } from '@gi';
 import EditableTilePreview from './editableTilePreview';
-import Meta from 'gi://Meta';
-import Mtk from 'gi://Mtk';
-import GObject from 'gi://GObject';
 import { getEventCoords, getScalingFactorOf } from '@utils/ui';
 
 @registerGObjectClass

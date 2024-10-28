@@ -1,8 +1,4 @@
-import St from 'gi://St';
-import Meta from 'gi://Meta';
-import Clutter from 'gi://Clutter';
-import Mtk from 'gi://Mtk';
-import Shell from 'gi://Shell';
+import { St, Meta, Mtk, Clutter, Shell } from '@gi';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
 

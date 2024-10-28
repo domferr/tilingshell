@@ -1,6 +1,5 @@
 import { buildRectangle } from '@utils/ui';
-import Meta from 'gi://Meta';
-import Mtk from 'gi://Mtk';
+import { Mtk, Meta } from '@gi';
 
 export default class TouchPointer {
     private static _instance: TouchPointer | null = null;

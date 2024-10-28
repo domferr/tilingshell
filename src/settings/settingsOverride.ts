@@ -1,6 +1,5 @@
 import Settings from '@settings/settings';
-import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
+import { Gio, GLib } from '@prefs.gi';
 
 export default class SettingsOverride {
     // map schema_id with map of keys and old values

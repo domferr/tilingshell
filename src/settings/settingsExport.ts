@@ -1,5 +1,4 @@
-import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
+import { Gio, GLib } from '@prefs.gi';
 import Settings from '@settings/settings';
 import SettingsOverride from '@settings/settingsOverride';
 

@@ -1,11 +1,8 @@
 import Gtk from 'gi://Gtk'; // Starting from GNOME 40, the preferences dialog uses GTK4
 import Adw from 'gi://Adw';
-import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
-import Gdk from 'gi://Gdk';
-import GObject from 'gi://GObject';
+import { Gio, GLib, Gdk, GObject } from '@prefs.gi';
 import Settings, { ActivationKey } from './settings/settings';
-import { logger } from './utils/shell';
+import { logger } from './utils/logger';
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 import Layout from '@components/layout/Layout';
 import SettingsExport from '@settings/settingsExport';
@@ -192,6 +189,17 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         behaviourGroup.add(enableTilingSystemRow);
 
+        const tilingSystemDeactivationRow = this._buildDropDownRow(
+            _('Tiling System deactivation key'),
+            _(
+                'Hold the deactivation key while moving a window to deactivate the tiling system',
+            ),
+            Settings.get_tiling_system_deactivation_key(),
+            (newVal: ActivationKey) =>
+                Settings.set_tiling_system_deactivation_key(newVal),
+        );
+        behaviourGroup.add(tilingSystemDeactivationRow);
+
         const spanMultipleTilesRow = this._buildSwitchRow(
             Settings.SETTING_SPAN_MULTIPLE_TILES,
             _('Span multiple tiles'),
@@ -203,6 +211,13 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             ),
         );
         behaviourGroup.add(spanMultipleTilesRow);
+
+        /* const autoTilingRow = this._buildSwitchRow(
+            Settings.SETTING_ENABLE_AUTO_TILING,
+            _('Enable Auto Tiling'),
+            _('Automatically tile new windows to the best tile'),
+        );
+        behaviourGroup.add(autoTilingRow);*/
 
         const resizeComplementingRow = this._buildSwitchRow(
             Settings.SETTING_RESIZE_COMPLEMENTING_WINDOWS,
@@ -348,7 +363,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                         _source.destroy();
                     },
                 );
-
+                fc.set_current_name('tilingshell-layouts.json');
                 fc.present();
             },
         );
@@ -425,10 +440,11 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             () => {
                 Settings.reset_layouts_json();
                 const layouts = Settings.get_layouts_json();
-                const selected = Settings.get_selected_layouts().map(
-                    () => layouts[0].id,
+                const newSelectedLayouts = Settings.get_selected_layouts().map(
+                    (monitors_selected) =>
+                        monitors_selected.map(() => layouts[0].id),
                 );
-                Settings.save_selected_layouts_json(selected);
+                Settings.save_selected_layouts(newSelectedLayouts);
             },
             'destructive-action',
         );
@@ -713,6 +729,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                     },
                 );
 
+                fc.set_current_name('tilingshell-settings.txt');
                 fc.present();
             },
         );
@@ -858,6 +875,30 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         if (suffix) adwRow.add_suffix(suffix);
         adwRow.add_suffix(gtkSwitch);
         Settings.bind(settingsKey, gtkSwitch, 'active');
+
+        return adwRow;
+    }
+
+    _buildDropDownRow(
+        title: string,
+        subtitle: string,
+        value: ActivationKey,
+        onSelected: (v: ActivationKey) => void,
+        styleClass?: string,
+    ): Adw.ActionRow {
+        const dropDown = this._buildActivationKeysDropDown(
+            value,
+            onSelected,
+            styleClass,
+        );
+        dropDown.set_vexpand(false);
+        dropDown.set_valign(Gtk.Align.CENTER);
+        const adwRow = new Adw.ActionRow({
+            title,
+            subtitle,
+            activatableWidget: dropDown,
+        });
+        adwRow.add_suffix(dropDown);
 
         return adwRow;
     }

@@ -1,11 +1,8 @@
 import TilePreview from '../tilepreview/tilePreview';
-import St from 'gi://St';
-import Clutter from 'gi://Clutter';
-import Mtk from 'gi://Mtk';
+import { GObject, St, Clutter, Mtk } from '@gi';
 import Tile from '../layout/Tile';
 import Slider from './slider';
 import TileUtils from '../layout/TileUtils';
-import GObject from 'gi://GObject';
 import { registerGObjectClass } from '@utils/gjs';
 
 @registerGObjectClass

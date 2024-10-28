@@ -1,5 +1,4 @@
-import Gio from 'gi://Gio';
-import GObject from 'gi://GObject';
+import { Gio, GObject, GLib } from '@prefs.gi';
 import Layout from '../components/layout/Layout';
 import Tile from '../components/layout/Tile';
 
@@ -19,6 +18,8 @@ export default class Settings {
     static SETTING_TILING_SYSTEM = 'enable-tiling-system';
     static SETTING_TILING_SYSTEM_ACTIVATION_KEY =
         'tiling-system-activation-key';
+    static SETTING_TILING_SYSTEM_DEACTIVATION_KEY =
+        'tiling-system-deactivation-key';
     static SETTING_SNAP_ASSIST = 'enable-snap-assist';
     static SETTING_SHOW_INDICATOR = 'show-indicator';
     static SETTING_INNER_GAPS = 'inner-gaps';
@@ -36,6 +37,7 @@ export default class Settings {
     static SETTING_ENABLE_BLUR_SELECTED_TILEPREVIEW =
         'enable-blur-selected-tilepreview';
     static SETTING_ENABLE_MOVE_KEYBINDINGS = 'enable-move-keybindings';
+    static SETTING_ENABLE_AUTO_TILING = 'enable-autotiling';
     static SETTING_ACTIVE_SCREEN_EDGES = 'active-screen-edges';
     static SETTING_TOP_EDGE_MAXIMIZE = 'top-edge-maximize';
     static SETTING_OVERRIDE_WINDOW_MENU = 'override-window-menu';
@@ -168,10 +170,30 @@ export default class Settings {
         }
     }
 
-    static get_selected_layouts(): string[] {
-        return (
-            this._settings?.get_strv(Settings.SETTING_SELECTED_LAYOUTS) || []
+    static get_selected_layouts(): string[][] {
+        const variant = this._settings?.get_value(
+            Settings.SETTING_SELECTED_LAYOUTS,
         );
+        if (!variant) return [];
+
+        const result: string[][] = [];
+        // for each monitor
+        for (let i = 0; i < variant.n_children(); i++) {
+            const monitor_variant = variant.get_child_value(i);
+            if (!monitor_variant) continue;
+
+            const n_workspaces = monitor_variant.n_children();
+            const monitor_result: string[] = [];
+            // for each workspace
+            for (let j = 0; j < n_workspaces; j++) {
+                const layout_variant = monitor_variant.get_child_value(j);
+                if (!layout_variant) continue;
+
+                monitor_result.push(layout_variant.get_string()[0]);
+            }
+            result.push(monitor_result);
+        }
+        return result;
     }
 
     static get_restore_window_original_size(): boolean {
@@ -195,6 +217,14 @@ export default class Settings {
             this.SETTING_TILING_SYSTEM_ACTIVATION_KEY,
         );
         if (!val || val.length === 0) return ActivationKey.CTRL;
+        return Number(val[0]);
+    }
+
+    static get_tiling_system_deactivation_key(): ActivationKey {
+        const val = this._settings?.get_strv(
+            this.SETTING_TILING_SYSTEM_DEACTIVATION_KEY,
+        );
+        if (!val || val.length === 0) return ActivationKey.NONE;
         return Number(val[0]);
     }
 
@@ -226,6 +256,13 @@ export default class Settings {
         return (
             this._settings?.get_boolean(this.SETTING_ENABLE_MOVE_KEYBINDINGS) ??
             true
+        );
+    }
+
+    static get_enable_autotiling(): boolean {
+        return (
+            this._settings?.get_boolean(this.SETTING_ENABLE_AUTO_TILING) ??
+            false
         );
     }
 
@@ -289,6 +326,12 @@ export default class Settings {
 
     static set_tiling_system_activation_key(key: ActivationKey) {
         this._settings?.set_strv(this.SETTING_TILING_SYSTEM_ACTIVATION_KEY, [
+            String(key),
+        ]);
+    }
+
+    static set_tiling_system_deactivation_key(key: ActivationKey) {
+        this._settings?.set_strv(this.SETTING_TILING_SYSTEM_DEACTIVATION_KEY, [
             String(key),
         ]);
     }
@@ -453,8 +496,17 @@ export default class Settings {
         );
     }
 
-    static save_selected_layouts_json(ids: string[]) {
-        this._settings?.set_strv(Settings.SETTING_SELECTED_LAYOUTS, ids);
+    static save_selected_layouts(ids: string[][]) {
+        if (ids.length === 0) {
+            this._settings?.reset(Settings.SETTING_SELECTED_LAYOUTS);
+            return;
+        }
+        const variants = ids.map((monitor_ids) =>
+            GLib.Variant.new_strv(monitor_ids),
+        );
+        const result = GLib.Variant.new_array(null, variants);
+        // @ts-expect-error "'result' is of a correct variant type"
+        this._settings?.set_value(Settings.SETTING_SELECTED_LAYOUTS, result);
     }
 
     static connect(key: string, func: (...arg: unknown[]) => void): number {

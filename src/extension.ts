@@ -1,12 +1,10 @@
 import './styles/stylesheet.scss';
 
-import { logger } from '@/utils/shell';
+import { logger } from '@utils/logger';
 import { getMonitors, squaredEuclideanDistance } from '@/utils/ui';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { TilingManager } from '@/components/tilingsystem/tilingManager';
-import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
-import Meta from 'gi://Meta';
+import { Gio, GLib, Meta } from '@gi';
 import Settings from '@settings/settings';
 import SignalHandling from './utils/signalHandling';
 import GlobalState from './utils/globalState';
@@ -20,6 +18,7 @@ import { ResizingManager } from '@components/tilingsystem/resizeManager';
 import OverriddenWindowMenu from '@components/window_menu/overriddenWindowMenu';
 import Tile from '@components/layout/Tile';
 import { WindowBorderManager } from '@components/windowBorderManager';
+import TilingShellWindowManager from '@components/windowManager/tilingShellWindowManager';
 
 const debug = logger('extension');
 
@@ -52,30 +51,17 @@ export default class TilingShellExtension extends Extension {
     }
 
     private _validateSettings() {
+        if (Settings.get_last_version_installed() === '14.0') {
+            debug('apply compatibility changes');
+            Settings.save_selected_layouts([]);
+        }
+
         // Setting used for compatibility changes if necessary
         if (this.metadata['version-name']) {
             Settings.set_last_version_installed(
                 this.metadata['version-name'] || '0',
             );
         }
-
-        const selectedLayouts = Settings.get_selected_layouts();
-        const monitors = getMonitors();
-        const layouts = GlobalState.get().layouts;
-
-        if (selectedLayouts.length === 0) selectedLayouts.push(layouts[0].id);
-        while (monitors.length < selectedLayouts.length) selectedLayouts.pop();
-
-        while (monitors.length > selectedLayouts.length)
-            selectedLayouts.push(selectedLayouts[0]);
-
-        for (let i = 0; i < selectedLayouts.length; i++) {
-            if (
-                layouts.findIndex((lay) => lay.id === selectedLayouts[i]) === -1
-            )
-                selectedLayouts[i] = selectedLayouts[0];
-        }
-        Settings.save_selected_layouts_json(selectedLayouts);
     }
 
     enable(): void {
@@ -84,6 +70,9 @@ export default class TilingShellExtension extends Extension {
 
         Settings.initialize(this.getSettings());
         this._validateSettings();
+
+        // force initialization and tracking of windows
+        TilingShellWindowManager.get();
 
         this._fractionalScalingEnabled = this._isFractionalScalingEnabled(
             new Gio.Settings({ schema: 'org.gnome.mutter' }),
@@ -154,18 +143,16 @@ export default class TilingShellExtension extends Extension {
             const allMonitors = getMonitors();
             if (this._tilingManagers.length !== allMonitors.length) {
                 // a monitor was disconnected or a new one was connected
-                // update the index of selected layouts
-                const oldIndexes = Settings.get_selected_layouts();
-                const indexes = allMonitors.map((monitor) => {
-                    // If there is a new monitor, give the same layout as the first monitor
-                    if (monitor.index >= oldIndexes.length)
-                        return GlobalState.get().layouts[0].id;
-                    return oldIndexes[monitor.index];
+                GlobalState.get().validate_selected_layouts();
+                // finally build a tiling manager for each monitor
+                this._createTilingManagers();
+            } else {
+                // the number of monitors is the same, so update the workarea
+                this._tilingManagers.forEach((tm, index) => {
+                    tm.workArea =
+                        Main.layoutManager.getWorkAreaForMonitor(index);
                 });
-                Settings.save_selected_layouts_json(indexes);
             }
-
-            this._createTilingManagers();
         });
 
         this._signals.connect(
@@ -603,6 +590,7 @@ export default class TilingShellExtension extends Extension {
         // destroy state and settings
         GlobalState.destroy();
         Settings.destroy();
+        TilingShellWindowManager.destroy();
 
         debug('extension is disabled');
     }

@@ -1,10 +1,7 @@
 import { registerGObjectClass } from '@/utils/gjs';
-import Clutter from 'gi://Clutter';
-import St from 'gi://St';
-import Gio from 'gi://Gio';
+import { GObject, St, Clutter, Gio } from '@gi';
 import TilePreview from './tilePreview';
 import Settings from '@settings/settings';
-import GObject from 'gi://GObject';
 import { buildBlurEffect } from '@utils/ui';
 
 @registerGObjectClass

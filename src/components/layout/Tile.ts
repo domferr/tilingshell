@@ -1,4 +1,4 @@
-import GObject from 'gi://GObject';
+import { GObject } from '@prefs.gi'; // prefs.gi because for transitivity this is also declared in prefs.js
 
 export default class Tile {
     // @ts-expect-error "GObject has TYPE_JSOBJECT"

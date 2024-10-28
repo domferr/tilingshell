@@ -1,8 +1,6 @@
 import Settings from '@settings/settings';
 import { registerGObjectClass } from '@/utils/gjs';
-import Clutter from 'gi://Clutter';
-import St from 'gi://St';
-import Gio from 'gi://Gio';
+import { St, Clutter, Gio } from '@gi';
 import LayoutButton from '../../indicator/layoutButton';
 import GlobalState from '@utils/globalState';
 import Layout from '@/components/layout/Layout';

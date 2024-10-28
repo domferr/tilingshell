@@ -2,8 +2,7 @@ import Layout from '@components/layout/Layout';
 import LayoutWidget from '@components/layout/LayoutWidget';
 import { registerGObjectClass } from '@utils/gjs';
 import { buildMarginOf, buildRectangle, getScalingFactorOf } from '@utils/ui';
-import Clutter from 'gi://Clutter';
-import Mtk from 'gi://Mtk';
+import { Clutter, Mtk } from '@gi';
 import SnapAssistTileButton from '../snapassist/snapAssistTileButton';
 import Tile from '@components/layout/Tile';
 

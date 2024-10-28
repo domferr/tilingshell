@@ -4,8 +4,7 @@ import Tile from '@components/layout/Tile';
 import SnapAssistTile from '@components/snapassist/snapAssistTile';
 import { registerGObjectClass } from '@utils/gjs';
 import { buildRectangle, getScalingFactorOf } from '@utils/ui';
-import Mtk from 'gi://Mtk';
-import Clutter from 'gi://Clutter';
+import { Clutter, Mtk } from '@gi';
 
 @registerGObjectClass
 export default class LayoutIcon extends LayoutWidget<SnapAssistTile> {

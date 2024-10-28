@@ -1,22 +1,14 @@
-import Meta from 'gi://Meta';
 import { registerGObjectClass } from '@/utils/gjs';
-import Mtk from 'gi://Mtk';
-import Clutter from 'gi://Clutter';
-import St from 'gi://St';
+import { Clutter, Mtk, Meta } from '@gi';
 import TilePreview, {
     TilePreviewConstructorProperties,
 } from '../tilepreview/tilePreview';
 import LayoutWidget from '../layout/LayoutWidget';
 import Layout from '../layout/Layout';
 import Tile from '../layout/Tile';
-import {
-    buildRectangle,
-    buildTileGaps,
-    isPointInsideRect,
-    squaredEuclideanDistance,
-} from '@utils/ui';
+import { buildRectangle, buildTileGaps, isPointInsideRect } from '@utils/ui';
 import TileUtils from '@components/layout/TileUtils';
-import { logger } from '@utils/shell';
+import { logger } from '@utils/logger';
 import GlobalState from '@utils/globalState';
 import { KeyBindingsDirection } from '@keybindings';
 

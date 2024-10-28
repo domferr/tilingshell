@@ -1,4 +1,4 @@
-import St from 'gi://St';
+import { St } from '@gi';
 import Indicator from './indicator';
 import * as IndicatorUtils from './utils';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';

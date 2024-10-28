@@ -17,6 +17,11 @@
             <summary>Tiling system activation key</summary>
             <description>Which key to hold while moving a window to activate the tiling system.</description>
         </key>
+        <key name="tiling-system-deactivation-key" type="as">
+            <default>[]</default>
+            <summary>Tiling system deactivation key</summary>
+            <description>Which key to hold while moving a window to deactivate the tiling system.</description>
+        </key>
         <key name="enable-snap-assist" type="b">
             <default>true</default>
             <summary>Enable snap assist</summary>
@@ -52,7 +57,7 @@
             <summary>Layouts</summary>
             <description>The layouts available to the tiling managers and the snap assist.</description>
         </key>
-        <key name="selected-layouts" type="as">
+        <key name="selected-layouts" type="aas">
             <default>[]</default>
             <summary>Selected layouts</summary>
             <description>Each monitor's active layout used by the monitor tiling manager.</description>
@@ -81,6 +86,11 @@
             <default>true</default>
             <summary>Enable keybindings</summary>
             <description>Move focused window through tiles by using keybindings.</description>
+        </key>
+        <key name="enable-autotiling" type="b">
+            <default>false</default>
+            <summary>Enable auto tiling</summary>
+            <description>Automatically tile a new window to the best tile according to the current layout.</description>
         </key>
         <key name="overridden-settings" type="s">
             <default>'{}'</default>

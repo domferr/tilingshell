@@ -1,8 +1,5 @@
-import St from 'gi://St';
-import Meta from 'gi://Meta';
-import Mtk from 'gi://Mtk';
+import { St, Clutter, Mtk, Meta } from '@gi';
 import { registerGObjectClass } from '@/utils/gjs';
-import Clutter from 'gi://Clutter';
 import { buildRectangle, getScalingFactorOf } from '@utils/ui';
 import GlobalState from '@utils/globalState';
 
