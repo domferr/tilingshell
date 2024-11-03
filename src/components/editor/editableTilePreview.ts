@@ -1,5 +1,5 @@
 import TilePreview from '../tilepreview/tilePreview';
-import { GObject, St, Clutter, Mtk } from '@gi';
+import { GObject, St, Clutter, Mtk } from '@gi.ext';
 import Tile from '../layout/Tile';
 import Slider from './slider';
 import TileUtils from '../layout/TileUtils';

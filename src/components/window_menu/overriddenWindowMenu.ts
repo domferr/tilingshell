@@ -2,7 +2,7 @@
 import * as windowMenu from 'resource:///org/gnome/shell/ui/windowMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import { GObject, St, Clutter, Meta } from '@gi';
+import { GObject, St, Clutter, Meta } from '@gi.ext';
 import GlobalState from '@utils/globalState';
 import Settings from '@settings/settings';
 import { registerGObjectClass } from '@utils/gjs';

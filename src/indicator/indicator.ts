@@ -1,4 +1,4 @@
-import { St, Clutter, Shell, Gio } from '@gi';
+import { St, Clutter, Shell, Gio } from '@gi.ext';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import Settings from '@settings/settings';

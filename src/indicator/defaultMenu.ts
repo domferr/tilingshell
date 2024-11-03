@@ -1,4 +1,4 @@
-import { GObject, St, Clutter, Gio } from '@gi';
+import { GObject, St, Clutter, Gio } from '@gi.ext';
 import SignalHandling from '@utils/signalHandling';
 import Indicator from './indicator';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';

@@ -1,10 +1,10 @@
 import './styles/stylesheet.scss';
 
+import { Gio, GLib, Meta } from '@gi.ext';
 import { logger } from '@utils/logger';
 import { getMonitors, squaredEuclideanDistance } from '@/utils/ui';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { TilingManager } from '@/components/tilingsystem/tilingManager';
-import { Gio, GLib, Meta } from '@gi';
 import Settings from '@settings/settings';
 import SignalHandling from './utils/signalHandling';
 import GlobalState from './utils/globalState';

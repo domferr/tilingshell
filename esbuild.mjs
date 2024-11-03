@@ -124,17 +124,29 @@ build({
     target: 'firefox78',
     platform: 'node',
     format: 'esm',
-    external: ['gi://*', 'resource://*', 'system', 'gettext', 'cairo', '@girs*'],
-    plugins: [sassPlugin()]/*,
-    banner: {
-        js: banner,
-    },
-    footer: {
-        js: footer
-    }*/
+    external: ['gi://*', 'resource://*'],
+    plugins: [sassPlugin()],
 }).then(() => {
     fs.renameSync(path.resolve(distDir, "extension.css"), path.resolve(distDir, "stylesheet.css"));
     fs.cpSync(resourcesDir, distDir, { recursive: true });
+    // warn if you imported GTK libraries in GNOME Shell (Gdk, Gtk or Adw)
+    const extensionJSContent = fs.readFileSync(`${distDir}/extension.js`).toString().split('\n');
+    ['Gdk', 'Gtk', 'Adw'].forEach(moduleName => {
+        for (let lineNumber = 0; lineNumber < extensionJSContent.length; lineNumber++) {
+            if (extensionJSContent[lineNumber].indexOf(`import ${moduleName}`) >= 0) {
+                console.error(`⚠️  Error: "${moduleName}" was imported in extension.js at line ${lineNumber}`);
+            }
+        }
+    });
+    // warn if you imported GNOME Shell libraries in Preferences (Clutter, Meta, St or Shell)
+    const prefsJSContent = fs.readFileSync(`${distDir}/prefs.js`).toString().split('\n');
+    ['Clutter', 'Meta', 'Mtk', 'St', 'Shell'].forEach(moduleName => {
+        for (let lineNumber = 0; lineNumber < prefsJSContent.length; lineNumber++) {
+            if (prefsJSContent[lineNumber].indexOf(`import ${moduleName}`) >= 0) {
+                console.error(`⚠️  Error: "${moduleName}" was imported in prefs.js at line ${lineNumber}`);
+            }
+        }
+    });
 }).then(async () => {
     console.log("   💡", "Generating legacy version...");
     // duplicate the build into distLegacyDir

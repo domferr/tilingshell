@@ -1,4 +1,4 @@
-import { St, Clutter, Gio } from '@gi';
+import { St, Clutter, Gio } from '@gi.ext';
 
 export const createButton = (
     iconName: string,

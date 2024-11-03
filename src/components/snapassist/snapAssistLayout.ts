@@ -1,6 +1,6 @@
 import { registerGObjectClass } from '@/utils/gjs';
 import { buildRectangle, getScalingFactorOf } from '@/utils/ui';
-import { Clutter, Mtk } from '@gi';
+import { Clutter, Mtk } from '@gi.ext';
 import LayoutWidget from '../layout/LayoutWidget';
 import Layout from '../layout/Layout';
 import Tile from '../layout/Tile';

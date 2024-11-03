@@ -4,7 +4,7 @@ const node = `<node>
     </interface>
 </node>`;
 
-import { Gio } from '@gi';
+import { Gio } from '@gi.ext';
 
 export default class DBus {
     private _dbus: Gio.DBusExportedObject | null;

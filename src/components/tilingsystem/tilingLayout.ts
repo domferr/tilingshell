@@ -1,5 +1,5 @@
 import { registerGObjectClass } from '@/utils/gjs';
-import { Clutter, Mtk, Meta } from '@gi';
+import { Clutter, Mtk, Meta } from '@gi.ext';
 import TilePreview, {
     TilePreviewConstructorProperties,
 } from '../tilepreview/tilePreview';

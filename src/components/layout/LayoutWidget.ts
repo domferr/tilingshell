@@ -1,4 +1,4 @@
-import { St, Clutter, Mtk } from '@gi';
+import { St, Clutter, Mtk } from '@gi.ext';
 import TilePreview from '../tilepreview/tilePreview';
 import {
     buildRectangle,

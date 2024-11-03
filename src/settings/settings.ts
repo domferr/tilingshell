@@ -1,4 +1,4 @@
-import { Gio, GObject, GLib } from '@prefs.gi';
+import { Gio, GObject, GLib } from '@gi.shared';
 import Layout from '../components/layout/Layout';
 import Tile from '../components/layout/Tile';
 

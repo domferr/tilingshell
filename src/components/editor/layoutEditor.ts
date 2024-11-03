@@ -1,5 +1,5 @@
 import { registerGObjectClass } from '@/utils/gjs';
-import { GObject, St, Clutter, Mtk, Meta, Shell } from '@gi';
+import { GObject, St, Clutter, Mtk, Meta, Shell } from '@gi.ext';
 import Settings from '@settings/settings';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {

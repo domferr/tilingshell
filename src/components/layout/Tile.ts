@@ -1,4 +1,4 @@
-import { GObject } from '@prefs.gi'; // prefs.gi because for transitivity this is also declared in prefs.js
+import { GObject } from '@gi.shared'; // gi.shared because it is imported by Layout which is also imported in prefs.ts
 
 export default class Tile {
     // @ts-expect-error "GObject has TYPE_JSOBJECT"

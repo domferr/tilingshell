@@ -2,7 +2,7 @@ import { registerGObjectClass } from '@utils/gjs';
 import Layout from '../components/layout/Layout';
 import Settings from '../settings/settings';
 import SignalHandling from './signalHandling';
-import { GObject, Meta, Gio } from '@gi';
+import { GObject, Meta, Gio } from '@gi.ext';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { logger } from './logger';
 

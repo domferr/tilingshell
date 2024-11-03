@@ -1,5 +1,5 @@
 import { registerGObjectClass } from '@/utils/gjs';
-import { GObject, St, Clutter, Mtk, Meta, Gio } from '@gi';
+import { GObject, St, Clutter, Mtk, Meta, Gio } from '@gi.ext';
 import SnapAssistTile from './snapAssistTile';
 import SnapAssistLayout from './snapAssistLayout';
 import Layout from '../layout/Layout';

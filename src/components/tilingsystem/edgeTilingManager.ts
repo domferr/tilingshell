@@ -3,7 +3,7 @@ import {
     isPointInsideRect,
     clampPointInsideRect,
 } from '@utils/ui';
-import { GObject, Mtk } from '@gi';
+import { GObject, Mtk } from '@gi.ext';
 import Settings from '@settings/settings';
 import { registerGObjectClass } from '@utils/gjs';
 

@@ -1,4 +1,4 @@
-import { GObject, Meta, St, Clutter } from '@gi';
+import { GObject, Meta, St, Clutter } from '@gi.ext';
 import SignalHandling from '@utils/signalHandling';
 import { logger } from '@utils/logger';
 import { registerGObjectClass } from '@utils/gjs';
@@ -27,6 +27,8 @@ class WindowBorder extends St.Bin {
         this.trackWindow(win, true);
 
         this.connect('destroy', () => {
+            this._bindings.forEach((b) => b.unbind());
+            this._bindings = [];
             this._signals.disconnect();
         });
     }
@@ -36,7 +38,7 @@ class WindowBorder extends St.Bin {
 
         this._bindings.forEach((b) => b.unbind());
         this._bindings = [];
-        this._signals.disconnect(this._window);
+        this._signals.disconnect();
         this._window = win;
         this.close();
         const winActor =

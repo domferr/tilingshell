@@ -1,7 +1,7 @@
 import { registerGObjectClass } from '@utils/gjs';
 import { logger } from '@utils/logger';
 import SignalHandling from '@utils/signalHandling';
-import { GObject, Meta } from '@gi';
+import { GObject, Meta } from '@gi.ext';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 const debug = logger('TilingShellWindowManager');

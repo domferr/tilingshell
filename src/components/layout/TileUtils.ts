@@ -1,4 +1,4 @@
-import { Mtk } from '@gi';
+import { Mtk } from '@gi.ext';
 import Tile from './Tile';
 import { buildRectangle } from '@utils/ui';
 

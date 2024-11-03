@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { GObject } from '@gi';
+import { GObject } from '@gi.ext';
 
 // Taken from https://github.com/material-shell/material-shell/blob/main/src/utils/gjs.ts
 // Decorator function to call `GObject.registerClass` with the given class.

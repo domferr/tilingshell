@@ -22,15 +22,18 @@ export default class SignalHandling {
         this._signalsIds[key] = { id: signalId, obj };
     }
 
-    public disconnect(): void;
-    public disconnect(obj: ObjectWithSignals): void;
+    public disconnect(): boolean;
+    public disconnect(obj: ObjectWithSignals): boolean;
     public disconnect(obj?: ObjectWithSignals) {
         if (!obj) {
             const toDelete: string[] = [];
             Object.keys(this._signalsIds).forEach((key) => {
                 this._signalsIds[key].obj.disconnect(this._signalsIds[key].id);
+                toDelete.push(key);
             });
+            const result = toDelete.length > 0;
             toDelete.forEach((key) => delete this._signalsIds[key]);
+            return result;
         } else {
             const keyFound = Object.keys(this._signalsIds).find(
                 (key) => this._signalsIds[key].obj === obj,
@@ -39,6 +42,7 @@ export default class SignalHandling {
                 obj.disconnect(this._signalsIds[keyFound].id);
                 delete this._signalsIds[keyFound];
             }
+            return keyFound;
         }
     }
 }

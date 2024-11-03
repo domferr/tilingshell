@@ -1,6 +1,4 @@
-import Gtk from 'gi://Gtk'; // Starting from GNOME 40, the preferences dialog uses GTK4
-import Adw from 'gi://Adw';
-import { Gio, GLib, Gdk, GObject } from '@prefs.gi';
+import { Gtk, Adw, Gio, GLib, Gdk, GObject } from '@gi.prefs';
 import Settings, { ActivationKey } from './settings/settings';
 import { logger } from './utils/logger';
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';

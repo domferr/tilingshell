@@ -1,5 +1,5 @@
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import { GObject, Meta, Gio, Shell, GLib } from '@gi';
+import { GObject, Meta, Gio, Shell, GLib } from '@gi.ext';
 import Settings from '@settings/settings';
 import SettingsOverride from '@settings/settingsOverride';
 import SignalHandling from '@utils/signalHandling';

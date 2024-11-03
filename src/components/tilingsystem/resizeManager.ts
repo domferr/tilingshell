@@ -1,4 +1,4 @@
-import { St, Mtk, Meta } from '@gi';
+import { St, Mtk, Meta } from '@gi.ext';
 import SignalHandling from '@utils/signalHandling';
 import Settings from '@settings/settings';
 import ExtendedWindow from './extendedWindow';

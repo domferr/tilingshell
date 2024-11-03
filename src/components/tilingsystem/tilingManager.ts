@@ -1,4 +1,4 @@
-import { Clutter, Mtk, Meta, GLib } from '@gi';
+import { Clutter, Mtk, Meta, GLib } from '@gi.ext';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { logger } from '@utils/logger';
 import {

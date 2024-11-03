@@ -1,4 +1,4 @@
-import { St, Clutter, Mtk } from '@gi';
+import { St, Clutter, Mtk } from '@gi.ext';
 import LayoutWidget from '@/components/layout/LayoutWidget';
 import SnapAssistTile from '@/components/snapassist/snapAssistTile';
 import Layout from '@/components/layout/Layout';
