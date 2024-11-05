@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-10-31 15:31+0100\n"
-"PO-Revision-Date: 2024-11-05 18:30+0100\n"
+"PO-Revision-Date: 2024-11-05 20:27+0100\n"
 "Last-Translator: Amerey <info@amerey.eu>\n"
 "Language-Team: \n"
 "Language: cs\n"
@@ -125,7 +125,7 @@ msgstr "Přizpůsobení animací"
 
 #: dist/prefs.js:758
 msgid "Snap assistant animation time"
-msgstr "Doba animace Asistent Snap"
+msgstr "Doba animace asistenta přichycení"
 
 #: dist/prefs.js:759
 msgid "The snap assistant animation time in milliseconds"
@@ -149,7 +149,7 @@ msgstr "Nastavení chování Tiling Shell"
 
 #: dist/prefs.js:780
 msgid "Enable Snap Assistant"
-msgstr "Povolit Asistent Snap"
+msgstr "Povolit asistenta přichycení"
 
 #: dist/prefs.js:781
 msgid "Move the window on top of the screen to snap assist it"
@@ -444,7 +444,7 @@ msgstr "Export nastavení do textového souboru"
 
 #: dist/prefs.js:1302 dist/prefs.js:1303
 msgid "Import settings"
-msgstr "Export nastavení"
+msgstr "Import nastavení"
 
 #: dist/prefs.js:1304
 msgid "Import settings from a file"
@@ -500,7 +500,7 @@ msgstr "rozdělí dlaždici vertikálně"
 
 #: dist/extension.js:4750
 msgid "to delete a tile"
-msgstr "smate dlaždici"
+msgstr "smaže dlaždici"
 
 #: dist/extension.js:4775
 msgid "use the indicator button to save or cancel"
