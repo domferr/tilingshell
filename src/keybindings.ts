@@ -14,6 +14,8 @@ export enum KeyBindingsDirection {
     DOWN,
     LEFT,
     RIGHT,
+    PREV,
+    NEXT,
 }
 
 @registerGObjectClass
@@ -175,6 +177,26 @@ export default class KeyBindings extends GObject.Object {
             Shell.ActionMode.NORMAL,
             (display: Meta.Display) => {
                 this.emit('focus-window', display, KeyBindingsDirection.DOWN);
+            },
+        );
+
+        Main.wm.addKeybinding(
+            Settings.SETTING_FOCUS_WINDOW_NEXT,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('focus-window', display, KeyBindingsDirection.NEXT);
+            },
+        );
+
+        Main.wm.addKeybinding(
+            Settings.SETTING_FOCUS_WINDOW_PREV,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('focus-window', display, KeyBindingsDirection.PREV);
             },
         );
     }

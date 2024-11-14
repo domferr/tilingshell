@@ -67,6 +67,11 @@
             <summary>Restore window size</summary>
             <description>Restore the windows to their original size when untiled.</description>
         </key>
+        <key name="enable-wraparound-focus" type="b">
+            <default>false</default>
+            <summary>Enable next/previous window focus to wrap around</summary>
+            <description>When focusing next or previous window, wrap around at the window edge</description>
+        </key>
         <key name="resize-complementing-windows" type="b">
             <default>true</default>
             <summary>Enable auto-resize of the complementing tiled windows</summary>
@@ -213,6 +218,14 @@
 		<key type="as" name="focus-window-down">
 			<default><![CDATA[['']]]></default>
 			<summary>Focus the window below the current focused window</summary>
+		</key>
+		<key type="as" name="focus-window-next">
+			<default><![CDATA[['']]]></default>
+			<summary>Focus the window next to the current focused window</summary>
+		</key>
+		<key type="as" name="focus-window-prev">
+			<default><![CDATA[['']]]></default>
+			<summary>Focus the window prior to the current focused window</summary>
 		</key>
     </schema>
 

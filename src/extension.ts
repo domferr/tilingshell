@@ -480,7 +480,27 @@ export default class TilingShellExtension extends Extension {
             x: focusWindowRect.x + focusWindowRect.width / 2,
             y: focusWindowRect.y + focusWindowRect.height / 2,
         };
-        getWindows(focus_window.get_workspace())
+
+        const windowList = getWindows(focus_window.get_workspace());
+        const focusedIdx = windowList.findIndex((win) => win === focus_window);
+
+        switch (direction) {
+            case KeyBindingsDirection.PREV:
+                if (focusedIdx == 0 && Settings.WRAPAROUND_FOCUS) {
+                    windowList[windowList.length - 1].activate(global.get_current_time());
+                } else {
+                    windowList[focusedIdx - 1].activate(global.get_current_time());
+                }
+                return;
+            case KeyBindingsDirection.NEXT:
+                const nextIdx = (focusedIdx + 1) % windowList.length;
+                if (nextIdx > 0 || Settings.WRAPAROUND_FOCUS) {
+                    windowList[nextIdx].activate(global.get_current_time());
+                }
+                return;
+        }
+
+        windowList
             .filter((win) => {
                 if (win === focus_window || win.minimized) return false;
 
