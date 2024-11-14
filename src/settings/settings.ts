@@ -89,6 +89,7 @@ export default class Settings {
         'span-multiple-tiles-activation-key';
     static KEY_SPAN_MULTIPLE_TILES = 'enable-span-multiple-tiles';
     static KEY_RESTORE_WINDOW_ORIGINAL_SIZE = 'restore-window-original-size';
+    static KEY_WRAPAROUND_FOCUS = 'enable-wraparound-focus';
     static KEY_RESIZE_COMPLEMENTING_WINDOWS = 'resize-complementing-windows';
     static KEY_ENABLE_BLUR_SNAP_ASSISTANT = 'enable-blur-snap-assistant';
     static KEY_ENABLE_BLUR_SELECTED_TILEPREVIEW =
@@ -126,6 +127,8 @@ export default class Settings {
     static SETTING_FOCUS_WINDOW_LEFT = 'focus-window-left';
     static SETTING_FOCUS_WINDOW_UP = 'focus-window-up';
     static SETTING_FOCUS_WINDOW_DOWN = 'focus-window-down';
+    static SETTING_FOCUS_WINDOW_NEXT = 'focus-window-next';
+    static SETTING_FOCUS_WINDOW_PREV = 'focus-window-prev';
 
     static initialize(settings: Gio.Settings) {
         if (this._is_initialized) return;
@@ -258,6 +261,14 @@ export default class Settings {
 
     static set RESTORE_WINDOW_ORIGINAL_SIZE(val: boolean) {
         set_boolean(Settings.KEY_RESTORE_WINDOW_ORIGINAL_SIZE, val);
+    }
+
+    static get WRAPAROUND_FOCUS(): boolean {
+        return get_boolean(Settings.KEY_WRAPAROUND_FOCUS);
+    }
+
+    static set WRAPAROUND_FOCUS(val: boolean) {
+        set_boolean(Settings.KEY_WRAPAROUND_FOCUS, val);
     }
 
     static get RESIZE_COMPLEMENTING_WINDOWS(): boolean {
