@@ -9,7 +9,7 @@ import { logger } from '@utils/logger';
 const debug = logger('KeyBindings');
 
 export enum KeyBindingsDirection {
-    CENTER = 1,
+    NODIRECTION = 1,
     UP,
     DOWN,
     LEFT,
@@ -51,18 +51,18 @@ export default class KeyBindings extends GObject.Object {
 
         this._signals.connect(
             Settings,
-            Settings.SETTING_ENABLE_MOVE_KEYBINDINGS,
+            Settings.KEY_ENABLE_MOVE_KEYBINDINGS,
             () => {
                 this._setupKeyBindings(extensionSettings);
             },
         );
-        if (Settings.get_enable_move_keybindings())
+        if (Settings.ENABLE_MOVE_KEYBINDINGS)
             this._setupKeyBindings(extensionSettings);
     }
 
     private _setupKeyBindings(extensionSettings: Gio.Settings) {
-        const enabled = Settings.get_enable_move_keybindings();
-        if (enabled) this._applyKeybindings(extensionSettings);
+        if (Settings.ENABLE_MOVE_KEYBINDINGS)
+            this._applyKeybindings(extensionSettings);
         else this._removeKeybindings();
     }
 

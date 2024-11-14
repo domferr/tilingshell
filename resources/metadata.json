@@ -11,7 +11,7 @@
     "47"
   ],
   "version": 99,
-  "version-name": "14.1",
+  "version-name": "15.0",
   "url": "https://github.com/domferr/tilingshell",
   "settings-schema": "org.gnome.shell.extensions.tilingshell",
   "gettext-domain": "tilingshell",

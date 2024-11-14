@@ -27,7 +27,7 @@ export default class SelectionTilePreview extends TilePreview {
         this._blur = false;
 
         Settings.bind(
-            Settings.SETTING_ENABLE_BLUR_SELECTED_TILEPREVIEW,
+            Settings.KEY_ENABLE_BLUR_SELECTED_TILEPREVIEW,
             this,
             'blur',
             Gio.SettingsBindFlags.GET,

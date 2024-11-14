@@ -128,10 +128,10 @@ export default class TilePreview extends St.Widget {
         position?: Mtk.Rectangle,
     ) {
         if (this.get_parent() === global.windowGroup) {
-            const windowActor =
+            /* const windowActor =
                 window.get_compositor_private() as Clutter.Actor;
-            if (!windowActor) return;
-            global.windowGroup.set_child_above_sibling(this, windowActor);
+            if (!windowActor) return;*/
+            global.windowGroup.set_child_above_sibling(this, null);
         }
 
         this.open(ease, position);

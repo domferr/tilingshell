@@ -65,21 +65,30 @@ export default class GlobalState extends GObject.Object {
         this.validate_selected_layouts();
 
         Settings.bind(
-            Settings.SETTING_TILE_PREVIEW_ANIMATION_TIME,
+            Settings.KEY_TILE_PREVIEW_ANIMATION_TIME,
             this,
             'tilePreviewAnimationTime',
             Gio.SettingsBindFlags.GET,
         );
-        this._signals.connect(Settings, Settings.SETTING_LAYOUTS_JSON, () => {
-            this._layouts = Settings.get_layouts_json();
-            this.emit(GlobalState.SIGNAL_LAYOUTS_CHANGED);
-        });
+        this._signals.connect(
+            Settings,
+            Settings.KEY_SETTING_LAYOUTS_JSON,
+            () => {
+                this._layouts = Settings.get_layouts_json();
+                this.emit(GlobalState.SIGNAL_LAYOUTS_CHANGED);
+            },
+        );
 
         this._signals.connect(
             Settings,
-            Settings.SETTING_SELECTED_LAYOUTS,
+            Settings.KEY_SETTING_SELECTED_LAYOUTS,
             () => {
                 const selected_layouts = Settings.get_selected_layouts();
+                if (selected_layouts.length === 0) {
+                    this.validate_selected_layouts();
+                    return;
+                }
+
                 const n_monitors = Main.layoutManager.monitors.length;
                 const n_workspaces = global.workspaceManager.get_n_workspaces();
                 for (let i = 0; i < n_workspaces; i++) {
@@ -87,7 +96,10 @@ export default class GlobalState extends GObject.Object {
                         global.workspaceManager.get_workspace_by_index(i);
                     if (!ws) continue;
 
-                    const monitors_layouts = selected_layouts[i];
+                    const monitors_layouts =
+                        i < selected_layouts.length
+                            ? selected_layouts[i]
+                            : [GlobalState.get().layouts[0].id];
                     while (monitors_layouts.length < n_monitors)
                         monitors_layouts.push(this._layouts[0].id);
                     while (monitors_layouts.length > n_monitors)
@@ -264,7 +276,10 @@ export default class GlobalState extends GObject.Object {
         if (workspaceIndex < 0 || workspaceIndex >= selectedLayouts.length)
             workspaceIndex = 0;
 
-        const monitors_selected = selectedLayouts[workspaceIndex];
+        const monitors_selected =
+            workspaceIndex < selectedLayouts.length
+                ? selectedLayouts[workspaceIndex]
+                : GlobalState.get().layouts[0].id;
         if (monitorIndex < 0 || monitorIndex >= monitors_selected.length)
             monitorIndex = 0;
 

@@ -51,16 +51,15 @@ export default class TilingShellExtension extends Extension {
     }
 
     private _validateSettings() {
-        if (Settings.get_last_version_installed() === '14.0') {
+        if (Settings.LAST_VERSION_NAME_INSTALLED === '14.0') {
             debug('apply compatibility changes');
             Settings.save_selected_layouts([]);
         }
 
         // Setting used for compatibility changes if necessary
         if (this.metadata['version-name']) {
-            Settings.set_last_version_installed(
-                this.metadata['version-name'] || '0',
-            );
+            Settings.LAST_VERSION_NAME_INSTALLED =
+                this.metadata['version-name'] || '0';
         }
     }
 
@@ -82,7 +81,7 @@ export default class TilingShellExtension extends Extension {
         this._keybindings = new KeyBindings(this.getSettings());
 
         // disable native edge tiling
-        if (Settings.get_active_screen_edges()) {
+        if (Settings.ACTIVE_SCREEN_EDGES) {
             SettingsOverride.get().override(
                 new Gio.Settings({ schema_id: 'org.gnome.mutter' }),
                 'edge-tiling',
@@ -117,7 +116,7 @@ export default class TilingShellExtension extends Extension {
         this._dbus = new DBus();
         this._dbus.enable(this);
 
-        if (Settings.get_override_window_menu()) OverriddenWindowMenu.enable();
+        if (Settings.OVERRIDE_WINDOW_MENU) OverriddenWindowMenu.enable();
 
         debug('extension is enabled');
     }
@@ -220,7 +219,7 @@ export default class TilingShellExtension extends Extension {
                 (kb: KeyBindings, dp: Meta.Display) => {
                     this._onKeyboardMoveWin(
                         dp,
-                        KeyBindingsDirection.CENTER,
+                        KeyBindingsDirection.NODIRECTION,
                         false,
                     );
                 },
@@ -242,12 +241,12 @@ export default class TilingShellExtension extends Extension {
         // then enable/disable native edge-tiling
         this._signals.connect(
             Settings,
-            Settings.SETTING_ACTIVE_SCREEN_EDGES,
+            Settings.KEY_ACTIVE_SCREEN_EDGES,
             () => {
                 const gioSettings = new Gio.Settings({
                     schema_id: 'org.gnome.mutter',
                 });
-                if (Settings.get_active_screen_edges()) {
+                if (Settings.ACTIVE_SCREEN_EDGES) {
                     debug('disable native edge tiling');
                     // disable native edge tiling
                     SettingsOverride.get().override(
@@ -269,9 +268,9 @@ export default class TilingShellExtension extends Extension {
         // enable/disable window menu from preferences
         this._signals.connect(
             Settings,
-            Settings.SETTING_OVERRIDE_WINDOW_MENU,
+            Settings.KEY_OVERRIDE_WINDOW_MENU,
             () => {
-                if (Settings.get_override_window_menu())
+                if (Settings.OVERRIDE_WINDOW_MENU)
                     OverriddenWindowMenu.enable();
                 else OverriddenWindowMenu.disable();
             },
@@ -397,13 +396,17 @@ export default class TilingShellExtension extends Extension {
             this._tilingManagers[focus_window.get_monitor()];
         if (!monitorTilingManager) return;
 
+        if (Settings.ENABLE_AUTO_TILING && focus_window.get_maximized()) {
+            focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
+            return;
+        }
         const success = monitorTilingManager.onKeyboardMoveWindow(
             focus_window,
             direction,
             false,
             spanFlag,
         );
-        if (success || direction === KeyBindingsDirection.CENTER) return;
+        if (success || direction === KeyBindingsDirection.NODIRECTION) return;
 
         let displayDirection = Meta.DisplayDirection.DOWN;
         switch (direction) {

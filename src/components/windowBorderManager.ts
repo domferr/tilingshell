@@ -3,6 +3,7 @@ import SignalHandling from '@utils/signalHandling';
 import { logger } from '@utils/logger';
 import { registerGObjectClass } from '@utils/gjs';
 import Settings from '@settings/settings';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 const debug = logger('WindowBorderManager');
 
@@ -135,7 +136,7 @@ class WindowBorder extends St.Bin {
 
     public updateStyle(): void {
         this.set_style(
-            `border-color: ${Settings.get_window_border_color()}; border-width: ${Settings.get_window_border_width()}px;`,
+            `border-color: ${Settings.WINDOW_BORDER_COLOR}; border-width: ${Settings.WINDOW_BORDER_WIDTH}px;`,
         );
     }
 
@@ -168,14 +169,14 @@ export class WindowBorderManager {
     }
 
     public enable(): void {
-        if (Settings.get_enable_window_border()) this._turnOn();
+        if (Settings.ENABLE_WINDOW_BORDER) this._turnOn();
 
         // enable/disable based on user preferences
         this._signals.connect(
             Settings,
-            Settings.SETTING_ENABLE_WINDOW_BORDER,
+            Settings.KEY_ENABLE_WINDOW_BORDER,
             () => {
-                if (Settings.get_enable_window_border()) this._turnOn();
+                if (Settings.ENABLE_WINDOW_BORDER) this._turnOn();
                 else this._turnOff();
             },
         );
@@ -188,20 +189,12 @@ export class WindowBorderManager {
             'notify::focus-window',
             this._onWindowFocused.bind(this),
         );
-        this._signals.connect(
-            Settings,
-            Settings.SETTING_WINDOW_BORDER_COLOR,
-            () => {
-                this._border?.updateStyle();
-            },
+        this._signals.connect(Settings, Settings.KEY_WINDOW_BORDER_COLOR, () =>
+            this._border?.updateStyle(),
         );
 
-        this._signals.connect(
-            Settings,
-            Settings.SETTING_WINDOW_BORDER_WIDTH,
-            () => {
-                this._border?.updateStyle();
-            },
+        this._signals.connect(Settings, Settings.KEY_WINDOW_BORDER_WIDTH, () =>
+            this._border?.updateStyle(),
         );
     }
 

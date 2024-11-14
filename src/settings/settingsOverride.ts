@@ -8,7 +8,7 @@ export default class SettingsOverride {
 
     private constructor() {
         this._overriddenKeys = this._jsonToOverriddenKeys(
-            Settings.get_overridden_settings(),
+            Settings.OVERRIDDEN_SETTINGS,
         );
     }
 
@@ -91,7 +91,7 @@ export default class SettingsOverride {
         if (!schemaMap.has(keyToOverride)) {
             schemaMap.set(keyToOverride, oldValue);
 
-            Settings.set_overridden_settings(this._overriddenKeysToJSON());
+            Settings.OVERRIDDEN_SETTINGS = this._overriddenKeysToJSON();
         }
 
         return oldValue;
@@ -115,7 +115,7 @@ export default class SettingsOverride {
             if (overridden.size === 0)
                 this._overriddenKeys.delete(giosettings.schemaId);
 
-            Settings.set_overridden_settings(this._overriddenKeysToJSON());
+            Settings.OVERRIDDEN_SETTINGS = this._overriddenKeysToJSON();
         }
 
         return oldValue;
@@ -147,6 +147,6 @@ export default class SettingsOverride {
 
         if (this._overriddenKeys.size === 0) this._overriddenKeys = new Map();
 
-        Settings.set_overridden_settings(this._overriddenKeysToJSON());
+        Settings.OVERRIDDEN_SETTINGS = this._overriddenKeysToJSON();
     }
 }

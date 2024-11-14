@@ -170,27 +170,34 @@ export default class DefaultMenu implements CurrentMenu {
         this._layoutsRows = [];
         this._drawLayouts();
         // update the layouts shown by the indicator when they are modified
-        this._signals.connect(Settings, Settings.SETTING_LAYOUTS_JSON, () => {
-            this._drawLayouts();
-        });
-        this._signals.connect(Settings, Settings.SETTING_INNER_GAPS, () => {
+        this._signals.connect(
+            Settings,
+            Settings.KEY_SETTING_LAYOUTS_JSON,
+            () => {
+                this._drawLayouts();
+            },
+        );
+        this._signals.connect(Settings, Settings.KEY_INNER_GAPS, () => {
             this._drawLayouts();
         });
 
         // if the selected layout was changed externaly, update the selected button
         this._signals.connect(
             Settings,
-            Settings.SETTING_SELECTED_LAYOUTS,
+            Settings.KEY_SETTING_SELECTED_LAYOUTS,
             () => {
                 this._updateScaling();
                 if (this._layoutsRows.length !== getMonitors().length)
                     this._drawLayouts();
 
+                const selected_layouts = Settings.get_selected_layouts();
+                const wsIndex =
+                    global.workspaceManager.get_active_workspace_index();
                 getMonitors().forEach((m, index) => {
                     const selectedId =
-                        Settings.get_selected_layouts()[
-                            global.workspaceManager.get_active_workspace_index()
-                        ][index];
+                        wsIndex < selected_layouts.length
+                            ? selected_layouts[wsIndex][index]
+                            : GlobalState.get().layouts[0].id;
                     this._layoutsRows[index].selectLayout(selectedId);
                 });
             },
@@ -200,11 +207,14 @@ export default class DefaultMenu implements CurrentMenu {
             global.workspaceManager,
             'active-workspace-changed',
             () => {
+                const selected_layouts = Settings.get_selected_layouts();
+                const wsIndex =
+                    global.workspaceManager.get_active_workspace_index();
                 getMonitors().forEach((m, index) => {
                     const selectedId =
-                        Settings.get_selected_layouts()[
-                            global.workspaceManager.get_active_workspace_index()
-                        ][index];
+                        wsIndex < selected_layouts.length
+                            ? selected_layouts[wsIndex][index]
+                            : GlobalState.get().layouts[0].id;
                     this._layoutsRows[index].selectLayout(selectedId);
                 });
             },
@@ -333,7 +343,14 @@ export default class DefaultMenu implements CurrentMenu {
         const ws_index = global.workspaceManager.get_active_workspace_index();
         const monitors = getMonitors();
         this._layoutsRows = monitors.map((monitor) => {
-            const selectedId = selected_layouts[ws_index][monitor.index];
+            const ws_selected_layouts =
+                ws_index < selected_layouts.length
+                    ? selected_layouts[ws_index]
+                    : [];
+            const selectedId =
+                monitor.index < ws_selected_layouts.length
+                    ? ws_selected_layouts[monitor.index]
+                    : GlobalState.get().layouts[0].id;
             const row = new LayoutsRow(
                 this._container,
                 layouts,
