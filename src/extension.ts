@@ -2,7 +2,7 @@ import './styles/stylesheet.scss';
 
 import { Gio, GLib, Meta } from '@gi.ext';
 import { logger } from '@utils/logger';
-import { getMonitors, squaredEuclideanDistance } from '@/utils/ui';
+import { getMonitors, getWindows, squaredEuclideanDistance } from '@/utils/ui';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { TilingManager } from '@/components/tilingsystem/tilingManager';
 import Settings from '@settings/settings';
@@ -107,7 +107,9 @@ export default class TilingShellExtension extends Extension {
         this._resizingManager.enable();
 
         if (this._windowBorderManager) this._windowBorderManager.destroy();
-        this._windowBorderManager = new WindowBorderManager();
+        this._windowBorderManager = new WindowBorderManager(
+            !this._fractionalScalingEnabled,
+        );
         this._windowBorderManager.enable();
 
         this.createIndicator();
@@ -172,6 +174,12 @@ export default class TilingShellExtension extends Extension {
                     this._indicator.enableScaling =
                         !this._fractionalScalingEnabled;
                 }
+                if (this._windowBorderManager)
+                    this._windowBorderManager.destroy();
+                this._windowBorderManager = new WindowBorderManager(
+                    this._fractionalScalingEnabled,
+                );
+                this._windowBorderManager.enable();
             },
         );
 
@@ -456,6 +464,7 @@ export default class TilingShellExtension extends Extension {
         if (
             !focus_window ||
             !focus_window.has_focus() ||
+            focus_window.windowType !== Meta.WindowType.NORMAL ||
             (focus_window.get_wm_class() &&
                 focus_window.get_wm_class() === 'gjs')
         )
@@ -469,16 +478,9 @@ export default class TilingShellExtension extends Extension {
             x: focusWindowRect.x + focusWindowRect.width / 2,
             y: focusWindowRect.y + focusWindowRect.height / 2,
         };
-        focus_window
-            .get_workspace()
-            .list_windows()
+        getWindows(focus_window.get_workspace())
             .filter((win) => {
-                if (
-                    win === focus_window ||
-                    (win.get_wm_class() && win.get_wm_class() === 'gjs') ||
-                    win.minimized
-                )
-                    return false;
+                if (win === focus_window || win.minimized) return false;
 
                 const winRect = win.get_frame_rect();
                 switch (direction) {
@@ -526,6 +528,7 @@ export default class TilingShellExtension extends Extension {
         if (
             !focus_window ||
             !focus_window.has_focus() ||
+            focus_window.windowType !== Meta.WindowType.NORMAL ||
             (focus_window.get_wm_class() &&
                 focus_window.get_wm_class() === 'gjs')
         )

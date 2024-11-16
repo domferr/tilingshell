@@ -22,10 +22,10 @@ export default class KeyBindings extends GObject.Object {
         GTypeName: 'KeyBindings',
         Signals: {
             'move-window': {
-                param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, Meta.Direction
+                param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, KeyBindingsDirection
             },
             'span-window': {
-                param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, Meta.Direction
+                param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, KeyBindingsDirection
             },
             'span-window-all-tiles': {
                 param_types: [Meta.Display.$gtype], // Meta.Display
@@ -37,7 +37,7 @@ export default class KeyBindings extends GObject.Object {
                 param_types: [Meta.Display.$gtype], // Meta.Display
             },
             'focus-window': {
-                param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, Meta.Direction
+                param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, KeyBindingsDirection
             },
         },
     };

@@ -2,10 +2,8 @@
     transition: 200ms ease all;
     border-style: solid;
     border-color: none;
+    // border-radius: 11px; // 14px for external border
+    border-radius-value: 11px;
     // top left and top right border radius only
-    border-radius: 11px 11px 0 0; // 14px for external border
-}
-
-.window-border.full-radius {
-    border-radius: 11px; // 14px for external border
+    // border-radius: 11px 11px 0 0; // 14px for external border
 }

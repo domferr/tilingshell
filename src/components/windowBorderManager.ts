@@ -4,6 +4,12 @@ import { logger } from '@utils/logger';
 import { registerGObjectClass } from '@utils/gjs';
 import Settings from '@settings/settings';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import {
+    enableScalingFactorSupport,
+    getMonitorScalingFactor,
+    getScalingFactorOf,
+    getScalingFactorSupportString,
+} from '@utils/ui';
 
 const debug = logger('WindowBorderManager');
 
@@ -12,19 +18,24 @@ class WindowBorder extends St.Bin {
     private readonly _signals: SignalHandling;
 
     private _window: Meta.Window;
+    private _windowMonitor: number;
     private _bindings: GObject.Binding[];
+    private _enableScaling: boolean;
 
-    constructor(win: Meta.Window) {
+    constructor(win: Meta.Window, enableScaling: boolean) {
         super({
-            style_class: 'window-border full-radius',
+            style_class: 'window-border',
         });
         this._signals = new SignalHandling();
         this._bindings = [];
 
-        this.updateStyle();
         this._window = win;
+        this._windowMonitor = win.get_monitor();
+        this._enableScaling = enableScaling;
+
         this.close();
         global.windowGroup.add_child(this);
+
         this.trackWindow(win, true);
 
         this.connect('destroy', () => {
@@ -87,6 +98,8 @@ class WindowBorder extends St.Bin {
         this.set_position(winRect.x, winRect.y);
         this.set_size(winRect.width, winRect.height);
 
+        this.updateStyle();
+
         const isMaximized =
             this._window.maximizedVertically &&
             this._window.maximizedHorizontally;
@@ -113,6 +126,11 @@ class WindowBorder extends St.Bin {
 
             const rect = this._window.get_frame_rect();
             this.set_position(rect.x, rect.y);
+            // if the window changes monitor, we may have a different scaling factor
+            if (this._windowMonitor !== win.get_monitor()) {
+                this._windowMonitor = win.get_monitor();
+                this.updateStyle();
+            }
             this.open();
         });
 
@@ -130,13 +148,47 @@ class WindowBorder extends St.Bin {
 
             const rect = this._window.get_frame_rect();
             this.set_size(rect.width, rect.height);
+            // if the window changes monitor, we may have a different scaling factor
+            if (this._windowMonitor !== win.get_monitor()) {
+                this._windowMonitor = win.get_monitor();
+                this.updateStyle();
+            }
             this.open();
         });
     }
 
     public updateStyle(): void {
+        // handle scale factor of the monitor
+        const monitorScalingFactor = this._enableScaling
+            ? getMonitorScalingFactor(this._window.get_monitor())
+            : undefined;
+        // CAUTION: this overrides the CSS style
+        enableScalingFactorSupport(this, monitorScalingFactor);
+
+        const [alreadyScaled, scalingFactor] = getScalingFactorOf(this);
+        // the value got is already scaled if the tile is on primary monitor
+        const radiusValue =
+            (alreadyScaled ? 1 : scalingFactor) *
+            (this.get_theme_node().get_length('border-radius-value') /
+                (alreadyScaled ? scalingFactor : 1));
+        const borderWidth =
+            (alreadyScaled ? 1 : scalingFactor) *
+            (Settings.WINDOW_BORDER_WIDTH /
+                (alreadyScaled ? scalingFactor : 1));
+        const radius = [radiusValue, radiusValue, radiusValue, radiusValue];
+        debug(
+            'sf is',
+            scalingFactor,
+            'radius is',
+            radius,
+            'border is',
+            borderWidth,
+        );
+        const scalingFactorSupportString = monitorScalingFactor
+            ? getScalingFactorSupportString(monitorScalingFactor)
+            : '';
         this.set_style(
-            `border-color: ${Settings.WINDOW_BORDER_COLOR}; border-width: ${Settings.WINDOW_BORDER_WIDTH}px;`,
+            `border-color: ${Settings.WINDOW_BORDER_COLOR}; border-width: ${borderWidth}px; border-radius: ${radius[St.Corner.TOPLEFT]}px ${radius[St.Corner.TOPRIGHT]}px ${radius[St.Corner.BOTTOMRIGHT]}px ${radius[St.Corner.BOTTOMLEFT]}px; ${scalingFactorSupportString};`,
         );
     }
 
@@ -162,10 +214,12 @@ export class WindowBorderManager {
     private readonly _signals: SignalHandling;
 
     private _border: WindowBorder | null;
+    private _enableScaling: boolean;
 
-    constructor() {
+    constructor(enableScaling: boolean) {
         this._signals = new SignalHandling();
         this._border = null;
+        this._enableScaling = enableScaling;
     }
 
     public enable(): void {
@@ -223,7 +277,22 @@ export class WindowBorderManager {
             return;
         }
 
-        if (!this._border) this._border = new WindowBorder(metaWindow);
+        if (!this._border)
+            this._border = new WindowBorder(metaWindow, this._enableScaling);
         else this._border.trackWindow(metaWindow);
     }
 }
+
+/*
+If in the future we want to have MULTIPLE borders visible AT THE SAME TIME,
+when the windows are restacked we have to restack the borders as well.
+
+display.connect('restacked', (display) => {
+    let wg = Meta.get_window_group_for_display(display);
+    forEachWindowInTheWindowGroup((win) => {
+        winBorder = getWindowBorder(win)
+        winActor = win.get_compositor_private()
+        wg.set_child_above_sibling(winBorder, winActor);
+    });
+});
+*/

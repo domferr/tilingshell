@@ -89,9 +89,11 @@ export const enableScalingFactorSupport = (
     monitorScalingFactor?: number,
 ) => {
     if (!monitorScalingFactor) return;
-    widget.set_style(
-        `scaling-reference: 1px; monitor-scaling-factor: ${monitorScalingFactor}px;`,
-    );
+    widget.set_style(`${getScalingFactorSupportString(monitorScalingFactor)};`);
+};
+
+export const getScalingFactorSupportString = (monitorScalingFactor: number) => {
+    return `scaling-reference: 1px; monitor-scaling-factor: ${monitorScalingFactor}px`;
 };
 
 export function getWindowsOfMonitor(monitor: Monitor): Meta.Window[] {
@@ -162,8 +164,8 @@ export function buildBlurEffect(sigma: number): Shell.BlurEffect {
 }
 
 /** From Gnome Shell: https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/main/js/ui/altTab.js#L53 */
-export function getWindows(): Meta.Window[] {
-    const workspace = global.workspaceManager.get_active_workspace();
+export function getWindows(workspace?: Meta.Workspace): Meta.Window[] {
+    if (!workspace) workspace = global.workspaceManager.get_active_workspace();
     // We ignore skip-taskbar windows in switchers, but if they are attached
     // to their parent, their position in the MRU list may be more appropriate
     // than the parent; so start with the complete list ...
