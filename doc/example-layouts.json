@@ -1,0 +1,60 @@
+[
+	{
+		"id": "split-half",
+		"tiles": [
+			{
+				"x": 0,
+				"y": 0,
+				"width": 0.5,
+				"height": 1,
+				"groups": [
+					2
+				]
+			},
+			{
+				"x": 0.5,
+				"y": 0,
+				"width": 0.5,
+				"height": 1,
+				"groups": [
+					1
+				]
+			}
+		]
+	},
+	{
+		"id": "split-thirds",
+		"tiles": [
+			{
+				"x": 0,
+				"y": 0,
+				"width": 0.333,
+				"height": 1,
+				"groups": [
+					2,
+					3
+				]
+			},
+			{
+				"x": 0.333,
+				"y": 0,
+				"width": 0.333,
+				"height": 1,
+				"groups": [
+					3,
+					1
+				]
+			},
+			{
+				"x": 0.666,
+				"y": 0,
+				"width": 0.333,
+				"height": 1,
+				"groups": [
+					2,
+					1
+				]
+			}
+		]
+	}
+]

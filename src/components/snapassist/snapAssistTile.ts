@@ -6,7 +6,6 @@ import { getScalingFactorOf } from '@utils/ui';
 
 @registerGObjectClass
 export default class SnapAssistTile extends TilePreview {
-    protected _tile: Tile;
     private _styleChangedSignalID: number | undefined;
 
     constructor(params: {
@@ -51,10 +50,6 @@ export default class SnapAssistTile extends TilePreview {
     _init() {
         super._init();
         this.set_style_class_name('snap-assist-tile button');
-    }
-
-    public get tile() {
-        return this._tile;
     }
 
     _applyStyle() {

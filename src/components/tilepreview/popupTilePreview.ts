@@ -6,9 +6,9 @@ import { buildBlurEffect } from '@utils/ui';
 import Tile from '@components/layout/Tile';
 
 @registerGObjectClass
-export default class SelectionTilePreview extends TilePreview {
+export default class PopupTilePreview extends TilePreview {
     static metaInfo: GObject.MetaInfo<unknown, unknown, unknown> = {
-        GTypeName: 'SelectionTilePreview',
+        GTypeName: 'PopupTilePreview',
         Properties: {
             blur: GObject.ParamSpec.boolean(
                 'blur',
@@ -25,7 +25,6 @@ export default class SelectionTilePreview extends TilePreview {
     constructor(params: {
         parent: Clutter.Actor;
         tile?: Tile;
-        containerRect?: Mtk.Rectangle;
         rect?: Mtk.Rectangle;
         gaps?: Clutter.Margin;
     }) {
@@ -33,12 +32,13 @@ export default class SelectionTilePreview extends TilePreview {
 
         this._blur = false;
 
-        Settings.bind(
+        // blur not supported due to GNOME shell known bug
+        /* Settings.bind(
             Settings.KEY_ENABLE_BLUR_SELECTED_TILEPREVIEW,
             this,
             'blur',
             Gio.SettingsBindFlags.GET,
-        );
+        );*/
 
         this._recolor();
         const styleChangedSignalID = St.ThemeContext.get_for_stage(
@@ -51,19 +51,18 @@ export default class SelectionTilePreview extends TilePreview {
                 styleChangedSignalID,
             ),
         );
-        this._rect.width = this.gaps.left + this.gaps.right;
-        this._rect.height = this.gaps.top + this.gaps.bottom;
     }
 
     set blur(value: boolean) {
         if (this._blur === value) return;
 
         this._blur = value;
-        this.get_effect('blur')?.set_enabled(value);
+        // blur not supported due to GNOME shell known bug
+        /* this.get_effect('blur')?.set_enabled(value);
         if (this._blur) this.add_style_class_name('blur-tile-preview');
         else this.remove_style_class_name('blur-tile-preview');
 
-        this._recolor();
+        this._recolor();*/
     }
 
     _init() {
@@ -92,13 +91,5 @@ export default class SelectionTilePreview extends TilePreview {
         this.set_style(`
             background-color: rgba(${backgroundColor.red}, ${backgroundColor.green}, ${backgroundColor.blue}, ${newAlpha / 255}) !important;
         `);
-    }
-
-    close(ease: boolean = false) {
-        if (!this._showing) return;
-
-        this._rect.width = this.gaps.left + this.gaps.right;
-        this._rect.height = this.gaps.top + this.gaps.bottom;
-        super.close(ease);
     }
 }

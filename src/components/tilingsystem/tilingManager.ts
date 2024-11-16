@@ -26,6 +26,7 @@ import EdgeTilingManager from './edgeTilingManager';
 import TouchPointer from './touchPointer';
 import { KeyBindingsDirection } from '@keybindings';
 import TilingShellWindowManager from '@components/windowManager/tilingShellWindowManager';
+import TilingPopup from './tilingPopup';
 
 const MINIMUM_DISTANCE_TO_RESTORE_ORIGINAL_SIZE = 90;
 
@@ -323,7 +324,7 @@ export class TilingManager {
         }
 
         // find the nearest tile
-        // direction is CENTER -> move to the center of the screen
+        // direction is NODIRECTION -> move to the center of the screen
         if (direction === KeyBindingsDirection.NODIRECTION) {
             const rect = buildRectangle({
                 x:
@@ -341,15 +342,18 @@ export class TilingManager {
                 rect,
                 tile: TileUtils.build_tile(rect, this._workArea),
             };
-        } else {
+        } else if (window.get_monitor() === this._monitor.index) {
             destination = tilingLayout.findNearestTileDirection(
                 windowRectCopy,
                 direction,
             );
+        } else {
+            destination = tilingLayout.findNearestTile(windowRectCopy);
         }
 
         // if the window is already on the desired tile
         if (
+            window.get_monitor() === this._monitor.index &&
             destination &&
             (window as ExtendedWindow).assignedTile &&
             (window as ExtendedWindow).assignedTile?.x === destination.tile.x &&
@@ -750,6 +754,9 @@ export class TilingManager {
             return;
 
         // disable snap assistance
+        const showPopup =
+            !this._isSnapAssisting &&
+            !this._edgeTilingManager.isPerformingEdgeTiling();
         this._isSnapAssisting = false;
 
         if (
@@ -779,6 +786,21 @@ export class TilingManager {
             ...TileUtils.build_tile(selectedTilesRect, this._workArea),
         });
         this._easeWindowRect(window, desiredWindowRect);
+
+        if (tilingLayout && showPopup) {
+            const layout = GlobalState.get().getSelectedLayoutOfMonitor(
+                this._monitor.index,
+                window.get_workspace().index(),
+            );
+            new TilingPopup(
+                layout,
+                tilingLayout.innerGaps,
+                tilingLayout.outerGaps,
+                this._workArea,
+                tilingLayout.scalingFactor,
+                window as ExtendedWindow,
+            );
+        }
     }
 
     private _easeWindowRect(
@@ -882,11 +904,16 @@ export class TilingManager {
         const [x, y] = TouchPointer.get().isTouchDeviceActive()
             ? TouchPointer.get().get_pointer(window)
             : global.get_pointer();
+
+        const monitorWidth =
+            this._workArea.x - this._monitor.x + this._workArea.width;
+        const monitorHeight =
+            this._workArea.y - this._monitor.y + this._workArea.height;
         return (
             x >= this._monitor.x &&
-            x <= this._monitor.x + this._monitor.width &&
+            x <= this._monitor.x + monitorWidth &&
             y >= this._monitor.y &&
-            y <= this._monitor.y + this._monitor.height
+            y <= this._monitor.y + monitorHeight
         );
     }
 
@@ -1047,8 +1074,6 @@ export class TilingManager {
         if (windowCreated) {
             const windowActor =
                 window.get_compositor_private() as Meta.WindowActor;
-            // the window won't be visible when will open on its position (e.g. the center of the screen)
-            windowActor.set_opacity(0);
             const id = windowActor.connect('first-frame', () => {
                 // while we restore the opacity, making the window visible
                 // again, we perform easing of movement too
@@ -1060,15 +1085,8 @@ export class TilingManager {
                     !window.maximizedVertically &&
                     window.get_transient_for() === null &&
                     !window.is_attached_dialog()
-                ) {
-                    windowActor.ease({
-                        opacity: 255,
-                        duration: 200,
-                    });
+                )
                     this._easeWindowRectFromTile(vacantTile, window, true);
-                } else {
-                    windowActor.set_opacity(255);
-                }
 
                 windowActor.disconnect(id);
             });

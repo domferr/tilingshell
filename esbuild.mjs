@@ -18,6 +18,10 @@ class Extension {
     getSettings() {
         return imports.misc.extensionUtils.getSettings();
     }
+
+    static openPrefs() {
+        return imports.misc.extensionUtils.openPrefs();
+    }
 }
 
 class Mtk { Rectangle }
