@@ -2,23 +2,31 @@ import './styles/stylesheet.scss';
 
 import { Gio, GLib, Meta } from '@gi.ext';
 import { logger } from '@utils/logger';
-import { getMonitors, squaredEuclideanDistance } from '@/utils/ui';
+import {
+    filterUnfocusableWindows,
+    getMonitors,
+    squaredEuclideanDistance,
+} from '@/utils/ui';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { TilingManager } from '@/components/tilingsystem/tilingManager';
 import Settings from '@settings/settings';
 import SignalHandling from './utils/signalHandling';
 import GlobalState from './utils/globalState';
 import Indicator from './indicator/indicator';
-import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import { ExtensionMetadata } from 'resource:///org/gnome/shell/extensions/extension.js';
 import DBus from './dbus';
-import KeyBindings, { KeyBindingsDirection } from './keybindings';
+import KeyBindings, {
+    KeyBindingsDirection,
+    FocusSwitchDirection,
+} from './keybindings';
 import SettingsOverride from '@settings/settingsOverride';
 import { ResizingManager } from '@components/tilingsystem/resizeManager';
 import OverriddenWindowMenu from '@components/window_menu/overriddenWindowMenu';
 import Tile from '@components/layout/Tile';
 import { WindowBorderManager } from '@components/windowBorderManager';
 import TilingShellWindowManager from '@components/windowManager/tilingShellWindowManager';
+import ExtendedWindow from '@components/tilingsystem/extendedWindow';
+import { Extension } from '@polyfill';
 
 const debug = logger('extension');
 
@@ -107,7 +115,9 @@ export default class TilingShellExtension extends Extension {
         this._resizingManager.enable();
 
         if (this._windowBorderManager) this._windowBorderManager.destroy();
-        this._windowBorderManager = new WindowBorderManager();
+        this._windowBorderManager = new WindowBorderManager(
+            !this._fractionalScalingEnabled,
+        );
         this._windowBorderManager.enable();
 
         this.createIndicator();
@@ -172,6 +182,12 @@ export default class TilingShellExtension extends Extension {
                     this._indicator.enableScaling =
                         !this._fractionalScalingEnabled;
                 }
+                if (this._windowBorderManager)
+                    this._windowBorderManager.destroy();
+                this._windowBorderManager = new WindowBorderManager(
+                    this._fractionalScalingEnabled,
+                );
+                this._windowBorderManager.enable();
             },
         );
 
@@ -230,9 +246,20 @@ export default class TilingShellExtension extends Extension {
                 (
                     kb: KeyBindings,
                     dp: Meta.Display,
-                    dir: KeyBindingsDirection,
+                    dir: FocusSwitchDirection,
                 ) => {
                     this._onKeyboardFocusWin(dp, dir);
+                },
+            );
+            this._signals.connect(
+                this._keybindings,
+                'focus-window-direction',
+                (
+                    kb: KeyBindings,
+                    dp: Meta.Display,
+                    dir: KeyBindingsDirection,
+                ) => {
+                    this._onKeyboardFocusWinDirection(dp, dir);
                 },
             );
         }
@@ -381,11 +408,17 @@ export default class TilingShellExtension extends Extension {
             return;
 
         // if the window is maximized, it cannot be spanned
-        if (focus_window.get_maximized() && spanFlag) return;
+        if (
+            (focus_window.maximizedHorizontally ||
+                focus_window.maximizedVertically) &&
+            spanFlag
+        )
+            return;
 
         // handle unmaximize of maximized window
         if (
-            focus_window.get_maximized() &&
+            (focus_window.maximizedHorizontally ||
+                focus_window.maximizedVertically) &&
             direction === KeyBindingsDirection.DOWN
         ) {
             focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
@@ -396,7 +429,11 @@ export default class TilingShellExtension extends Extension {
             this._tilingManagers[focus_window.get_monitor()];
         if (!monitorTilingManager) return;
 
-        if (Settings.ENABLE_AUTO_TILING && focus_window.get_maximized()) {
+        if (
+            Settings.ENABLE_AUTO_TILING &&
+            (focus_window.maximizedHorizontally ||
+                focus_window.maximizedVertically)
+        ) {
             focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
             return;
         }
@@ -428,12 +465,14 @@ export default class TilingShellExtension extends Extension {
 
         // if the window is maximized, direction is UP and there is a monitor above, minimize the window
         if (
-            focus_window.get_maximized() &&
+            (focus_window.maximizedHorizontally ||
+                focus_window.maximizedVertically) &&
             direction === KeyBindingsDirection.UP
         ) {
             // @ts-expect-error "Main.wm has skipNextEffect function"
             Main.wm.skipNextEffect(focus_window.get_compositor_private());
             focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
+            (focus_window as ExtendedWindow).assignedTile = undefined;
         }
 
         const neighborTilingManager =
@@ -448,14 +487,17 @@ export default class TilingShellExtension extends Extension {
         );
     }
 
-    private _onKeyboardFocusWin(
+    private _onKeyboardFocusWinDirection(
         display: Meta.Display,
-        direction: KeyBindingsDirection,
+        direction: KeyBindingsDirection | FocusSwitchDirection,
     ) {
         const focus_window = display.get_focus_window();
+        const focusParent = focus_window.get_transient_for() || focus_window;
+
         if (
             !focus_window ||
             !focus_window.has_focus() ||
+            focusParent.windowType !== Meta.WindowType.NORMAL ||
             (focus_window.get_wm_class() &&
                 focus_window.get_wm_class() === 'gjs')
         )
@@ -469,16 +511,14 @@ export default class TilingShellExtension extends Extension {
             x: focusWindowRect.x + focusWindowRect.width / 2,
             y: focusWindowRect.y + focusWindowRect.height / 2,
         };
-        focus_window
-            .get_workspace()
-            .list_windows()
+
+        const windowList = filterUnfocusableWindows(
+            focus_window.get_workspace().list_windows(),
+        );
+
+        windowList
             .filter((win) => {
-                if (
-                    win === focus_window ||
-                    (win.get_wm_class() && win.get_wm_class() === 'gjs') ||
-                    win.minimized
-                )
-                    return false;
+                if (win === focus_window || win.minimized) return false;
 
                 const winRect = win.get_frame_rect();
                 switch (direction) {
@@ -521,11 +561,57 @@ export default class TilingShellExtension extends Extension {
         bestWindow.activate(global.get_current_time());
     }
 
+    private _onKeyboardFocusWin(
+        display: Meta.Display,
+        direction: FocusSwitchDirection,
+    ) {
+        const focus_window = display.get_focus_window();
+        const focusParent = focus_window.get_transient_for() || focus_window;
+
+        if (
+            !focus_window ||
+            !focus_window.has_focus() ||
+            focusParent.windowType !== Meta.WindowType.NORMAL ||
+            (focus_window.get_wm_class() &&
+                focus_window.get_wm_class() === 'gjs')
+        )
+            return;
+
+        const windowList = filterUnfocusableWindows(
+            focus_window.get_workspace().list_windows(),
+        );
+        const focusedIdx = windowList.findIndex((win) => {
+            // in case we are iterating over a modal dialog for our focused window
+            return win === focusParent;
+        });
+
+        let nextIndex = -1;
+        switch (direction) {
+            case FocusSwitchDirection.PREV:
+                if (focusedIdx === 0 && Settings.WRAPAROUND_FOCUS) {
+                    windowList[windowList.length - 1].activate(
+                        global.get_current_time(),
+                    );
+                } else {
+                    windowList[focusedIdx - 1].activate(
+                        global.get_current_time(),
+                    );
+                }
+                break;
+            case FocusSwitchDirection.NEXT:
+                nextIndex = (focusedIdx + 1) % windowList.length;
+                if (nextIndex > 0 || Settings.WRAPAROUND_FOCUS)
+                    windowList[nextIndex].activate(global.get_current_time());
+                break;
+        }
+    }
+
     private _onKeyboardUntileWindow(kb: KeyBindings, display: Meta.Display) {
         const focus_window = display.get_focus_window();
         if (
             !focus_window ||
             !focus_window.has_focus() ||
+            focus_window.windowType !== Meta.WindowType.NORMAL ||
             (focus_window.get_wm_class() &&
                 focus_window.get_wm_class() === 'gjs')
         )

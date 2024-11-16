@@ -36,7 +36,7 @@ class SnapAssistContent extends St.BoxLayout {
                 'Distance from the snap assistant to trigger its opening/closing',
                 GObject.ParamFlags.READWRITE,
                 0,
-                240,
+                2000,
                 16,
             ),
             snapAssistantAnimationTime: GObject.ParamSpec.uint(
