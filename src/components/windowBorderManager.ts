@@ -1,17 +1,27 @@
-import { GObject, Meta, St, Clutter } from '@gi.ext';
+import { GObject, Meta, St, Clutter, Shell, Gio, GLib } from '@gi.ext';
 import SignalHandling from '@utils/signalHandling';
 import { logger } from '@utils/logger';
 import { registerGObjectClass } from '@utils/gjs';
 import Settings from '@settings/settings';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {
+    buildRectangle,
     enableScalingFactorSupport,
     getMonitorScalingFactor,
     getScalingFactorOf,
     getScalingFactorSupportString,
 } from '@utils/ui';
 
+Gio._promisify(Shell.Screenshot, 'composite_to_stream');
+
+const WINDOW_BORDER_WIDTH = 1;
+const DEFAULT_BORDER_RADIUS = 11;
+
 const debug = logger('WindowBorderManager');
+
+interface WindowWithCachedRadius extends Meta.Window {
+    __ts_cached_radius: [number, number, number, number] | undefined;
+}
 
 @registerGObjectClass
 class WindowBorder extends St.Bin {
@@ -21,6 +31,8 @@ class WindowBorder extends St.Bin {
     private _windowMonitor: number;
     private _bindings: GObject.Binding[];
     private _enableScaling: boolean;
+    private _borderRadiusValue: [number, number, number, number];
+    private _timeout: GLib.Source | undefined;
 
     constructor(win: Meta.Window, enableScaling: boolean) {
         super({
@@ -32,6 +44,12 @@ class WindowBorder extends St.Bin {
         this._window = win;
         this._windowMonitor = win.get_monitor();
         this._enableScaling = enableScaling;
+        this._borderRadiusValue = [
+            DEFAULT_BORDER_RADIUS,
+            DEFAULT_BORDER_RADIUS,
+            DEFAULT_BORDER_RADIUS,
+            DEFAULT_BORDER_RADIUS,
+        ]; // default value
 
         this.close();
         global.windowGroup.add_child(this);
@@ -42,6 +60,8 @@ class WindowBorder extends St.Bin {
             this._bindings.forEach((b) => b.unbind());
             this._bindings = [];
             this._signals.disconnect();
+            if (this._timeout) clearTimeout(this._timeout);
+            this._timeout = undefined;
         });
     }
 
@@ -57,47 +77,44 @@ class WindowBorder extends St.Bin {
             this._window.get_compositor_private() as Meta.WindowActor;
 
         // scale and translate like the window actor
-        this._bindings.push(
-            // @ts-expect-error "For some reason GObject.Binding is not recognized"
+        // @ts-expect-error "For some reason GObject.Binding is not recognized"
+        this._bindings = [
+            'pivot-point',
+            'scale-x',
+            'scale-y',
+            'translation_x',
+            'translation_y',
+        ].map((prop) =>
             winActor.bind_property(
-                'scale-x',
+                prop,
                 this,
-                'scale-x',
-                GObject.BindingFlags.DEFAULT, // if winActor changes, this will change
-            ),
-        );
-        this._bindings.push(
-            // @ts-expect-error "For some reason GObject.Binding is not recognized"
-            winActor.bind_property(
-                'scale-y',
-                this,
-                'scale-y',
-                GObject.BindingFlags.DEFAULT, // if winActor changes, this will change
-            ),
-        );
-        this._bindings.push(
-            // @ts-expect-error "For some reason GObject.Binding is not recognized"
-            winActor.bind_property(
-                'translation_x',
-                this,
-                'translation_x',
-                GObject.BindingFlags.DEFAULT, // if winActor changes, this will change
-            ),
-        );
-        this._bindings.push(
-            // @ts-expect-error "For some reason GObject.Binding is not recognized"
-            winActor.bind_property(
-                'translation_y',
-                this,
-                'translation_y',
+                prop,
                 GObject.BindingFlags.DEFAULT, // if winActor changes, this will change
             ),
         );
 
         const winRect = this._window.get_frame_rect();
-        this.set_position(winRect.x, winRect.y);
-        this.set_size(winRect.width, winRect.height);
+        this.set_position(
+            winRect.x - WINDOW_BORDER_WIDTH,
+            winRect.y - WINDOW_BORDER_WIDTH,
+        );
+        this.set_size(
+            winRect.width + 2 * WINDOW_BORDER_WIDTH,
+            winRect.height + 2 * WINDOW_BORDER_WIDTH,
+        );
 
+        const cached_radius = (this._window as WindowWithCachedRadius)
+            .__ts_cached_radius;
+        if (cached_radius) {
+            this._borderRadiusValue[St.Corner.TOPLEFT] =
+                cached_radius[St.Corner.TOPLEFT];
+            this._borderRadiusValue[St.Corner.TOPRIGHT] =
+                cached_radius[St.Corner.TOPRIGHT];
+            this._borderRadiusValue[St.Corner.BOTTOMLEFT] =
+                cached_radius[St.Corner.BOTTOMLEFT];
+            this._borderRadiusValue[St.Corner.BOTTOMRIGHT] =
+                cached_radius[St.Corner.BOTTOMRIGHT];
+        }
         this.updateStyle();
 
         const isMaximized =
@@ -125,7 +142,10 @@ class WindowBorder extends St.Bin {
             }
 
             const rect = this._window.get_frame_rect();
-            this.set_position(rect.x, rect.y);
+            this.set_position(
+                rect.x - WINDOW_BORDER_WIDTH,
+                rect.y - WINDOW_BORDER_WIDTH,
+            );
             // if the window changes monitor, we may have a different scaling factor
             if (this._windowMonitor !== win.get_monitor()) {
                 this._windowMonitor = win.get_monitor();
@@ -147,7 +167,10 @@ class WindowBorder extends St.Bin {
             }
 
             const rect = this._window.get_frame_rect();
-            this.set_size(rect.width, rect.height);
+            this.set_size(
+                rect.width + 2 * WINDOW_BORDER_WIDTH,
+                rect.height + 2 * WINDOW_BORDER_WIDTH,
+            );
             // if the window changes monitor, we may have a different scaling factor
             if (this._windowMonitor !== win.get_monitor()) {
                 this._windowMonitor = win.get_monitor();
@@ -155,6 +178,93 @@ class WindowBorder extends St.Bin {
             }
             this.open();
         });
+
+        const firstFrameId = winActor.connect('first-frame', () => {
+            this._timeout = setTimeout(() => {
+                this._computeBorderRadius(winActor).then(() =>
+                    this.updateStyle(),
+                );
+                if (this._timeout) clearTimeout(this._timeout);
+                this._timeout = undefined;
+            }, 180);
+
+            winActor.disconnect(firstFrameId);
+        });
+    }
+
+    private async _computeBorderRadius(winActor: Meta.WindowActor) {
+        // we are only interested into analyze the leftmost pixels (i.e. the whole left border)
+        const width = 1;
+        const height = winActor.metaWindow.get_frame_rect().height;
+        const content = winActor.paint_to_content(
+            buildRectangle({
+                x: winActor.metaWindow.get_frame_rect().x,
+                y: winActor.metaWindow.get_frame_rect().y,
+                height,
+                width,
+            }),
+        );
+        if (!content) {
+            debug('actor content is undefined');
+            return;
+        }
+        // @ts-expect-error "content has get_texture() method"
+        const texture = content.get_texture();
+        const stream = Gio.MemoryOutputStream.new_resizable();
+        const x = 0;
+        const y = 0;
+        const pixbuf = await Shell.Screenshot.composite_to_stream(
+            texture,
+            x,
+            y,
+            width,
+            height,
+            1,
+            null,
+            0,
+            0,
+            1,
+            stream,
+        );
+        // @ts-expect-error "pixbuf has get_pixels() method"
+        const pixels = pixbuf.get_pixels();
+
+        // iterate pixels from top to bottom
+        for (let i = 0; i < height; i++) {
+            if (pixels[i * 4 + 3] === 255) {
+                this._borderRadiusValue[St.Corner.TOPLEFT] = i;
+                this._borderRadiusValue[St.Corner.TOPRIGHT] =
+                    this._borderRadiusValue[St.Corner.TOPLEFT];
+                break;
+            }
+        }
+        // iterate pixels from bottom to top
+        for (let i = height - 1; i >= 0; i--) {
+            if (pixels[i * 4 + 3] === 255) {
+                this._borderRadiusValue[St.Corner.BOTTOMLEFT] = height - i - 1;
+                this._borderRadiusValue[St.Corner.BOTTOMRIGHT] =
+                    this._borderRadiusValue[St.Corner.BOTTOMLEFT];
+                break;
+            }
+        }
+        stream.close(null);
+
+        const cached_radius: [number, number, number, number] = [
+            DEFAULT_BORDER_RADIUS,
+            DEFAULT_BORDER_RADIUS,
+            DEFAULT_BORDER_RADIUS,
+            DEFAULT_BORDER_RADIUS,
+        ];
+        cached_radius[St.Corner.TOPLEFT] =
+            this._borderRadiusValue[St.Corner.TOPLEFT];
+        cached_radius[St.Corner.TOPRIGHT] =
+            this._borderRadiusValue[St.Corner.TOPRIGHT];
+        cached_radius[St.Corner.BOTTOMLEFT] =
+            this._borderRadiusValue[St.Corner.BOTTOMLEFT];
+        cached_radius[St.Corner.BOTTOMRIGHT] =
+            this._borderRadiusValue[St.Corner.BOTTOMRIGHT];
+        (this._window as WindowWithCachedRadius).__ts_cached_radius =
+            cached_radius;
     }
 
     public updateStyle(): void {
@@ -166,24 +276,18 @@ class WindowBorder extends St.Bin {
         enableScalingFactorSupport(this, monitorScalingFactor);
 
         const [alreadyScaled, scalingFactor] = getScalingFactorOf(this);
-        // the value got is already scaled if the tile is on primary monitor
-        const radiusValue =
-            (alreadyScaled ? 1 : scalingFactor) *
-            (this.get_theme_node().get_length('border-radius-value') /
-                (alreadyScaled ? scalingFactor : 1));
+        // the value is already scaled if the border is on primary monitor
         const borderWidth =
             (alreadyScaled ? 1 : scalingFactor) *
             (Settings.WINDOW_BORDER_WIDTH /
                 (alreadyScaled ? scalingFactor : 1));
-        const radius = [radiusValue, radiusValue, radiusValue, radiusValue];
-        debug(
-            'sf is',
-            scalingFactor,
-            'radius is',
-            radius,
-            'border is',
-            borderWidth,
-        );
+        const radius = this._borderRadiusValue.map((val) => {
+            return (
+                (alreadyScaled ? 1 : scalingFactor) *
+                (val / (alreadyScaled ? scalingFactor : 1))
+            );
+        });
+
         const scalingFactorSupportString = monitorScalingFactor
             ? getScalingFactorSupportString(monitorScalingFactor)
             : '';
@@ -200,7 +304,7 @@ class WindowBorder extends St.Bin {
             opacity: 255,
             duration: 200,
             mode: Clutter.AnimationMode.EASE,
-            delay: 100,
+            delay: 130,
         });
     }
 
