@@ -26,6 +26,7 @@ import EdgeTilingManager from './edgeTilingManager';
 import TouchPointer from './touchPointer';
 import { KeyBindingsDirection } from '@keybindings';
 import TilingShellWindowManager from '@components/windowManager/tilingShellWindowManager';
+import TilingPopup from './tilingPopup';
 
 const MINIMUM_DISTANCE_TO_RESTORE_ORIGINAL_SIZE = 90;
 
@@ -779,6 +780,13 @@ export class TilingManager {
             ...TileUtils.build_tile(selectedTilesRect, this._workArea),
         });
         this._easeWindowRect(window, desiredWindowRect);
+        /*if (tilingLayout) {
+            new TilingPopup(tilingLayout).open(
+                window as ExtendedWindow,
+                this._monitor.index,
+                this._workArea,
+            );
+        }*/
     }
 
     private _easeWindowRect(

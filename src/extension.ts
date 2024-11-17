@@ -461,6 +461,7 @@ export default class TilingShellExtension extends Extension {
         display: Meta.Display,
         direction: KeyBindingsDirection,
     ) {
+        debug('focus window');
         const focus_window = display.get_focus_window();
         if (
             !focus_window ||
