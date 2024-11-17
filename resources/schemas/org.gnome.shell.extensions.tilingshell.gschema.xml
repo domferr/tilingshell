@@ -137,6 +137,11 @@
             <summary>Focused window border width</summary>
             <description>The width of the focused window's border.</description>
         </key>
+        <key name="enable-smart-window-border-radius" type="b">
+            <default>true</default>
+            <summary>Enable smart window border radius</summary>
+            <description>Dinamically adapt to the window's border radius.</description>
+        </key>
         <key name="snap-assistant-animation-time" type="u">
             <default>180</default>
             <summary>Snap assistant animation time (milliseconds)</summary>

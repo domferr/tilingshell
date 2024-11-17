@@ -16,6 +16,7 @@ Gio._promisify(Shell.Screenshot, 'composite_to_stream');
 
 const WINDOW_BORDER_WIDTH = 1;
 const DEFAULT_BORDER_RADIUS = 11;
+const SMART_BORDER_RADIUS_DELAY = 180;
 
 const debug = logger('WindowBorderManager');
 
@@ -33,6 +34,7 @@ class WindowBorder extends St.Bin {
     private _enableScaling: boolean;
     private _borderRadiusValue: [number, number, number, number];
     private _timeout: GLib.Source | undefined;
+    private _delayedSmartBorderRadius: boolean;
 
     constructor(win: Meta.Window, enableScaling: boolean) {
         super({
@@ -44,11 +46,13 @@ class WindowBorder extends St.Bin {
         this._window = win;
         this._windowMonitor = win.get_monitor();
         this._enableScaling = enableScaling;
+        this._delayedSmartBorderRadius = false;
+        const smartRadius = Settings.ENABLE_SMART_WINDOW_BORDER_RADIUS;
         this._borderRadiusValue = [
             DEFAULT_BORDER_RADIUS,
             DEFAULT_BORDER_RADIUS,
-            DEFAULT_BORDER_RADIUS,
-            DEFAULT_BORDER_RADIUS,
+            smartRadius ? 0 : DEFAULT_BORDER_RADIUS,
+            smartRadius ? 0 : DEFAULT_BORDER_RADIUS,
         ]; // default value
 
         this.close();
@@ -103,17 +107,19 @@ class WindowBorder extends St.Bin {
             winRect.height + 2 * WINDOW_BORDER_WIDTH,
         );
 
-        const cached_radius = (this._window as WindowWithCachedRadius)
-            .__ts_cached_radius;
-        if (cached_radius) {
-            this._borderRadiusValue[St.Corner.TOPLEFT] =
-                cached_radius[St.Corner.TOPLEFT];
-            this._borderRadiusValue[St.Corner.TOPRIGHT] =
-                cached_radius[St.Corner.TOPRIGHT];
-            this._borderRadiusValue[St.Corner.BOTTOMLEFT] =
-                cached_radius[St.Corner.BOTTOMLEFT];
-            this._borderRadiusValue[St.Corner.BOTTOMRIGHT] =
-                cached_radius[St.Corner.BOTTOMRIGHT];
+        if (Settings.ENABLE_SMART_WINDOW_BORDER_RADIUS) {
+            const cached_radius = (this._window as WindowWithCachedRadius)
+                .__ts_cached_radius;
+            if (cached_radius) {
+                this._borderRadiusValue[St.Corner.TOPLEFT] =
+                    cached_radius[St.Corner.TOPLEFT];
+                this._borderRadiusValue[St.Corner.TOPRIGHT] =
+                    cached_radius[St.Corner.TOPRIGHT];
+                this._borderRadiusValue[St.Corner.BOTTOMLEFT] =
+                    cached_radius[St.Corner.BOTTOMLEFT];
+                this._borderRadiusValue[St.Corner.BOTTOMRIGHT] =
+                    cached_radius[St.Corner.BOTTOMRIGHT];
+            }
         }
         this.updateStyle();
 
@@ -141,6 +147,20 @@ class WindowBorder extends St.Bin {
                 return;
             }
 
+            if (
+                this._delayedSmartBorderRadius &&
+                Settings.ENABLE_SMART_WINDOW_BORDER_RADIUS
+            ) {
+                this._delayedSmartBorderRadius = false;
+                this._timeout = setTimeout(() => {
+                    this._computeBorderRadius(winActor).then(() =>
+                        this.updateStyle(),
+                    );
+                    if (this._timeout) clearTimeout(this._timeout);
+                    this._timeout = undefined;
+                }, SMART_BORDER_RADIUS_DELAY);
+            }
+
             const rect = this._window.get_frame_rect();
             this.set_position(
                 rect.x - WINDOW_BORDER_WIDTH,
@@ -166,6 +186,20 @@ class WindowBorder extends St.Bin {
                 return;
             }
 
+            if (
+                this._delayedSmartBorderRadius &&
+                Settings.ENABLE_SMART_WINDOW_BORDER_RADIUS
+            ) {
+                this._delayedSmartBorderRadius = false;
+                this._timeout = setTimeout(() => {
+                    this._computeBorderRadius(winActor).then(() =>
+                        this.updateStyle(),
+                    );
+                    if (this._timeout) clearTimeout(this._timeout);
+                    this._timeout = undefined;
+                }, SMART_BORDER_RADIUS_DELAY);
+            }
+
             const rect = this._window.get_frame_rect();
             this.set_size(
                 rect.width + 2 * WINDOW_BORDER_WIDTH,
@@ -179,23 +213,34 @@ class WindowBorder extends St.Bin {
             this.open();
         });
 
-        const firstFrameId = winActor.connect('first-frame', () => {
-            this._timeout = setTimeout(() => {
-                this._computeBorderRadius(winActor).then(() =>
-                    this.updateStyle(),
-                );
-                if (this._timeout) clearTimeout(this._timeout);
-                this._timeout = undefined;
-            }, 180);
+        if (Settings.ENABLE_SMART_WINDOW_BORDER_RADIUS) {
+            const firstFrameId = winActor.connect_after('first-frame', () => {
+                if (
+                    this._window.maximizedHorizontally ||
+                    this._window.maximizedVertically ||
+                    this._window.is_fullscreen()
+                ) {
+                    this._delayedSmartBorderRadius = true;
+                    return;
+                }
+                this._timeout = setTimeout(() => {
+                    this._computeBorderRadius(winActor).then(() =>
+                        this.updateStyle(),
+                    );
+                    if (this._timeout) clearTimeout(this._timeout);
+                    this._timeout = undefined;
+                }, SMART_BORDER_RADIUS_DELAY);
 
-            winActor.disconnect(firstFrameId);
-        });
+                winActor.disconnect(firstFrameId);
+            });
+        }
     }
 
     private async _computeBorderRadius(winActor: Meta.WindowActor) {
         // we are only interested into analyze the leftmost pixels (i.e. the whole left border)
-        const width = 1;
+        const width = 3;
         const height = winActor.metaWindow.get_frame_rect().height;
+        if (height <= 0) return;
         const content = winActor.paint_to_content(
             buildRectangle({
                 x: winActor.metaWindow.get_frame_rect().x,
@@ -208,6 +253,21 @@ class WindowBorder extends St.Bin {
             debug('actor content is undefined');
             return;
         }
+
+        /* for debugging purposes
+        const elem = new St.Widget({
+            x: 100,
+            y: 100,
+            width,
+            height,
+            content,
+            name: 'elem',
+        });
+        global.windowGroup
+            .get_children()
+            .find((el) => el.get_name() === 'elem')
+            ?.destroy();
+        global.windowGroup.add_child(elem);*/
         // @ts-expect-error "content has get_texture() method"
         const texture = content.get_texture();
         const stream = Gio.MemoryOutputStream.new_resizable();
@@ -229,9 +289,10 @@ class WindowBorder extends St.Bin {
         // @ts-expect-error "pixbuf has get_pixels() method"
         const pixels = pixbuf.get_pixels();
 
+        const alphaThreshold = 240; // 255 would be the best value, however, some windows may still have a bit of transparency
         // iterate pixels from top to bottom
         for (let i = 0; i < height; i++) {
-            if (pixels[i * 4 + 3] === 255) {
+            if (pixels[i * width * 4 + 3] > alphaThreshold) {
                 this._borderRadiusValue[St.Corner.TOPLEFT] = i;
                 this._borderRadiusValue[St.Corner.TOPRIGHT] =
                     this._borderRadiusValue[St.Corner.TOPLEFT];
@@ -239,8 +300,9 @@ class WindowBorder extends St.Bin {
             }
         }
         // iterate pixels from bottom to top
-        for (let i = height - 1; i >= 0; i--) {
-            if (pixels[i * 4 + 3] === 255) {
+        // eslint-disable-next-line prettier/prettier
+        for (let i = height - 1; i >= height - this._borderRadiusValue[St.Corner.TOPLEFT] - 2; i--) {
+            if (pixels[i * width * 4 + 3] > alphaThreshold) {
                 this._borderRadiusValue[St.Corner.BOTTOMLEFT] = height - i - 1;
                 this._borderRadiusValue[St.Corner.BOTTOMRIGHT] =
                     this._borderRadiusValue[St.Corner.BOTTOMLEFT];
@@ -248,12 +310,13 @@ class WindowBorder extends St.Bin {
             }
         }
         stream.close(null);
+        debug('border radius is', JSON.stringify(this._borderRadiusValue));
 
         const cached_radius: [number, number, number, number] = [
             DEFAULT_BORDER_RADIUS,
             DEFAULT_BORDER_RADIUS,
-            DEFAULT_BORDER_RADIUS,
-            DEFAULT_BORDER_RADIUS,
+            0,
+            0,
         ];
         cached_radius[St.Corner.TOPLEFT] =
             this._borderRadiusValue[St.Corner.TOPLEFT];
@@ -289,10 +352,10 @@ class WindowBorder extends St.Bin {
         });
 
         const scalingFactorSupportString = monitorScalingFactor
-            ? getScalingFactorSupportString(monitorScalingFactor)
+            ? `${getScalingFactorSupportString(monitorScalingFactor)};`
             : '';
         this.set_style(
-            `border-color: ${Settings.WINDOW_BORDER_COLOR}; border-width: ${borderWidth}px; border-radius: ${radius[St.Corner.TOPLEFT]}px ${radius[St.Corner.TOPRIGHT]}px ${radius[St.Corner.BOTTOMRIGHT]}px ${radius[St.Corner.BOTTOMLEFT]}px; ${scalingFactorSupportString};`,
+            `border-color: ${Settings.WINDOW_BORDER_COLOR}; border-width: ${borderWidth}px; border-radius: ${radius[St.Corner.TOPLEFT]}px ${radius[St.Corner.TOPRIGHT]}px ${radius[St.Corner.BOTTOMRIGHT]}px ${radius[St.Corner.BOTTOMLEFT]}px; ${scalingFactorSupportString}`,
         );
     }
 

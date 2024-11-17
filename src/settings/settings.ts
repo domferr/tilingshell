@@ -107,6 +107,8 @@ export default class Settings {
     static KEY_SETTING_LAYOUTS_JSON = 'layouts-json';
     static KEY_SETTING_SELECTED_LAYOUTS = 'selected-layouts';
     static KEY_WINDOW_BORDER_WIDTH = 'window-border-width';
+    static KEY_ENABLE_SMART_WINDOW_BORDER_RADIUS =
+        'enable-smart-window-border-radius';
     static KEY_QUARTER_TILING_THRESHOLD = 'quarter-tiling-threshold';
 
     static SETTING_MOVE_WINDOW_RIGHT = 'move-window-right';
@@ -352,6 +354,14 @@ export default class Settings {
 
     static set WINDOW_BORDER_WIDTH(val: number) {
         set_unsigned_number(Settings.KEY_WINDOW_BORDER_WIDTH, val);
+    }
+
+    static get ENABLE_SMART_WINDOW_BORDER_RADIUS(): boolean {
+        return get_boolean(Settings.KEY_ENABLE_SMART_WINDOW_BORDER_RADIUS);
+    }
+
+    static set ENABLE_SMART_WINDOW_BORDER_RADIUS(val: boolean) {
+        set_boolean(Settings.KEY_ENABLE_SMART_WINDOW_BORDER_RADIUS, val);
     }
 
     static get ENABLE_WINDOW_BORDER(): boolean {

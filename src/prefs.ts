@@ -115,6 +115,13 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         appearenceGroup.add(windowBorderRow);
         windowBorderRow.add_row(
             this._buildSwitchRow(
+                Settings.KEY_ENABLE_SMART_WINDOW_BORDER_RADIUS,
+                _('Smart border radius'),
+                _('Dynamically adapt to the window’s actual border radius'),
+            ),
+        );
+        windowBorderRow.add_row(
+            this._buildSwitchRow(
                 Settings.KEY_ENABLE_WINDOW_BORDER,
                 _('Enable'),
                 _('Show a border around focused window'),

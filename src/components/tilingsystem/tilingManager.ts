@@ -1047,8 +1047,6 @@ export class TilingManager {
         if (windowCreated) {
             const windowActor =
                 window.get_compositor_private() as Meta.WindowActor;
-            // the window won't be visible when will open on its position (e.g. the center of the screen)
-            windowActor.set_opacity(0);
             const id = windowActor.connect('first-frame', () => {
                 // while we restore the opacity, making the window visible
                 // again, we perform easing of movement too
@@ -1060,15 +1058,8 @@ export class TilingManager {
                     !window.maximizedVertically &&
                     window.get_transient_for() === null &&
                     !window.is_attached_dialog()
-                ) {
-                    windowActor.ease({
-                        opacity: 255,
-                        duration: 200,
-                    });
+                )
                     this._easeWindowRectFromTile(vacantTile, window, true);
-                } else {
-                    windowActor.set_opacity(255);
-                }
 
                 windowActor.disconnect(id);
             });

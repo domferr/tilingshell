@@ -448,6 +448,7 @@ export default class TilingShellExtension extends Extension {
             this._tilingManagers[neighborMonitorIndex];
         if (!neighborTilingManager) return;
 
+        focus_window.move_to_monitor(neighborMonitorIndex);
         neighborTilingManager.onKeyboardMoveWindow(
             focus_window,
             direction,
