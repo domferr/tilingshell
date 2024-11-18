@@ -11,10 +11,13 @@ import Tile from '@components/layout/Tile';
 import TilePreview from '@components/tilepreview/tilePreview';
 import LayoutWidget from '@components/layout/LayoutWidget';
 import SignalHandling from '@utils/signalHandling';
-import SelectionTilePreview from '@components/tilepreview/selectionTilePreview';
 import PopupTilePreview from '@components/tilepreview/popupTilePreview';
 
 const debug = logger('TilingPopup');
+
+const MASONRY_LAYOUT_SPACING = 32;
+const ANIMATION_SPEED = 200;
+const MASONRY_COLUMN_MIN_WIDTH_PERCENTAGE = 0.3;
 
 interface ContainerWithAllocationCache extends Clutter.Actor {
     _allocationCache:
@@ -30,12 +33,14 @@ class MasonryLayout extends Clutter.LayoutManager {
     private _columnCount: number;
     private _spacing: number;
     private _maxColumnWidth: number;
+    private _columnWidth: number;
 
-    constructor(spacing: number, maxColumnWidth: number) {
+    constructor(spacing: number, columnWidth: number, maxColumnWidth: number) {
         super();
         this._columnCount = 0; // Number of columns
         this._spacing = spacing; // Spacing between items
         this._maxColumnWidth = maxColumnWidth;
+        this._columnWidth = columnWidth;
     }
 
     vfunc_allocate(container: Clutter.Actor, box: Clutter.ActorBox) {
@@ -44,13 +49,17 @@ class MasonryLayout extends Clutter.LayoutManager {
 
         this._columnCount = Math.ceil(Math.sqrt(children.length)) + 1;
         let columnWidth = 0;
-        while (this._columnCount > 1 && columnWidth < box.get_width() * 0.3) {
+        while (
+            this._columnCount > 1 &&
+            columnWidth < box.get_width() * MASONRY_COLUMN_MIN_WIDTH_PERCENTAGE
+        ) {
             this._columnCount--;
             columnWidth =
                 (box.get_width() - this._spacing * (this._columnCount - 1)) /
                 this._columnCount;
         }
         columnWidth = Math.min(columnWidth, this._maxColumnWidth);
+        columnWidth = this._columnWidth;
         const columnHeights = Array(this._columnCount).fill(0); // Tracks the height of each column
 
         // Calculate total content width and height
@@ -111,10 +120,7 @@ class MasonryLayout extends Clutter.LayoutManager {
         }
 
         // Calculate offsets for centering the entire grid within the available space
-        const horizontalOffset = Math.max(
-            0,
-            (box.get_width() - contentWidth) / 2,
-        );
+        const horizontalOffset = (box.get_width() - contentWidth) / 2;
         // Determine the tallest column and center the content around it
         const tallestColumnHeight = sortedColumnHeights[0][0];
         const verticalOffset = Math.max(
@@ -216,8 +222,6 @@ class MasonryLayout extends Clutter.LayoutManager {
     }
 }
 
-const MASONRY_LAYOUT_SPACING = 32;
-
 @registerGObjectClass
 export default class TilingPopup extends LayoutWidget<TilePreview> {
     private _keyPressEvent: number | undefined;
@@ -242,7 +246,7 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
             scalingFactor,
         });
         this._signals = new SignalHandling();
-        this._lastTiledWindow = null;
+        this._lastTiledWindow = global.display.focusWindow;
         this._showing = true;
         const tiledWindows: ExtendedWindow[] = [];
         const nontiledWindows: Meta.Window[] = [];
@@ -268,16 +272,12 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
         this.show();
         this._recursivelyShowPopup(nontiledWindows);
 
-        this.connect('key-focus-out', () => {
-            debug('key-focus-out');
-            this.close();
-        });
+        this.connect('key-focus-out', () => this.close());
 
         this._signals.connect(
             global.stage,
             'button-press-event',
             (_: Clutter.Actor, event: Clutter.Event) => {
-                debug('button-press-event');
                 const isDescendant = this.contains(event.get_source());
                 if (
                     !isDescendant ||
@@ -297,6 +297,9 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
         window: ExtendedWindow,
     ) {
         const tiles = layout.tiles;
+        const windowDesiredRect = window.assignedTile
+            ? TileUtils.apply_props(window.assignedTile, this._containerRect)
+            : window.get_frame_rect();
         const vacantTiles = tiles.filter((t) => {
             if (
                 window.assignedTile &&
@@ -307,9 +310,10 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
             )
                 return false;
             const tileRect = TileUtils.apply_props(t, this._containerRect);
-            return !tiledWindows.find(
-                (win) =>
-                    win !== window && tileRect.overlap(win.get_frame_rect()),
+            return !tiledWindows.find((win) =>
+                tileRect.overlap(
+                    win !== window ? win.get_frame_rect() : windowDesiredRect,
+                ),
             );
         });
         this.relayout({ layout: new Layout(vacantTiles, 'popup') });
@@ -325,6 +329,7 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
 
         const layoutManager = new MasonryLayout(
             MASONRY_LAYOUT_SPACING,
+            this._containerRect.width * 0.08,
             this._containerRect.width * 0.15,
         );
         const container = new St.Widget({
@@ -363,12 +368,11 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
                 nonTiledWin.get_compositor_private() as Meta.WindowActor;
 
             container.add_child(winClone);
-            const animation_speed = 200;
             // fade out and unscale by 10% the window actor
             winActor.set_pivot_point(0.5, 0.5);
             winActor.ease({
                 opacity: 0,
-                duration: animation_speed,
+                duration: ANIMATION_SPEED,
                 scaleX: 0.9,
                 scaleY: 0.9,
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD,
@@ -383,7 +387,7 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
             winClone.set_scale(0.6, 0.6);
             winClone.ease({
                 opacity: 255,
-                duration: Math.floor(animation_speed * 1.8),
+                duration: Math.floor(ANIMATION_SPEED * 1.8),
                 scaleX: 1.03,
                 scaleY: 1.03,
                 mode: Clutter.AnimationMode.EASE_IN_OUT,
@@ -391,7 +395,7 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
                     // scale back to 100% the window preview (i.e the clone)
                     winClone.ease({
                         delay: 60,
-                        duration: Math.floor(animation_speed * 2.1),
+                        duration: Math.floor(ANIMATION_SPEED * 2.1),
                         scaleX: 1,
                         scaleY: 1,
                         mode: Clutter.AnimationMode.EASE_IN_OUT,
@@ -409,7 +413,7 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
                 winActor.show();
                 winActor.ease({
                     opacity: 255,
-                    duration: animation_speed,
+                    duration: ANIMATION_SPEED,
                     scaleX: 1,
                     scaleY: 1,
                     mode: Clutter.AnimationMode.EASE_OUT_QUAD,
@@ -421,9 +425,9 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
             winClone.connect('button-press-event', () => {
                 // finally move the window
                 // the actor has opacity = 0, so this is not seen by the user
-                // place the actor with a scale 10% lower, to perform scaling and fading animation later
+                // place the actor with a scale 4% lower, to perform scaling and fading animation later
                 winActor.set_pivot_point(0.5, 0.5);
-                winActor.set_scale(0.9, 0.9);
+                winActor.set_scale(0.96, 0.96);
                 winActor.set_position(preview.innerX, preview.innerY);
                 winActor.set_size(preview.innerWidth, preview.innerHeight);
 
@@ -446,9 +450,19 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
                     .get_frame_rect()
                     .copy();
 
+                // create a static clone and hide the live clone
+                // then we can change the actual window size
+                // without showing that to the user
+                /* const staticClone = new Clutter.Clone({
+                    source: winClone,
+                    reactive: false,
+                });*/
+                // hide the live clone, so we can change the actual window size
+                // without showing that to the user
+                winClone.opacity = 0;
                 preview.ease({
                     opacity: 0,
-                    duration: animation_speed,
+                    duration: ANIMATION_SPEED,
                     onStopped: () => {
                         this._previews.splice(
                             this._previews.indexOf(preview),
@@ -462,14 +476,6 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
                         this._recursivelyShowPopup(nontiledWindows);
                     },
                 });
-                // create a static clone and hide the live clone
-                // then we can change the actual window size
-                // without showing that to the user
-                const staticClone = new Clutter.Clone({
-                    source: winClone,
-                    reactive: false,
-                });
-                winClone.hide();
                 nonTiledWin.move_resize_frame(
                     false,
                     preview.innerX,
@@ -487,7 +493,7 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
                     opacity: 255,
                     scaleX: 1,
                     scaleY: 1,
-                    duration: animation_speed * 0.8,
+                    duration: ANIMATION_SPEED * 0.8,
                     delay: 100,
                     onStopped: () => {
                         winActor.set_pivot_point(0, 0);

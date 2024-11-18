@@ -35,6 +35,7 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
     private _metaWindow: Meta.Window;
     private _windowActor: Meta.WindowActor;
     private _title: St.Label;
+    private _previewContainer: St.Widget;
 
     constructor(metaWindow: Meta.Window) {
         super({
@@ -46,6 +47,12 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
         this._metaWindow = metaWindow;
         this._windowActor = metaWindow.get_compositor_private();
 
+        this._previewContainer = new St.Widget({
+            style: 'background-color: rgba(255, 255, 255, 0.3); border-radius: 8px; padding: 6px;',
+            pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
+            layoutManager: new Clutter.BinLayout(),
+            xAlign: Clutter.ActorAlign.CENTER,
+        });
         const windowContainer = new Clutter.Actor({
             pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
         });
@@ -59,7 +66,8 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
         // of its container, so set the layout manager after creating the
         // container
         windowContainer.layout_manager = new Shell.WindowPreviewLayout();
-        this.add_child(windowContainer);
+        this.add_child(this._previewContainer);
+        this._previewContainer.add_child(windowContainer);
 
         this._addWindow(metaWindow);
 
@@ -86,20 +94,20 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
         });
         this._icon.add_constraint(
             new Clutter.BindConstraint({
-                source: windowContainer,
+                source: this._previewContainer,
                 coordinate: Clutter.BindCoordinate.POSITION,
             }),
         );
         this._icon.add_constraint(
             new Clutter.AlignConstraint({
-                source: windowContainer,
+                source: this._previewContainer,
                 align_axis: Clutter.AlignAxis.X_AXIS,
                 factor: 0.5,
             }),
         );
         this._icon.add_constraint(
             new Clutter.AlignConstraint({
-                source: windowContainer,
+                source: this._previewContainer,
                 align_axis: Clutter.AlignAxis.Y_AXIS,
                 pivot_point: new Graphene.Point({ x: -1, y: ICON_OVERLAP }),
                 factor: 1,
@@ -118,28 +126,28 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
         this._title.clutter_text.single_line_mode = true;
         this._title.add_constraint(
             new Clutter.BindConstraint({
-                source: windowContainer,
+                source: this._previewContainer,
                 coordinate: Clutter.BindCoordinate.X,
             }),
         );
         const iconBottomOverlap = ICON_SIZE * (1 - ICON_OVERLAP);
         this._title.add_constraint(
             new Clutter.BindConstraint({
-                source: windowContainer,
+                source: this._previewContainer,
                 coordinate: Clutter.BindCoordinate.Y,
                 offset: scaleFactor * (iconBottomOverlap + ICON_TITLE_SPACING),
             }),
         );
         this._title.add_constraint(
             new Clutter.AlignConstraint({
-                source: windowContainer,
+                source: this._previewContainer,
                 align_axis: Clutter.AlignAxis.X_AXIS,
                 factor: 0.5,
             }),
         );
         this._title.add_constraint(
             new Clutter.AlignConstraint({
-                source: windowContainer,
+                source: this._previewContainer,
                 align_axis: Clutter.AlignAxis.Y_AXIS,
                 pivot_point: new Graphene.Point({ x: -1, y: 0 }),
                 factor: 1,
@@ -153,8 +161,8 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
             this,
         );
 
-        this.add_child(this._title);
-        this.add_child(this._icon);
+        this._previewContainer.add_child(this._title);
+        this._previewContainer.add_child(this._icon);
 
         this.connect('notify::realized', () => {
             if (!this.realized) return;
@@ -200,7 +208,7 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
             });
         });
 
-        const [width, height] = this.window_container.get_size();
+        const [width, height] = this.windowContainer.get_size();
         const { scaleFactor } = St.ThemeContext.get_for_stage(
             global.stage as Clutter.Stage,
         );
@@ -208,7 +216,7 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
         const origSize = Math.max(width, height);
         const scale = (origSize + activeExtraSize) / origSize;
 
-        this.window_container.ease({
+        this._previewContainer.ease({
             scaleX: scale,
             scaleY: scale,
             duration: animate ? WINDOW_SCALE_TIME : 0,
@@ -242,7 +250,7 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
             });
         });
 
-        this.window_container.ease({
+        this._previewContainer.ease({
             scaleX: 1,
             scaleY: 1,
             duration: animate ? WINDOW_SCALE_TIME : 0,
@@ -254,9 +262,9 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
         // Assume that scale-x and scale-y update always set
         // in lock-step; that allows us to not use separate
         // handlers for horizontal and vertical offsets
-        const previewScale = this.window_container.scale_x;
+        const previewScale = this._previewContainer.scale_x;
         const [previewWidth, previewHeight] =
-            this.window_container.allocation.get_size();
+            this._previewContainer.allocation.get_size();
 
         const heightIncrease = Math.floor(
             (previewHeight * (previewScale - 1)) / 2,
