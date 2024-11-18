@@ -72,6 +72,7 @@ export default class LayoutEditor extends St.Widget {
 
         this._layout = layout;
         this._drawEditor();
+        this.grab_key_focus();
 
         this.connect('destroy', this._onDestroy.bind(this));
     }

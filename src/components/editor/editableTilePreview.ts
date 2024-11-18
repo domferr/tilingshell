@@ -18,7 +18,6 @@ export default class EditableTilePreview extends TilePreview {
     public static MIN_TILE_SIZE: number = 140;
 
     private readonly _btn: St.Button;
-    private readonly _tile: Tile;
     private readonly _containerRect: Mtk.Rectangle;
 
     private _sliders: (Slider | null)[];
@@ -49,10 +48,6 @@ export default class EditableTilePreview extends TilePreview {
         this._updateLabelText();
 
         this.connect('destroy', this._onDestroy.bind(this));
-    }
-
-    public get tile(): Tile {
-        return this._tile;
     }
 
     public getSlider(side: St.Side): Slider | null {

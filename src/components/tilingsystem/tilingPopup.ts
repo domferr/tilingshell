@@ -1,56 +1,57 @@
 import { registerGObjectClass } from '@/utils/gjs';
 import { Clutter, Mtk, Meta, St, Graphene } from '@gi.ext';
-import TilePreview, {
-    TilePreviewConstructorProperties,
-} from '../tilepreview/tilePreview';
-import LayoutWidget from '../layout/LayoutWidget';
 import Layout from '../layout/Layout';
-import Tile from '../layout/Tile';
-import {
-    buildRectangle,
-    buildTileGaps,
-    getWindows,
-    isPointInsideRect,
-} from '@utils/ui';
+import { getWindows } from '@utils/ui';
 import TileUtils from '@components/layout/TileUtils';
 import { logger } from '@utils/logger';
 import GlobalState from '@utils/globalState';
-import { KeyBindingsDirection } from '@keybindings';
-import TilingLayout from './tilingLayout';
 import ExtendedWindow from './extendedWindow';
-import * as workspace from 'resource:///org/gnome/shell/ui/workspace.js';
-import * as overviewControls from 'resource:///org/gnome/shell/ui/overviewControls.js';
-import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import PopupWindowPreview from './popupWindowPreview';
+import Tile from '@components/layout/Tile';
+import TilePreview from '@components/tilepreview/tilePreview';
+import LayoutWidget from '@components/layout/LayoutWidget';
+import SignalHandling from '@utils/signalHandling';
+import SelectionTilePreview from '@components/tilepreview/selectionTilePreview';
+import PopupTilePreview from '@components/tilepreview/popupTilePreview';
 
 const debug = logger('TilingPopup');
 
-@registerGObjectClass
-class PopupTilingLayout extends TilingLayout {
-    public override open(): void {
-        super.open();
-    }
+interface ContainerWithAllocationCache extends Clutter.Actor {
+    _allocationCache:
+        | Map<
+              Clutter.Actor,
+              { x: number; y: number; width: number; height: number }
+          >
+        | undefined;
 }
 
 @registerGObjectClass
 class MasonryLayout extends Clutter.LayoutManager {
     private _columnCount: number;
     private _spacing: number;
-    constructor(columnCount = 3, spacing = 10) {
+    private _maxColumnWidth: number;
+
+    constructor(spacing: number, maxColumnWidth: number) {
         super();
-        this._columnCount = columnCount; // Number of columns
+        this._columnCount = 0; // Number of columns
         this._spacing = spacing; // Spacing between items
+        this._maxColumnWidth = maxColumnWidth;
     }
 
     vfunc_allocate(container: Clutter.Actor, box: Clutter.ActorBox) {
         const children = container.get_children();
         if (children.length === 0) return;
 
-        this._columnCount = Math.ceil(Math.sqrt(children.length));
+        this._columnCount = Math.ceil(Math.sqrt(children.length)) + 1;
+        let columnWidth = 0;
+        while (this._columnCount > 1 && columnWidth < box.get_width() * 0.3) {
+            this._columnCount--;
+            columnWidth =
+                (box.get_width() - this._spacing * (this._columnCount - 1)) /
+                this._columnCount;
+        }
+        columnWidth = Math.min(columnWidth, this._maxColumnWidth);
         const columnHeights = Array(this._columnCount).fill(0); // Tracks the height of each column
-        const columnWidth =
-            (box.get_width() - this._spacing * (this._columnCount - 1)) /
-            this._columnCount;
 
         // Calculate total content width and height
         const contentWidth =
@@ -59,7 +60,9 @@ class MasonryLayout extends Clutter.LayoutManager {
 
         // Store placements and cache
         const placements = [];
-        const allocationCache = container._allocationCache || {};
+        const allocationCache =
+            (container as ContainerWithAllocationCache)._allocationCache ??
+            new Map();
 
         for (const child of children) {
             // Retrieve the preferred width and height to calculate the aspect ratio
@@ -133,7 +136,7 @@ class MasonryLayout extends Clutter.LayoutManager {
             const yPosition = box.y1 + y + verticalOffset + columnOffset;
 
             // Check if this child has a cached allocation
-            const cachedAlloc = allocationCache[child];
+            const cachedAlloc = allocationCache.get(child);
             if (cachedAlloc) {
                 child.allocate(
                     new Clutter.ActorBox({
@@ -157,16 +160,17 @@ class MasonryLayout extends Clutter.LayoutManager {
             );
 
             // Update cache with the new allocation
-            allocationCache[child] = {
+            allocationCache.set(child, {
                 x,
                 y: yPosition,
                 width: columnWidth,
                 height,
-            };
+            });
         }
 
         // Store the updated cache for future allocation passes
-        container._allocationCache = allocationCache;
+        (container as ContainerWithAllocationCache)._allocationCache =
+            allocationCache;
     }
 
     vfunc_get_preferred_width(
@@ -212,21 +216,36 @@ class MasonryLayout extends Clutter.LayoutManager {
     }
 }
 
-export default class TilingPopup {
-    private _tilingLayout: TilingLayout;
+const MASONRY_LAYOUT_SPACING = 32;
+
+@registerGObjectClass
+export default class TilingPopup extends LayoutWidget<TilePreview> {
     private _keyPressEvent: number | undefined;
+    private _signals: SignalHandling;
+    private _lastTiledWindow: Meta.Window | null;
+    private _showing: boolean;
 
-    constructor(tilingLayout: TilingLayout) {
-        this._tilingLayout = tilingLayout;
-    }
-
-    public open(
-        window: ExtendedWindow,
-        monitorIndex: number,
+    constructor(
+        layout: Layout,
+        innerGaps: Clutter.Margin,
+        outerGaps: Clutter.Margin,
         workarea: Mtk.Rectangle,
-    ): void {
+        scalingFactor: number,
+        window: ExtendedWindow,
+    ) {
+        super({
+            containerRect: workarea,
+            parent: global.windowGroup,
+            layout: new Layout([], ''),
+            innerGaps,
+            outerGaps,
+            scalingFactor,
+        });
+        this._signals = new SignalHandling();
+        this._lastTiledWindow = null;
+        this._showing = true;
         const tiledWindows: ExtendedWindow[] = [];
-        const nontiledWindow: Meta.Window[] = [];
+        const nontiledWindows: Meta.Window[] = [];
         getWindows().forEach((extWin) => {
             if (
                 extWin &&
@@ -234,95 +253,271 @@ export default class TilingPopup {
                 (extWin as ExtendedWindow).assignedTile
             )
                 tiledWindows.push(extWin as ExtendedWindow);
-            else nontiledWindow.push(extWin);
+            else nontiledWindows.push(extWin);
         });
-        const tiles = GlobalState.get().getSelectedLayoutOfMonitor(
-            monitorIndex,
-            global.workspaceManager.get_active_workspace_index(),
-        ).tiles;
-        const vacantTiles = tiles.filter((t) => {
-            if (t === window.assignedTile) return false;
-            const tileRect = TileUtils.apply_props(t, workarea);
-            return !tiledWindows.find((win) => {
-                const winRect =
-                    win === window && window.assignedTile
-                        ? TileUtils.apply_props(window.assignedTile, workarea)
-                        : win.get_frame_rect();
-                return tileRect.overlap(winRect);
-            });
+        if (nontiledWindows.length === 0) {
+            this.destroy();
+            return;
+        }
+
+        this._relayoutVacantTiles(layout, tiledWindows, window);
+
+        this.canFocus = true;
+        this.reactive = true;
+
+        this.show();
+        this._recursivelyShowPopup(nontiledWindows);
+
+        this.connect('key-focus-out', () => {
+            debug('key-focus-out');
+            this.close();
         });
 
-        const tl = new PopupTilingLayout(
-            new Layout(vacantTiles, 'popup'),
-            this._tilingLayout.innerGaps,
-            this._tilingLayout.outerGaps,
-            workarea,
-            this._tilingLayout.scalingFactor,
-        );
-        tl.open();
-        if (this._keyPressEvent) global.stage.disconnect(this._keyPressEvent);
-        this._keyPressEvent = global.stage.connect_after(
-            'key-press-event',
-            (_, event) => {
-                const symbol = event.get_key_symbol();
-                if (symbol === Clutter.KEY_Escape) {
-                    if (this._keyPressEvent)
-                        global.stage.disconnect(this._keyPressEvent);
-                    this._keyPressEvent = undefined;
-                    tl.destroy();
-                }
-
-                return Clutter.EVENT_PROPAGATE;
+        this._signals.connect(
+            global.stage,
+            'button-press-event',
+            (_: Clutter.Actor, event: Clutter.Event) => {
+                debug('button-press-event');
+                const isDescendant = this.contains(event.get_source());
+                if (
+                    !isDescendant ||
+                    event.get_source() === this ||
+                    event.get_source().get_layout_manager() instanceof
+                        MasonryLayout
+                )
+                    this.close();
             },
         );
-        const loc = TileUtils.apply_props(vacantTiles[0], workarea);
-        const outer_container = new St.Widget({
-            pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
-            layout_manager: new Clutter.BinLayout(),
-            x: loc.x,
-            y: loc.y,
-            width: loc.width,
-            height: loc.height,
-            style: 'background-color: rgba(0,0,0,0.2); padding: 16px;',
+        this.connect('destroy', () => this._signals.disconnect());
+    }
+
+    private _relayoutVacantTiles(
+        layout: Layout,
+        tiledWindows: ExtendedWindow[],
+        window: ExtendedWindow,
+    ) {
+        const tiles = layout.tiles;
+        const vacantTiles = tiles.filter((t) => {
+            if (
+                window.assignedTile &&
+                t.x === window.assignedTile.x &&
+                t.y === window.assignedTile.y &&
+                t.width === window.assignedTile.width &&
+                t.height === window.assignedTile.height
+            )
+                return false;
+            const tileRect = TileUtils.apply_props(t, this._containerRect);
+            return !tiledWindows.find(
+                (win) =>
+                    win !== window && tileRect.overlap(win.get_frame_rect()),
+            );
         });
-        const layoutManager = new MasonryLayout(3, 32);
-        const container = new Clutter.Actor({
+        this.relayout({ layout: new Layout(vacantTiles, 'popup') });
+    }
+
+    protected override buildTile(
+        parent: Clutter.Actor,
+        rect: Mtk.Rectangle,
+        gaps: Clutter.Margin,
+        tile: Tile,
+    ): TilePreview {
+        const preview = new PopupTilePreview({ parent, rect, gaps, tile });
+
+        const layoutManager = new MasonryLayout(
+            MASONRY_LAYOUT_SPACING,
+            this._containerRect.width * 0.15,
+        );
+        const container = new St.Widget({
             reactive: true,
             x_expand: true,
             y_expand: true,
             pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
             layout_manager: layoutManager,
+            style: 'padding: 32px;',
         });
-        outer_container.add_child(container);
-        Main.uiGroup.add_child(outer_container);
-        nontiledWindow.forEach((nonTiledWin) => {
+        preview.layout_manager = new Clutter.BinLayout();
+        preview.add_child(container);
+
+        return preview;
+    }
+
+    private _recursivelyShowPopup(nontiledWindows: Meta.Window[]): void {
+        if (this._previews.length === 0 || nontiledWindows.length === 0) {
+            this.close();
+            return;
+        }
+
+        // find the leftmost preview
+        let preview = this._previews[0];
+        let container = this._previews[0].firstChild;
+        this._previews.forEach((prev) => {
+            if (prev.x < container.x) {
+                container = prev.firstChild;
+                preview = prev;
+            }
+        });
+
+        nontiledWindows.forEach((nonTiledWin) => {
             const winClone = new PopupWindowPreview(nonTiledWin);
             const winActor =
                 nonTiledWin.get_compositor_private() as Meta.WindowActor;
-            if (!winActor) return;
 
             container.add_child(winClone);
+            const animation_speed = 200;
+            // fade out and unscale by 10% the window actor
             winActor.set_pivot_point(0.5, 0.5);
-            const animation_speed = 400;
             winActor.ease({
                 opacity: 0,
                 duration: animation_speed,
-                scaleX: 0,
-                scaleY: 0,
+                scaleX: 0.9,
+                scaleY: 0.9,
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-                onComplete: () => winActor.hide(),
+                onComplete: () => {
+                    winActor.hide();
+                    winActor.set_pivot_point(0, 0);
+                },
             });
+            // fade in and upscale by 3% the window preview (i.e. the clone)
             winClone.set_opacity(0);
             winClone.set_pivot_point(0.5, 0.5);
-            winClone.set_scale(0, 0);
+            winClone.set_scale(0.6, 0.6);
             winClone.ease({
                 opacity: 255,
-                duration: animation_speed,
-                scaleX: 1,
-                scaleY: 1,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-                onComplete: () => winActor.hide(),
+                duration: Math.floor(animation_speed * 1.8),
+                scaleX: 1.03,
+                scaleY: 1.03,
+                mode: Clutter.AnimationMode.EASE_IN_OUT,
+                onComplete: () => {
+                    // scale back to 100% the window preview (i.e the clone)
+                    winClone.ease({
+                        delay: 60,
+                        duration: Math.floor(animation_speed * 2.1),
+                        scaleX: 1,
+                        scaleY: 1,
+                        mode: Clutter.AnimationMode.EASE_IN_OUT,
+                        // finally hide the window actor when the whole animation completes
+                        onComplete: () => winActor.hide(),
+                    });
+                },
             });
+
+            // when the clone is destroyed, fade in the window actor
+            winClone.connect('destroy', () => {
+                if (winActor.visible) return;
+
+                winActor.set_pivot_point(0.5, 0.5);
+                winActor.show();
+                winActor.ease({
+                    opacity: 255,
+                    duration: animation_speed,
+                    scaleX: 1,
+                    scaleY: 1,
+                    mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+                    onStopped: () => winActor.set_pivot_point(0, 0),
+                });
+            });
+
+            // when the clone is selected by the user
+            winClone.connect('button-press-event', () => {
+                // finally move the window
+                // the actor has opacity = 0, so this is not seen by the user
+                // place the actor with a scale 10% lower, to perform scaling and fading animation later
+                winActor.set_pivot_point(0.5, 0.5);
+                winActor.set_scale(0.9, 0.9);
+                winActor.set_position(preview.innerX, preview.innerY);
+                winActor.set_size(preview.innerWidth, preview.innerHeight);
+
+                this._lastTiledWindow = nonTiledWin;
+                // place this window on TOP of everyone (we will focus it later, after the animation)
+                global.windowGroup.set_child_above_sibling(
+                    this._lastTiledWindow.get_compositor_private(),
+                    null,
+                );
+                if (
+                    nonTiledWin.maximizedHorizontally ||
+                    nonTiledWin.maximizedVertically
+                )
+                    nonTiledWin.unmaximize(Meta.MaximizeFlags.BOTH);
+                if (nonTiledWin.is_fullscreen())
+                    nonTiledWin.unmake_fullscreen();
+                if (nonTiledWin.minimized) nonTiledWin.unminimize();
+
+                (nonTiledWin as ExtendedWindow).originalSize = nonTiledWin
+                    .get_frame_rect()
+                    .copy();
+
+                preview.ease({
+                    opacity: 0,
+                    duration: animation_speed,
+                    onStopped: () => {
+                        this._previews.splice(
+                            this._previews.indexOf(preview),
+                            1,
+                        );
+                        preview.destroy();
+                        nontiledWindows.splice(
+                            nontiledWindows.indexOf(nonTiledWin),
+                            1,
+                        );
+                        this._recursivelyShowPopup(nontiledWindows);
+                    },
+                });
+                // create a static clone and hide the live clone
+                // then we can change the actual window size
+                // without showing that to the user
+                const staticClone = new Clutter.Clone({
+                    source: winClone,
+                    reactive: false,
+                });
+                winClone.hide();
+                nonTiledWin.move_resize_frame(
+                    false,
+                    preview.innerX,
+                    preview.innerY,
+                    preview.innerWidth,
+                    preview.innerHeight,
+                );
+                (nonTiledWin as ExtendedWindow).assignedTile = new Tile({
+                    ...preview.tile,
+                });
+                // while we hide the preview, show the actor to the new position,
+                // fade in and scale back to 100% size
+                winActor.show();
+                winActor.ease({
+                    opacity: 255,
+                    scaleX: 1,
+                    scaleY: 1,
+                    duration: animation_speed * 0.8,
+                    delay: 100,
+                    onStopped: () => {
+                        winActor.set_pivot_point(0, 0);
+                        if (
+                            this._previews.length === 0 &&
+                            this._lastTiledWindow
+                        ) {
+                            this._lastTiledWindow.focus(
+                                global.get_current_time(),
+                            );
+                        }
+                    },
+                });
+            });
+        });
+
+        this.grab_key_focus();
+    }
+
+    public close() {
+        if (!this._showing) return;
+
+        this._showing = false;
+        this.ease({
+            opacity: 0,
+            duration: GlobalState.get().tilePreviewAnimationTime,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+            onStopped: () => {
+                this.destroy();
+            },
         });
     }
 }

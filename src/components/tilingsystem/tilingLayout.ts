@@ -14,25 +14,18 @@ import { KeyBindingsDirection } from '@keybindings';
 
 const debug = logger('TilingLayout');
 
-export interface DynamicTilePreviewConstructorProperties
-    extends Partial<TilePreviewConstructorProperties> {
-    tile: Tile;
-}
-
 @registerGObjectClass
 class DynamicTilePreview extends TilePreview {
     private _originalRect: Mtk.Rectangle;
     private _canRestore: boolean;
-    private _tile: Tile;
 
     constructor(
-        params: DynamicTilePreviewConstructorProperties,
+        params: Partial<TilePreviewConstructorProperties>,
         canRestore?: boolean,
     ) {
         super(params);
         this._canRestore = canRestore || false;
         this._originalRect = this.rect.copy();
-        this._tile = params.tile;
     }
 
     public get originalRect(): Mtk.Rectangle {
@@ -41,10 +34,6 @@ class DynamicTilePreview extends TilePreview {
 
     public get canRestore(): boolean {
         return this._canRestore;
-    }
-
-    public get tile(): Tile {
-        return this._tile;
     }
 
     public restore(ease: boolean = false): boolean {

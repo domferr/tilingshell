@@ -751,6 +751,9 @@ export class TilingManager {
             return;
 
         // disable snap assistance
+        const showPopup =
+            !this._isSnapAssisting &&
+            !this._edgeTilingManager.isPerformingEdgeTiling();
         this._isSnapAssisting = false;
 
         if (
@@ -780,13 +783,21 @@ export class TilingManager {
             ...TileUtils.build_tile(selectedTilesRect, this._workArea),
         });
         this._easeWindowRect(window, desiredWindowRect);
-        /*if (tilingLayout) {
-            new TilingPopup(tilingLayout).open(
-                window as ExtendedWindow,
+
+        if (tilingLayout && showPopup) {
+            const layout = GlobalState.get().getSelectedLayoutOfMonitor(
                 this._monitor.index,
-                this._workArea,
+                window.get_workspace().index(),
             );
-        }*/
+            new TilingPopup(
+                layout,
+                tilingLayout.innerGaps,
+                tilingLayout.outerGaps,
+                this._workArea,
+                tilingLayout.scalingFactor,
+                window as ExtendedWindow,
+            );
+        }
     }
 
     private _easeWindowRect(
