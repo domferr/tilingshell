@@ -288,6 +288,12 @@ export default class KeyBindings extends GObject.Object {
         Main.wm.removeKeybinding(Settings.SETTING_SPAN_WINDOW_ALL_TILES);
         Main.wm.removeKeybinding(Settings.SETTING_UNTILE_WINDOW);
         Main.wm.removeKeybinding(Settings.SETTING_MOVE_WINDOW_CENTER);
+        Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_UP);
+        Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_DOWN);
+        Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_LEFT);
+        Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_RIGHT);
+        Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_NEXT);
+        Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_PREV);
     }
 
     private _restoreNatives() {
