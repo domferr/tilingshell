@@ -17,7 +17,7 @@ const debug = logger('TilingPopup');
 
 const MASONRY_LAYOUT_SPACING = 32;
 const ANIMATION_SPEED = 200;
-const MASONRY_COLUMN_MIN_WIDTH_PERCENTAGE = 0.3;
+const MASONRY_ROW_MIN_HEIGHT_PERCENTAGE = 0.3;
 
 interface ContainerWithAllocationCache extends Clutter.Actor {
     _allocationCache:
@@ -30,42 +30,41 @@ interface ContainerWithAllocationCache extends Clutter.Actor {
 
 @registerGObjectClass
 class MasonryLayout extends Clutter.LayoutManager {
-    private _columnCount: number;
+    private _rowCount: number;
     private _spacing: number;
-    private _maxColumnWidth: number;
-    private _columnWidth: number;
+    private _maxRowHeight: number;
+    private _rowHeight: number;
 
-    constructor(spacing: number, columnWidth: number, maxColumnWidth: number) {
+    constructor(spacing: number, rowHeight: number, maxRowHeight: number) {
         super();
-        this._columnCount = 0; // Number of columns
+        this._rowCount = 0; // Number of rows
         this._spacing = spacing; // Spacing between items
-        this._maxColumnWidth = maxColumnWidth;
-        this._columnWidth = columnWidth;
+        this._maxRowHeight = maxRowHeight;
+        this._rowHeight = rowHeight;
     }
 
     vfunc_allocate(container: Clutter.Actor, box: Clutter.ActorBox) {
         const children = container.get_children();
         if (children.length === 0) return;
 
-        this._columnCount = Math.ceil(Math.sqrt(children.length)) + 1;
-        let columnWidth = 0;
+        this._rowCount = Math.ceil(Math.sqrt(children.length)) + 1;
+        let rowHeight = 0;
         while (
-            this._columnCount > 1 &&
-            columnWidth < box.get_width() * MASONRY_COLUMN_MIN_WIDTH_PERCENTAGE
+            this._rowCount > 1 &&
+            rowHeight < box.get_height() * MASONRY_ROW_MIN_HEIGHT_PERCENTAGE
         ) {
-            this._columnCount--;
-            columnWidth =
-                (box.get_width() - this._spacing * (this._columnCount - 1)) /
-                this._columnCount;
+            this._rowCount--;
+            rowHeight =
+                (box.get_height() - this._spacing * (this._rowCount - 1)) /
+                this._rowCount;
         }
-        columnWidth = Math.min(columnWidth, this._maxColumnWidth);
-        columnWidth = this._columnWidth;
-        const columnHeights = Array(this._columnCount).fill(0); // Tracks the height of each column
+        rowHeight = Math.min(rowHeight, this._maxRowHeight);
+        rowHeight = this._rowHeight;
+        const rowWidths = Array(this._rowCount).fill(0); // Tracks the width of each row
 
-        // Calculate total content width and height
-        const contentWidth =
-            columnWidth * this._columnCount +
-            this._spacing * (this._columnCount - 1);
+        // Calculate total content height and width
+        const contentHeight =
+            rowHeight * this._rowCount + this._spacing * (this._rowCount - 1);
 
         // Store placements and cache
         const placements = [];
@@ -74,72 +73,63 @@ class MasonryLayout extends Clutter.LayoutManager {
             new Map();
 
         for (const child of children) {
-            // Retrieve the preferred width and height to calculate the aspect ratio
-            const [minWidth, naturalWidth] = child.get_preferred_width(-1);
-            const [minHeight, naturalHeight] =
-                child.get_preferred_height(naturalWidth);
+            // Retrieve the preferred height and width to calculate the aspect ratio
+            const [minHeight, naturalHeight] = child.get_preferred_height(-1);
+            const [minWidth, naturalWidth] =
+                child.get_preferred_width(naturalHeight);
 
             // Maintain the aspect ratio
-            const aspectRatio = naturalHeight / naturalWidth;
-            const height = columnWidth * aspectRatio;
+            const aspectRatio = naturalWidth / naturalHeight;
+            const width = rowHeight * aspectRatio;
 
-            // Find the shortest column
-            const shortestColumn = columnHeights.indexOf(
-                Math.min(...columnHeights),
-            );
+            // Find the shortest row
+            const shortestRow = rowWidths.indexOf(Math.min(...rowWidths));
             placements.push({
                 child,
-                column: shortestColumn,
-                height,
-                y: columnHeights[shortestColumn],
-                columnHeight: 0,
+                row: shortestRow,
+                width,
+                x: rowWidths[shortestRow],
+                rowWidth: 0,
             });
 
-            // Update column height
-            columnHeights[shortestColumn] += height + this._spacing;
+            // Update row height
+            rowWidths[shortestRow] += width + this._spacing;
         }
         for (const placement of placements)
-            placement.columnHeight = columnHeights[placement.column];
+            placement.rowWidth = rowWidths[placement.row];
 
-        const sortedColumnHeights: number[][] = [...columnHeights].map(
-            (v, i) => [v, i],
-        );
-        sortedColumnHeights.sort((a, b) => b[0] - a[0]);
-        const columnsOrdering = new Map<number, number>();
-        sortedColumnHeights.forEach((col, newIndex) => {
-            const index = col[1];
-            columnsOrdering.set(
+        const sortedRowWidths: number[][] = [...rowWidths].map((v, i) => [
+            v,
+            i,
+        ]);
+        sortedRowWidths.sort((a, b) => b[0] - a[0]);
+        const rowsOrdering = new Map<number, number>();
+        sortedRowWidths.forEach((row, newIndex) => {
+            const index = row[1];
+            rowsOrdering.set(
                 index,
-                (newIndex + Math.floor(this._columnCount / 2)) %
-                    this._columnCount,
+                (newIndex + Math.floor(this._rowCount / 2)) % this._rowCount,
             );
         });
-        for (const placement of placements) {
-            placement.column =
-                columnsOrdering.get(placement.column) ?? placement.column;
-        }
+        for (const placement of placements)
+            placement.row = rowsOrdering.get(placement.row) ?? placement.row;
 
         // Calculate offsets for centering the entire grid within the available space
-        const horizontalOffset = (box.get_width() - contentWidth) / 2;
-        // Determine the tallest column and center the content around it
-        const tallestColumnHeight = sortedColumnHeights[0][0];
-        const verticalOffset = Math.max(
-            0,
-            (box.get_height() - tallestColumnHeight) / 2,
-        );
+        const verticalOffset = (box.get_height() - contentHeight) / 2;
+        // Determine the largest row and center the content around it
+        const largestRowWidth = sortedRowWidths[0][0];
+        const horizontalOffset = (box.get_width() - largestRowWidth) / 2;
 
-        // Reset column heights for actual allocation
-        columnHeights.fill(0);
+        // Reset row heights for actual allocation
+        rowWidths.fill(0);
 
         // Allocate children with preserved proportions
         for (const placement of placements) {
-            const { child, column, height, y, columnHeight } = placement;
-            const x =
-                box.x1 +
-                column * (columnWidth + this._spacing) +
-                horizontalOffset;
-            const columnOffset = (tallestColumnHeight - columnHeight) / 2;
-            const yPosition = box.y1 + y + verticalOffset + columnOffset;
+            const { child, row, width, x, rowWidth } = placement;
+            const y =
+                box.y1 + row * (rowHeight + this._spacing) + verticalOffset;
+            const rowOffset = (largestRowWidth - rowWidth) / 2;
+            const xPosition = box.x1 + x + horizontalOffset + rowOffset + (this._spacing / 2);
 
             // Check if this child has a cached allocation
             const cachedAlloc = allocationCache.get(child);
@@ -148,8 +138,8 @@ class MasonryLayout extends Clutter.LayoutManager {
                     new Clutter.ActorBox({
                         x1: cachedAlloc.x,
                         y1: cachedAlloc.y,
-                        x2: cachedAlloc.x + columnWidth,
-                        y2: cachedAlloc.y + height,
+                        x2: cachedAlloc.x + width,
+                        y2: cachedAlloc.y + rowHeight,
                     }),
                 );
                 continue; // Skip reallocation
@@ -158,19 +148,19 @@ class MasonryLayout extends Clutter.LayoutManager {
             // If the allocation has changed or no cache exists, perform new allocation
             child.allocate(
                 new Clutter.ActorBox({
-                    x1: x,
-                    y1: yPosition,
-                    x2: x + columnWidth,
-                    y2: yPosition + height,
+                    x1: xPosition,
+                    y1: y,
+                    x2: xPosition + width,
+                    y2: y + rowHeight,
                 }),
             );
 
             // Update cache with the new allocation
             allocationCache.set(child, {
-                x,
-                y: yPosition,
-                width: columnWidth,
-                height,
+                x: xPosition,
+                y,
+                height: rowHeight,
+                width,
             });
         }
 
@@ -186,14 +176,17 @@ class MasonryLayout extends Clutter.LayoutManager {
         const children = container.get_children();
         if (children.length === 0) return [0, 0];
 
-        const childWidths = children.map(
-            (child) => child.get_preferred_width(forHeight)[1],
-        );
-        const maxChildWidth = Math.max(...childWidths);
+        const rowWidths = Array(this._rowCount).fill(0);
+        const rowWidth =
+            (forHeight - this._spacing * (this._rowCount - 1)) / this._rowCount;
 
-        const totalWidth =
-            this._columnCount * maxChildWidth +
-            (this._columnCount - 1) * this._spacing;
+        for (const child of children) {
+            const preferredWidth = child.get_preferred_width(rowWidth)[1];
+            const shortestRow = rowWidths.indexOf(Math.min(...rowWidths));
+            rowWidths[shortestRow] += preferredWidth + this._spacing;
+        }
+
+        const totalWidth = Math.max(...rowWidths);
         return [totalWidth, totalWidth];
     }
 
@@ -204,20 +197,14 @@ class MasonryLayout extends Clutter.LayoutManager {
         const children = container.get_children();
         if (children.length === 0) return [0, 0];
 
-        const columnHeights = Array(this._columnCount).fill(0);
-        const columnWidth =
-            (forWidth - this._spacing * (this._columnCount - 1)) /
-            this._columnCount;
+        const childHeights = children.map(
+            (child) => child.get_preferred_height(forWidth)[1],
+        );
+        const maxChildHeights = Math.max(...childHeights);
 
-        for (const child of children) {
-            const preferredHeight = child.get_preferred_height(columnWidth)[1];
-            const shortestColumn = columnHeights.indexOf(
-                Math.min(...columnHeights),
-            );
-            columnHeights[shortestColumn] += preferredHeight + this._spacing;
-        }
-
-        const totalHeight = Math.max(...columnHeights);
+        const totalHeight =
+            this._rowCount * maxChildHeights +
+            (this._rowCount - 1) * this._spacing;
         return [totalHeight, totalHeight];
     }
 }
@@ -329,8 +316,8 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
 
         const layoutManager = new MasonryLayout(
             MASONRY_LAYOUT_SPACING,
-            this._containerRect.width * 0.08,
-            this._containerRect.width * 0.15,
+            this._containerRect.height * 0.2,
+            this._containerRect.height * 0.3,
         );
         const container = new St.Widget({
             reactive: true,
