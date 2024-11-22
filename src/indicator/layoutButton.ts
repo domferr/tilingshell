@@ -7,7 +7,7 @@ import { buildMarginOf, buildRectangle, getScalingFactorOf } from '@utils/ui';
 import { registerGObjectClass } from '@utils/gjs';
 
 @registerGObjectClass
-class LayoutButtonWidget extends LayoutWidget<SnapAssistTile> {
+export class LayoutButtonWidget extends LayoutWidget<SnapAssistTile> {
     constructor(
         parent: Clutter.Actor,
         layout: Layout,
