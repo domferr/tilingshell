@@ -14,6 +14,8 @@ export enum KeyBindingsDirection {
     DOWN,
     LEFT,
     RIGHT,
+    PREV,
+    NEXT,
 }
 
 @registerGObjectClass
@@ -22,10 +24,10 @@ export default class KeyBindings extends GObject.Object {
         GTypeName: 'KeyBindings',
         Signals: {
             'move-window': {
-                param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, Meta.Direction
+                param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, KeyBindingsDirection
             },
             'span-window': {
-                param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, Meta.Direction
+                param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, KeyBindingsDirection
             },
             'span-window-all-tiles': {
                 param_types: [Meta.Display.$gtype], // Meta.Display
@@ -37,7 +39,7 @@ export default class KeyBindings extends GObject.Object {
                 param_types: [Meta.Display.$gtype], // Meta.Display
             },
             'focus-window': {
-                param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, Meta.Direction
+                param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, KeyBindingsDirection
             },
         },
     };
@@ -177,6 +179,26 @@ export default class KeyBindings extends GObject.Object {
                 this.emit('focus-window', display, KeyBindingsDirection.DOWN);
             },
         );
+
+        Main.wm.addKeybinding(
+            Settings.SETTING_FOCUS_WINDOW_NEXT,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('focus-window', display, KeyBindingsDirection.NEXT);
+            },
+        );
+
+        Main.wm.addKeybinding(
+            Settings.SETTING_FOCUS_WINDOW_PREV,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('focus-window', display, KeyBindingsDirection.PREV);
+            },
+        );
     }
 
     private _overrideNatives(extensionSettings: Gio.Settings) {
@@ -266,6 +288,12 @@ export default class KeyBindings extends GObject.Object {
         Main.wm.removeKeybinding(Settings.SETTING_SPAN_WINDOW_ALL_TILES);
         Main.wm.removeKeybinding(Settings.SETTING_UNTILE_WINDOW);
         Main.wm.removeKeybinding(Settings.SETTING_MOVE_WINDOW_CENTER);
+        Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_UP);
+        Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_DOWN);
+        Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_LEFT);
+        Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_RIGHT);
+        Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_NEXT);
+        Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_PREV);
     }
 
     private _restoreNatives() {

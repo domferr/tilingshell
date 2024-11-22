@@ -3,15 +3,27 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import Settings from '@settings/settings';
 import Layout from '@/components/layout/Layout';
+import LayoutWidget from '@/components/layout/LayoutWidget';
+import SnapAssistTile from '@/components/snapassist/snapAssistTile';
 import Tile from '@/components/layout/Tile';
+import {
+    buildMarginOf,
+    buildRectangle,
+    getMonitors,
+} from '@/utils/ui';
+import { logger } from '@utils/logger';
 import LayoutEditor from '@/components/editor/layoutEditor';
 import DefaultMenu from './defaultMenu';
 import GlobalState from '@utils/globalState';
 import EditingMenu from './editingMenu';
 import EditorDialog from '../components/editor/editorDialog';
 import CurrentMenu from './currentMenu';
+import LayoutButtonWidget from './layoutButton';
 import { registerGObjectClass } from '@utils/gjs';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
+import { wiggle } from '@girs/gnome-shell/misc/animationUtils';
+
+const debug = logger('indicator');
 
 enum IndicatorState {
     DEFAULT = 1,
@@ -48,7 +60,36 @@ export default class Indicator extends PanelMenu.Button {
             styleClass: 'system-status-icon indicator-icon',
         });
 
-        this.add_child(icon);
+        const layouts = GlobalState.get().layouts;
+        const selected_layouts = Settings.get_selected_layouts();
+        const ws_index = global.workspaceManager.get_active_workspace_index();
+        const monitors = getMonitors();
+        const monitor = monitors[0];
+        const ws_selected_layouts =
+            ws_index < selected_layouts.length
+                ? selected_layouts[ws_index]
+                : [];
+        const selectedId =
+            monitor.index < ws_selected_layouts.length
+                ? ws_selected_layouts[monitor.index]
+                : GlobalState.get().layouts[0].id;
+        const selectedIndex = layouts.findIndex((lay) => lay.id === selectedId);
+        const currentLayout = layouts[selectedIndex];
+        const hasGaps = Settings.get_inner_gaps(1).top > 0;
+
+        const height: number = icon.height;
+        const width: number = icon.width; // 16:9 ratio. -> (16*layoutHeight) / 9 and then rounded to int
+        // const widget = new LayoutWidget<SnapAssistTile>({
+        //     parent: this,
+        //     layout: currentLayout,
+        //     innerGaps: buildMarginOf(Settings.get_inner_gaps(1).top),
+        //     outerGaps: new Clutter.Margin(),
+        //     containerRect: buildRectangle({ x: 0, y: 0, height: 180, width: 180 }),
+        // });
+        const widget = new LayoutButtonWidget(this, currentLayout, 2, 18, 18*(16/9));
+
+        // this.add_child(icon);
+        // this.add_child(widget);
         this._layoutEditor = null;
         this._editorDialog = null;
         this._currentMenu = null;

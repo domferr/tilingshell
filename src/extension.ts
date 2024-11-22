@@ -2,7 +2,7 @@ import './styles/stylesheet.scss';
 
 import { Gio, GLib, Meta } from '@gi.ext';
 import { logger } from '@utils/logger';
-import { getMonitors, squaredEuclideanDistance } from '@/utils/ui';
+import { filterUnfocusableWindows, getMonitors, squaredEuclideanDistance } from '@/utils/ui';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { TilingManager } from '@/components/tilingsystem/tilingManager';
 import Settings from '@settings/settings';
@@ -107,7 +107,9 @@ export default class TilingShellExtension extends Extension {
         this._resizingManager.enable();
 
         if (this._windowBorderManager) this._windowBorderManager.destroy();
-        this._windowBorderManager = new WindowBorderManager();
+        this._windowBorderManager = new WindowBorderManager(
+            !this._fractionalScalingEnabled,
+        );
         this._windowBorderManager.enable();
 
         this.createIndicator();
@@ -172,6 +174,12 @@ export default class TilingShellExtension extends Extension {
                     this._indicator.enableScaling =
                         !this._fractionalScalingEnabled;
                 }
+                if (this._windowBorderManager)
+                    this._windowBorderManager.destroy();
+                this._windowBorderManager = new WindowBorderManager(
+                    this._fractionalScalingEnabled,
+                );
+                this._windowBorderManager.enable();
             },
         );
 
@@ -440,6 +448,7 @@ export default class TilingShellExtension extends Extension {
             this._tilingManagers[neighborMonitorIndex];
         if (!neighborTilingManager) return;
 
+        focus_window.move_to_monitor(neighborMonitorIndex);
         neighborTilingManager.onKeyboardMoveWindow(
             focus_window,
             direction,
@@ -453,9 +462,12 @@ export default class TilingShellExtension extends Extension {
         direction: KeyBindingsDirection,
     ) {
         const focus_window = display.get_focus_window();
+        const focusParent = (focus_window.get_transient_for() || focus_window);
+
         if (
             !focus_window ||
             !focus_window.has_focus() ||
+            focusParent.windowType !== Meta.WindowType.NORMAL ||
             (focus_window.get_wm_class() &&
                 focus_window.get_wm_class() === 'gjs')
         )
@@ -469,16 +481,32 @@ export default class TilingShellExtension extends Extension {
             x: focusWindowRect.x + focusWindowRect.width / 2,
             y: focusWindowRect.y + focusWindowRect.height / 2,
         };
-        focus_window
-            .get_workspace()
-            .list_windows()
+
+        const windowList = filterUnfocusableWindows(focus_window.get_workspace().list_windows());
+        const focusedIdx = windowList.findIndex((win) => {
+            // in case we are iterating over a modal dialog for our focused window
+            return win === focusParent;
+        });
+
+        switch (direction) {
+            case KeyBindingsDirection.PREV:
+                if (focusedIdx == 0 && Settings.WRAPAROUND_FOCUS) {
+                    windowList[windowList.length - 1].activate(global.get_current_time());
+                } else {
+                    windowList[focusedIdx - 1].activate(global.get_current_time());
+                }
+                return;
+            case KeyBindingsDirection.NEXT:
+                const nextIdx = (focusedIdx + 1) % windowList.length;
+                if (nextIdx > 0 || Settings.WRAPAROUND_FOCUS) {
+                    windowList[nextIdx].activate(global.get_current_time());
+                }
+                return;
+        }
+
+        windowList
             .filter((win) => {
-                if (
-                    win === focus_window ||
-                    (win.get_wm_class() && win.get_wm_class() === 'gjs') ||
-                    win.minimized
-                )
-                    return false;
+                if (win === focus_window || win.minimized) return false;
 
                 const winRect = win.get_frame_rect();
                 switch (direction) {
@@ -526,6 +554,7 @@ export default class TilingShellExtension extends Extension {
         if (
             !focus_window ||
             !focus_window.has_focus() ||
+            focus_window.windowType !== Meta.WindowType.NORMAL ||
             (focus_window.get_wm_class() &&
                 focus_window.get_wm_class() === 'gjs')
         )
