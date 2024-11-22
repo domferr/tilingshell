@@ -163,6 +163,25 @@ export function buildBlurEffect(sigma: number): Shell.BlurEffect {
     return effect;
 }
 
+function getTransientOrParent(window: Meta.Window): Meta.Window {
+    const transient = window.get_transient_for();
+    return window.is_attached_dialog() && transient !== null ? transient : window;
+}
+
+export function filterUnfocusableWindows(windows: Meta.Window[]): Meta.Window[] {
+    // we want to filter out
+    // - top-level windows which are precluded by dialogs
+    // - anything tagged skip-taskbar
+    // - duplicates
+    return windows
+        .map(getTransientOrParent)
+        .filter((win: Meta.Window, idx: number, arr: Meta.Window[]) => {
+            // typings indicate win will not be null, but this check is found
+            // in the source, so...
+            return win !== null && !win.skipTaskbar && arr.indexOf(win) === idx;
+        });
+}
+
 /** From Gnome Shell: https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/main/js/ui/altTab.js#L53 */
 export function getWindows(workspace?: Meta.Workspace): Meta.Window[] {
     if (!workspace) workspace = global.workspaceManager.get_active_workspace();
@@ -170,16 +189,9 @@ export function getWindows(workspace?: Meta.Workspace): Meta.Window[] {
     // to their parent, their position in the MRU list may be more appropriate
     // than the parent; so start with the complete list ...
     // ... map windows to their parent where appropriate ...
-    return global.display
-        .get_tab_list(Meta.TabList.NORMAL_ALL, workspace)
-        .map((w) => {
-            const transient = w.get_transient_for();
-            return w.is_attached_dialog() && transient !== null ? transient : w;
-            // ... and filter out skip-taskbar windows and duplicates
-        })
-        .filter(
-            (w, i, a) => w !== null && !w.skipTaskbar && a.indexOf(w) === i,
-        );
+    return filterUnfocusableWindows(
+        global.display
+            .get_tab_list(Meta.TabList.NORMAL_ALL, workspace));
 }
 
 export function squaredEuclideanDistance(
