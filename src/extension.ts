@@ -2,7 +2,7 @@ import './styles/stylesheet.scss';
 
 import { Gio, GLib, Meta } from '@gi.ext';
 import { logger } from '@utils/logger';
-import { getMonitors, getWindows, squaredEuclideanDistance } from '@/utils/ui';
+import { filterUnfocusableWindows, getMonitors, squaredEuclideanDistance } from '@/utils/ui';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { TilingManager } from '@/components/tilingsystem/tilingManager';
 import Settings from '@settings/settings';
@@ -473,12 +473,13 @@ export default class TilingShellExtension extends Extension {
         display: Meta.Display,
         direction: KeyBindingsDirection,
     ) {
-        debug('focus window');
         const focus_window = display.get_focus_window();
+        const focusParent = (focus_window.get_transient_for() || focus_window);
+
         if (
             !focus_window ||
             !focus_window.has_focus() ||
-            focus_window.windowType !== Meta.WindowType.NORMAL ||
+            focusParent.windowType !== Meta.WindowType.NORMAL ||
             (focus_window.get_wm_class() &&
                 focus_window.get_wm_class() === 'gjs')
         )
@@ -493,8 +494,11 @@ export default class TilingShellExtension extends Extension {
             y: focusWindowRect.y + focusWindowRect.height / 2,
         };
 
-        const windowList = getWindows(focus_window.get_workspace());
-        const focusedIdx = windowList.findIndex((win) => win === focus_window);
+        const windowList = filterUnfocusableWindows(focus_window.get_workspace().list_windows());
+        const focusedIdx = windowList.findIndex((win) => {
+            // in case we are iterating over a modal dialog for our focused window
+            return win === focusParent;
+        });
 
         switch (direction) {
             case KeyBindingsDirection.PREV:
