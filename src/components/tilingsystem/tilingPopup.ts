@@ -129,7 +129,8 @@ class MasonryLayout extends Clutter.LayoutManager {
             const y =
                 box.y1 + row * (rowHeight + this._spacing) + verticalOffset;
             const rowOffset = (largestRowWidth - rowWidth) / 2;
-            const xPosition = box.x1 + x + horizontalOffset + rowOffset + (this._spacing / 2);
+            const xPosition =
+                box.x1 + x + horizontalOffset + rowOffset + this._spacing / 2;
 
             // Check if this child has a cached allocation
             const cachedAlloc = allocationCache.get(child);
@@ -232,6 +233,8 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
             outerGaps,
             scalingFactor,
         });
+        this.canFocus = true;
+        this.reactive = true;
         this._signals = new SignalHandling();
         this._lastTiledWindow = global.display.focusWindow;
         this._showing = true;
@@ -253,9 +256,6 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
 
         this._relayoutVacantTiles(layout, tiledWindows, window);
 
-        this.canFocus = true;
-        this.reactive = true;
-
         this.show();
         this._recursivelyShowPopup(nontiledWindows);
 
@@ -273,6 +273,16 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
                         MasonryLayout
                 )
                     this.close();
+            },
+        );
+        this._signals.connect(
+            global.stage,
+            'key-press-event',
+            (_: Clutter.Actor, event: Clutter.Event) => {
+                const symbol = event.get_key_symbol();
+                if (symbol === Clutter.KEY_Escape) this.close();
+
+                return Clutter.EVENT_PROPAGATE;
             },
         );
         this.connect('destroy', () => this._signals.disconnect());
