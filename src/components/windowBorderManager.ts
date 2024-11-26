@@ -16,7 +16,7 @@ Gio._promisify(Shell.Screenshot, 'composite_to_stream');
 
 const WINDOW_BORDER_WIDTH = 1;
 const DEFAULT_BORDER_RADIUS = 11;
-const SMART_BORDER_RADIUS_DELAY = 180;
+const SMART_BORDER_RADIUS_DELAY = 240;
 
 const debug = logger('WindowBorderManager');
 
@@ -83,7 +83,6 @@ class WindowBorder extends St.Bin {
         // scale and translate like the window actor
         // @ts-expect-error "For some reason GObject.Binding is not recognized"
         this._bindings = [
-            'pivot-point',
             'scale-x',
             'scale-y',
             'translation_x',
@@ -135,6 +134,9 @@ class WindowBorder extends St.Bin {
             this.close();
         else this.open();
 
+        this._signals.connect(global.display, 'restacked', () => {
+            global.windowGroup.set_child_above_sibling(this, null);
+        });
         this._signals.connect(this._window, 'position-changed', () => {
             if (
                 this._window.maximizedVertically ||
@@ -249,10 +251,7 @@ class WindowBorder extends St.Bin {
                 width,
             }),
         );
-        if (!content) {
-            debug('actor content is undefined');
-            return;
-        }
+        if (!content) return;
 
         /* for debugging purposes
         const elem = new St.Widget({
@@ -310,7 +309,6 @@ class WindowBorder extends St.Bin {
             }
         }
         stream.close(null);
-        debug('border radius is', JSON.stringify(this._borderRadiusValue));
 
         const cached_radius: [number, number, number, number] = [
             DEFAULT_BORDER_RADIUS,

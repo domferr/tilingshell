@@ -19,6 +19,7 @@ import OverriddenWindowMenu from '@components/window_menu/overriddenWindowMenu';
 import Tile from '@components/layout/Tile';
 import { WindowBorderManager } from '@components/windowBorderManager';
 import TilingShellWindowManager from '@components/windowManager/tilingShellWindowManager';
+import ExtendedWindow from '@components/tilingsystem/extendedWindow';
 
 const debug = logger('extension');
 
@@ -389,11 +390,17 @@ export default class TilingShellExtension extends Extension {
             return;
 
         // if the window is maximized, it cannot be spanned
-        if (focus_window.get_maximized() && spanFlag) return;
+        if (
+            (focus_window.maximizedHorizontally ||
+                focus_window.maximizedVertically) &&
+            spanFlag
+        )
+            return;
 
         // handle unmaximize of maximized window
         if (
-            focus_window.get_maximized() &&
+            (focus_window.maximizedHorizontally ||
+                focus_window.maximizedVertically) &&
             direction === KeyBindingsDirection.DOWN
         ) {
             focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
@@ -404,7 +411,11 @@ export default class TilingShellExtension extends Extension {
             this._tilingManagers[focus_window.get_monitor()];
         if (!monitorTilingManager) return;
 
-        if (Settings.ENABLE_AUTO_TILING && focus_window.get_maximized()) {
+        if (
+            Settings.ENABLE_AUTO_TILING &&
+            (focus_window.maximizedHorizontally ||
+                focus_window.maximizedVertically)
+        ) {
             focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
             return;
         }
@@ -436,19 +447,20 @@ export default class TilingShellExtension extends Extension {
 
         // if the window is maximized, direction is UP and there is a monitor above, minimize the window
         if (
-            focus_window.get_maximized() &&
+            (focus_window.maximizedHorizontally ||
+                focus_window.maximizedVertically) &&
             direction === KeyBindingsDirection.UP
         ) {
             // @ts-expect-error "Main.wm has skipNextEffect function"
             Main.wm.skipNextEffect(focus_window.get_compositor_private());
             focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
+            (focus_window as ExtendedWindow).assignedTile = undefined;
         }
 
         const neighborTilingManager =
             this._tilingManagers[neighborMonitorIndex];
         if (!neighborTilingManager) return;
 
-        focus_window.move_to_monitor(neighborMonitorIndex);
         neighborTilingManager.onKeyboardMoveWindow(
             focus_window,
             direction,

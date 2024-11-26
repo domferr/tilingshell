@@ -212,7 +212,6 @@ class MasonryLayout extends Clutter.LayoutManager {
 
 @registerGObjectClass
 export default class TilingPopup extends LayoutWidget<TilePreview> {
-    private _keyPressEvent: number | undefined;
     private _signals: SignalHandling;
     private _lastTiledWindow: Meta.Window | null;
     private _showing: boolean;
@@ -249,7 +248,9 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
                 tiledWindows.push(extWin as ExtendedWindow);
             else nontiledWindows.push(extWin);
         });
-        if (nontiledWindows.length === 0) {
+        // TODO: let's make this available in the future
+        const enabled = true;
+        if (nontiledWindows.length === 0 || !enabled) {
             this.destroy();
             return;
         }
@@ -257,7 +258,7 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
         this._relayoutVacantTiles(layout, tiledWindows, window);
 
         this.show();
-        this._recursivelyShowPopup(nontiledWindows);
+        this._recursivelyShowPopup(nontiledWindows, window.get_monitor());
 
         this.connect('key-focus-out', () => this.close());
 
@@ -343,7 +344,10 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
         return preview;
     }
 
-    private _recursivelyShowPopup(nontiledWindows: Meta.Window[]): void {
+    private _recursivelyShowPopup(
+        nontiledWindows: Meta.Window[],
+        monitorIndex: number,
+    ): void {
         if (this._previews.length === 0 || nontiledWindows.length === 0) {
             this.close();
             return;
@@ -470,11 +474,17 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
                             nontiledWindows.indexOf(nonTiledWin),
                             1,
                         );
-                        this._recursivelyShowPopup(nontiledWindows);
+                        this._recursivelyShowPopup(
+                            nontiledWindows,
+                            monitorIndex,
+                        );
                     },
                 });
+                const user_op = false;
+                nonTiledWin.move_to_monitor(monitorIndex);
+                nonTiledWin.move_frame(user_op, preview.innerX, preview.innerY);
                 nonTiledWin.move_resize_frame(
-                    false,
+                    user_op,
                     preview.innerX,
                     preview.innerY,
                     preview.innerWidth,

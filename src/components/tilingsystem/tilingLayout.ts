@@ -6,7 +6,12 @@ import TilePreview, {
 import LayoutWidget from '../layout/LayoutWidget';
 import Layout from '../layout/Layout';
 import Tile from '../layout/Tile';
-import { buildRectangle, buildTileGaps, isPointInsideRect } from '@utils/ui';
+import {
+    buildRectangle,
+    buildTileGaps,
+    isPointInsideRect,
+    squaredEuclideanDistance,
+} from '@utils/ui';
 import TileUtils from '@components/layout/TileUtils';
 import { logger } from '@utils/logger';
 import GlobalState from '@utils/globalState';
@@ -367,30 +372,28 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
 
         switch (direction) {
             case KeyBindingsDirection.RIGHT:
-                sourceCoords.x = Math.min(
-                    this._containerRect.width + this._containerRect.x,
-                    source.x + source.width + enlarge,
-                );
+                sourceCoords.x = source.x + source.width + enlarge;
                 break;
             case KeyBindingsDirection.LEFT:
-                sourceCoords.x = Math.max(
-                    this._containerRect.x,
-                    source.x - enlarge,
-                );
+                sourceCoords.x = source.x - enlarge;
                 break;
             case KeyBindingsDirection.DOWN:
-                sourceCoords.y = Math.min(
-                    this._containerRect.height + this._containerRect.y,
-                    source.y + source.height + enlarge,
-                );
+                sourceCoords.y = source.y + source.height + enlarge;
                 break;
             case KeyBindingsDirection.UP:
-                sourceCoords.y = Math.max(
-                    this._containerRect.y,
-                    source.y - enlarge,
-                );
+                sourceCoords.y = source.y - enlarge;
                 break;
         }
+
+        // if the point to search is outside the container we can already return undefined
+        if (
+            sourceCoords.x < this._containerRect.x ||
+            sourceCoords.x >
+                this._containerRect.width + this._containerRect.x ||
+            sourceCoords.y < this._containerRect.y ||
+            sourceCoords.y > this._containerRect.height + this._containerRect.y
+        )
+            return undefined;
 
         // uncomment to show debugging
         /* global.windowGroup
@@ -423,5 +426,48 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
         }
 
         return undefined;
+    }
+
+    public findNearestTile(
+        source: Mtk.Rectangle,
+    ): { rect: Mtk.Rectangle; tile: Tile } | undefined {
+        let previewFound: DynamicTilePreview | undefined;
+        let bestDistance = -1;
+
+        const sourceCenter = {
+            x: source.x + source.width / 2,
+            y: source.x + source.height / 2,
+        };
+
+        for (let i = 0; i < this._previews.length; i++) {
+            const preview = this._previews[i];
+
+            const previewCenter = {
+                x: preview.innerX + preview.innerWidth / 2,
+                y: preview.innerY + preview.innerHeight / 2,
+            };
+
+            const euclideanDistance = squaredEuclideanDistance(
+                previewCenter,
+                sourceCenter,
+            );
+
+            if (!previewFound || euclideanDistance < bestDistance) {
+                previewFound = preview;
+                bestDistance = euclideanDistance;
+            }
+        }
+
+        if (!previewFound) return undefined;
+
+        return {
+            rect: buildRectangle({
+                x: previewFound.innerX,
+                y: previewFound.innerY,
+                width: previewFound.innerWidth,
+                height: previewFound.innerHeight,
+            }),
+            tile: previewFound.tile,
+        };
     }
 }

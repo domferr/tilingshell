@@ -324,7 +324,7 @@ export class TilingManager {
         }
 
         // find the nearest tile
-        // direction is CENTER -> move to the center of the screen
+        // direction is NODIRECTION -> move to the center of the screen
         if (direction === KeyBindingsDirection.NODIRECTION) {
             const rect = buildRectangle({
                 x:
@@ -342,15 +342,18 @@ export class TilingManager {
                 rect,
                 tile: TileUtils.build_tile(rect, this._workArea),
             };
-        } else {
+        } else if (window.get_monitor() === this._monitor.index) {
             destination = tilingLayout.findNearestTileDirection(
                 windowRectCopy,
                 direction,
             );
+        } else {
+            destination = tilingLayout.findNearestTile(windowRectCopy);
         }
 
         // if the window is already on the desired tile
         if (
+            window.get_monitor() === this._monitor.index &&
             destination &&
             (window as ExtendedWindow).assignedTile &&
             (window as ExtendedWindow).assignedTile?.x === destination.tile.x &&
