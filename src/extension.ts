@@ -12,7 +12,7 @@ import Indicator from './indicator/indicator';
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 import { ExtensionMetadata } from 'resource:///org/gnome/shell/extensions/extension.js';
 import DBus from './dbus';
-import KeyBindings, { KeyBindingsDirection } from './keybindings';
+import KeyBindings, { KeyBindingsDirection, FocusSwitchDirection } from './keybindings';
 import SettingsOverride from '@settings/settingsOverride';
 import { ResizingManager } from '@components/tilingsystem/resizeManager';
 import OverriddenWindowMenu from '@components/window_menu/overriddenWindowMenu';
@@ -239,7 +239,7 @@ export default class TilingShellExtension extends Extension {
                 (
                     kb: KeyBindings,
                     dp: Meta.Display,
-                    dir: KeyBindingsDirection,
+                    dir: KeyBindingsDirection | FocusSwitchDirection,
                 ) => {
                     this._onKeyboardFocusWin(dp, dir);
                 },
@@ -471,7 +471,7 @@ export default class TilingShellExtension extends Extension {
 
     private _onKeyboardFocusWin(
         display: Meta.Display,
-        direction: KeyBindingsDirection,
+        direction: KeyBindingsDirection | FocusSwitchDirection,
     ) {
         const focus_window = display.get_focus_window();
         const focusParent = (focus_window.get_transient_for() || focus_window);
@@ -501,14 +501,14 @@ export default class TilingShellExtension extends Extension {
         });
 
         switch (direction) {
-            case KeyBindingsDirection.PREV:
+            case FocusSwitchDirection.PREV:
                 if (focusedIdx == 0 && Settings.WRAPAROUND_FOCUS) {
                     windowList[windowList.length - 1].activate(global.get_current_time());
                 } else {
                     windowList[focusedIdx - 1].activate(global.get_current_time());
                 }
                 return;
-            case KeyBindingsDirection.NEXT:
+            case FocusSwitchDirection.NEXT:
                 const nextIdx = (focusedIdx + 1) % windowList.length;
                 if (nextIdx > 0 || Settings.WRAPAROUND_FOCUS) {
                     windowList[nextIdx].activate(global.get_current_time());
