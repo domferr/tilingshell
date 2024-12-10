@@ -115,6 +115,13 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         appearenceGroup.add(windowBorderRow);
         windowBorderRow.add_row(
             this._buildSwitchRow(
+                Settings.KEY_ENABLE_SMART_WINDOW_BORDER_RADIUS,
+                _('Smart border radius'),
+                _('Dynamically adapt to the window’s actual border radius'),
+            ),
+        );
+        windowBorderRow.add_row(
+            this._buildSwitchRow(
                 Settings.KEY_ENABLE_WINDOW_BORDER,
                 _('Enable'),
                 _('Show a border around focused window'),
@@ -581,6 +588,20 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 false,
                 false,
             ],
+            [
+                Settings.SETTING_FOCUS_WINDOW_NEXT,
+                _('Focus next window'),
+                _('Focus the window next to the current focused window'),
+                false,
+                false,
+            ],
+            [
+                Settings.SETTING_FOCUS_WINDOW_PREV,
+                _('Focus previous window'),
+                _('Focus the window prior to the current focused window'),
+                false,
+                false,
+            ],
         ];
 
         // set if the keybinding was set or not by the user
@@ -662,6 +683,15 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             );
             keybindingsDialogGroup.add(row);
         });
+
+        const wrapAroundRow = this._buildSwitchRow(
+            Settings.KEY_WRAPAROUND_FOCUS,
+            _('Enable next/previous window focus to wrap around'),
+            _(
+                'When focusing next or previous window, wrap around at the window edge',
+            ),
+        );
+        keybindingsGroup.add(wrapAroundRow);
 
         // Import/export/reset section
         const importExportGroup = new Adw.PreferencesGroup({

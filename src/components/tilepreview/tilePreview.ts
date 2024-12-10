@@ -2,6 +2,7 @@ import { St, Clutter, Mtk, Meta } from '@gi.ext';
 import { registerGObjectClass } from '@/utils/gjs';
 import { buildRectangle, getScalingFactorOf } from '@utils/ui';
 import GlobalState from '@utils/globalState';
+import Tile from '@components/layout/Tile';
 
 // export module TilePreview {
 export interface TilePreviewConstructorProperties
@@ -9,6 +10,7 @@ export interface TilePreviewConstructorProperties
     parent: Clutter.Actor;
     rect: Mtk.Rectangle;
     gaps: Clutter.Margin;
+    tile: Tile;
 }
 // }
 
@@ -16,6 +18,7 @@ export interface TilePreviewConstructorProperties
 export default class TilePreview extends St.Widget {
     protected _rect: Mtk.Rectangle;
     protected _showing: boolean;
+    protected _tile: Tile;
 
     private _gaps: Clutter.Margin;
 
@@ -27,6 +30,9 @@ export default class TilePreview extends St.Widget {
         this._rect = params.rect || buildRectangle({});
         this._gaps = new Clutter.Margin();
         this.gaps = params.gaps || new Clutter.Margin();
+        this._tile =
+            params.tile ||
+            new Tile({ x: 0, y: 0, width: 0, height: 0, groups: [] });
     }
 
     public set gaps(gaps: Clutter.Margin) {
@@ -48,6 +54,10 @@ export default class TilePreview extends St.Widget {
 
     public get gaps(): Clutter.Margin {
         return this._gaps;
+    }
+
+    public get tile() {
+        return this._tile;
     }
 
     _init() {

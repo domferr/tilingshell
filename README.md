@@ -127,8 +127,12 @@ You can select your favorite layout for each workspace of each monitor.
 
 When a window is created, it is automatically moved to the best tile according to where other windows are tiled and the current layout. This is disabled by default and can be enabled in the preferences.
 
-
 [automatic_tiling](https://github.com/user-attachments/assets/76abc53f-2c6d-47ab-bee3-bbcdd946f2a1)
+
+### Export and import layouts ###
+
+*Tiling Shell* supports importing and exporting its layouts to a JSON file. With this you can create your own custom layouts without the built-in graphical editor, or share your layouts with others! If you are interested into knowing more about the contents of the layout file check the official [documentation](./doc/json-internal-documentation.md).
+
 
 <p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
 
