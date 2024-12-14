@@ -156,8 +156,8 @@ Right-click on a window to use the auto-tile buttons and the snap assistant from
 In GNOME, different windows may have different border radius. Drawing a border around the focused window is hard because it is not possible to know the window border radius. All the existing extensions just draw a border with a static value, making the UI less polished. Tiling Shell, instead, now **dynamically** computes the focused window border radius at runtime. Moreover, if you have an extension or anything else who customize the border radius, the focused window border radius adapts as well! This can be enabled/disabled from the extension's preferences. Closes #135. Discover more at the end of this release notes!
 
 <p align="center">
-<img src="https://github.com/user-attachments/assets/cfaca5f9-d9b2-4739-9426-1aebb5f33c29" width=400 />
-<img src="https://github.com/user-attachments/assets/8e68abff-66e5-4b85-a6ce-0bd2da7be166" width=432 />
+<img src="https://github.com/user-attachments/assets/cfaca5f9-d9b2-4739-9426-1aebb5f33c29" width=304 />
+<img src="https://github.com/user-attachments/assets/8e68abff-66e5-4b85-a6ce-0bd2da7be166" width=332 />
 </p>
 
 <p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
