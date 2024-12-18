@@ -26,6 +26,7 @@ import EdgeTilingManager from './edgeTilingManager';
 import TouchPointer from './touchPointer';
 import { KeyBindingsDirection } from '@keybindings';
 import TilingShellWindowManager from '@components/windowManager/tilingShellWindowManager';
+import TilingPopup from './tilingPopup';
 
 const MINIMUM_DISTANCE_TO_RESTORE_ORIGINAL_SIZE = 90;
 
@@ -129,7 +130,7 @@ export class TilingManager {
     public enable() {
         this._signals.connect(
             Settings,
-            Settings.SETTING_SELECTED_LAYOUTS,
+            Settings.KEY_SETTING_SELECTED_LAYOUTS,
             () => {
                 const ws = global.workspaceManager.get_active_workspace();
                 if (!ws) return;
@@ -156,13 +157,13 @@ export class TilingManager {
             },
         );
 
-        this._signals.connect(Settings, Settings.SETTING_INNER_GAPS, () => {
+        this._signals.connect(Settings, Settings.KEY_INNER_GAPS, () => {
             const innerGaps = buildMargin(Settings.get_inner_gaps());
             this._workspaceTilingLayout.forEach((tilingLayout) =>
                 tilingLayout.relayout({ innerGaps }),
             );
         });
-        this._signals.connect(Settings, Settings.SETTING_OUTER_GAPS, () => {
+        this._signals.connect(Settings, Settings.KEY_OUTER_GAPS, () => {
             const outerGaps = buildMargin(Settings.get_outer_gaps());
             this._workspaceTilingLayout.forEach((tilingLayout) =>
                 tilingLayout.relayout({ outerGaps }),
@@ -262,16 +263,14 @@ export class TilingManager {
             global.display,
             'window-created',
             (_display: Meta.Display, window: Meta.Window) => {
-                if (Settings.get_enable_autotiling())
-                    this._autoTile(window, true);
+                if (Settings.ENABLE_AUTO_TILING) this._autoTile(window, true);
             },
         );
         this._signals.connect(
             TilingShellWindowManager.get(),
             'unmaximized',
             (_, window: Meta.Window) => {
-                if (Settings.get_enable_autotiling())
-                    this._autoTile(window, false);
+                if (Settings.ENABLE_AUTO_TILING) this._autoTile(window, false);
             },
         );
     }
@@ -282,7 +281,7 @@ export class TilingManager {
 
         this._easeWindowRect(window, destination, false, force);
 
-        (window as ExtendedWindow).originalSize = undefined;
+        (window as ExtendedWindow).assignedTile = undefined;
     }
 
     public onKeyboardMoveWindow(
@@ -297,57 +296,74 @@ export class TilingManager {
         const currentWs = window.get_workspace();
         const tilingLayout = this._workspaceTilingLayout.get(currentWs);
         if (!tilingLayout) return false;
+        const windowRectCopy = window.get_frame_rect().copy();
+        const extWin = window as ExtendedWindow;
 
         if (window.get_maximized()) {
             switch (direction) {
-                case KeyBindingsDirection.CENTER:
-                    window.unmaximize(Meta.MaximizeFlags.BOTH);
+                case KeyBindingsDirection.NODIRECTION:
+                case KeyBindingsDirection.LEFT:
+                case KeyBindingsDirection.RIGHT:
                     break;
                 case KeyBindingsDirection.DOWN:
                     window.unmaximize(Meta.MaximizeFlags.BOTH);
                     return true;
                 case KeyBindingsDirection.UP:
                     return false;
-                case KeyBindingsDirection.LEFT:
-                    destination = tilingLayout.getLeftmostTile();
-                    break;
-                case KeyBindingsDirection.RIGHT:
-                    destination = tilingLayout.getRightmostTile();
-                    break;
             }
         }
 
-        // find the nearest tile
-        const windowRectCopy = window.get_frame_rect().copy();
-        if (!destination) {
-            // if the window is not tiled, find the nearest tile in any direction
-            if (direction === KeyBindingsDirection.CENTER) {
-                // direction is undefined -> move to the center of the screen
-                const rect = buildRectangle({
-                    x:
-                        this._workArea.x +
-                        this._workArea.width / 2 -
-                        windowRectCopy.width / 2,
-                    y:
-                        this._workArea.y +
-                        this._workArea.height / 2 -
-                        windowRectCopy.height / 2,
-                    width: windowRectCopy.width,
-                    height: windowRectCopy.height,
-                });
-                destination = {
-                    rect,
-                    tile: TileUtils.build_tile(rect, this._workArea),
-                };
-            } else if (!(window as ExtendedWindow).assignedTile) {
-                destination = tilingLayout.findNearestTile(windowRectCopy);
-            } else {
-                destination = tilingLayout.findNearestTileDirection(
-                    windowRectCopy,
-                    direction,
-                );
-            }
+        // maximize the window using keybindings
+        if (
+            direction === KeyBindingsDirection.UP &&
+            extWin.assignedTile &&
+            extWin.assignedTile?.y === 0
+        ) {
+            window.maximize(Meta.MaximizeFlags.BOTH);
+            return true;
         }
+
+        // find the nearest tile
+        // direction is NODIRECTION -> move to the center of the screen
+        if (direction === KeyBindingsDirection.NODIRECTION) {
+            const rect = buildRectangle({
+                x:
+                    this._workArea.x +
+                    this._workArea.width / 2 -
+                    windowRectCopy.width / 2,
+                y:
+                    this._workArea.y +
+                    this._workArea.height / 2 -
+                    windowRectCopy.height / 2,
+                width: windowRectCopy.width,
+                height: windowRectCopy.height,
+            });
+            destination = {
+                rect,
+                tile: TileUtils.build_tile(rect, this._workArea),
+            };
+        } else if (window.get_monitor() === this._monitor.index) {
+            destination = tilingLayout.findNearestTileDirection(
+                windowRectCopy,
+                direction,
+            );
+        } else {
+            destination = tilingLayout.findNearestTile(windowRectCopy);
+        }
+
+        // if the window is already on the desired tile
+        if (
+            window.get_monitor() === this._monitor.index &&
+            destination &&
+            (window as ExtendedWindow).assignedTile &&
+            (window as ExtendedWindow).assignedTile?.x === destination.tile.x &&
+            (window as ExtendedWindow).assignedTile?.y === destination.tile.y &&
+            (window as ExtendedWindow).assignedTile?.width ===
+                destination.tile.width &&
+            (window as ExtendedWindow).assignedTile?.height ===
+                destination.tile.height
+        )
+            return true;
 
         // there isn't a tile near the window
         if (!destination) {
@@ -364,7 +380,9 @@ export class TilingManager {
             return false;
         }
 
-        if (!(window as ExtendedWindow).assignedTile && !window.get_maximized())
+        const isMaximized =
+            window.maximizedHorizontally || window.maximizedVertically;
+        if (!(window as ExtendedWindow).assignedTile && !isMaximized)
             (window as ExtendedWindow).originalSize = windowRectCopy;
 
         if (spanFlag) {
@@ -375,7 +393,7 @@ export class TilingManager {
             );
         }
 
-        if (window.get_maximized()) window.unmaximize(Meta.MaximizeFlags.BOTH);
+        if (isMaximized) window.unmaximize(Meta.MaximizeFlags.BOTH);
 
         this._easeWindowRect(window, destination.rect, false, force);
 
@@ -436,16 +454,16 @@ export class TilingManager {
 
         // workaround for gnome-shell bug https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/2857
         if (
-            Settings.get_enable_blur_snap_assistant() ||
-            Settings.get_enable_blur_selected_tilepreview()
+            Settings.ENABLE_BLUR_SNAP_ASSISTANT ||
+            Settings.ENABLE_BLUR_SELECTED_TILEPREVIEW
         ) {
             this._signals.connect(window, 'position-changed', () => {
-                if (Settings.get_enable_blur_selected_tilepreview()) {
+                if (Settings.ENABLE_BLUR_SELECTED_TILEPREVIEW) {
                     this._selectedTilesPreview
                         .get_effect('blur')
                         ?.queue_repaint();
                 }
-                if (Settings.get_enable_blur_snap_assistant()) {
+                if (Settings.ENABLE_BLUR_SNAP_ASSISTANT) {
                     this._snapAssist
                         .get_first_child()
                         ?.get_effect('blur')
@@ -528,7 +546,7 @@ export class TilingManager {
             squaredEuclideanDistance(currPointerPos, this._grabStartPosition) >
                 MINIMUM_DISTANCE_TO_RESTORE_ORIGINAL_SIZE
         ) {
-            if (Settings.get_restore_window_original_size()) {
+            if (Settings.RESTORE_WINDOW_ORIGINAL_SIZE) {
                 const windowRect = window.get_frame_rect();
                 const offsetX = (x - windowRect.x) / windowRect.width;
                 const offsetY = (y - windowRect.y) / windowRect.height;
@@ -577,31 +595,31 @@ export class TilingManager {
 
         const isSpanMultiTilesActivated = this._activationKeyStatus(
             modifier,
-            Settings.get_span_multiple_tiles_activation_key(),
+            Settings.SPAN_MULTIPLE_TILES_ACTIVATION_KEY,
         );
         const isTilingSystemActivated = this._activationKeyStatus(
             modifier,
-            Settings.get_tiling_system_activation_key(),
+            Settings.TILING_SYSTEM_ACTIVATION_KEY,
         );
-        const deactivationKey = Settings.get_tiling_system_deactivation_key();
+        const deactivationKey = Settings.TILING_SYSTEM_DEACTIVATION_KEY;
         const isTilingSystemDeactivated =
             deactivationKey === ActivationKey.NONE
                 ? false
                 : this._activationKeyStatus(modifier, deactivationKey);
         const allowSpanMultipleTiles =
-            Settings.get_span_multiple_tiles() && isSpanMultiTilesActivated;
+            Settings.SPAN_MULTIPLE_TILES && isSpanMultiTilesActivated;
         const showTilingSystem =
-            Settings.get_tiling_system_enabled() &&
+            Settings.TILING_SYSTEM &&
             isTilingSystemActivated &&
             !isTilingSystemDeactivated;
         // ensure we handle window movement only when needed
         // if the snap assistant activation key status is not changed and the mouse is on the same position as before
         // and the tiling system activation key status is not changed, we have nothing to do
         const changedSpanMultipleTiles =
-            Settings.get_span_multiple_tiles() &&
+            Settings.SPAN_MULTIPLE_TILES &&
             isSpanMultiTilesActivated !== this._wasSpanMultipleTilesActivated;
         const changedShowTilingSystem =
-            Settings.get_tiling_system_enabled() &&
+            Settings.TILING_SYSTEM &&
             isTilingSystemActivated !== this._wasTilingSystemActivated;
         if (
             !changedSpanMultipleTiles &&
@@ -624,7 +642,7 @@ export class TilingManager {
             }
 
             if (
-                Settings.get_active_screen_edges() &&
+                Settings.ACTIVE_SCREEN_EDGES &&
                 !this._isSnapAssisting &&
                 this._edgeTilingManager.canActivateEdgeTiling(currPointerPos)
             ) {
@@ -639,7 +657,7 @@ export class TilingManager {
                     this._edgeTilingManager.abortEdgeTiling();
                 }
 
-                if (Settings.get_snap_assist_enabled()) {
+                if (Settings.SNAP_ASSIST) {
                     this._snapAssist.onMovingWindow(
                         window,
                         true,
@@ -726,7 +744,7 @@ export class TilingManager {
 
         const isTilingSystemActivated = this._activationKeyStatus(
             global.get_pointer()[2],
-            Settings.get_tiling_system_activation_key(),
+            Settings.TILING_SYSTEM_ACTIVATION_KEY,
         );
         if (
             !isTilingSystemActivated &&
@@ -736,6 +754,9 @@ export class TilingManager {
             return;
 
         // disable snap assistance
+        const showPopup =
+            !this._isSnapAssisting &&
+            !this._edgeTilingManager.isPerformingEdgeTiling();
         this._isSnapAssisting = false;
 
         if (
@@ -765,6 +786,21 @@ export class TilingManager {
             ...TileUtils.build_tile(selectedTilesRect, this._workArea),
         });
         this._easeWindowRect(window, desiredWindowRect);
+
+        if (tilingLayout && showPopup) {
+            const layout = GlobalState.get().getSelectedLayoutOfMonitor(
+                this._monitor.index,
+                window.get_workspace().index(),
+            );
+            new TilingPopup(
+                layout,
+                tilingLayout.innerGaps,
+                tilingLayout.outerGaps,
+                this._workArea,
+                tilingLayout.scalingFactor,
+                window as ExtendedWindow,
+            );
+        }
     }
 
     private _easeWindowRect(
@@ -868,11 +904,16 @@ export class TilingManager {
         const [x, y] = TouchPointer.get().isTouchDeviceActive()
             ? TouchPointer.get().get_pointer(window)
             : global.get_pointer();
+
+        const monitorWidth =
+            this._workArea.x - this._monitor.x + this._workArea.width;
+        const monitorHeight =
+            this._workArea.y - this._monitor.y + this._workArea.height;
         return (
             x >= this._monitor.x &&
-            x <= this._monitor.x + this._monitor.width &&
+            x <= this._monitor.x + monitorWidth &&
             y >= this._monitor.y &&
-            y <= this._monitor.y + this._monitor.height
+            y <= this._monitor.y + monitorHeight
         );
     }
 
@@ -1012,7 +1053,6 @@ export class TilingManager {
     }
 
     private _autoTile(window: Meta.Window, windowCreated: boolean) {
-        /*
         // do not handle windows in monitors not managed by this manager
         if (window.get_monitor() !== this._monitor.index) return;
 
@@ -1034,8 +1074,6 @@ export class TilingManager {
         if (windowCreated) {
             const windowActor =
                 window.get_compositor_private() as Meta.WindowActor;
-            // the window won't be visible when will open on its position (e.g. the center of the screen)
-            windowActor.set_opacity(0);
             const id = windowActor.connect('first-frame', () => {
                 // while we restore the opacity, making the window visible
                 // again, we perform easing of movement too
@@ -1047,21 +1085,14 @@ export class TilingManager {
                     !window.maximizedVertically &&
                     window.get_transient_for() === null &&
                     !window.is_attached_dialog()
-                ) {
-                    windowActor.ease({
-                        opacity: 255,
-                        duration: 200,
-                    });
+                )
                     this._easeWindowRectFromTile(vacantTile, window, true);
-                } else {
-                    windowActor.set_opacity(255);
-                }
 
                 windowActor.disconnect(id);
             });
         } else {
             this._easeWindowRectFromTile(vacantTile, window, true);
-        } */
+        }
     }
 
     private _findEmptyTile(window: Meta.Window): Tile | undefined {

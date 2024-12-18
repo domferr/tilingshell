@@ -36,7 +36,7 @@ class SnapAssistContent extends St.BoxLayout {
                 'Distance from the snap assistant to trigger its opening/closing',
                 GObject.ParamFlags.READWRITE,
                 0,
-                240,
+                2000,
                 16,
             ),
             snapAssistantAnimationTime: GObject.ParamSpec.uint(
@@ -88,19 +88,19 @@ class SnapAssistContent extends St.BoxLayout {
             54 * getMonitorScalingFactor(this._monitorIndex);
 
         Settings.bind(
-            Settings.SETTING_ENABLE_BLUR_SNAP_ASSISTANT,
+            Settings.KEY_ENABLE_BLUR_SNAP_ASSISTANT,
             this,
             'blur',
             Gio.SettingsBindFlags.GET,
         );
         Settings.bind(
-            Settings.SETTING_SNAP_ASSISTANT_THRESHOLD,
+            Settings.KEY_SNAP_ASSISTANT_THRESHOLD,
             this,
             'snapAssistantThreshold',
             Gio.SettingsBindFlags.GET,
         );
         Settings.bind(
-            Settings.SETTING_SNAP_ASSISTANT_ANIMATION_TIME,
+            Settings.KEY_SNAP_ASSISTANT_ANIMATION_TIME,
             this,
             'snapAssistantAnimationTime',
             Gio.SettingsBindFlags.GET,

@@ -9,46 +9,108 @@ export enum ActivationKey {
     SUPER,
 }
 
+/** ------------- Utility functions ------------- */
+function get_string(key: string): string {
+    return (
+        Settings.gioSetting.get_string(key) ??
+        Settings.gioSetting.get_default_value(key)?.get_string()[0]
+    );
+}
+
+function set_string(key: string, val: string): boolean {
+    return Settings.gioSetting.set_string(key, val);
+}
+
+function get_boolean(key: string): boolean {
+    return (
+        Settings.gioSetting.get_boolean(key) ??
+        Settings.gioSetting.get_default_value(key)?.get_boolean()
+    );
+}
+
+function set_boolean(key: string, val: boolean): boolean {
+    return Settings.gioSetting.set_boolean(key, val);
+}
+
+function get_number(key: string): number {
+    return (
+        Settings.gioSetting.get_int(key) ??
+        Settings.gioSetting.get_default_value(key)?.get_int64()
+    );
+}
+
+function set_number(key: string, val: number): boolean {
+    return Settings.gioSetting.set_int(key, val);
+}
+
+function get_unsigned_number(key: string): number {
+    return (
+        Settings.gioSetting.get_uint(key) ??
+        Settings.gioSetting.get_default_value(key)?.get_uint64()
+    );
+}
+
+function set_unsigned_number(key: string, val: number): boolean {
+    return Settings.gioSetting.set_uint(key, val);
+}
+
+function get_activationkey(
+    key: string,
+    defaultValue: ActivationKey,
+): ActivationKey {
+    let val = Settings.gioSetting.get_strv(key);
+    if (!val || val.length === 0) {
+        val = Settings.gioSetting.get_default_value(key)?.get_strv() ?? [
+            String(defaultValue),
+        ];
+        if (val.length === 0) val = [String(defaultValue)];
+    }
+    return Number(val[0]);
+}
+
+function set_activationkey(key: string, val: ActivationKey): boolean {
+    return Settings.gioSetting.set_strv(key, [String(val)]);
+}
+
 export default class Settings {
     static _settings: Gio.Settings | null;
     static _is_initialized: boolean = false;
 
-    static SETTING_LAST_VERSION_NAME_INSTALLED = 'last-version-name-installed';
-    static SETTING_OVERRIDDEN_SETTINGS = 'overridden-settings';
-    static SETTING_TILING_SYSTEM = 'enable-tiling-system';
-    static SETTING_TILING_SYSTEM_ACTIVATION_KEY =
-        'tiling-system-activation-key';
-    static SETTING_TILING_SYSTEM_DEACTIVATION_KEY =
+    static KEY_LAST_VERSION_NAME_INSTALLED = 'last-version-name-installed';
+    static KEY_OVERRIDDEN_SETTINGS = 'overridden-settings';
+    static KEY_WINDOW_BORDER_COLOR = 'window-border-color';
+    static KEY_TILING_SYSTEM = 'enable-tiling-system';
+    static KEY_SNAP_ASSIST = 'enable-snap-assist';
+    static KEY_SHOW_INDICATOR = 'show-indicator';
+    static KEY_TILING_SYSTEM_ACTIVATION_KEY = 'tiling-system-activation-key';
+    static KEY_TILING_SYSTEM_DEACTIVATION_KEY =
         'tiling-system-deactivation-key';
-    static SETTING_SNAP_ASSIST = 'enable-snap-assist';
-    static SETTING_SHOW_INDICATOR = 'show-indicator';
-    static SETTING_INNER_GAPS = 'inner-gaps';
-    static SETTING_OUTER_GAPS = 'outer-gaps';
-    static SETTING_SPAN_MULTIPLE_TILES = 'enable-span-multiple-tiles';
-    static SETTING_SPAN_MULTIPLE_TILES_ACTIVATION_KEY =
+    static KEY_SPAN_MULTIPLE_TILES_ACTIVATION_KEY =
         'span-multiple-tiles-activation-key';
-    static SETTING_LAYOUTS_JSON = 'layouts-json';
-    static SETTING_SELECTED_LAYOUTS = 'selected-layouts';
-    static SETTING_RESTORE_WINDOW_ORIGINAL_SIZE =
-        'restore-window-original-size';
-    static SETTING_RESIZE_COMPLEMENTING_WINDOWS =
-        'resize-complementing-windows';
-    static SETTING_ENABLE_BLUR_SNAP_ASSISTANT = 'enable-blur-snap-assistant';
-    static SETTING_ENABLE_BLUR_SELECTED_TILEPREVIEW =
+    static KEY_SPAN_MULTIPLE_TILES = 'enable-span-multiple-tiles';
+    static KEY_RESTORE_WINDOW_ORIGINAL_SIZE = 'restore-window-original-size';
+    static KEY_WRAPAROUND_FOCUS = 'enable-wraparound-focus';
+    static KEY_RESIZE_COMPLEMENTING_WINDOWS = 'resize-complementing-windows';
+    static KEY_ENABLE_BLUR_SNAP_ASSISTANT = 'enable-blur-snap-assistant';
+    static KEY_ENABLE_BLUR_SELECTED_TILEPREVIEW =
         'enable-blur-selected-tilepreview';
-    static SETTING_ENABLE_MOVE_KEYBINDINGS = 'enable-move-keybindings';
-    static SETTING_ENABLE_AUTO_TILING = 'enable-autotiling';
-    static SETTING_ACTIVE_SCREEN_EDGES = 'active-screen-edges';
-    static SETTING_TOP_EDGE_MAXIMIZE = 'top-edge-maximize';
-    static SETTING_OVERRIDE_WINDOW_MENU = 'override-window-menu';
-    static SETTING_SNAP_ASSISTANT_THRESHOLD = 'snap-assistant-threshold';
-    static SETTING_QUARTER_TILING_THRESHOLD = 'quarter-tiling-threshold';
-    static SETTING_WINDOW_BORDER_COLOR = 'window-border-color';
-    static SETTING_WINDOW_BORDER_WIDTH = 'window-border-width';
-    static SETTING_ENABLE_WINDOW_BORDER = 'enable-window-border';
-    static SETTING_SNAP_ASSISTANT_ANIMATION_TIME =
-        'snap-assistant-animation-time';
-    static SETTING_TILE_PREVIEW_ANIMATION_TIME = 'tile-preview-animation-time';
+    static KEY_ENABLE_MOVE_KEYBINDINGS = 'enable-move-keybindings';
+    static KEY_ENABLE_AUTO_TILING = 'enable-autotiling';
+    static KEY_ACTIVE_SCREEN_EDGES = 'active-screen-edges';
+    static KEY_TOP_EDGE_MAXIMIZE = 'top-edge-maximize';
+    static KEY_OVERRIDE_WINDOW_MENU = 'override-window-menu';
+    static KEY_SNAP_ASSISTANT_THRESHOLD = 'snap-assistant-threshold';
+    static KEY_ENABLE_WINDOW_BORDER = 'enable-window-border';
+    static KEY_INNER_GAPS = 'inner-gaps';
+    static KEY_OUTER_GAPS = 'outer-gaps';
+    static KEY_SNAP_ASSISTANT_ANIMATION_TIME = 'snap-assistant-animation-time';
+    static KEY_TILE_PREVIEW_ANIMATION_TIME = 'tile-preview-animation-time';
+    static KEY_SETTING_LAYOUTS_JSON = 'layouts-json';
+    static KEY_SETTING_SELECTED_LAYOUTS = 'selected-layouts';
+    static KEY_WINDOW_BORDER_WIDTH = 'window-border-width';
+    static KEY_ENABLE_SMART_WINDOW_BORDER_RADIUS =
+        'enable-smart-window-border-radius';
+    static KEY_QUARTER_TILING_THRESHOLD = 'quarter-tiling-threshold';
 
     static SETTING_MOVE_WINDOW_RIGHT = 'move-window-right';
     static SETTING_MOVE_WINDOW_LEFT = 'move-window-left';
@@ -65,6 +127,8 @@ export default class Settings {
     static SETTING_FOCUS_WINDOW_LEFT = 'focus-window-left';
     static SETTING_FOCUS_WINDOW_UP = 'focus-window-up';
     static SETTING_FOCUS_WINDOW_DOWN = 'focus-window-down';
+    static SETTING_FOCUS_WINDOW_NEXT = 'focus-window-next';
+    static SETTING_FOCUS_WINDOW_PREV = 'focus-window-prev';
 
     static initialize(settings: Gio.Settings) {
         if (this._is_initialized) return;
@@ -80,6 +144,10 @@ export default class Settings {
         }
     }
 
+    static get gioSetting(): Gio.Settings {
+        return this._settings ?? new Gio.Settings();
+    }
+
     static bind(
         key: string,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -90,25 +158,245 @@ export default class Settings {
         this._settings?.bind(key, object, property, flags);
     }
 
-    static get_last_version_installed(): string {
-        return (
-            this._settings?.get_string(
-                this.SETTING_LAST_VERSION_NAME_INSTALLED,
-            ) ?? '0'
+    static get LAST_VERSION_NAME_INSTALLED(): string {
+        return get_string(Settings.KEY_LAST_VERSION_NAME_INSTALLED);
+    }
+
+    static set LAST_VERSION_NAME_INSTALLED(val: string) {
+        set_string(Settings.KEY_LAST_VERSION_NAME_INSTALLED, val);
+    }
+
+    static get OVERRIDDEN_SETTINGS(): string {
+        return get_string(Settings.KEY_OVERRIDDEN_SETTINGS);
+    }
+
+    static set OVERRIDDEN_SETTINGS(val: string) {
+        set_string(Settings.KEY_OVERRIDDEN_SETTINGS, val);
+    }
+
+    static get TILING_SYSTEM(): boolean {
+        return get_boolean(Settings.KEY_TILING_SYSTEM);
+    }
+
+    static set TILING_SYSTEM(val: boolean) {
+        set_boolean(Settings.KEY_TILING_SYSTEM, val);
+    }
+
+    static get SNAP_ASSIST(): boolean {
+        return get_boolean(Settings.KEY_SNAP_ASSIST);
+    }
+
+    static set SNAP_ASSIST(val: boolean) {
+        set_boolean(Settings.KEY_SNAP_ASSIST, val);
+    }
+
+    static get SHOW_INDICATOR(): boolean {
+        return get_boolean(Settings.KEY_SHOW_INDICATOR);
+    }
+
+    static set SHOW_INDICATOR(val: boolean) {
+        set_boolean(Settings.KEY_SHOW_INDICATOR, val);
+    }
+
+    static get TILING_SYSTEM_ACTIVATION_KEY(): ActivationKey {
+        return get_activationkey(
+            Settings.KEY_TILING_SYSTEM_ACTIVATION_KEY,
+            ActivationKey.CTRL,
         );
     }
 
-    static get_tiling_system_enabled(): boolean {
-        return this._settings?.get_boolean(this.SETTING_TILING_SYSTEM) ?? true;
+    static set TILING_SYSTEM_ACTIVATION_KEY(val: ActivationKey) {
+        set_activationkey(Settings.KEY_TILING_SYSTEM_ACTIVATION_KEY, val);
     }
 
-    static get_snap_assist_enabled(): boolean {
-        return this._settings?.get_boolean(this.SETTING_SNAP_ASSIST) ?? true;
+    static get TILING_SYSTEM_DEACTIVATION_KEY(): ActivationKey {
+        return get_activationkey(
+            Settings.KEY_TILING_SYSTEM_DEACTIVATION_KEY,
+            ActivationKey.NONE,
+        );
     }
 
-    static get_show_indicator(): boolean {
-        if (!this._settings) return true;
-        return this._settings.get_boolean(this.SETTING_SHOW_INDICATOR) ?? true;
+    static set TILING_SYSTEM_DEACTIVATION_KEY(val: ActivationKey) {
+        set_activationkey(Settings.KEY_TILING_SYSTEM_DEACTIVATION_KEY, val);
+    }
+
+    static get INNER_GAPS(): number {
+        return get_unsigned_number(Settings.KEY_INNER_GAPS);
+    }
+
+    static set INNER_GAPS(val: number) {
+        set_unsigned_number(Settings.KEY_INNER_GAPS, val);
+    }
+
+    static get OUTER_GAPS(): number {
+        return get_unsigned_number(Settings.KEY_OUTER_GAPS);
+    }
+
+    static set OUTER_GAPS(val: number) {
+        set_unsigned_number(Settings.KEY_OUTER_GAPS, val);
+    }
+
+    static get SPAN_MULTIPLE_TILES(): boolean {
+        return get_boolean(Settings.KEY_SPAN_MULTIPLE_TILES);
+    }
+
+    static set SPAN_MULTIPLE_TILES(val: boolean) {
+        set_boolean(Settings.KEY_SPAN_MULTIPLE_TILES, val);
+    }
+
+    static get SPAN_MULTIPLE_TILES_ACTIVATION_KEY(): ActivationKey {
+        return get_activationkey(
+            Settings.KEY_SPAN_MULTIPLE_TILES_ACTIVATION_KEY,
+            ActivationKey.ALT,
+        );
+    }
+
+    static set SPAN_MULTIPLE_TILES_ACTIVATION_KEY(val: ActivationKey) {
+        set_activationkey(Settings.KEY_SPAN_MULTIPLE_TILES_ACTIVATION_KEY, val);
+    }
+
+    static get RESTORE_WINDOW_ORIGINAL_SIZE(): boolean {
+        return get_boolean(Settings.KEY_RESTORE_WINDOW_ORIGINAL_SIZE);
+    }
+
+    static set RESTORE_WINDOW_ORIGINAL_SIZE(val: boolean) {
+        set_boolean(Settings.KEY_RESTORE_WINDOW_ORIGINAL_SIZE, val);
+    }
+
+    static get WRAPAROUND_FOCUS(): boolean {
+        return get_boolean(Settings.KEY_WRAPAROUND_FOCUS);
+    }
+
+    static set WRAPAROUND_FOCUS(val: boolean) {
+        set_boolean(Settings.KEY_WRAPAROUND_FOCUS, val);
+    }
+
+    static get RESIZE_COMPLEMENTING_WINDOWS(): boolean {
+        return get_boolean(Settings.KEY_RESIZE_COMPLEMENTING_WINDOWS);
+    }
+
+    static set RESIZE_COMPLEMENTING_WINDOWS(val: boolean) {
+        set_boolean(Settings.KEY_RESIZE_COMPLEMENTING_WINDOWS, val);
+    }
+
+    static get ENABLE_BLUR_SNAP_ASSISTANT(): boolean {
+        return get_boolean(Settings.KEY_ENABLE_BLUR_SNAP_ASSISTANT);
+    }
+
+    static set ENABLE_BLUR_SNAP_ASSISTANT(val: boolean) {
+        set_boolean(Settings.KEY_ENABLE_BLUR_SNAP_ASSISTANT, val);
+    }
+
+    static get ENABLE_BLUR_SELECTED_TILEPREVIEW(): boolean {
+        return get_boolean(Settings.KEY_ENABLE_BLUR_SELECTED_TILEPREVIEW);
+    }
+
+    static set ENABLE_BLUR_SELECTED_TILEPREVIEW(val: boolean) {
+        set_boolean(Settings.KEY_ENABLE_BLUR_SELECTED_TILEPREVIEW, val);
+    }
+
+    static get ENABLE_MOVE_KEYBINDINGS(): boolean {
+        return get_boolean(Settings.KEY_ENABLE_MOVE_KEYBINDINGS);
+    }
+
+    static set ENABLE_MOVE_KEYBINDINGS(val: boolean) {
+        set_boolean(Settings.KEY_ENABLE_MOVE_KEYBINDINGS, val);
+    }
+
+    static get ENABLE_AUTO_TILING(): boolean {
+        return get_boolean(Settings.KEY_ENABLE_AUTO_TILING);
+    }
+
+    static set ENABLE_AUTO_TILING(val: boolean) {
+        set_boolean(Settings.KEY_ENABLE_AUTO_TILING, val);
+    }
+
+    static get ACTIVE_SCREEN_EDGES(): boolean {
+        return get_boolean(Settings.KEY_ACTIVE_SCREEN_EDGES);
+    }
+
+    static set ACTIVE_SCREEN_EDGES(val: boolean) {
+        set_boolean(Settings.KEY_ACTIVE_SCREEN_EDGES, val);
+    }
+
+    static get TOP_EDGE_MAXIMIZE(): boolean {
+        return get_boolean(Settings.KEY_TOP_EDGE_MAXIMIZE);
+    }
+
+    static set TOP_EDGE_MAXIMIZE(val: boolean) {
+        set_boolean(Settings.KEY_TOP_EDGE_MAXIMIZE, val);
+    }
+
+    static get OVERRIDE_WINDOW_MENU(): boolean {
+        return get_boolean(Settings.KEY_OVERRIDE_WINDOW_MENU);
+    }
+
+    static set OVERRIDE_WINDOW_MENU(val: boolean) {
+        set_boolean(Settings.KEY_OVERRIDE_WINDOW_MENU, val);
+    }
+
+    static get SNAP_ASSISTANT_THRESHOLD(): number {
+        return get_number(Settings.KEY_SNAP_ASSISTANT_THRESHOLD);
+    }
+
+    static set SNAP_ASSISTANT_THRESHOLD(val: number) {
+        set_number(Settings.KEY_SNAP_ASSISTANT_THRESHOLD, val);
+    }
+
+    static get QUARTER_TILING_THRESHOLD(): number {
+        return get_unsigned_number(Settings.KEY_QUARTER_TILING_THRESHOLD);
+    }
+
+    static set QUARTER_TILING_THRESHOLD(val: number) {
+        set_unsigned_number(Settings.KEY_QUARTER_TILING_THRESHOLD, val);
+    }
+
+    static get WINDOW_BORDER_COLOR(): string {
+        return get_string(Settings.KEY_WINDOW_BORDER_COLOR);
+    }
+
+    static set WINDOW_BORDER_COLOR(val: string) {
+        set_string(Settings.KEY_WINDOW_BORDER_COLOR, val);
+    }
+
+    static get WINDOW_BORDER_WIDTH(): number {
+        return get_unsigned_number(Settings.KEY_WINDOW_BORDER_WIDTH);
+    }
+
+    static set WINDOW_BORDER_WIDTH(val: number) {
+        set_unsigned_number(Settings.KEY_WINDOW_BORDER_WIDTH, val);
+    }
+
+    static get ENABLE_SMART_WINDOW_BORDER_RADIUS(): boolean {
+        return get_boolean(Settings.KEY_ENABLE_SMART_WINDOW_BORDER_RADIUS);
+    }
+
+    static set ENABLE_SMART_WINDOW_BORDER_RADIUS(val: boolean) {
+        set_boolean(Settings.KEY_ENABLE_SMART_WINDOW_BORDER_RADIUS, val);
+    }
+
+    static get ENABLE_WINDOW_BORDER(): boolean {
+        return get_boolean(Settings.KEY_ENABLE_WINDOW_BORDER);
+    }
+
+    static set ENABLE_WINDOW_BORDER(val: boolean) {
+        set_boolean(Settings.KEY_ENABLE_WINDOW_BORDER, val);
+    }
+
+    static get SNAP_ASSISTANT_ANIMATION_TIME(): number {
+        return get_unsigned_number(Settings.KEY_SNAP_ASSISTANT_ANIMATION_TIME);
+    }
+
+    static set SNAP_ASSISTANT_ANIMATION_TIME(val: number) {
+        set_unsigned_number(Settings.KEY_SNAP_ASSISTANT_ANIMATION_TIME, val);
+    }
+
+    static get TILE_PREVIEW_ANIMATION_TIME(): number {
+        return get_unsigned_number(Settings.KEY_TILE_PREVIEW_ANIMATION_TIME);
+    }
+
+    static set TILE_PREVIEW_ANIMATION_TIME(val: number) {
+        set_unsigned_number(Settings.KEY_TILE_PREVIEW_ANIMATION_TIME, val);
     }
 
     static get_inner_gaps(scaleFactor: number = 1): {
@@ -118,9 +406,7 @@ export default class Settings {
         right: number;
     } {
         // get the gaps settings and scale by scale factor
-        const value =
-            (this._settings?.get_uint(this.SETTING_INNER_GAPS) ?? 0) *
-            scaleFactor;
+        const value = this.INNER_GAPS * scaleFactor;
         return {
             top: value,
             bottom: value,
@@ -136,9 +422,7 @@ export default class Settings {
         right: number;
     } {
         // get the gaps settings and scale by scale factor
-        const value =
-            (this._settings?.get_uint(this.SETTING_OUTER_GAPS) ?? 0) *
-            scaleFactor;
+        const value = this.OUTER_GAPS * scaleFactor;
         return {
             top: value,
             bottom: value,
@@ -147,17 +431,11 @@ export default class Settings {
         };
     }
 
-    static get_span_multiple_tiles(): boolean {
-        return (
-            this._settings?.get_boolean(this.SETTING_SPAN_MULTIPLE_TILES) ??
-            true
-        );
-    }
-
     static get_layouts_json(): Layout[] {
         try {
             const layouts = JSON.parse(
-                this._settings?.get_string(this.SETTING_LAYOUTS_JSON) || '[]',
+                this._settings?.get_string(this.KEY_SETTING_LAYOUTS_JSON) ||
+                    '[]',
             ) as Layout[];
             if (layouts.length === 0)
                 throw new Error('At least one layout is required');
@@ -165,14 +443,15 @@ export default class Settings {
         } catch (ex: unknown) {
             this.reset_layouts_json();
             return JSON.parse(
-                this._settings?.get_string(this.SETTING_LAYOUTS_JSON) || '[]',
+                this._settings?.get_string(this.KEY_SETTING_LAYOUTS_JSON) ||
+                    '[]',
             ) as Layout[];
         }
     }
 
     static get_selected_layouts(): string[][] {
         const variant = this._settings?.get_value(
-            Settings.SETTING_SELECTED_LAYOUTS,
+            Settings.KEY_SETTING_SELECTED_LAYOUTS,
         );
         if (!variant) return [];
 
@@ -194,190 +473,6 @@ export default class Settings {
             result.push(monitor_result);
         }
         return result;
-    }
-
-    static get_restore_window_original_size(): boolean {
-        return (
-            this._settings?.get_boolean(
-                Settings.SETTING_RESTORE_WINDOW_ORIGINAL_SIZE,
-            ) ?? true
-        );
-    }
-
-    static get_resize_complementing_windows(): boolean {
-        return (
-            this._settings?.get_boolean(
-                Settings.SETTING_RESIZE_COMPLEMENTING_WINDOWS,
-            ) ?? true
-        );
-    }
-
-    static get_tiling_system_activation_key(): ActivationKey {
-        const val = this._settings?.get_strv(
-            this.SETTING_TILING_SYSTEM_ACTIVATION_KEY,
-        );
-        if (!val || val.length === 0) return ActivationKey.CTRL;
-        return Number(val[0]);
-    }
-
-    static get_tiling_system_deactivation_key(): ActivationKey {
-        const val = this._settings?.get_strv(
-            this.SETTING_TILING_SYSTEM_DEACTIVATION_KEY,
-        );
-        if (!val || val.length === 0) return ActivationKey.NONE;
-        return Number(val[0]);
-    }
-
-    static get_span_multiple_tiles_activation_key(): ActivationKey {
-        const val = this._settings?.get_strv(
-            this.SETTING_SPAN_MULTIPLE_TILES_ACTIVATION_KEY,
-        );
-        if (!val || val.length === 0) return ActivationKey.ALT;
-        return Number(val[0]);
-    }
-
-    static get_enable_blur_snap_assistant(): boolean {
-        return (
-            this._settings?.get_boolean(
-                this.SETTING_ENABLE_BLUR_SNAP_ASSISTANT,
-            ) ?? false
-        );
-    }
-
-    static get_enable_blur_selected_tilepreview(): boolean {
-        return (
-            this._settings?.get_boolean(
-                this.SETTING_ENABLE_BLUR_SELECTED_TILEPREVIEW,
-            ) ?? false
-        );
-    }
-
-    static get_enable_move_keybindings(): boolean {
-        return (
-            this._settings?.get_boolean(this.SETTING_ENABLE_MOVE_KEYBINDINGS) ??
-            true
-        );
-    }
-
-    static get_enable_autotiling(): boolean {
-        return (
-            this._settings?.get_boolean(this.SETTING_ENABLE_AUTO_TILING) ??
-            false
-        );
-    }
-
-    static get_overridden_settings(): string {
-        return (
-            this._settings?.get_string(this.SETTING_OVERRIDDEN_SETTINGS) ?? '{}'
-        );
-    }
-
-    static get_active_screen_edges(): boolean {
-        return (
-            this._settings?.get_boolean(this.SETTING_ACTIVE_SCREEN_EDGES) ??
-            true
-        );
-    }
-
-    static get_top_edge_maximize(): boolean {
-        return (
-            this._settings?.get_boolean(this.SETTING_TOP_EDGE_MAXIMIZE) ?? false
-        );
-    }
-
-    static get_override_window_menu(): boolean {
-        return (
-            this._settings?.get_boolean(this.SETTING_OVERRIDE_WINDOW_MENU) ??
-            false
-        );
-    }
-
-    static get_quarter_tiling_threshold(): number {
-        return (
-            this._settings?.get_uint(this.SETTING_QUARTER_TILING_THRESHOLD) ??
-            40
-        );
-    }
-
-    static get_window_border_color(): string {
-        return (
-            this._settings?.get_string(this.SETTING_WINDOW_BORDER_COLOR) ??
-            '#ec5e5e'
-        );
-    }
-
-    static get_window_border_width(): number {
-        return this._settings?.get_uint(this.SETTING_WINDOW_BORDER_WIDTH) ?? 3;
-    }
-
-    static get_enable_window_border(): boolean {
-        return (
-            this._settings?.get_boolean(this.SETTING_ENABLE_WINDOW_BORDER) ??
-            false
-        );
-    }
-
-    static set_last_version_installed(version: string) {
-        this._settings?.set_string(
-            this.SETTING_LAST_VERSION_NAME_INSTALLED,
-            version,
-        );
-    }
-
-    static set_tiling_system_activation_key(key: ActivationKey) {
-        this._settings?.set_strv(this.SETTING_TILING_SYSTEM_ACTIVATION_KEY, [
-            String(key),
-        ]);
-    }
-
-    static set_tiling_system_deactivation_key(key: ActivationKey) {
-        this._settings?.set_strv(this.SETTING_TILING_SYSTEM_DEACTIVATION_KEY, [
-            String(key),
-        ]);
-    }
-
-    static set_span_multiple_tiles_activation_key(key: ActivationKey) {
-        this._settings?.set_strv(
-            this.SETTING_SPAN_MULTIPLE_TILES_ACTIVATION_KEY,
-            [String(key)],
-        );
-    }
-
-    static set_show_indicator(value: boolean) {
-        this._settings?.set_boolean(this.SETTING_SHOW_INDICATOR, value);
-    }
-
-    static set_quarter_tiling_threshold(value: number) {
-        this._settings?.set_uint(this.SETTING_QUARTER_TILING_THRESHOLD, value);
-    }
-
-    static set_overridden_settings(newVal: string): boolean {
-        return (
-            this._settings?.set_string(
-                this.SETTING_OVERRIDDEN_SETTINGS,
-                newVal,
-            ) ?? false
-        );
-    }
-
-    static set_enable_move_keybindings(value: boolean) {
-        this._settings?.set_boolean(
-            this.SETTING_ENABLE_MOVE_KEYBINDINGS,
-            value,
-        );
-    }
-
-    static set_active_screen_edges(value: boolean) {
-        this._settings?.set_boolean(this.SETTING_ACTIVE_SCREEN_EDGES, value);
-    }
-
-    static set_window_border_color(value: string): boolean {
-        return (
-            this._settings?.set_string(
-                this.SETTING_WINDOW_BORDER_COLOR,
-                value,
-            ) ?? false
-        );
     }
 
     static reset_layouts_json() {
@@ -491,22 +586,25 @@ export default class Settings {
 
     static save_layouts_json(layouts: Layout[]) {
         this._settings?.set_string(
-            this.SETTING_LAYOUTS_JSON,
+            this.KEY_SETTING_LAYOUTS_JSON,
             JSON.stringify(layouts),
         );
     }
 
     static save_selected_layouts(ids: string[][]) {
         if (ids.length === 0) {
-            this._settings?.reset(Settings.SETTING_SELECTED_LAYOUTS);
+            this._settings?.reset(Settings.KEY_SETTING_SELECTED_LAYOUTS);
             return;
         }
         const variants = ids.map((monitor_ids) =>
             GLib.Variant.new_strv(monitor_ids),
         );
         const result = GLib.Variant.new_array(null, variants);
-        // @ts-expect-error "'result' is of a correct variant type"
-        this._settings?.set_value(Settings.SETTING_SELECTED_LAYOUTS, result);
+        this._settings?.set_value(
+            Settings.KEY_SETTING_SELECTED_LAYOUTS,
+            // @ts-expect-error "'result' is of a correct variant type"
+            result,
+        );
     }
 
     static connect(key: string, func: (...arg: unknown[]) => void): number {

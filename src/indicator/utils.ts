@@ -5,7 +5,8 @@ export const createButton = (
     text: string,
     path?: string,
 ): St.Button => {
-    const btn = createIconButton(iconName, path);
+    const btn = createIconButton(iconName, path, 8);
+    btn.set_style('padding-left: 5px !important;'); // bring back the right padding
     btn.child.add_child(
         new St.Label({
             marginBottom: 4,
@@ -20,11 +21,13 @@ export const createButton = (
 export const createIconButton = (
     iconName: string,
     path?: string,
+    spacing = 0,
 ): St.Button => {
     const btn = new St.Button({
         styleClass: 'message-list-clear-button button',
         canFocus: true,
         xExpand: true,
+        style: 'padding-left: 5px !important; padding-right: 5px !important;',
         child: new St.BoxLayout({
             vertical: false, // horizontal box layout
             clipToAllocation: true,
@@ -32,7 +35,7 @@ export const createIconButton = (
             yAlign: Clutter.ActorAlign.CENTER,
             reactive: true,
             xExpand: true,
-            style: 'spacing: 8px',
+            style: spacing > 0 ? `spacing: ${spacing}px` : '',
         }),
     });
 
