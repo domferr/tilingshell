@@ -10,6 +10,7 @@ import {
     Pango,
     GLib,
 } from '@gi.ext';
+import { logger } from '@utils/logger';
 
 const WINDOW_OVERLAY_FADE_TIME = 200;
 
@@ -21,11 +22,16 @@ const ICON_OVERLAP = 0.7;
 
 const ICON_TITLE_SPACING = 6;
 
+const debug = logger('PopupWindowPreview');
+
 /*
 This class is heavily based on Gnome Shell's WindowPreview class
 */
 @registerGObjectClass
 export default class PopupWindowPreview extends Shell.WindowPreview {
+    get_window_clone(): Clutter.Actor | undefined {
+        return this.window_container;
+    }
     static metaInfo: GObject.MetaInfo<unknown, unknown, unknown> = {
         GTypeName: 'PopupWindowPreview',
     };
@@ -275,7 +281,7 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
     }
 
     _addWindow(metaWindow: Meta.Window) {
-        const clone =
+        this.clone =
             this.window_container.layout_manager.add_window(metaWindow);
         // if (!clone) return;
 

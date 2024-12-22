@@ -26,7 +26,7 @@ import EdgeTilingManager from './edgeTilingManager';
 import TouchPointer from './touchPointer';
 import { KeyBindingsDirection } from '@keybindings';
 import TilingShellWindowManager from '@components/windowManager/tilingShellWindowManager';
-import TilingPopup from './tilingPopup';
+import TilingLayoutWithPopup from './tilingLayoutWithPopup';
 
 const MINIMUM_DISTANCE_TO_RESTORE_ORIGINAL_SIZE = 90;
 
@@ -754,7 +754,7 @@ export class TilingManager {
             return;
 
         // disable snap assistance
-        const showPopup =
+        const canShowPopup =
             !this._isSnapAssisting &&
             !this._edgeTilingManager.isPerformingEdgeTiling();
         this._isSnapAssisting = false;
@@ -787,12 +787,14 @@ export class TilingManager {
         });
         this._easeWindowRect(window, desiredWindowRect);
 
-        if (tilingLayout && showPopup) {
+        if (tilingLayout && canShowPopup) {
+            // retrieve the current layout for the monitor and workspace
+            // were the window was tiled
             const layout = GlobalState.get().getSelectedLayoutOfMonitor(
                 this._monitor.index,
                 window.get_workspace().index(),
             );
-            new TilingPopup(
+            new TilingLayoutWithPopup(
                 layout,
                 tilingLayout.innerGaps,
                 tilingLayout.outerGaps,

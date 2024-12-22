@@ -1,7 +1,7 @@
 import { registerGObjectClass } from '@/utils/gjs';
 import { Clutter, Mtk, Meta, St, Graphene } from '@gi.ext';
 import Layout from '../layout/Layout';
-import { getWindows } from '@utils/ui';
+import { buildRectangle, getWindows } from '@utils/ui';
 import TileUtils from '@components/layout/TileUtils';
 import { logger } from '@utils/logger';
 import GlobalState from '@utils/globalState';
@@ -12,10 +12,13 @@ import TilePreview from '@components/tilepreview/tilePreview';
 import LayoutWidget from '@components/layout/LayoutWidget';
 import SignalHandling from '@utils/signalHandling';
 import PopupTilePreview from '@components/tilepreview/popupTilePreview';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 const debug = logger('TilingPopup');
 
 const MASONRY_LAYOUT_SPACING = 32;
+const MASONRY_LAYOUT_ROW_HEIGHT = 0.35;
+const MASONRY_LAYOUT_MAX_ROW_HEIGHT = 0.35;
 const ANIMATION_SPEED = 200;
 const MASONRY_ROW_MIN_HEIGHT_PERCENTAGE = 0.3;
 
@@ -211,7 +214,7 @@ class MasonryLayout extends Clutter.LayoutManager {
 }
 
 @registerGObjectClass
-export default class TilingPopup extends LayoutWidget<TilePreview> {
+export default class TilingLayoutWithPopup extends LayoutWidget<TilePreview> {
     private _signals: SignalHandling;
     private _lastTiledWindow: Meta.Window | null;
     private _showing: boolean;
@@ -326,8 +329,8 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
 
         const layoutManager = new MasonryLayout(
             MASONRY_LAYOUT_SPACING,
-            this._containerRect.height * 0.2,
-            this._containerRect.height * 0.3,
+            this._containerRect.height * MASONRY_LAYOUT_ROW_HEIGHT,
+            this._containerRect.height * MASONRY_LAYOUT_MAX_ROW_HEIGHT,
         );
         const container = new St.Widget({
             reactive: true,
@@ -423,14 +426,6 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
 
             // when the clone is selected by the user
             winClone.connect('button-press-event', () => {
-                // finally move the window
-                // the actor has opacity = 0, so this is not seen by the user
-                // place the actor with a scale 4% lower, to perform scaling and fading animation later
-                winActor.set_pivot_point(0.5, 0.5);
-                winActor.set_scale(0.96, 0.96);
-                winActor.set_position(preview.innerX, preview.innerY);
-                winActor.set_size(preview.innerWidth, preview.innerHeight);
-
                 this._lastTiledWindow = nonTiledWin;
                 // place this window on TOP of everyone (we will focus it later, after the animation)
                 global.windowGroup.set_child_above_sibling(
@@ -446,20 +441,53 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
                     nonTiledWin.unmake_fullscreen();
                 if (nonTiledWin.minimized) nonTiledWin.unminimize();
 
-                (nonTiledWin as ExtendedWindow).originalSize = nonTiledWin
-                    .get_frame_rect()
-                    .copy();
+                const winRect = nonTiledWin.get_frame_rect();
+                (nonTiledWin as ExtendedWindow).originalSize = winRect.copy();
 
                 // create a static clone and hide the live clone
                 // then we can change the actual window size
                 // without showing that to the user
-                /* const staticClone = new Clutter.Clone({
-                    source: winClone,
+                const cl = winClone.get_window_clone() ?? winClone;
+                const [x, y] = cl.get_transformed_position();
+                const allocation = cl.get_allocation_box();
+                const xExcludingShadow = winRect.x - winActor.get_x();
+                const yExcludingShadow = winRect.y - winActor.get_y();
+                const staticClone = new Clutter.Clone({
+                    source: winActor,
                     reactive: false,
-                });*/
-                // hide the live clone, so we can change the actual window size
-                // without showing that to the user
+                    scale_x: 1,
+                    scale_y: 1,
+                    x,
+                    y,
+                    width: allocation.x2 - allocation.x1,
+                    height: allocation.y2 - allocation.y1,
+                    pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
+                });
+                global.windowGroup.add_child(staticClone);
+                staticClone.ease({
+                    x: preview.innerX - xExcludingShadow,
+                    y: preview.innerY - yExcludingShadow,
+                    width: preview.innerWidth + 2 * yExcludingShadow,
+                    height: preview.innerHeight + 2 * xExcludingShadow,
+                    duration: ANIMATION_SPEED * 1.8,
+                    onStopped: () => {
+                        winActor.opacity = 255;
+                        winActor.set_scale(1, 1);
+                        if (
+                            this._previews.length === 0 &&
+                            this._lastTiledWindow
+                        ) {
+                            this._lastTiledWindow.focus(
+                                global.get_current_time(),
+                            );
+                        }
+                        staticClone.destroy();
+                    },
+                });
+                // hide the live clone, since we have a clone animating on top of it
                 winClone.opacity = 0;
+                // begin hiding the preview. Destroy it when it is hidden
+                // and recursively show popup on the next vacant tile
                 preview.ease({
                     opacity: 0,
                     duration: ANIMATION_SPEED,
@@ -479,6 +507,11 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
                         );
                     },
                 });
+                // finally move the window
+                // the actor has opacity = 0, so this is not seen by the user
+                winActor.set_pivot_point(0, 0);
+                winActor.set_position(preview.innerX, preview.innerY);
+                winActor.set_size(preview.innerWidth, preview.innerHeight);
                 const user_op = false;
                 nonTiledWin.move_to_monitor(monitorIndex);
                 nonTiledWin.move_frame(user_op, preview.innerX, preview.innerY);
@@ -493,26 +526,9 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
                     ...preview.tile,
                 });
                 // while we hide the preview, show the actor to the new position,
-                // fade in and scale back to 100% size
+                // this has opacity of 0 so it is hidden. Later we immediately swap
+                // the animating actor with this
                 winActor.show();
-                winActor.ease({
-                    opacity: 255,
-                    scaleX: 1,
-                    scaleY: 1,
-                    duration: ANIMATION_SPEED * 0.8,
-                    delay: 100,
-                    onStopped: () => {
-                        winActor.set_pivot_point(0, 0);
-                        if (
-                            this._previews.length === 0 &&
-                            this._lastTiledWindow
-                        ) {
-                            this._lastTiledWindow.focus(
-                                global.get_current_time(),
-                            );
-                        }
-                    },
-                });
             });
         });
 
