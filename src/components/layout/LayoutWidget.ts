@@ -35,10 +35,12 @@ export default class LayoutWidget<
     protected _layout: Layout;
     protected _innerGaps: Clutter.Margin;
     protected _outerGaps: Clutter.Margin;
+    protected _scalingFactor: number;
 
     constructor(params: LayoutWidgetConstructorProperties) {
         super({ styleClass: params.styleClass || '' });
         params.parent.add_child(this);
+        this._scalingFactor = 1;
         if (params.scalingFactor) this.scalingFactor = params.scalingFactor;
 
         this._previews = [];
@@ -50,6 +52,11 @@ export default class LayoutWidget<
 
     public set scalingFactor(value: number) {
         enableScalingFactorSupport(this, value);
+        this._scalingFactor = value;
+    }
+
+    public get scalingFactor(): number {
+        return this._scalingFactor;
     }
 
     public get innerGaps(): Clutter.Margin {
