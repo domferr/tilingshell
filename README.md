@@ -24,6 +24,12 @@ This is a Gnome Shell extension implementing modern windows tiling system by ext
 
 <img src="https://github.com/domferr/tilingshell/blob/main/doc/horiz_summary.jpg" align="center"/>
 
+<details>
+  <summary><span align="center">See here the video overview</span></summary>
+  
+  https://github.com/user-attachments/assets/2905f0a1-ecd4-47b5-a6bc-59f91716e685
+</details>
+
 Have issues, you want to suggest a new feature or contribute? Please open a new [issue](https://github.com/domferr/tilingshell/issues)!
 
 ## Usage ##

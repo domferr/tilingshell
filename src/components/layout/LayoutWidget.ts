@@ -35,10 +35,12 @@ export default class LayoutWidget<
     protected _layout: Layout;
     protected _innerGaps: Clutter.Margin;
     protected _outerGaps: Clutter.Margin;
+    protected _scalingFactor: number;
 
     constructor(params: LayoutWidgetConstructorProperties) {
         super({ styleClass: params.styleClass || '' });
         params.parent.add_child(this);
+        this._scalingFactor = 1;
         if (params.scalingFactor) this.scalingFactor = params.scalingFactor;
 
         this._previews = [];
@@ -50,6 +52,11 @@ export default class LayoutWidget<
 
     public set scalingFactor(value: number) {
         enableScalingFactorSupport(this, value);
+        this._scalingFactor = value;
+    }
+
+    public get scalingFactor(): number {
+        return this._scalingFactor;
     }
 
     public get innerGaps(): Clutter.Margin {
@@ -58,6 +65,10 @@ export default class LayoutWidget<
 
     public get outerGaps(): Clutter.Margin {
         return this._outerGaps.copy();
+    }
+
+    public get layout(): Layout {
+        return this._layout;
     }
 
     protected draw_layout(): void {
@@ -93,21 +104,27 @@ export default class LayoutWidget<
         }>,
     ): boolean {
         let trigger_relayout = this._previews.length === 0;
-        if (params?.innerGaps) {
-            this._innerGaps = params.innerGaps.copy();
-            trigger_relayout = true;
-        }
-        if (params?.outerGaps && this._outerGaps !== params.outerGaps) {
-            this._outerGaps = params.outerGaps.copy();
-            trigger_relayout = true;
-        }
         if (params?.layout && this._layout !== params.layout) {
             this._layout = params.layout;
             trigger_relayout = true;
         }
+        if (params?.innerGaps) {
+            trigger_relayout ||= !this._areGapsEqual(
+                this._innerGaps,
+                params.innerGaps,
+            );
+            this._innerGaps = params.innerGaps.copy();
+        }
+        if (params?.outerGaps && this._outerGaps !== params.outerGaps) {
+            trigger_relayout ||= !this._areGapsEqual(
+                this._outerGaps,
+                params.outerGaps,
+            );
+            this._outerGaps = params.outerGaps.copy();
+        }
         if (
             params?.containerRect &&
-            this._containerRect !== params.containerRect
+            !this._containerRect.equal(params.containerRect)
         ) {
             this._containerRect = params.containerRect.copy();
             trigger_relayout = true;
@@ -131,5 +148,17 @@ export default class LayoutWidget<
         this._previews.forEach((lay) => lay.open());
 
         return true;
+    }
+
+    private _areGapsEqual(
+        first: Clutter.Margin,
+        second: Clutter.Margin,
+    ): boolean {
+        return (
+            first.bottom === second.bottom &&
+            first.top === second.top &&
+            first.left === second.left &&
+            first.right === second.right
+        );
     }
 }

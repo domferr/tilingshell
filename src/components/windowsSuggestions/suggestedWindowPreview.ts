@@ -10,6 +10,7 @@ import {
     Pango,
     GLib,
 } from '@gi.ext';
+import { logger } from '@utils/logger';
 
 const WINDOW_OVERLAY_FADE_TIME = 200;
 
@@ -19,13 +20,13 @@ const WINDOW_ACTIVE_SIZE_INC = 5; // in each direction
 const ICON_SIZE = 36;
 const ICON_OVERLAP = 0.7;
 
-const ICON_TITLE_SPACING = 6;
+const debug = logger('SuggestedWindowPreview');
 
 /*
 This class is heavily based on Gnome Shell's WindowPreview class
 */
 @registerGObjectClass
-export default class PopupWindowPreview extends Shell.WindowPreview {
+export default class SuggestedWindowPreview extends Shell.WindowPreview {
     static metaInfo: GObject.MetaInfo<unknown, unknown, unknown> = {
         GTypeName: 'PopupWindowPreview',
     };
@@ -48,7 +49,7 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
         this._windowActor = metaWindow.get_compositor_private();
 
         this._previewContainer = new St.Widget({
-            style: 'background-color: rgba(255, 255, 255, 0.3); border-radius: 8px; padding: 6px;',
+            style_class: 'popup-window-preview-container',
             pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
             layoutManager: new Clutter.BinLayout(),
             xAlign: Clutter.ActorAlign.CENTER,
@@ -58,9 +59,6 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
         });
         this.window_container = windowContainer;
 
-        windowContainer.connect('notify::scale-x', () =>
-            this._adjustOverlayOffsets(),
-        );
         // gjs currently can't handle setting an actors layout manager during
         // the initialization of the actor if that layout manager keeps track
         // of its container, so set the layout manager after creating the
@@ -79,9 +77,7 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
 
         this.connect('destroy', this._onDestroy.bind(this));
 
-        // this._overlayEnabled = true;
         this._overlayShown = false;
-        // this._idleHideOverlayId = 0;
 
         const tracker = Shell.WindowTracker.get_default();
         const app = tracker.get_window_app(this._metaWindow);
@@ -89,7 +85,7 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
         this._icon.add_style_class_name('window-icon');
         this._icon.add_style_class_name('icon-dropshadow');
         this._icon.set({
-            reactive: true,
+            reactive: false,
             pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
         });
         this._icon.add_constraint(
@@ -114,43 +110,26 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
             }),
         );
 
-        const { scaleFactor } = St.ThemeContext.get_for_stage(
-            global.stage as Clutter.Stage,
-        );
         this._title = new St.Label({
             visible: false,
             style_class: 'window-caption',
             text: this._getCaption(),
-            reactive: true,
+            reactive: false,
         });
         this._title.clutter_text.single_line_mode = true;
-        this._title.add_constraint(
-            new Clutter.BindConstraint({
-                source: this._previewContainer,
-                coordinate: Clutter.BindCoordinate.X,
-            }),
-        );
-        const iconBottomOverlap = ICON_SIZE * (1 - ICON_OVERLAP);
-        this._title.add_constraint(
-            new Clutter.BindConstraint({
-                source: this._previewContainer,
-                coordinate: Clutter.BindCoordinate.Y,
-                offset: scaleFactor * (iconBottomOverlap + ICON_TITLE_SPACING),
-            }),
-        );
         this._title.add_constraint(
             new Clutter.AlignConstraint({
                 source: this._previewContainer,
                 align_axis: Clutter.AlignAxis.X_AXIS,
-                factor: 0.5,
+                factor: 0, // Center horizontally
             }),
         );
         this._title.add_constraint(
             new Clutter.AlignConstraint({
                 source: this._previewContainer,
                 align_axis: Clutter.AlignAxis.Y_AXIS,
+                factor: 0, // Center vertically
                 pivot_point: new Graphene.Point({ x: -1, y: 0 }),
-                factor: 1,
             }),
         );
         this._title.clutter_text.ellipsize = Pango.EllipsizeMode.END;
@@ -172,7 +151,11 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
         });
     }
 
-    _getCaption() {
+    public get_window_clone(): Clutter.Actor | undefined {
+        return this.window_container;
+    }
+
+    private _getCaption() {
         if (this._metaWindow.title) return this._metaWindow.title;
 
         const tracker = Shell.WindowTracker.get_default();
@@ -180,13 +163,10 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
         return app.get_name();
     }
 
-    showOverlay(animate: boolean) {
-        // if (!this._overlayEnabled) return;
-
+    public showOverlay(animate: boolean) {
         if (this._overlayShown) return;
 
         this._overlayShown = true;
-        this._restack();
 
         // If we're supposed to animate and an animation in our direction
         // is already happening, let that one continue
@@ -228,7 +208,6 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
         if (!this._overlayShown) return;
 
         this._overlayShown = false;
-        this._restack();
 
         // If we're supposed to animate and an animation in our direction
         // is already happening, let that one continue
@@ -258,24 +237,8 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
         });
     }
 
-    _adjustOverlayOffsets() {
-        // Assume that scale-x and scale-y update always set
-        // in lock-step; that allows us to not use separate
-        // handlers for horizontal and vertical offsets
-        const previewScale = this._previewContainer.scale_x;
-        const [previewWidth, previewHeight] =
-            this._previewContainer.allocation.get_size();
-
-        const heightIncrease = Math.floor(
-            (previewHeight * (previewScale - 1)) / 2,
-        );
-
-        this._icon.translation_y = heightIncrease;
-        this._title.translation_y = heightIncrease;
-    }
-
     _addWindow(metaWindow: Meta.Window) {
-        const clone =
+        this.clone =
             this.window_container.layout_manager.add_window(metaWindow);
         // if (!clone) return;
 
@@ -318,21 +281,6 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
         };
         this._metaWindow.foreach_transient(iter);
     }
-
-    /* get overlayEnabled() {
-        return this._overlayEnabled;
-    }
-
-    set overlayEnabled(enabled) {
-        if (this._overlayEnabled === enabled) return;
-
-        this._overlayEnabled = enabled;
-        this.notify('overlay-enabled');
-
-        if (!enabled) this.hideOverlay(false);
-        else if (this['has-pointer'] || global.stage.key_focus === this)
-            this.showOverlay(true);
-    }*/
 
     // Find the actor just below us, respecting reparenting done by DND code
     _getActualStackAbove() {
@@ -386,7 +334,6 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
             });
 
         GLib.Source.set_name_by_id(this._idleHideOverlayId, '[gnome-shell] this._idleHideOverlayId');*/
-
         return super.vfunc_leave_event(event);
     }
 
@@ -399,19 +346,5 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
         super.vfunc_key_focus_out();
 
         this.hideOverlay(true);
-    }
-
-    _restack() {
-        // We may not have a parent if DnD completed successfully, in
-        // which case our clone will shortly be destroyed and replaced
-        // with a new one on the target workspace.
-        const parent = this.get_parent();
-        if (parent !== null) {
-            if (this._overlayShown) parent.set_child_above_sibling(this, null);
-            else if (this._stackAbove === null)
-                parent.set_child_below_sibling(this, null);
-            else if (!this._stackAbove._overlayShown)
-                parent.set_child_above_sibling(this, this._stackAbove);
-        }
     }
 }

@@ -391,6 +391,15 @@ export default class TilingShellExtension extends Extension {
         // move the window
         ws.activate_with_focus(window, global.get_current_time());
         window.change_workspace(ws);
+        // todo check the following
+        // If the selected window is on a different workspace, we don't
+        // want it to disappear, then slide in with the workspace; instead,
+        // always activate it on the active workspace ...
+        activeWs.activate_with_focus(window, global.get_current_time());
+
+        // ... then slide it over to the original workspace if necessary
+        Main.wm.actionMoveWindow(window, ws);
+
     }*/
 
     private _onKeyboardMoveWin(

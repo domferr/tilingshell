@@ -157,6 +157,21 @@
             <summary>Tile animation time (milliseconds)</summary>
             <description>Animation time in milliseconds of the tiles</description>
         </key>
+        <key name="enable-tiling-system-windows-suggestions" type="b">
+            <default>false</default>
+            <summary>Enable window suggestions for the tiling system</summary>
+            <description>Provides smart suggestions to fill empty tiles when using the tiling system.</description>
+        </key>
+        <key name="enable-snap-assistant-windows-suggestions" type="b">
+            <default>false</default>
+            <summary>Enable window suggestions for the snap assistant</summary>
+            <description>Offers suggestions to populate empty tiles when using the snap assistant.</description>
+        </key>
+        <key name="enable-screen-edges-windows-suggestions" type="b">
+            <default>false</default>
+            <summary>Enable window suggestions for screen edge snapping</summary>
+            <description>Suggests windows to occupy empty tiles when snapping to screen edges.</description>
+        </key>
 
         <!-- keybindings -->
 		<key type="as" name="move-window-right">
