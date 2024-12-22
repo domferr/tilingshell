@@ -248,9 +248,8 @@ export default class TilingPopup extends LayoutWidget<TilePreview> {
                 tiledWindows.push(extWin as ExtendedWindow);
             else nontiledWindows.push(extWin);
         });
-        // TODO: let's make this available in the future
-        const enabled = false;
-        if (nontiledWindows.length === 0 || !enabled) {
+
+        if (nontiledWindows.length === 0) {
             this.destroy();
             return;
         }
