@@ -26,7 +26,7 @@ import EdgeTilingManager from './edgeTilingManager';
 import TouchPointer from './touchPointer';
 import { KeyBindingsDirection } from '@keybindings';
 import TilingShellWindowManager from '@components/windowManager/tilingShellWindowManager';
-import TilingLayoutWithPopup from './tilingLayoutWithPopup';
+import TilingLayoutWithPopup from '../tilingPopup/tilingLayoutWithPopup';
 
 const MINIMUM_DISTANCE_TO_RESTORE_ORIGINAL_SIZE = 90;
 

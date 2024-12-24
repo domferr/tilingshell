@@ -1,9 +1,11 @@
 import { registerGObjectClass } from '@/utils/gjs';
-import { GObject, St, Clutter, Gio, Mtk } from '@gi.ext';
-import TilePreview from './tilePreview';
-import Settings from '@settings/settings';
+import { GObject, St, Clutter, Mtk, Graphene } from '@gi.ext';
+import TilePreview from '../tilepreview/tilePreview';
 import { buildBlurEffect } from '@utils/ui';
 import Tile from '@components/layout/Tile';
+import MasonryLayoutManager from './masonryLayoutManager';
+
+const MASONRY_LAYOUT_SPACING = 32;
 
 @registerGObjectClass
 export default class PopupTilePreview extends TilePreview {
@@ -21,18 +23,19 @@ export default class PopupTilePreview extends TilePreview {
     };
 
     private _blur: boolean;
+    private _container: St.Widget;
 
     constructor(params: {
         parent: Clutter.Actor;
+        maxRowHeight: number;
         tile?: Tile;
         rect?: Mtk.Rectangle;
         gaps?: Clutter.Margin;
     }) {
         super(params);
 
-        this._blur = false;
-
         // blur not supported due to GNOME shell known bug
+        this._blur = false;
         /* Settings.bind(
             Settings.KEY_ENABLE_BLUR_SELECTED_TILEPREVIEW,
             this,
@@ -51,6 +54,40 @@ export default class PopupTilePreview extends TilePreview {
                 styleChangedSignalID,
             ),
         );
+
+        this.layout_manager = new Clutter.BinLayout();
+
+        const layoutManager = new MasonryLayoutManager(
+            MASONRY_LAYOUT_SPACING,
+            params.maxRowHeight,
+            params.maxRowHeight,
+        );
+        this._container = new St.Viewport({
+            reactive: true,
+            x_expand: true,
+            y_expand: true,
+            layout_manager: layoutManager,
+            // pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
+            // style: 'padding: 32px;',
+        });
+        const scrollView = new St.ScrollView({
+            overlay_scrollbars: false,
+            width: this.innerWidth,
+            height: this.innerHeight,
+        });
+        // Create an St.Viewport to hold the scrollable content
+        /* const viewport = new St.Viewport({
+            style_class: 'scrollable-viewport',
+        });
+        viewport.add_child(this._container);*/
+        // @ts-expect-error "add_actor is valid"
+        scrollView.add_actor(this._container);
+        this.add_child(scrollView);
+        // this.add_child(this._container);
+    }
+
+    get container(): St.Widget {
+        return this._container;
     }
 
     set blur(value: boolean) {

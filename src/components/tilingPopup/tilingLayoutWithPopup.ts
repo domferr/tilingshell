@@ -1,220 +1,26 @@
 import { registerGObjectClass } from '@/utils/gjs';
-import { Clutter, Mtk, Meta, St, Graphene } from '@gi.ext';
+import { Clutter, Mtk, Meta, Graphene } from '@gi.ext';
 import Layout from '../layout/Layout';
-import { buildRectangle, getWindows } from '@utils/ui';
+import { getWindows } from '@utils/ui';
 import TileUtils from '@components/layout/TileUtils';
 import { logger } from '@utils/logger';
 import GlobalState from '@utils/globalState';
-import ExtendedWindow from './extendedWindow';
+import ExtendedWindow from '../tilingsystem/extendedWindow';
 import PopupWindowPreview from './popupWindowPreview';
 import Tile from '@components/layout/Tile';
 import TilePreview from '@components/tilepreview/tilePreview';
 import LayoutWidget from '@components/layout/LayoutWidget';
 import SignalHandling from '@utils/signalHandling';
-import PopupTilePreview from '@components/tilepreview/popupTilePreview';
-import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import PopupTilePreview from '@components/tilingPopup/popupTilePreview';
+import MasonryLayoutManager from './masonryLayoutManager';
 
 const debug = logger('TilingPopup');
 
-const MASONRY_LAYOUT_SPACING = 32;
-const MASONRY_LAYOUT_ROW_HEIGHT = 0.35;
-const MASONRY_LAYOUT_MAX_ROW_HEIGHT = 0.35;
 const ANIMATION_SPEED = 200;
-const MASONRY_ROW_MIN_HEIGHT_PERCENTAGE = 0.3;
-
-interface ContainerWithAllocationCache extends Clutter.Actor {
-    _allocationCache:
-        | Map<
-              Clutter.Actor,
-              { x: number; y: number; width: number; height: number }
-          >
-        | undefined;
-}
+const MASONRY_LAYOUT_ROW_HEIGHT = 0.35;
 
 @registerGObjectClass
-class MasonryLayout extends Clutter.LayoutManager {
-    private _rowCount: number;
-    private _spacing: number;
-    private _maxRowHeight: number;
-    private _rowHeight: number;
-
-    constructor(spacing: number, rowHeight: number, maxRowHeight: number) {
-        super();
-        this._rowCount = 0; // Number of rows
-        this._spacing = spacing; // Spacing between items
-        this._maxRowHeight = maxRowHeight;
-        this._rowHeight = rowHeight;
-    }
-
-    vfunc_allocate(container: Clutter.Actor, box: Clutter.ActorBox) {
-        const children = container.get_children();
-        if (children.length === 0) return;
-
-        this._rowCount = Math.ceil(Math.sqrt(children.length)) + 1;
-        let rowHeight = 0;
-        while (
-            this._rowCount > 1 &&
-            rowHeight < box.get_height() * MASONRY_ROW_MIN_HEIGHT_PERCENTAGE
-        ) {
-            this._rowCount--;
-            rowHeight =
-                (box.get_height() - this._spacing * (this._rowCount - 1)) /
-                this._rowCount;
-        }
-        rowHeight = Math.min(rowHeight, this._maxRowHeight);
-        rowHeight = this._rowHeight;
-        const rowWidths = Array(this._rowCount).fill(0); // Tracks the width of each row
-
-        // Calculate total content height and width
-        const contentHeight =
-            rowHeight * this._rowCount + this._spacing * (this._rowCount - 1);
-
-        // Store placements and cache
-        const placements = [];
-        const allocationCache =
-            (container as ContainerWithAllocationCache)._allocationCache ??
-            new Map();
-
-        for (const child of children) {
-            // Retrieve the preferred height and width to calculate the aspect ratio
-            const [minHeight, naturalHeight] = child.get_preferred_height(-1);
-            const [minWidth, naturalWidth] =
-                child.get_preferred_width(naturalHeight);
-
-            // Maintain the aspect ratio
-            const aspectRatio = naturalWidth / naturalHeight;
-            const width = rowHeight * aspectRatio;
-
-            // Find the shortest row
-            const shortestRow = rowWidths.indexOf(Math.min(...rowWidths));
-            placements.push({
-                child,
-                row: shortestRow,
-                width,
-                x: rowWidths[shortestRow],
-                rowWidth: 0,
-            });
-
-            // Update row height
-            rowWidths[shortestRow] += width + this._spacing;
-        }
-        for (const placement of placements)
-            placement.rowWidth = rowWidths[placement.row];
-
-        const sortedRowWidths: number[][] = [...rowWidths].map((v, i) => [
-            v,
-            i,
-        ]);
-        sortedRowWidths.sort((a, b) => b[0] - a[0]);
-        const rowsOrdering = new Map<number, number>();
-        sortedRowWidths.forEach((row, newIndex) => {
-            const index = row[1];
-            rowsOrdering.set(
-                index,
-                (newIndex + Math.floor(this._rowCount / 2)) % this._rowCount,
-            );
-        });
-        for (const placement of placements)
-            placement.row = rowsOrdering.get(placement.row) ?? placement.row;
-
-        // Calculate offsets for centering the entire grid within the available space
-        const verticalOffset = (box.get_height() - contentHeight) / 2;
-        // Determine the largest row and center the content around it
-        const largestRowWidth = sortedRowWidths[0][0];
-        const horizontalOffset = (box.get_width() - largestRowWidth) / 2;
-
-        // Reset row heights for actual allocation
-        rowWidths.fill(0);
-
-        // Allocate children with preserved proportions
-        for (const placement of placements) {
-            const { child, row, width, x, rowWidth } = placement;
-            const y =
-                box.y1 + row * (rowHeight + this._spacing) + verticalOffset;
-            const rowOffset = (largestRowWidth - rowWidth) / 2;
-            const xPosition =
-                box.x1 + x + horizontalOffset + rowOffset + this._spacing / 2;
-
-            // Check if this child has a cached allocation
-            const cachedAlloc = allocationCache.get(child);
-            if (cachedAlloc) {
-                child.allocate(
-                    new Clutter.ActorBox({
-                        x1: cachedAlloc.x,
-                        y1: cachedAlloc.y,
-                        x2: cachedAlloc.x + width,
-                        y2: cachedAlloc.y + rowHeight,
-                    }),
-                );
-                continue; // Skip reallocation
-            }
-
-            // If the allocation has changed or no cache exists, perform new allocation
-            child.allocate(
-                new Clutter.ActorBox({
-                    x1: xPosition,
-                    y1: y,
-                    x2: xPosition + width,
-                    y2: y + rowHeight,
-                }),
-            );
-
-            // Update cache with the new allocation
-            allocationCache.set(child, {
-                x: xPosition,
-                y,
-                height: rowHeight,
-                width,
-            });
-        }
-
-        // Store the updated cache for future allocation passes
-        (container as ContainerWithAllocationCache)._allocationCache =
-            allocationCache;
-    }
-
-    vfunc_get_preferred_width(
-        container: Clutter.Actor,
-        forHeight: number,
-    ): [number, number] {
-        const children = container.get_children();
-        if (children.length === 0) return [0, 0];
-
-        const rowWidths = Array(this._rowCount).fill(0);
-        const rowWidth =
-            (forHeight - this._spacing * (this._rowCount - 1)) / this._rowCount;
-
-        for (const child of children) {
-            const preferredWidth = child.get_preferred_width(rowWidth)[1];
-            const shortestRow = rowWidths.indexOf(Math.min(...rowWidths));
-            rowWidths[shortestRow] += preferredWidth + this._spacing;
-        }
-
-        const totalWidth = Math.max(...rowWidths);
-        return [totalWidth, totalWidth];
-    }
-
-    vfunc_get_preferred_height(
-        container: Clutter.Actor,
-        forWidth: number,
-    ): [number, number] {
-        const children = container.get_children();
-        if (children.length === 0) return [0, 0];
-
-        const childHeights = children.map(
-            (child) => child.get_preferred_height(forWidth)[1],
-        );
-        const maxChildHeights = Math.max(...childHeights);
-
-        const totalHeight =
-            this._rowCount * maxChildHeights +
-            (this._rowCount - 1) * this._spacing;
-        return [totalHeight, totalHeight];
-    }
-}
-
-@registerGObjectClass
-export default class TilingLayoutWithPopup extends LayoutWidget<TilePreview> {
+export default class TilingLayoutWithPopup extends LayoutWidget<PopupTilePreview> {
     private _signals: SignalHandling;
     private _lastTiledWindow: Meta.Window | null;
     private _showing: boolean;
@@ -273,7 +79,7 @@ export default class TilingLayoutWithPopup extends LayoutWidget<TilePreview> {
                     !isDescendant ||
                     event.get_source() === this ||
                     event.get_source().get_layout_manager() instanceof
-                        MasonryLayout
+                        MasonryLayoutManager
                 )
                     this.close();
             },
@@ -324,26 +130,15 @@ export default class TilingLayoutWithPopup extends LayoutWidget<TilePreview> {
         rect: Mtk.Rectangle,
         gaps: Clutter.Margin,
         tile: Tile,
-    ): TilePreview {
-        const preview = new PopupTilePreview({ parent, rect, gaps, tile });
-
-        const layoutManager = new MasonryLayout(
-            MASONRY_LAYOUT_SPACING,
-            this._containerRect.height * MASONRY_LAYOUT_ROW_HEIGHT,
-            this._containerRect.height * MASONRY_LAYOUT_MAX_ROW_HEIGHT,
-        );
-        const container = new St.Widget({
-            reactive: true,
-            x_expand: true,
-            y_expand: true,
-            pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
-            layout_manager: layoutManager,
-            style: 'padding: 32px;',
+    ): PopupTilePreview {
+        return new PopupTilePreview({
+            parent,
+            rect,
+            gaps,
+            tile,
+            maxRowHeight:
+                this._containerRect.height * MASONRY_LAYOUT_ROW_HEIGHT,
         });
-        preview.layout_manager = new Clutter.BinLayout();
-        preview.add_child(container);
-
-        return preview;
     }
 
     private _recursivelyShowPopup(
@@ -354,13 +149,12 @@ export default class TilingLayoutWithPopup extends LayoutWidget<TilePreview> {
             this.close();
             return;
         }
-
         // find the leftmost preview
         let preview = this._previews[0];
-        let container = this._previews[0].firstChild;
+        let container = this._previews[0].container;
         this._previews.forEach((prev) => {
-            if (prev.x < container.x) {
-                container = prev.firstChild;
+            if (prev.x < preview.x) {
+                container = prev.container;
                 preview = prev;
             }
         });

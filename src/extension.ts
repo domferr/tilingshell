@@ -1,6 +1,6 @@
 import './styles/stylesheet.scss';
 
-import { Gio, GLib, Meta } from '@gi.ext';
+import { Gio, GLib, Meta, St, Clutter } from '@gi.ext';
 import { logger } from '@utils/logger';
 import {
     filterUnfocusableWindows,
@@ -27,6 +27,8 @@ import { WindowBorderManager } from '@components/windowBorderManager';
 import TilingShellWindowManager from '@components/windowManager/tilingShellWindowManager';
 import ExtendedWindow from '@components/tilingsystem/extendedWindow';
 import { Extension } from '@polyfill';
+import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
+import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
 const debug = logger('extension');
 
@@ -129,6 +131,32 @@ export default class TilingShellExtension extends Extension {
         if (Settings.OVERRIDE_WINDOW_MENU) OverriddenWindowMenu.enable();
 
         debug('extension is enabled');
+
+        /*
+        const preview = new St.Widget({
+            height: 400,
+            width: 100,
+        });
+        const scrollView = new St.ScrollView({
+            overlay_scrollbars: true,
+            height: preview.height,
+            width: preview.width,
+        });
+
+        const section1 = new St.BoxLayout({
+            vertical: true,
+        });
+
+        scrollView.add_actor(section1);
+
+        for (let i = 0; i < 30; i++) {
+            const pmItem = new PopupMenu.PopupMenuItem(`This is item ${i}`, {});
+
+            section1.add_child(pmItem);
+        }
+
+        global.windowGroup.add_child(preview);
+        preview.add_child(scrollView);*/
     }
 
     public openLayoutEditor() {

@@ -29,9 +29,6 @@ This class is heavily based on Gnome Shell's WindowPreview class
 */
 @registerGObjectClass
 export default class PopupWindowPreview extends Shell.WindowPreview {
-    get_window_clone(): Clutter.Actor | undefined {
-        return this.window_container;
-    }
     static metaInfo: GObject.MetaInfo<unknown, unknown, unknown> = {
         GTypeName: 'PopupWindowPreview',
     };
@@ -54,7 +51,7 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
         this._windowActor = metaWindow.get_compositor_private();
 
         this._previewContainer = new St.Widget({
-            style: 'background-color: rgba(255, 255, 255, 0.3); border-radius: 8px; padding: 6px;',
+            style_class: 'popup-window-preview-container',
             pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
             layoutManager: new Clutter.BinLayout(),
             xAlign: Clutter.ActorAlign.CENTER,
@@ -67,6 +64,7 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
         windowContainer.connect('notify::scale-x', () =>
             this._adjustOverlayOffsets(),
         );
+
         // gjs currently can't handle setting an actors layout manager during
         // the initialization of the actor if that layout manager keeps track
         // of its container, so set the layout manager after creating the
@@ -178,7 +176,11 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
         });
     }
 
-    _getCaption() {
+    public get_window_clone(): Clutter.Actor | undefined {
+        return this.window_container;
+    }
+
+    private _getCaption() {
         if (this._metaWindow.title) return this._metaWindow.title;
 
         const tracker = Shell.WindowTracker.get_default();
@@ -186,7 +188,7 @@ export default class PopupWindowPreview extends Shell.WindowPreview {
         return app.get_name();
     }
 
-    showOverlay(animate: boolean) {
+    public showOverlay(animate: boolean) {
         // if (!this._overlayEnabled) return;
 
         if (this._overlayShown) return;
