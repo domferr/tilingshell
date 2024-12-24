@@ -67,9 +67,18 @@ export default class MasonryLayoutManager extends Clutter.LayoutManager {
             const width = rowHeight * aspectRatio;
 
             // Find the shortest row
-            // This might not be efficient, but the number of rows is
+            // This might not look efficient, but the number of rows is
             // very low so is not going to affect performance
-            const shortestRow = rowWidths.indexOf(Math.min(...rowWidths));
+            let shortestRow = rowWidths.indexOf(Math.min(...rowWidths));
+            if (
+                rowWidths[shortestRow] + width > container.width &&
+                rowWidths[shortestRow] !== 0
+            ) {
+                shortestRow = rowWidths.length;
+                rowWidths.push(0);
+                this._rowCount++;
+            }
+
             placements.push({
                 child,
                 row: shortestRow,
@@ -121,6 +130,16 @@ export default class MasonryLayoutManager extends Clutter.LayoutManager {
             const xPosition =
                 box.x1 + x + horizontalOffset + rowOffset + this._spacing / 2;
 
+            // if the element has a width higher than the container
+            // clamp its width and change its height preserving
+            // aspect ratio
+            let realHeight = rowHeight;
+            let realWidth = width;
+            if (width > container.width) {
+                realHeight = (realHeight * container.width) / realWidth;
+                realWidth = container.width;
+            }
+
             // Check if this child has a cached allocation
             const cachedAlloc = allocationCache.get(child);
             if (cachedAlloc) {
@@ -128,8 +147,8 @@ export default class MasonryLayoutManager extends Clutter.LayoutManager {
                     new Clutter.ActorBox({
                         x1: cachedAlloc.x,
                         y1: cachedAlloc.y,
-                        x2: cachedAlloc.x + width,
-                        y2: cachedAlloc.y + rowHeight,
+                        x2: cachedAlloc.x + realWidth,
+                        y2: cachedAlloc.y + realHeight,
                     }),
                 );
                 continue; // Skip reallocation
@@ -140,8 +159,8 @@ export default class MasonryLayoutManager extends Clutter.LayoutManager {
                 new Clutter.ActorBox({
                     x1: xPosition,
                     y1: y,
-                    x2: xPosition + width,
-                    y2: y + rowHeight,
+                    x2: xPosition + realWidth,
+                    y2: y + realHeight,
                 }),
             );
 
@@ -149,8 +168,8 @@ export default class MasonryLayoutManager extends Clutter.LayoutManager {
             allocationCache.set(child, {
                 x: xPosition,
                 y,
-                height: rowHeight,
-                width,
+                height: realHeight,
+                width: realWidth,
             });
         }
 
