@@ -904,7 +904,15 @@ export class TilingManager {
         const [x, y] = TouchPointer.get().isTouchDeviceActive()
             ? TouchPointer.get().get_pointer(window)
             : global.get_pointer();
-
+        const pointerMonitorIndex = global.display.get_monitor_index_for_rect(
+            buildRectangle({
+                x,
+                y,
+                width: 1,
+                height: 1,
+            }),
+        );
+        return this._monitor.index === pointerMonitorIndex;
         const monitorWidth =
             this._workArea.x - this._monitor.x + this._workArea.width;
         const monitorHeight =
