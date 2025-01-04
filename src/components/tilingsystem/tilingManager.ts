@@ -284,6 +284,17 @@ export class TilingManager {
         (window as ExtendedWindow).assignedTile = undefined;
     }
 
+    public moveToTargetTile(window: Meta.Window, hotkeyNumber: string): void {
+        const targetRef = GlobalState.get().tileHotkeys[hotkeyNumber];
+        if (!targetRef) return;
+
+        const layout = GlobalState.get().layouts.find(l => l.id === targetRef.layoutId);
+        if (!layout || !layout.tiles[targetRef.tileIndex]) return;
+
+        const targetTile = layout.tiles[targetRef.tileIndex];
+        this._easeWindowRectFromTile(targetTile, window);
+    }
+
     public onKeyboardMoveWindow(
         window: Meta.Window,
         direction: KeyBindingsDirection,
@@ -359,9 +370,9 @@ export class TilingManager {
             (window as ExtendedWindow).assignedTile?.x === destination.tile.x &&
             (window as ExtendedWindow).assignedTile?.y === destination.tile.y &&
             (window as ExtendedWindow).assignedTile?.width ===
-                destination.tile.width &&
+            destination.tile.width &&
             (window as ExtendedWindow).assignedTile?.height ===
-                destination.tile.height
+            destination.tile.height
         )
             return true;
 
@@ -544,7 +555,7 @@ export class TilingManager {
         if (
             extWin.originalSize &&
             squaredEuclideanDistance(currPointerPos, this._grabStartPosition) >
-                MINIMUM_DISTANCE_TO_RESTORE_ORIGINAL_SIZE
+            MINIMUM_DISTANCE_TO_RESTORE_ORIGINAL_SIZE
         ) {
             if (Settings.RESTORE_WINDOW_ORIGINAL_SIZE) {
                 const windowRect = window.get_frame_rect();
@@ -1129,8 +1140,8 @@ export class TilingManager {
         let bestTileIndex = 0;
         let bestDistance = Math.abs(
             0.5 -
-                vacantTiles[bestTileIndex].x +
-                vacantTiles[bestTileIndex].width / 2,
+            vacantTiles[bestTileIndex].x +
+            vacantTiles[bestTileIndex].width / 2,
         );
         for (let index = 1; index < vacantTiles.length; index++) {
             const distance = Math.abs(
