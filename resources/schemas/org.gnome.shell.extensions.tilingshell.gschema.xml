@@ -234,43 +234,43 @@
 		</key>
         <key type="as" name="move-to-tile-1">
             <default><![CDATA[['']]]></default>
-            <summary>Move window to user-defined tile hotkey 1 with user-defined hotkey</summary>
+            <summary>Move window to user-defined tile with user-defined hotkey 1</summary>
         </key>
         <key type="as" name="move-to-tile-2">
             <default><![CDATA[['']]]></default>
-            <summary>Move window to user-defined tile hotkey 2 with user-defined hotkey</summary>
+            <summary>Move window to user-defined tile with user-defined hotkey 2</summary>
         </key>
         <key type="as" name="move-to-tile-3">
             <default><![CDATA[['']]]></default>
-            <summary>Move window to user-defined tile hotkey 3 with user-defined hotkey</summary>
+            <summary>Move window to user-defined tile with user-defined hotkey 3</summary>
         </key>
         <key type="as" name="move-to-tile-4">
             <default><![CDATA[['']]]></default>
-            <summary>Move window to user-defined tile hotkey 4 with user-defined hotkey</summary>
+            <summary>Move window to user-defined tile with user-defined hotkey 4</summary>
         </key>
         <key type="as" name="move-to-tile-5">
             <default><![CDATA[['']]]></default>
-            <summary>Move window to user-defined tile hotkey 5 with user-defined hotkey</summary>
+            <summary>Move window to user-defined tile with user-defined hotkey 5</summary>
         </key>
         <key type="as" name="move-to-tile-6">
             <default><![CDATA[['']]]></default>
-            <summary>Move window to user-defined tile hotkey 6 with user-defined hotkey</summary>
+            <summary>Move window to user-defined tile with user-defined hotkey 6</summary>
         </key>
         <key type="as" name="move-to-tile-7">
             <default><![CDATA[['']]]></default>
-            <summary>Move window to user-defined tile hotkey 7 with user-defined hotkey</summary>
+            <summary>Move window to user-defined tile with user-defined hotkey 7</summary>
         </key>
         <key type="as" name="move-to-tile-8">
             <default><![CDATA[['']]]></default>
-            <summary>Move window to user-defined tile hotkey 8 with user-defined hotkey</summary>
+            <summary>Move window to user-defined tile with user-defined hotkey 8</summary>
         </key>
         <key type="as" name="move-to-tile-9">
             <default><![CDATA[['']]]></default>
-            <summary>Move window to user-defined tile hotkey 9 with user-defined hotkey</summary>
+            <summary>Move window to user-defined tile with user-defined hotkey 9</summary>
         </key>
         <key type="as" name="move-to-tile-0">
             <default><![CDATA[['']]]></default>
-            <summary>Move window to user-defined tile hotkey 0 with user-defined hotkey</summary>
+            <summary>Move window to user-defined tile with user-defined hotkey 0</summary>
         </key>
     </schema>
 
