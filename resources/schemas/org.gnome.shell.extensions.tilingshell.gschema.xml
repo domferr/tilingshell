@@ -57,6 +57,11 @@
             <summary>Layouts</summary>
             <description>The layouts available to the tiling managers and the snap assist.</description>
         </key>
+        <key name="tile-hotkeys-json" type="s">
+            <default>'{}'</default>
+            <summary>Tile hotkey mappings</summary>
+            <description>Optional mapping of hotkey numbers to layout tiles</description>
+        </key>
         <key name="selected-layouts" type="aas">
             <default>[]</default>
             <summary>Selected layouts</summary>
@@ -227,6 +232,46 @@
 			<default><![CDATA[['']]]></default>
 			<summary>Focus the window prior to the current focused window</summary>
 		</key>
+        <key type="as" name="move-to-tile-1">
+            <default><![CDATA[['']]]></default>
+            <summary>Move window to user-defined tile hotkey 1 with user-defined hotkey</summary>
+        </key>
+        <key type="as" name="move-to-tile-2">
+            <default><![CDATA[['']]]></default>
+            <summary>Move window to user-defined tile hotkey 2 with user-defined hotkey</summary>
+        </key>
+        <key type="as" name="move-to-tile-3">
+            <default><![CDATA[['']]]></default>
+            <summary>Move window to user-defined tile hotkey 3 with user-defined hotkey</summary>
+        </key>
+        <key type="as" name="move-to-tile-4">
+            <default><![CDATA[['']]]></default>
+            <summary>Move window to user-defined tile hotkey 4 with user-defined hotkey</summary>
+        </key>
+        <key type="as" name="move-to-tile-5">
+            <default><![CDATA[['']]]></default>
+            <summary>Move window to user-defined tile hotkey 5 with user-defined hotkey</summary>
+        </key>
+        <key type="as" name="move-to-tile-6">
+            <default><![CDATA[['']]]></default>
+            <summary>Move window to user-defined tile hotkey 6 with user-defined hotkey</summary>
+        </key>
+        <key type="as" name="move-to-tile-7">
+            <default><![CDATA[['']]]></default>
+            <summary>Move window to user-defined tile hotkey 7 with user-defined hotkey</summary>
+        </key>
+        <key type="as" name="move-to-tile-8">
+            <default><![CDATA[['']]]></default>
+            <summary>Move window to user-defined tile hotkey 8 with user-defined hotkey</summary>
+        </key>
+        <key type="as" name="move-to-tile-9">
+            <default><![CDATA[['']]]></default>
+            <summary>Move window to user-defined tile hotkey 9 with user-defined hotkey</summary>
+        </key>
+        <key type="as" name="move-to-tile-0">
+            <default><![CDATA[['']]]></default>
+            <summary>Move window to user-defined tile hotkey 0 with user-defined hotkey</summary>
+        </key>
     </schema>
 
 </schemalist>
