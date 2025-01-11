@@ -1,11 +1,10 @@
 <img src="https://raw.githubusercontent.com/domferr/tilingshell/main/logo.png" align="right" width="76"/>
 
-![](https://img.shields.io/github/v/release/domferr/tilingshell)
-![](https://img.shields.io/badge/GNOME-42--47-e04196)
-![](https://img.shields.io/github/downloads/domferr/tilingshell/total)
-![](https://img.shields.io/badge/Built%20with-Typescript-blue)
-![](https://img.shields.io/github/license/domferr/tilingshell)
-[![kofi](https://img.shields.io/badge/Donate-on_Ko--fi-purple?logo=ko-fi)](https://ko-fi.com/domferr)
+[![release](https://img.shields.io/badge/Release_v16-blue?style=for-the-badge)]([https://ko-fi.com/domferr](https://github.com/domferr/tilingshell/releases))
+![](https://img.shields.io/github/license/domferr/tilingshell?style=for-the-badge)
+![](https://img.shields.io/badge/GNOME-42--47-e04196?style=for-the-badge&logo=gnome&logoColor=white)
+[![kofi](https://img.shields.io/badge/Donate_on_Ko--fi-purple?logo=ko-fi&style=for-the-badge)](https://ko-fi.com/domferr)
+[![kofi](https://img.shields.io/badge/Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white)](https://patreon.com/domferr)
 
 # Tiling Shell #
 
