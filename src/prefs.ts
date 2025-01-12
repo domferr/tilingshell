@@ -365,17 +365,15 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                     _('Export layouts'),
                     Gtk.FileChooserAction.SAVE,
                     window,
-                    [
-                        [_('Cancel'), Gtk.ResponseType.CANCEL],
-                        [_('Save'), Gtk.ResponseType.OK],
-                    ],
+                    _('Save'),
+                    _('Cancel'),
                     new Gtk.FileFilter({
                         suffixes: ['json'],
                         name: 'JSON',
                     }),
-                    (_source: Gtk.FileChooserDialog, response_id: number) => {
+                    (_source: Gtk.FileChooserNative, response_id: number) => {
                         try {
-                            if (response_id === Gtk.ResponseType.OK) {
+                            if (response_id === Gtk.ResponseType.ACCEPT) {
                                 const file = _source.get_file();
                                 if (!file) throw new Error('no file selected');
 
@@ -410,7 +408,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                     },
                 );
                 fc.set_current_name('tilingshell-layouts.json');
-                fc.present();
+                fc.show();
             },
         );
         layoutsGroup.add(exportLayoutsBtn);
@@ -424,17 +422,15 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                     _('Select layouts file'),
                     Gtk.FileChooserAction.OPEN,
                     window,
-                    [
-                        [_('Cancel'), Gtk.ResponseType.CANCEL],
-                        [_('Open'), Gtk.ResponseType.OK],
-                    ],
+                    _('Open'),
+                    _('Cancel'),
                     new Gtk.FileFilter({
                         suffixes: ['json'],
                         name: 'JSON',
                     }),
-                    (_source: Gtk.FileChooserDialog, response_id: number) => {
+                    (_source: Gtk.FileChooserNative, response_id: number) => {
                         try {
-                            if (response_id === Gtk.ResponseType.OK) {
+                            if (response_id === Gtk.ResponseType.ACCEPT) {
                                 const file = _source.get_file();
                                 if (!file) {
                                     _source.destroy();
@@ -474,7 +470,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                     },
                 );
 
-                fc.present();
+                fc.show();
             },
         );
         layoutsGroup.add(importLayoutsBtn);
@@ -752,17 +748,15 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                     _('Export settings to a text file'),
                     Gtk.FileChooserAction.SAVE,
                     window,
-                    [
-                        [_('Cancel'), Gtk.ResponseType.CANCEL],
-                        [_('Save'), Gtk.ResponseType.OK],
-                    ],
+                    _('Save'),
+                    _('Cancel'),
                     new Gtk.FileFilter({
                         suffixes: ['txt'],
                         name: 'Text file',
                     }),
-                    (_source: Gtk.FileChooserDialog, response_id: number) => {
+                    (_source: Gtk.FileChooserNative, response_id: number) => {
                         try {
-                            if (response_id === Gtk.ResponseType.OK) {
+                            if (response_id === Gtk.ResponseType.ACCEPT) {
                                 const file = _source.get_file();
                                 if (!file) throw new Error('no file selected');
 
@@ -799,7 +793,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 );
 
                 fc.set_current_name('tilingshell-settings.txt');
-                fc.present();
+                fc.show();
             },
         );
         importExportGroup.add(exportSettingsBtn);
@@ -813,17 +807,15 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                     _('Select a text file to import from'),
                     Gtk.FileChooserAction.OPEN,
                     window,
-                    [
-                        [_('Cancel'), Gtk.ResponseType.CANCEL],
-                        [_('Open'), Gtk.ResponseType.OK],
-                    ],
+                    _('Open'),
+                    _('Cancel'),
                     new Gtk.FileFilter({
                         suffixes: ['txt'],
                         name: 'Text file',
                     }),
-                    (_source: Gtk.FileChooserDialog, response_id: number) => {
+                    (_source: Gtk.FileChooserNative, response_id: number) => {
                         try {
-                            if (response_id === Gtk.ResponseType.OK) {
+                            if (response_id === Gtk.ResponseType.ACCEPT) {
                                 const file = _source.get_file();
                                 if (!file) {
                                     _source.destroy();
@@ -852,7 +844,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                     },
                 );
 
-                fc.present();
+                fc.show();
             },
         );
         importExportGroup.add(importSettingsBtn);
@@ -1163,18 +1155,21 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         title: string,
         action: Gtk.FileChooserAction,
         window: Gtk.Window,
-        buttons: [string, Gtk.ResponseType][],
+        accept: string,
+        cancel: string,
         filter: Gtk.FileFilter,
         onResponse: (
-            _source: Gtk.FileChooserDialog,
+            _source: Gtk.FileChooserNative,
             response_id: number,
         ) => void,
-    ): Gtk.FileChooserDialog {
-        const fc = new Gtk.FileChooserDialog({
+    ): Gtk.FileChooserNative {
+        const fc = new Gtk.FileChooserNative({
             title,
             action,
             select_multiple: false,
             transientFor: window,
+            accept_label: accept,
+            cancel_label: cancel,
         });
         const [major] = Config.PACKAGE_VERSION.split('.').map((s: string) =>
             Number(s),
@@ -1183,7 +1178,6 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         // filter is then enabled for GNOME 43+
         if (major >= 43) fc.set_filter(filter);
         fc.set_current_folder(Gio.File.new_for_path(GLib.get_home_dir()));
-        buttons.forEach(([name, type]) => fc.add_button(name, type));
         fc.connect('response', onResponse);
 
         return fc;
