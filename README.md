@@ -38,7 +38,7 @@ Have issues, you want to suggest a new feature or contribute? Please open a new 
 |:---|:---|:---|:---|
 | [⬇️](#layout-editor) **Layout editor** | [⬇️](#smart-resize) **Smart resize** | [⬇️](#tile-with-keyboard) **Tile with Keyboard** | [⬇️](#edge-tiling) **Edge Tiling** |
 | [⬇️](#tiling-buttons) **Tiling Buttons** | [⬇️](#per-workspace-layout) **Per-workspace layout** | [⬇️](#auto-tiling) **Auto-tiling** | [⬇️](#tiling-context-menu) **Tiling context menu** |
-| [⬇️](#smart-border-radius) **Smart border radius** 
+| [⬇️](#smart-border-radius) **Smart border radius** | [⬇️](#windows-suggestions) **Windows Suggestions** 
 
 ### Tiling System ###
 When grabbing and moving a window, press <kbd>CTRL</kbd> key to show the tiling layout (you can choose another key from the preferences). When moving on a tile, it will highlight. Ungrab the window to place that window on the highlighted tile.
@@ -164,6 +164,18 @@ In GNOME, different windows may have different border radius. Drawing a border a
 <img src="https://github.com/user-attachments/assets/cfaca5f9-d9b2-4739-9426-1aebb5f33c29" width=304 />
 <img src="https://github.com/user-attachments/assets/8e68abff-66e5-4b85-a6ce-0bd2da7be166" width=332 />
 </p>
+
+<p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
+
+### Windows Suggestions ###
+
+After placing a window in a tile using the tiling system, snap assistant or active screen edges, you’ll see suggestions for other windows to fill the remaining tiles. Got too many windows open? No problem! If all suggestions don’t fit within the available space, you’ll get a **scrollable list** for quick and easy navigation. See it in action:
+
+https://github.com/user-attachments/assets/fbf68458-199d-490b-90cf-3e976d5b511b
+
+_Can I choose to opt in or out?_
+
+Yes. From the extension's preferences you find a section called Windows Suggestions. You can enable and disable windows suggestions for tiling system, snap assistant and screen edges. You can choose which of the three to keep enabled, or all of them, to personalize for your needs and preferences. 
 
 <p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
 
