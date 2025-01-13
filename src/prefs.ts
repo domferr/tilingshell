@@ -758,7 +758,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                     ],
                     new Gtk.FileFilter({
                         suffixes: ['txt'],
-                        name: 'Text file',
+                        name: _('Text file'),
                     }),
                     (_source: Gtk.FileChooserDialog, response_id: number) => {
                         try {
@@ -1230,7 +1230,7 @@ const ShortcutSettingButton = class extends Gtk.Button {
         this._gioSettings = gioSettings;
         this._editor = null;
         this._label = new Gtk.ShortcutLabel({
-            disabled_text: 'New accelerator…',
+            disabled_text: _('New accelerator…'),
             valign: Gtk.Align.CENTER,
             hexpand: false,
             vexpand: false,
@@ -1259,10 +1259,10 @@ const ShortcutSettingButton = class extends Gtk.Button {
         const ctl = new Gtk.EventControllerKey();
 
         const content = new Adw.StatusPage({
-            title: 'New accelerator…',
+            title: _('New accelerator…'),
             // description: this._description,
             icon_name: 'preferences-desktop-keyboard-shortcuts-symbolic',
-            description: 'Use Backspace to clear',
+            description: _('Use Backspace to clear'),
         });
 
         this._editor = new Adw.Window({
