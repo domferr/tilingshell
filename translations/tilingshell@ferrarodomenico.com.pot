@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-12 13:01+0100\n"
+"POT-Creation-Date: 2025-01-13 23:18+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -253,11 +253,12 @@ msgstr ""
 #: dist/prefs.js:909 dist/prefs.js:966 dist/prefs.js:1253 dist/prefs.js:1311
 #: dist/prefs.js:1003 dist/prefs.js:1060 dist/prefs.js:1369 dist/prefs.js:1427
 #: dist/prefs.js:1067 dist/prefs.js:1124 dist/prefs.js:1433 dist/prefs.js:1491
+#: dist/extension.js:5767
 msgid "Cancel"
 msgstr ""
 
 #: dist/prefs.js:910 dist/prefs.js:1254 dist/prefs.js:1004 dist/prefs.js:1370
-#: dist/prefs.js:1068 dist/prefs.js:1434
+#: dist/prefs.js:1068 dist/prefs.js:1434 dist/extension.js:5757
 msgid "Save"
 msgstr ""
 
@@ -485,26 +486,32 @@ msgid "Open a new issue on"
 msgstr ""
 
 #: dist/extension.js:4500 dist/extension.js:5361 dist/extension.js:5652
+#: dist/extension.js:5658
 msgid "Edit Layouts"
 msgstr ""
 
 #: dist/extension.js:4510 dist/extension.js:5371 dist/extension.js:5662
+#: dist/extension.js:5668
 msgid "New Layout"
 msgstr ""
 
 #: dist/extension.js:4691 dist/extension.js:5558 dist/extension.js:5849
+#: dist/extension.js:5855
 msgid "to split a tile"
 msgstr ""
 
 #: dist/extension.js:4730 dist/extension.js:5597 dist/extension.js:5888
+#: dist/extension.js:5894
 msgid "to split a tile vertically"
 msgstr ""
 
 #: dist/extension.js:4750 dist/extension.js:5617 dist/extension.js:5908
+#: dist/extension.js:5914
 msgid "to delete a tile"
 msgstr ""
 
 #: dist/extension.js:4775 dist/extension.js:5642 dist/extension.js:5933
+#: dist/extension.js:5939
 msgid "use the indicator button to save or cancel"
 msgstr ""
 
@@ -590,4 +597,52 @@ msgstr ""
 
 #: dist/prefs.js:1036
 msgid "Suggests windows to occupy empty tiles when snapping to screen edges"
+msgstr ""
+
+#: dist/prefs.js:1438
+msgid "Text file"
+msgstr ""
+
+#: dist/prefs.js:1800 dist/prefs.js:1823
+msgid "New accelerator…"
+msgstr ""
+
+#: dist/prefs.js:1826
+msgid "Use Backspace to clear"
+msgstr ""
+
+#: dist/extension.js:5743
+msgid "Menu"
+msgstr ""
+
+#: dist/extension.js:5750
+msgid "Info"
+msgstr ""
+
+#: dist/extension.js:5809
+msgid "Select the layout to edit"
+msgstr ""
+
+#: dist/extension.js:5829
+msgid "Close"
+msgstr ""
+
+#: dist/extension.js:5957
+msgid "How to use the editor"
+msgstr ""
+
+#: dist/extension.js:5966
+msgid "Start editing"
+msgstr ""
+
+#: dist/extension.js:6801
+msgid "Move to best tile"
+msgstr ""
+
+#: dist/extension.js:6821
+msgid "Move to leftmost tile"
+msgstr ""
+
+#: dist/extension.js:6840
+msgid "Move to rightmost tile"
 msgstr ""
