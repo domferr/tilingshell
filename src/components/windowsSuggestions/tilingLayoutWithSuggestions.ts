@@ -80,19 +80,11 @@ export default class TilingLayoutWithSuggestions extends LayoutWidget<Suggestion
 
         this._signals.disconnect();
         this._signals.connect(this, 'key-focus-out', () => this.close());
-        this._signals.connect(
-            global.stage,
-            'button-press-event',
-            (_: Clutter.Actor, event: Clutter.Event) => {
-                const isDescendant = this.contains(event.get_source());
-                if (
-                    isDescendant &&
-                    (event.get_source() === this ||
-                        event.get_source() instanceof St.ScrollView)
-                )
-                    this.close();
-            },
-        );
+        this._signals.connect(this, 'button-press-event', () => {
+            // if a window clone is pressed by a button, it will stop propagating the event
+            // then if this is called it is not a window clone that was pressed
+            this.close();
+        });
         this._signals.connect(
             global.stage,
             'key-press-event',
@@ -251,6 +243,7 @@ export default class TilingLayoutWithSuggestions extends LayoutWidget<Suggestion
                 nontiledWindows.splice(nontiledWindows.indexOf(nonTiledWin), 1);
                 preview.close(true);
                 this._recursivelyShowPopup(nontiledWindows, monitorIndex);
+                return Clutter.EVENT_STOP; // Blocca la propagazione
             });
             return winClone;
         });

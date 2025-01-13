@@ -74,8 +74,12 @@ export default class SuggestionsTilePreview extends TilePreview {
             x_expand: true,
             y_expand: true,
         });
+
         // @ts-expect-error "add_actor is valid"
-        this._scrollView.add_actor(this._container);
+        if (this._scrollView.add_actor)
+            // @ts-expect-error "add_actor is valid"
+            this._scrollView.add_actor(this._container);
+        else this._scrollView.add_child(this._container);
         this.add_child(this._scrollView);
 
         this._scrollView.get_hscroll_bar().opacity = 0;
