@@ -262,6 +262,20 @@ export default class TilingShellExtension extends Extension {
                     this._onKeyboardFocusWinDirection(dp, dir);
                 },
             );
+            this._signals.connect(
+                this._keybindings,
+                'move-to-tile',
+                (kb: KeyBindings, dp: Meta.Display, hotkeyNumber: string) => {
+                    const window = dp.focus_window;
+                    if (!window || !window.has_focus()) return;
+
+                    const monitorIndex = window.get_monitor();
+                    const manager = this._tilingManagers[monitorIndex];
+                    if (manager) {
+                        manager.moveToTargetTile(window, hotkeyNumber);
+                    }
+                },
+            );
         }
 
         // when Tiling Shell's edge-tiling is enabled/disable

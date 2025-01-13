@@ -496,6 +496,137 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         layoutsGroup.add(resetBtn);
 
+        // Hotkey "secret" feature section
+        // Confirmed Working
+        const tileHotkeysGroup = new Adw.PreferencesGroup({
+            title: _('Tile Hotkeys'),
+            description: _('Configure keyboard shortcuts to move windows directly to specific tiles'),
+        });
+        prefsPage.add(tileHotkeysGroup);
+
+        // // Confirmed not working!!!
+        // I can't for the life of me understand why this crashes...
+        // const exportTileHotkeysBtn = this._buildButtonRow(
+        //     _('Export tile hotkeys'),
+        //     _('Export tile hotkeys'),
+        //     _('Export tile hotkeys to a file'),
+        //     () => {
+        //         const fc = this._buildFileChooserDialog(
+        //             _('Export tile hotkeys'),
+        //             Gtk.FileChooserAction.SAVE,
+        //             window,
+        //             [
+        //                 [_('Cancel'), Gtk.ResponseType.CANCEL],
+        //                 [_('Save'), Gtk.ResponseType.OK],
+        //             ],
+        //             new Gtk.FileFilter({
+        //                 suffixes: ['json'],
+        //                 name: 'JSON',
+        //             }),
+        //             (_source: Gtk.FileChooserDialog, response_id: number) => {
+        //                 try {
+        //                     if (response_id === Gtk.ResponseType.OK) {
+        //                         const file = _source.get_file();
+        //                         if (!file) throw new Error('no file selected');
+
+        //                         debug(
+        //                             `Create file with path ${file.get_path()}`,
+        //                         );
+        //                         const content = JSON.stringify(
+        //                             Settings.get_tile_hotkeys()
+        //                         );
+        //                         file.replace_contents_bytes_async(
+        //                             new TextEncoder().encode(content),
+        //                             null,
+        //                             false,
+        //                             Gio.FileCreateFlags.REPLACE_DESTINATION,
+        //                             null,
+        //                             (thisFile, res) => {
+        //                                 try {
+        //                                     thisFile?.replace_contents_finish(
+        //                                         res,
+        //                                     );
+        //                                 } catch (e) {
+        //                                     debug(e);
+        //                                 }
+        //                             },
+        //                         );
+        //                     }
+        //                 } catch (error: unknown) {
+        //                     debug(error);
+        //                 }
+
+        //                 _source.destroy();
+        //             },
+        //         );
+        //         fc.set_current_name('tilingshell-hotkeys.json');
+        //         fc.present();
+        //     },
+        // );
+        // tileHotkeysGroup.add(exportTileHotkeysBtn);
+
+        // Confirming if this causes crashes
+        const importTileHotkeysBtn = this._buildButtonRow(
+            _('Import tile hotkeys'),
+            _('Import tile hotkeys'),
+            _('Import tile hotkeys from a file'),
+            () => {
+                const fc = this._buildFileChooserDialog(
+                    _('Select tile hotkeys file'),
+                    Gtk.FileChooserAction.OPEN,
+                    window,
+                    [
+                        [_('Cancel'), Gtk.ResponseType.CANCEL],
+                        [_('Open'), Gtk.ResponseType.OK],
+                    ],
+                    new Gtk.FileFilter({
+                        suffixes: ['json'],
+                        name: 'JSON',
+                    }),
+                    (_source: Gtk.FileChooserDialog, response_id: number) => {
+                        try {
+                            if (response_id === Gtk.ResponseType.OK) {
+                                const file = _source.get_file();
+                                if (!file) {
+                                    _source.destroy();
+                                    return;
+                                }
+                                debug(`Selected path ${file.get_path()}`);
+                                const [success, content] = file.load_contents(null);
+
+                                if (success) {
+                                    const importedHotkeys = JSON.parse(
+                                        new TextDecoder('utf-8').decode(content)
+                                    ) as Record<string, TileReference>;
+
+                                    // Now TypeScript knows the structure of importedHotkeys
+                                    Object.entries(importedHotkeys).forEach(([number, config]: [string, TileReference]) => {
+                                        const binding = config.binding;
+                                        if (binding) {
+                                            Settings.gioSetting.set_strv(
+                                                `move-to-tile-${number}`,
+                                                [binding]
+                                            );
+                                        }
+                                    });
+                                    Settings.save_tile_hotkeys(importedHotkeys);
+                                } else {
+                                    debug('Error while opening file');
+                                }
+                            }
+                        } catch (error: unknown) {
+                            debug(error);
+                        }
+
+                        _source.destroy();
+                    },
+                );
+
+                fc.present();
+            },
+        );
+        tileHotkeysGroup.add(importTileHotkeysBtn);
+
         // Keybindings section
         const keybindingsGroup = new Adw.PreferencesGroup({
             title: _('Keybindings'),
@@ -522,128 +653,128 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             boolean, // is set
             boolean, // is on main page
         ][] = [
-            [
-                Settings.SETTING_MOVE_WINDOW_RIGHT, // settings key
-                _('Move window to right tile'), // title
-                _('Move the focused window to the tile on its right'), // subtitle
-                false, // is set
-                true, // is on main page
-            ],
-            [
-                Settings.SETTING_MOVE_WINDOW_LEFT,
-                _('Move window to left tile'),
-                _('Move the focused window to the tile on its left'),
-                false,
-                true,
-            ],
-            [
-                Settings.SETTING_MOVE_WINDOW_UP,
-                _('Move window to tile above'),
-                _('Move the focused window to the tile above'),
-                false,
-                true,
-            ],
-            [
-                Settings.SETTING_MOVE_WINDOW_DOWN,
-                _('Move window to tile below'),
-                _('Move the focused window to the tile below'),
-                false,
-                true,
-            ],
-            [
-                Settings.SETTING_SPAN_WINDOW_RIGHT,
-                _('Span window to right tile'),
-                _('Span the focused window to the tile on its right'),
-                false,
-                false,
-            ],
-            [
-                Settings.SETTING_SPAN_WINDOW_LEFT,
-                _('Span window to left tile'),
-                _('Span the focused window to the tile on its left'),
-                false,
-                false,
-            ],
-            [
-                Settings.SETTING_SPAN_WINDOW_UP,
-                _('Span window above'),
-                _('Span the focused window to the tile above'),
-                false,
-                false,
-            ],
-            [
-                Settings.SETTING_SPAN_WINDOW_DOWN,
-                _('Span window down'),
-                _('Span the focused window to the tile below'),
-                false,
-                false,
-            ],
-            [
-                Settings.SETTING_SPAN_WINDOW_ALL_TILES,
-                _('Span window to all tiles'),
-                _('Span the focused window to all the tiles'),
-                false,
-                false,
-            ],
-            [
-                Settings.SETTING_UNTILE_WINDOW,
-                _('Untile focused window'),
-                undefined,
-                false,
-                false,
-            ],
-            [
-                Settings.SETTING_MOVE_WINDOW_CENTER, // settings key
-                _('Move window to the center'), // title
-                _('Move the focused window to the center of the screen'), // subtitle
-                false, // is set
-                false, // is on main page
-            ],
-            [
-                Settings.SETTING_FOCUS_WINDOW_RIGHT,
-                _('Focus window to the right'),
-                _(
-                    'Focus the window to the right of the current focused window',
-                ),
-                false,
-                false,
-            ],
-            [
-                Settings.SETTING_FOCUS_WINDOW_LEFT,
-                _('Focus window to the left'),
-                _('Focus the window to the left of the current focused window'),
-                false,
-                false,
-            ],
-            [
-                Settings.SETTING_FOCUS_WINDOW_UP,
-                _('Focus window above'),
-                _('Focus the window above the current focused window'),
-                false,
-                false,
-            ],
-            [
-                Settings.SETTING_FOCUS_WINDOW_DOWN,
-                _('Focus window below'),
-                _('Focus the window below the current focused window'),
-                false,
-                false,
-            ],
-            [
-                Settings.SETTING_FOCUS_WINDOW_NEXT,
-                _('Focus next window'),
-                _('Focus the window next to the current focused window'),
-                false,
-                false,
-            ],
-            [
-                Settings.SETTING_FOCUS_WINDOW_PREV,
-                _('Focus previous window'),
-                _('Focus the window prior to the current focused window'),
-                false,
-                false,
-            ],
-        ];
+                [
+                    Settings.SETTING_MOVE_WINDOW_RIGHT, // settings key
+                    _('Move window to right tile'), // title
+                    _('Move the focused window to the tile on its right'), // subtitle
+                    false, // is set
+                    true, // is on main page
+                ],
+                [
+                    Settings.SETTING_MOVE_WINDOW_LEFT,
+                    _('Move window to left tile'),
+                    _('Move the focused window to the tile on its left'),
+                    false,
+                    true,
+                ],
+                [
+                    Settings.SETTING_MOVE_WINDOW_UP,
+                    _('Move window to tile above'),
+                    _('Move the focused window to the tile above'),
+                    false,
+                    true,
+                ],
+                [
+                    Settings.SETTING_MOVE_WINDOW_DOWN,
+                    _('Move window to tile below'),
+                    _('Move the focused window to the tile below'),
+                    false,
+                    true,
+                ],
+                [
+                    Settings.SETTING_SPAN_WINDOW_RIGHT,
+                    _('Span window to right tile'),
+                    _('Span the focused window to the tile on its right'),
+                    false,
+                    false,
+                ],
+                [
+                    Settings.SETTING_SPAN_WINDOW_LEFT,
+                    _('Span window to left tile'),
+                    _('Span the focused window to the tile on its left'),
+                    false,
+                    false,
+                ],
+                [
+                    Settings.SETTING_SPAN_WINDOW_UP,
+                    _('Span window above'),
+                    _('Span the focused window to the tile above'),
+                    false,
+                    false,
+                ],
+                [
+                    Settings.SETTING_SPAN_WINDOW_DOWN,
+                    _('Span window down'),
+                    _('Span the focused window to the tile below'),
+                    false,
+                    false,
+                ],
+                [
+                    Settings.SETTING_SPAN_WINDOW_ALL_TILES,
+                    _('Span window to all tiles'),
+                    _('Span the focused window to all the tiles'),
+                    false,
+                    false,
+                ],
+                [
+                    Settings.SETTING_UNTILE_WINDOW,
+                    _('Untile focused window'),
+                    undefined,
+                    false,
+                    false,
+                ],
+                [
+                    Settings.SETTING_MOVE_WINDOW_CENTER, // settings key
+                    _('Move window to the center'), // title
+                    _('Move the focused window to the center of the screen'), // subtitle
+                    false, // is set
+                    false, // is on main page
+                ],
+                [
+                    Settings.SETTING_FOCUS_WINDOW_RIGHT,
+                    _('Focus window to the right'),
+                    _(
+                        'Focus the window to the right of the current focused window',
+                    ),
+                    false,
+                    false,
+                ],
+                [
+                    Settings.SETTING_FOCUS_WINDOW_LEFT,
+                    _('Focus window to the left'),
+                    _('Focus the window to the left of the current focused window'),
+                    false,
+                    false,
+                ],
+                [
+                    Settings.SETTING_FOCUS_WINDOW_UP,
+                    _('Focus window above'),
+                    _('Focus the window above the current focused window'),
+                    false,
+                    false,
+                ],
+                [
+                    Settings.SETTING_FOCUS_WINDOW_DOWN,
+                    _('Focus window below'),
+                    _('Focus the window below the current focused window'),
+                    false,
+                    false,
+                ],
+                [
+                    Settings.SETTING_FOCUS_WINDOW_NEXT,
+                    _('Focus next window'),
+                    _('Focus the window next to the current focused window'),
+                    false,
+                    false,
+                ],
+                [
+                    Settings.SETTING_FOCUS_WINDOW_PREV,
+                    _('Focus previous window'),
+                    _('Focus the window prior to the current focused window'),
+                    false,
+                    false,
+                ],
+            ];
 
         // set if the keybinding was set or not by the user
         for (let i = 0; i < keybindings.length; i++) {

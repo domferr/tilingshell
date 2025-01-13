@@ -7,6 +7,8 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { logger } from './logger';
 import { getWindows } from './ui';
 import ExtendedWindow from '@components/tilingsystem/extendedWindow';
+import { TileReference } from '@/components/layout/TileReference';
+
 
 const debug = logger('GlobalState');
 
@@ -16,6 +18,9 @@ export default class GlobalState extends GObject.Object {
         GTypeName: 'GlobalState',
         Signals: {
             'layouts-changed': {
+                param_types: [],
+            },
+            'tile-hotkeys-changed': {
                 param_types: [],
             },
         },
@@ -33,11 +38,13 @@ export default class GlobalState extends GObject.Object {
     };
 
     public static SIGNAL_LAYOUTS_CHANGED = 'layouts-changed';
+    public static SIGNAL_TILE_HOTKEYS_CHANGED = 'tile-hotkeys-changed';
 
     private static _instance: GlobalState | null;
 
     private _signals: SignalHandling;
     private _layouts: Layout[];
+    private _tileHotkeys: Record<string, TileReference>;
     private _tilePreviewAnimationTime: number;
     // if workspaces are reordered, we use this map to know which layouts where selected
     // to each workspace and we save the new ordering in the settings
@@ -53,6 +60,7 @@ export default class GlobalState extends GObject.Object {
         if (this._instance) {
             this._instance._signals.disconnect();
             this._instance._layouts = [];
+            this._instance._tileHotkeys = {};
             this._instance = null;
         }
     }
@@ -62,6 +70,7 @@ export default class GlobalState extends GObject.Object {
 
         this._signals = new SignalHandling();
         this._layouts = Settings.get_layouts_json();
+        this._tileHotkeys = Settings.get_tile_hotkeys();
         this._tilePreviewAnimationTime = 100;
         this._selected_layouts = new Map();
         this.validate_selected_layouts();
@@ -78,6 +87,15 @@ export default class GlobalState extends GObject.Object {
             () => {
                 this._layouts = Settings.get_layouts_json();
                 this.emit(GlobalState.SIGNAL_LAYOUTS_CHANGED);
+            },
+        );
+
+        this._signals.connect(
+            Settings,
+            Settings.KEY_TILE_HOTKEYS_JSON,
+            () => {
+                this._tileHotkeys = Settings.get_tile_hotkeys();
+                this.emit(GlobalState.SIGNAL_TILE_HOTKEYS_CHANGED);
             },
         );
 
@@ -289,6 +307,25 @@ export default class GlobalState extends GObject.Object {
         this._layouts = layouts;
         Settings.save_layouts_json(layouts);
         this.emit(GlobalState.SIGNAL_LAYOUTS_CHANGED);
+    }
+
+    get tileHotkeys(): Record<string, TileReference> {
+        return this._tileHotkeys;
+    }
+
+    set tileHotkeys(hotkeys: Record<string, TileReference>) {
+        this._tileHotkeys = hotkeys;
+        Settings.save_tile_hotkeys(hotkeys);
+        this.emit(GlobalState.SIGNAL_TILE_HOTKEYS_CHANGED);
+    }
+
+    public setTileHotkey(number: string, ref: TileReference | undefined) {
+        if (ref === undefined) {
+            delete this._tileHotkeys[number];
+        } else {
+            this._tileHotkeys[number] = ref;
+        }
+        this.tileHotkeys = this._tileHotkeys; // Triggers save and signal
     }
 
     public getSelectedLayoutOfMonitor(

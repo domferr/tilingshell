@@ -47,6 +47,9 @@ export default class KeyBindings extends GObject.Object {
             'focus-window': {
                 param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, FocusSwitchDirection
             },
+            'move-to-tile': {
+                param_types: [Meta.Display.$gtype, GObject.TYPE_STRING], // Meta.Display, hotkeyNumber
+            },
         },
     };
 
@@ -221,6 +224,98 @@ export default class KeyBindings extends GObject.Object {
                 this.emit('focus-window', display, FocusSwitchDirection.PREV);
             },
         );
+
+        // Adding the option "beam to tile hotkeys"
+        Main.wm.addKeybinding(
+            Settings.SETTING_MOVE_TO_TILE_0,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('move-to-tile', display, '0');
+            },
+        );
+        Main.wm.addKeybinding(
+            Settings.SETTING_MOVE_TO_TILE_1,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('move-to-tile', display, '1');
+            },
+        );
+        Main.wm.addKeybinding(
+            Settings.SETTING_MOVE_TO_TILE_2,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('move-to-tile', display, '2');
+            },
+        );
+        Main.wm.addKeybinding(
+            Settings.SETTING_MOVE_TO_TILE_3,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('move-to-tile', display, '3');
+            },
+        );
+        Main.wm.addKeybinding(
+            Settings.SETTING_MOVE_TO_TILE_4,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('move-to-tile', display, '4');
+            },
+        );
+        Main.wm.addKeybinding(
+            Settings.SETTING_MOVE_TO_TILE_5,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('move-to-tile', display, '5');
+            },
+        );
+        Main.wm.addKeybinding(
+            Settings.SETTING_MOVE_TO_TILE_6,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('move-to-tile', display, '6');
+            },
+        );
+        Main.wm.addKeybinding(
+            Settings.SETTING_MOVE_TO_TILE_7,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('move-to-tile', display, '7');
+            },
+        );
+        Main.wm.addKeybinding(
+            Settings.SETTING_MOVE_TO_TILE_8,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('move-to-tile', display, '8');
+            },
+        );
+        Main.wm.addKeybinding(
+            Settings.SETTING_MOVE_TO_TILE_9,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('move-to-tile', display, '9');
+            },
+        );
     }
 
     private _overrideNatives(extensionSettings: Gio.Settings) {
@@ -316,6 +411,16 @@ export default class KeyBindings extends GObject.Object {
         Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_RIGHT);
         Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_NEXT);
         Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_PREV);
+        Main.wm.removeKeybinding(Settings.SETTING_MOVE_TO_TILE_0);
+        Main.wm.removeKeybinding(Settings.SETTING_MOVE_TO_TILE_1);
+        Main.wm.removeKeybinding(Settings.SETTING_MOVE_TO_TILE_2);
+        Main.wm.removeKeybinding(Settings.SETTING_MOVE_TO_TILE_3);
+        Main.wm.removeKeybinding(Settings.SETTING_MOVE_TO_TILE_4);
+        Main.wm.removeKeybinding(Settings.SETTING_MOVE_TO_TILE_5);
+        Main.wm.removeKeybinding(Settings.SETTING_MOVE_TO_TILE_6);
+        Main.wm.removeKeybinding(Settings.SETTING_MOVE_TO_TILE_7);
+        Main.wm.removeKeybinding(Settings.SETTING_MOVE_TO_TILE_8);
+        Main.wm.removeKeybinding(Settings.SETTING_MOVE_TO_TILE_9);
     }
 
     private _restoreNatives() {

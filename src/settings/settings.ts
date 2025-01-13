@@ -1,6 +1,7 @@
 import { Gio, GObject, GLib } from '@gi.shared';
 import Layout from '../components/layout/Layout';
 import Tile from '../components/layout/Tile';
+import { TileReference } from '@/components/layout/TileReference';
 
 export enum ActivationKey {
     NONE = -1,
@@ -106,6 +107,7 @@ export default class Settings {
     static KEY_SNAP_ASSISTANT_ANIMATION_TIME = 'snap-assistant-animation-time';
     static KEY_TILE_PREVIEW_ANIMATION_TIME = 'tile-preview-animation-time';
     static KEY_SETTING_LAYOUTS_JSON = 'layouts-json';
+    static KEY_TILE_HOTKEYS_JSON = 'tile-hotkeys-json';
     static KEY_SETTING_SELECTED_LAYOUTS = 'selected-layouts';
     static KEY_WINDOW_BORDER_WIDTH = 'window-border-width';
     static KEY_ENABLE_SMART_WINDOW_BORDER_RADIUS =
@@ -135,6 +137,16 @@ export default class Settings {
     static SETTING_FOCUS_WINDOW_DOWN = 'focus-window-down';
     static SETTING_FOCUS_WINDOW_NEXT = 'focus-window-next';
     static SETTING_FOCUS_WINDOW_PREV = 'focus-window-prev';
+    static SETTING_MOVE_TO_TILE_0 = 'move-to-tile-0';
+    static SETTING_MOVE_TO_TILE_1 = 'move-to-tile-1';
+    static SETTING_MOVE_TO_TILE_2 = 'move-to-tile-2';
+    static SETTING_MOVE_TO_TILE_3 = 'move-to-tile-3';
+    static SETTING_MOVE_TO_TILE_4 = 'move-to-tile-4';
+    static SETTING_MOVE_TO_TILE_5 = 'move-to-tile-5';
+    static SETTING_MOVE_TO_TILE_6 = 'move-to-tile-6';
+    static SETTING_MOVE_TO_TILE_7 = 'move-to-tile-7';
+    static SETTING_MOVE_TO_TILE_8 = 'move-to-tile-8';
+    static SETTING_MOVE_TO_TILE_9 = 'move-to-tile-9';
 
     static initialize(settings: Gio.Settings) {
         if (this._is_initialized) return;
@@ -474,7 +486,7 @@ export default class Settings {
         try {
             const layouts = JSON.parse(
                 this._settings?.get_string(this.KEY_SETTING_LAYOUTS_JSON) ||
-                    '[]',
+                '[]',
             ) as Layout[];
             if (layouts.length === 0)
                 throw new Error('At least one layout is required');
@@ -483,8 +495,18 @@ export default class Settings {
             this.reset_layouts_json();
             return JSON.parse(
                 this._settings?.get_string(this.KEY_SETTING_LAYOUTS_JSON) ||
-                    '[]',
+                '[]',
             ) as Layout[];
+        }
+    }
+
+    static get_tile_hotkeys(): Record<string, TileReference> {
+        try {
+            return JSON.parse(
+                this._settings?.get_string(this.KEY_TILE_HOTKEYS_JSON) || '{}'
+            );
+        } catch {
+            return {};
         }
     }
 
@@ -627,6 +649,13 @@ export default class Settings {
         this._settings?.set_string(
             this.KEY_SETTING_LAYOUTS_JSON,
             JSON.stringify(layouts),
+        );
+    }
+
+    static save_tile_hotkeys(hotkeys: Record<string, TileReference>) {
+        this._settings?.set_string(
+            this.KEY_TILE_HOTKEYS_JSON,
+            JSON.stringify(hotkeys)
         );
     }
 
