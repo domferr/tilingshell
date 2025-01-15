@@ -57,7 +57,7 @@ class SnapAssistContent extends St.BoxLayout {
     private _signals: SignalHandling;
     private _snapAssistLayouts: SnapAssistLayout[];
     private _isEnlarged = false;
-    private _hoveredTile: SnapAssistTile | undefined;
+    private _hoveredInfo: [SnapAssistTile, SnapAssistLayout] | undefined;
     private _bottomPadding: number;
     private _blur: boolean;
     private _snapAssistantThreshold: number;
@@ -263,24 +263,32 @@ class SnapAssistContent extends St.BoxLayout {
         const wasEnlarged = this._isEnlarged;
         this.handleOpening(window, ease, currPointerPos);
         if (!this._showing || !this._isEnlarged) {
-            if (this._hoveredTile) this._hoveredTile.set_hover(false);
+            if (this._hoveredInfo) this._hoveredInfo[0].set_hover(false);
 
-            this._hoveredTile = undefined;
+            this._hoveredInfo = undefined;
             if (wasEnlarged) {
                 this._container.emit(
                     SNAP_ASSIST_SIGNAL,
                     new Tile({ x: 0, y: 0, width: 0, height: 0, groups: [] }),
+                    '',
                 );
             }
             return;
         }
 
-        const changed = this.handleTileHovering(currPointerPos);
-        if (changed) {
+        const layoutHovered = this.handleTileHovering(currPointerPos);
+        if (layoutHovered) {
+            const snapTile = this._hoveredInfo
+                ? this._hoveredInfo[0]
+                : undefined;
+            const snapLay = this._hoveredInfo
+                ? this._hoveredInfo[1]
+                : undefined;
             const tile =
-                this._hoveredTile?.tile ||
+                snapTile?.tile ||
                 new Tile({ x: 0, y: 0, width: 0, height: 0, groups: [] });
-            this._container.emit(SNAP_ASSIST_SIGNAL, tile);
+            const layoutId = snapLay?.layout.id ?? '';
+            this._container.emit(SNAP_ASSIST_SIGNAL, tile, layoutId);
         }
     }
 
@@ -339,25 +347,33 @@ class SnapAssistContent extends St.BoxLayout {
         y: number;
     }): boolean {
         if (!this._isEnlarged) {
-            const changed = this._hoveredTile !== undefined;
-            if (this._hoveredTile) this._hoveredTile.set_hover(false);
+            const changed = this._hoveredInfo !== undefined;
+            if (this._hoveredInfo) this._hoveredInfo[0].set_hover(false);
 
-            this._hoveredTile = undefined;
+            this._hoveredInfo = undefined;
             return changed;
         }
 
         let newTileHovered: SnapAssistTile | undefined;
+        let layoutHovered: SnapAssistLayout | undefined;
         for (let index = 0; index < this._snapAssistLayouts.length; index++) {
-            const snapAssistLay = this._snapAssistLayouts[index];
-            newTileHovered = snapAssistLay.getTileBelow(currPointerPos);
-            if (newTileHovered) break;
+            newTileHovered =
+                this._snapAssistLayouts[index].getTileBelow(currPointerPos);
+            if (newTileHovered) {
+                layoutHovered = this._snapAssistLayouts[index];
+                break;
+            }
         }
-        const tileChanged = newTileHovered !== this._hoveredTile;
+
+        const oldTile = this._hoveredInfo ? this._hoveredInfo[0] : undefined;
+        const tileChanged = newTileHovered !== oldTile;
         if (tileChanged) {
-            this._hoveredTile?.set_hover(false);
-            this._hoveredTile = newTileHovered;
+            oldTile?.set_hover(false);
+            if (newTileHovered === undefined || layoutHovered === undefined)
+                this._hoveredInfo = undefined;
+            else this._hoveredInfo = [newTileHovered, layoutHovered];
         }
-        if (this._hoveredTile) this._hoveredTile.set_hover(true);
+        if (this._hoveredInfo) this._hoveredInfo[0].set_hover(true);
 
         return tileChanged;
     }
@@ -373,7 +389,7 @@ export default class SnapAssist extends St.Widget {
         GTypeName: 'SnapAssist',
         Signals: {
             'snap-assist': {
-                param_types: [Tile.$gtype],
+                param_types: [Tile.$gtype, String.$gtype], // tile, layout_id
             },
         },
     };

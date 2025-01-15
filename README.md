@@ -1,11 +1,10 @@
 <img src="https://raw.githubusercontent.com/domferr/tilingshell/main/logo.png" align="right" width="76"/>
 
-![](https://img.shields.io/github/v/release/domferr/tilingshell)
-![](https://img.shields.io/badge/GNOME-42--47-e04196)
-![](https://img.shields.io/github/downloads/domferr/tilingshell/total)
-![](https://img.shields.io/badge/Built%20with-Typescript-blue)
-![](https://img.shields.io/github/license/domferr/tilingshell)
-[![kofi](https://img.shields.io/badge/Donate-on_Ko--fi-purple?logo=ko-fi)](https://ko-fi.com/domferr)
+[![release](https://img.shields.io/badge/Release_v16-blue?style=for-the-badge)]([https://ko-fi.com/domferr](https://github.com/domferr/tilingshell/releases))
+![](https://img.shields.io/github/license/domferr/tilingshell?style=for-the-badge)
+![](https://img.shields.io/badge/GNOME-42--47-e04196?style=for-the-badge&logo=gnome&logoColor=white)
+[![kofi](https://img.shields.io/badge/Donate_on_Ko--fi-purple?logo=ko-fi&style=for-the-badge)](https://ko-fi.com/domferr)
+[![kofi](https://img.shields.io/badge/Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white)](https://patreon.com/domferr)
 
 # Tiling Shell #
 
@@ -25,6 +24,12 @@ This is a Gnome Shell extension implementing modern windows tiling system by ext
 
 <img src="https://github.com/domferr/tilingshell/blob/main/doc/horiz_summary.jpg" align="center"/>
 
+<details>
+  <summary><span align="center">See here the video overview</span></summary>
+  
+  https://github.com/user-attachments/assets/2905f0a1-ecd4-47b5-a6bc-59f91716e685
+</details>
+
 Have issues, you want to suggest a new feature or contribute? Please open a new [issue](https://github.com/domferr/tilingshell/issues)!
 
 ## Usage ##
@@ -33,7 +38,7 @@ Have issues, you want to suggest a new feature or contribute? Please open a new 
 |:---|:---|:---|:---|
 | [⬇️](#layout-editor) **Layout editor** | [⬇️](#smart-resize) **Smart resize** | [⬇️](#tile-with-keyboard) **Tile with Keyboard** | [⬇️](#edge-tiling) **Edge Tiling** |
 | [⬇️](#tiling-buttons) **Tiling Buttons** | [⬇️](#per-workspace-layout) **Per-workspace layout** | [⬇️](#auto-tiling) **Auto-tiling** | [⬇️](#tiling-context-menu) **Tiling context menu** |
-| [⬇️](#smart-border-radius) **Smart border radius** 
+| [⬇️](#smart-border-radius) **Smart border radius** | [⬇️](#windows-suggestions) **Windows Suggestions** 
 
 ### Tiling System ###
 When grabbing and moving a window, press <kbd>CTRL</kbd> key to show the tiling layout (you can choose another key from the preferences). When moving on a tile, it will highlight. Ungrab the window to place that window on the highlighted tile.
@@ -159,6 +164,18 @@ In GNOME, different windows may have different border radius. Drawing a border a
 <img src="https://github.com/user-attachments/assets/cfaca5f9-d9b2-4739-9426-1aebb5f33c29" width=304 />
 <img src="https://github.com/user-attachments/assets/8e68abff-66e5-4b85-a6ce-0bd2da7be166" width=332 />
 </p>
+
+<p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
+
+### Windows Suggestions ###
+
+After placing a window in a tile using the tiling system, snap assistant or active screen edges, you’ll see suggestions for other windows to fill the remaining tiles. Got too many windows open? No problem! If all suggestions don’t fit within the available space, you’ll get a **scrollable list** for quick and easy navigation. See it in action:
+
+https://github.com/user-attachments/assets/fbf68458-199d-490b-90cf-3e976d5b511b
+
+_Can I choose to opt in or out?_
+
+Yes. From the extension's preferences you find a section called Windows Suggestions. You can enable and disable windows suggestions for tiling system, snap assistant and screen edges. You can choose which of the three to keep enabled, or all of them, to personalize for your needs and preferences. 
 
 <p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
 

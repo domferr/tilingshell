@@ -1,6 +1,6 @@
 {
   "name": "tilingshell",
-  "version": "15.1",
+  "version": "16.0",
   "author": "Domenico Ferraro <ferraro.domenico125@gmail.com>",
   "private": true,
   "license": "GPL v2.0",
@@ -13,7 +13,7 @@
     "build:package": "npm run clean:package; npm run build && cd ./dist && zip -qr ../tilingshell@ferrarodomenico.com.zip * && cd ../dist_legacy && zip -qr ../GNOME.42-44.tilingshell@ferrarodomenico.com.zip *",
     "clean:package": "rm -rf './dist/tilingshell@ferrarodomenico.com.zip'; rm -rf './dist_legacy/tilingshell@ferrarodomenico.com.zip'",
     "install:extension": "mkdir -p ~/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com && cp ./dist$([ $(gnome-shell --version | grep -o -E '[0-9]+' | head -n 1) -le 44 ] && echo '_legacy')/* ~/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/ -r",
-    "wayland-session": "dbus-run-session -- gnome-shell --nested --wayland",
+    "wayland-session": "dbus-run-session -- env MUTTER_DEBUG_NUM_DUMMY_MONITORS=1 MUTTER_DEBUG_DUMMY_MODE_SPECS=1920x1080 gnome-shell --nested --wayland",
     "dev:wayland": "npm run build && npm run install:extension && npm run wayland-session",
     "build:translations": "for file in $(ls translations/*.po); do mkdir -p resources/locale/$(basename $file .po)/LC_MESSAGES; msgfmt -c $file -o resources/locale/$(basename $file .po)/LC_MESSAGES/tilingshell.mo; done",
     "create:translations": "xgettext --from-code=UTF-8 --output=translations/tilingshell@ferrarodomenico.com.pot -j --language=javascript --force-po dist/prefs.js dist/extension.js",

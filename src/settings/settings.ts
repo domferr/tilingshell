@@ -111,6 +111,12 @@ export default class Settings {
     static KEY_ENABLE_SMART_WINDOW_BORDER_RADIUS =
         'enable-smart-window-border-radius';
     static KEY_QUARTER_TILING_THRESHOLD = 'quarter-tiling-threshold';
+    static KEY_ENABLE_TILING_SYSTEM_WINDOWS_SUGGESTIONS =
+        'enable-tiling-system-windows-suggestions';
+    static KEY_ENABLE_SNAP_ASSISTANT_WINDOWS_SUGGESTIONS =
+        'enable-snap-assistant-windows-suggestions';
+    static KEY_ENABLE_SCREEN_EDGES_WINDOWS_SUGGESTIONS =
+        'enable-screen-edges-windows-suggestions';
 
     static SETTING_MOVE_WINDOW_RIGHT = 'move-window-right';
     static SETTING_MOVE_WINDOW_LEFT = 'move-window-left';
@@ -397,6 +403,39 @@ export default class Settings {
 
     static set TILE_PREVIEW_ANIMATION_TIME(val: number) {
         set_unsigned_number(Settings.KEY_TILE_PREVIEW_ANIMATION_TIME, val);
+    }
+
+    static get ENABLE_TILING_SYSTEM_WINDOWS_SUGGESTIONS(): boolean {
+        return get_boolean(
+            Settings.KEY_ENABLE_TILING_SYSTEM_WINDOWS_SUGGESTIONS,
+        );
+    }
+
+    static set ENABLE_TILING_SYSTEM_WINDOWS_SUGGESTIONS(val: boolean) {
+        set_boolean(Settings.KEY_ENABLE_TILING_SYSTEM_WINDOWS_SUGGESTIONS, val);
+    }
+
+    static get ENABLE_SNAP_ASSISTANT_WINDOWS_SUGGESTIONS(): boolean {
+        return get_boolean(
+            Settings.KEY_ENABLE_SNAP_ASSISTANT_WINDOWS_SUGGESTIONS,
+        );
+    }
+
+    static set ENABLE_SNAP_ASSISTANT_WINDOWS_SUGGESTIONS(val: boolean) {
+        set_boolean(
+            Settings.KEY_ENABLE_SNAP_ASSISTANT_WINDOWS_SUGGESTIONS,
+            val,
+        );
+    }
+
+    static get ENABLE_SCREEN_EDGES_WINDOWS_SUGGESTIONS(): boolean {
+        return get_boolean(
+            Settings.KEY_ENABLE_SCREEN_EDGES_WINDOWS_SUGGESTIONS,
+        );
+    }
+
+    static set ENABLE_SCREEN_EDGES_WINDOWS_SUGGESTIONS(val: boolean) {
+        set_boolean(Settings.KEY_ENABLE_SCREEN_EDGES_WINDOWS_SUGGESTIONS, val);
     }
 
     static get_inner_gaps(scaleFactor: number = 1): {

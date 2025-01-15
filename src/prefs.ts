@@ -115,16 +115,16 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         appearenceGroup.add(windowBorderRow);
         windowBorderRow.add_row(
             this._buildSwitchRow(
-                Settings.KEY_ENABLE_SMART_WINDOW_BORDER_RADIUS,
-                _('Smart border radius'),
-                _('Dynamically adapt to the window’s actual border radius'),
+                Settings.KEY_ENABLE_WINDOW_BORDER,
+                _('Enable'),
+                _('Show a border around focused window'),
             ),
         );
         windowBorderRow.add_row(
             this._buildSwitchRow(
-                Settings.KEY_ENABLE_WINDOW_BORDER,
-                _('Enable'),
-                _('Show a border around focused window'),
+                Settings.KEY_ENABLE_SMART_WINDOW_BORDER_RADIUS,
+                _('Smart border radius'),
+                _('Dynamically adapt to the window’s actual border radius'),
             ),
         );
         windowBorderRow.add_row(
@@ -299,6 +299,47 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         activeScreenEdgesGroup.add(quarterTiling);
 
         prefsPage.add(activeScreenEdgesGroup);
+
+        // Windows suggestions section
+        const windowsSuggestionsGroup = new Adw.PreferencesGroup({
+            title: _('Windows suggestions'),
+            description: _('Enable and disable windows suggestions'),
+        });
+        prefsPage.add(behaviourGroup);
+
+        const tilingSystemWindowSuggestionRow = this._buildSwitchRow(
+            Settings.KEY_ENABLE_TILING_SYSTEM_WINDOWS_SUGGESTIONS,
+            _('Enable window suggestions for the tiling system'),
+            _(
+                'Provides smart suggestions to fill empty tiles when using the tiling system',
+            ),
+        );
+        windowsSuggestionsGroup.add(tilingSystemWindowSuggestionRow);
+
+        const snapAssistWindowSuggestionRow = this._buildSwitchRow(
+            Settings.KEY_ENABLE_SNAP_ASSISTANT_WINDOWS_SUGGESTIONS,
+            _('Enable window suggestions for the snap assistant'),
+            _(
+                'Offers suggestions to populate empty tiles when using the snap assistant',
+            ),
+        );
+        windowsSuggestionsGroup.add(snapAssistWindowSuggestionRow);
+
+        const screenEdgesWindowSuggestionRow = this._buildSwitchRow(
+            Settings.KEY_ENABLE_SCREEN_EDGES_WINDOWS_SUGGESTIONS,
+            _('Enable window suggestions for screen edge snapping'),
+            _(
+                'Suggests windows to occupy empty tiles when snapping to screen edges',
+            ),
+        );
+        windowsSuggestionsGroup.add(screenEdgesWindowSuggestionRow);
+
+        screenEdgesWindowSuggestionRow.set_sensitive(false);
+        screenEdgesWindowSuggestionRow.set_tooltip_text('To be released soon!');
+        snapAssistWindowSuggestionRow.set_sensitive(false);
+        snapAssistWindowSuggestionRow.set_tooltip_text('To be released soon!');
+
+        prefsPage.add(windowsSuggestionsGroup);
 
         // Layouts section
         const layoutsGroup = new Adw.PreferencesGroup({

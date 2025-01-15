@@ -1,8 +1,7 @@
 import { registerGObjectClass } from '@utils/gjs';
 import { logger } from '@utils/logger';
 import SignalHandling from '@utils/signalHandling';
-import { GObject, Meta } from '@gi.ext';
-import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import { GObject, Meta, Mtk, Clutter, Graphene } from '@gi.ext';
 
 const debug = logger('TilingShellWindowManager');
 
@@ -116,5 +115,69 @@ export default class TilingShellWindowManager extends GObject.Object {
                 );
             },
         );
+    }
+
+    public static easeMoveWindow(params: {
+        window: Meta.Window;
+        from: Mtk.Rectangle;
+        to: Mtk.Rectangle;
+        duration: number;
+        monitorIndex?: number;
+    }): void {
+        const winActor =
+            params.window.get_compositor_private() as Meta.WindowActor;
+        if (!winActor) return;
+
+        // create a clone and hide the window actor
+        // then we can change the actual window size
+        // without showing that to the user
+        const winRect = params.window.get_frame_rect();
+        const xExcludingShadow = winRect.x - winActor.get_x();
+        const yExcludingShadow = winRect.y - winActor.get_y();
+        const staticClone = new Clutter.Clone({
+            source: winActor,
+            reactive: false,
+            scale_x: 1,
+            scale_y: 1,
+            x: params.from.x,
+            y: params.from.y,
+            width: params.from.width,
+            height: params.from.height,
+            pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
+        });
+        global.windowGroup.add_child(staticClone);
+        winActor.opacity = 0;
+        staticClone.ease({
+            x: params.to.x - xExcludingShadow,
+            y: params.to.y - yExcludingShadow,
+            width: params.to.width + 2 * yExcludingShadow,
+            height: params.to.height + 2 * xExcludingShadow,
+            duration: params.duration,
+            onStopped: () => {
+                winActor.opacity = 255;
+                winActor.set_scale(1, 1);
+                staticClone.destroy();
+            },
+        });
+        // finally move the window
+        // the actor has opacity = 0, so this is not seen by the user
+        winActor.set_pivot_point(0, 0);
+        winActor.set_position(params.to.x, params.to.y);
+        winActor.set_size(params.to.width, params.to.height);
+        const user_op = false;
+        if (params.monitorIndex)
+            params.window.move_to_monitor(params.monitorIndex);
+        params.window.move_frame(user_op, params.to.x, params.to.y);
+        params.window.move_resize_frame(
+            user_op,
+            params.to.x,
+            params.to.y,
+            params.to.width,
+            params.to.height,
+        );
+        // while we hide the preview, show the actor to the new position,
+        // this has opacity of 0 so it is hidden. Later we immediately swap
+        // the animating actor with this
+        winActor.show();
     }
 }
