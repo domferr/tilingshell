@@ -1167,9 +1167,12 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             title,
             action,
             select_multiple: false,
-            transientFor: window,
+            modal: true,
             accept_label: accept,
             cancel_label: cancel,
+        });
+        window.connect('map', () => {
+            fc.set_transient_for(window);
         });
         const [major] = Config.PACKAGE_VERSION.split('.').map((s: string) =>
             Number(s),
