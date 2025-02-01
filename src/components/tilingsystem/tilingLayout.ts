@@ -1,5 +1,5 @@
 import { registerGObjectClass } from '@/utils/gjs';
-import { Clutter, Mtk, Meta, St } from '@gi.ext';
+import { Clutter, Mtk, Meta } from '@gi.ext';
 import TilePreview, {
     TilePreviewConstructorProperties,
 } from '../tilepreview/tilePreview';
@@ -9,11 +9,12 @@ import Tile from '../layout/Tile';
 import {
     buildRectangle,
     buildTileGaps,
+    clampPointInsideRect,
     isPointInsideRect,
     squaredEuclideanDistance,
 } from '@utils/ui';
 import TileUtils from '@components/layout/TileUtils';
-import { logger } from '@utils/logger';
+import { logger, rect_to_string } from '@utils/logger';
 import GlobalState from '@utils/globalState';
 import { KeyBindingsDirection } from '@keybindings';
 
@@ -355,9 +356,13 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
         return [true, results];
     }
 
+    // enlarge the side of the direction and search a tile that contains that point
+    // clamp to ensure we do not go outside of the container area (e.g. the screen)
     public findNearestTileDirection(
         source: Mtk.Rectangle,
         direction: KeyBindingsDirection,
+        clamp: boolean,
+        enlarge: number,
     ): { rect: Mtk.Rectangle; tile: Tile } | undefined {
         if (direction === KeyBindingsDirection.NODIRECTION) return undefined;
 
@@ -365,10 +370,6 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
             x: source.x + source.width / 2,
             y: source.y + source.height / 2,
         };
-
-        // enlarge the side of the direction and search a tile that contains that point
-        // clamp to ensure we do not go outside of the container area (e.g. the screen)
-        const enlarge = 64;
 
         switch (direction) {
             case KeyBindingsDirection.RIGHT:
@@ -392,8 +393,20 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
                 this._containerRect.width + this._containerRect.x ||
             sourceCoords.y < this._containerRect.y ||
             sourceCoords.y > this._containerRect.height + this._containerRect.y
-        )
-            return undefined;
+        ) {
+            if (!clamp) return undefined;
+            // return undefined;
+            sourceCoords.x = Math.clamp(
+                sourceCoords.x,
+                this._containerRect.x,
+                this._containerRect.width + this._containerRect.x,
+            );
+            sourceCoords.y = Math.clamp(
+                sourceCoords.y,
+                this._containerRect.y,
+                this._containerRect.height + this._containerRect.y,
+            );
+        }
 
         // uncomment to show debugging
         /* global.windowGroup

@@ -392,9 +392,9 @@ class WindowClone extends St.Widget {
             yAlign: Clutter.ActorAlign.CENTER,
             xExpand: true,
             yExpand: true,
-            vertical: true,
             style: "spacing: 16px;"
         });
+        setWidgetOrientation(box, true);
         box.add_child(this._createAppIcon(window, APP_ICON_SIZE));
         box.add_child(new St.Label({
             xAlign: Clutter.ActorAlign.CENTER,

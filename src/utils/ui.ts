@@ -207,3 +207,17 @@ export function squaredEuclideanDistance(
         (pointA.y - pointB.y) * (pointA.y - pointB.y)
     );
 }
+
+// Compatibility for GNOME 48+ where 'vertical' was deprecated in favor of 'orientation'
+export function setWidgetOrientation(
+    widget: { vertical?: boolean; orientation?: Clutter.Orientation },
+    vertical: boolean,
+) {
+    if (widget.orientation) {
+        widget.orientation = vertical
+            ? Clutter.Orientation.VERTICAL
+            : Clutter.Orientation.HORIZONTAL;
+    } else {
+        widget.vertical = vertical;
+    }
+}

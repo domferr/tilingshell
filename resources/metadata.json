@@ -8,10 +8,11 @@
     "44",
     "45",
     "46",
-    "47"
+    "47",
+    "48"
   ],
   "version": 99,
-  "version-name": "16.1",
+  "version-name": "16.2",
   "url": "https://github.com/domferr/tilingshell",
   "settings-schema": "org.gnome.shell.extensions.tilingshell",
   "gettext-domain": "tilingshell",

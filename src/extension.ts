@@ -446,13 +446,6 @@ export default class TilingShellExtension extends Extension {
             focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
             return;
         }
-        const success = monitorTilingManager.onKeyboardMoveWindow(
-            focus_window,
-            direction,
-            false,
-            spanFlag,
-        );
-        if (success || direction === KeyBindingsDirection.NODIRECTION) return;
 
         let displayDirection = Meta.DisplayDirection.DOWN;
         switch (direction) {
@@ -466,11 +459,25 @@ export default class TilingShellExtension extends Extension {
                 displayDirection = Meta.DisplayDirection.UP;
                 break;
         }
-
         const neighborMonitorIndex = display.get_monitor_neighbor_index(
             focus_window.get_monitor(),
             displayDirection,
         );
+
+        const success = monitorTilingManager.onKeyboardMoveWindow(
+            focus_window,
+            direction,
+            false,
+            spanFlag,
+            neighborMonitorIndex === -1, // clamp if there is NOT a monitor in this direction
+        );
+
+        if (
+            success ||
+            direction === KeyBindingsDirection.NODIRECTION ||
+            neighborMonitorIndex === -1
+        )
+            return;
 
         // if the window is maximized, direction is UP and there is a monitor above, minimize the window
         if (
@@ -493,6 +500,7 @@ export default class TilingShellExtension extends Extension {
             direction,
             true,
             spanFlag,
+            false,
         );
     }
 

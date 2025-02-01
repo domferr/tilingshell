@@ -7,6 +7,7 @@ import {
     getMonitors,
     getMonitorScalingFactor,
     getScalingFactorOf,
+    setWidgetOrientation,
 } from '@/utils/ui';
 import Settings from '@settings/settings';
 import * as IndicatorUtils from './utils';
@@ -51,15 +52,14 @@ class LayoutsRow extends St.BoxLayout {
             yAlign: Clutter.ActorAlign.CENTER,
             xExpand: true,
             yExpand: true,
-            vertical: true,
             style: 'spacing: 8px',
         });
+        setWidgetOrientation(this, true);
         this._layoutsBox = new St.BoxLayout({
             xAlign: Clutter.ActorAlign.CENTER,
             yAlign: Clutter.ActorAlign.CENTER,
             xExpand: true,
             yExpand: true,
-            vertical: false, // horizontal box layout
             styleClass: 'layouts-box-layout',
         });
         this._monitor = monitor;
@@ -149,9 +149,9 @@ export default class DefaultMenu implements CurrentMenu {
             yAlign: Clutter.ActorAlign.CENTER,
             xExpand: true,
             yExpand: true,
-            vertical: true,
             styleClass: 'default-menu-container',
         });
+        setWidgetOrientation(this._container, true);
         layoutsPopupMenu.add_child(this._container);
         (this._indicator.menu as PopupMenu.PopupMenu).addMenuItem(
             layoutsPopupMenu,
@@ -304,7 +304,6 @@ export default class DefaultMenu implements CurrentMenu {
             yAlign: Clutter.ActorAlign.CENTER,
             xExpand: true,
             yExpand: true,
-            vertical: false, // horizontal box layout
             styleClass: 'buttons-box-layout',
         });
 

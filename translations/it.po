@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tiling Shell\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-12 13:01+0100\n"
+"POT-Creation-Date: 2025-02-01 12:59+0100\n"
 "PO-Revision-Date: 2024-10-22 12:39+0200\n"
 "Last-Translator: Domenico Ferraro <ferraro.domenico125@gmail.com>\n"
 "Language-Team: Italian <>\n"
@@ -262,260 +262,269 @@ msgstr "Esporta layouts in un file"
 #: dist/prefs.js:909 dist/prefs.js:966 dist/prefs.js:1253 dist/prefs.js:1311
 #: dist/prefs.js:1003 dist/prefs.js:1060 dist/prefs.js:1369 dist/prefs.js:1427
 #: dist/prefs.js:1067 dist/prefs.js:1124 dist/prefs.js:1433 dist/prefs.js:1491
+#: dist/extension.js:5767 dist/prefs.js:1122 dist/prefs.js:1429
+#: dist/prefs.js:1485
 msgid "Cancel"
 msgstr "Annulla"
 
 #: dist/prefs.js:910 dist/prefs.js:1254 dist/prefs.js:1004 dist/prefs.js:1370
-#: dist/prefs.js:1068 dist/prefs.js:1434
+#: dist/prefs.js:1068 dist/prefs.js:1434 dist/extension.js:5757
+#: dist/prefs.js:1066 dist/prefs.js:1428
 msgid "Save"
 msgstr "Salva"
 
 #: dist/prefs.js:957 dist/prefs.js:958 dist/prefs.js:1051 dist/prefs.js:1052
-#: dist/prefs.js:1115 dist/prefs.js:1116
+#: dist/prefs.js:1115 dist/prefs.js:1116 dist/prefs.js:1113 dist/prefs.js:1114
 msgid "Import layouts"
 msgstr "Importa layouts"
 
-#: dist/prefs.js:959 dist/prefs.js:1053 dist/prefs.js:1117
+#: dist/prefs.js:959 dist/prefs.js:1053 dist/prefs.js:1117 dist/prefs.js:1115
 msgid "Import layouts from a file"
 msgstr "Importa layouts da un file"
 
-#: dist/prefs.js:962 dist/prefs.js:1056 dist/prefs.js:1120
+#: dist/prefs.js:962 dist/prefs.js:1056 dist/prefs.js:1120 dist/prefs.js:1118
 msgid "Select layouts file"
 msgstr "Seleziona file di layouts"
 
 #: dist/prefs.js:967 dist/prefs.js:1312 dist/prefs.js:1061 dist/prefs.js:1428
-#: dist/prefs.js:1125 dist/prefs.js:1492
+#: dist/prefs.js:1125 dist/prefs.js:1492 dist/prefs.js:1121 dist/prefs.js:1484
 msgid "Open"
 msgstr "Apri"
 
 #: dist/prefs.js:1015 dist/prefs.js:1016 dist/prefs.js:1109 dist/prefs.js:1110
-#: dist/prefs.js:1173 dist/prefs.js:1174
+#: dist/prefs.js:1173 dist/prefs.js:1174 dist/prefs.js:1169 dist/prefs.js:1170
 msgid "Reset layouts"
 msgstr "Ripristina layouts"
 
-#: dist/prefs.js:1017 dist/prefs.js:1111 dist/prefs.js:1175
+#: dist/prefs.js:1017 dist/prefs.js:1111 dist/prefs.js:1175 dist/prefs.js:1171
 msgid "Bring back the default layouts"
 msgstr "Ripristina i layouts predefiniti"
 
-#: dist/prefs.js:1030 dist/prefs.js:1124 dist/prefs.js:1188
+#: dist/prefs.js:1030 dist/prefs.js:1124 dist/prefs.js:1188 dist/prefs.js:1184
 msgid "Keybindings"
 msgstr "Scorciatoie da tastiera"
 
-#: dist/prefs.js:1032 dist/prefs.js:1126 dist/prefs.js:1190
+#: dist/prefs.js:1032 dist/prefs.js:1126 dist/prefs.js:1190 dist/prefs.js:1186
 msgid "Use hotkeys to perform actions on the focused window"
 msgstr ""
 "Usa i tasti di scelta rapida per eseguire azioni sulla finestra selezionata"
 
-#: dist/prefs.js:1050 dist/prefs.js:1152 dist/prefs.js:1208
+#: dist/prefs.js:1050 dist/prefs.js:1152 dist/prefs.js:1208 dist/prefs.js:1204
 msgid "Move window to right tile"
 msgstr "Sposta la finestra nel riquadro destro"
 
-#: dist/prefs.js:1052 dist/prefs.js:1154 dist/prefs.js:1210
+#: dist/prefs.js:1052 dist/prefs.js:1154 dist/prefs.js:1210 dist/prefs.js:1206
 msgid "Move the focused window to the tile on its right"
 msgstr "Sposta la finestra selezionata sul riquadro alla sua destra"
 
-#: dist/prefs.js:1061 dist/prefs.js:1163 dist/prefs.js:1219
+#: dist/prefs.js:1061 dist/prefs.js:1163 dist/prefs.js:1219 dist/prefs.js:1215
 msgid "Move window to left tile"
 msgstr "Sposta la finestra nel riquadro sinistro"
 
-#: dist/prefs.js:1062 dist/prefs.js:1164 dist/prefs.js:1220
+#: dist/prefs.js:1062 dist/prefs.js:1164 dist/prefs.js:1220 dist/prefs.js:1216
 msgid "Move the focused window to the tile on its left"
 msgstr "Sposta la finestra selezionata sul riquadro alla sua sinistra"
 
-#: dist/prefs.js:1068 dist/prefs.js:1170 dist/prefs.js:1226
+#: dist/prefs.js:1068 dist/prefs.js:1170 dist/prefs.js:1226 dist/prefs.js:1222
 msgid "Move window to tile above"
 msgstr "Sposta la finestra nel riquadro sopra"
 
-#: dist/prefs.js:1069 dist/prefs.js:1171 dist/prefs.js:1227
+#: dist/prefs.js:1069 dist/prefs.js:1171 dist/prefs.js:1227 dist/prefs.js:1223
 msgid "Move the focused window to the tile above"
 msgstr "Sposta la finestra selezionata sul riquadro sopra"
 
-#: dist/prefs.js:1075 dist/prefs.js:1177 dist/prefs.js:1233
+#: dist/prefs.js:1075 dist/prefs.js:1177 dist/prefs.js:1233 dist/prefs.js:1229
 msgid "Move window to tile below"
 msgstr "Sposta la finestra sul riquadro sottostante"
 
-#: dist/prefs.js:1076 dist/prefs.js:1178 dist/prefs.js:1234
+#: dist/prefs.js:1076 dist/prefs.js:1178 dist/prefs.js:1234 dist/prefs.js:1230
 msgid "Move the focused window to the tile below"
 msgstr "Sposta la finestra selezionata sul riquadro sottostante"
 
-#: dist/prefs.js:1082 dist/prefs.js:1184 dist/prefs.js:1240
+#: dist/prefs.js:1082 dist/prefs.js:1184 dist/prefs.js:1240 dist/prefs.js:1236
 msgid "Span window to right tile"
 msgstr "Estendi la finestra al riquadro destro"
 
-#: dist/prefs.js:1083 dist/prefs.js:1185 dist/prefs.js:1241
+#: dist/prefs.js:1083 dist/prefs.js:1185 dist/prefs.js:1241 dist/prefs.js:1237
 msgid "Span the focused window to the tile on its right"
 msgstr "Extendi la finestra selezionata sul riquadro alla sua destra"
 
-#: dist/prefs.js:1089 dist/prefs.js:1191 dist/prefs.js:1247
+#: dist/prefs.js:1089 dist/prefs.js:1191 dist/prefs.js:1247 dist/prefs.js:1243
 msgid "Span window to left tile"
 msgstr "Estendi la finestra al riquadro sinistro"
 
-#: dist/prefs.js:1090 dist/prefs.js:1192 dist/prefs.js:1248
+#: dist/prefs.js:1090 dist/prefs.js:1192 dist/prefs.js:1248 dist/prefs.js:1244
 msgid "Span the focused window to the tile on its left"
 msgstr "Estendi la finestra selezionata al riquadro alla sua sinistra"
 
-#: dist/prefs.js:1096 dist/prefs.js:1198 dist/prefs.js:1254
+#: dist/prefs.js:1096 dist/prefs.js:1198 dist/prefs.js:1254 dist/prefs.js:1250
 msgid "Span window above"
 msgstr "Estendi finestra verso l'alto"
 
-#: dist/prefs.js:1097 dist/prefs.js:1199 dist/prefs.js:1255
+#: dist/prefs.js:1097 dist/prefs.js:1199 dist/prefs.js:1255 dist/prefs.js:1251
 msgid "Span the focused window to the tile above"
 msgstr "Estendi la finestra selezionata al riquadro in alto"
 
-#: dist/prefs.js:1103 dist/prefs.js:1205 dist/prefs.js:1261
+#: dist/prefs.js:1103 dist/prefs.js:1205 dist/prefs.js:1261 dist/prefs.js:1257
 msgid "Span window down"
 msgstr "Estendi finestra verso il basso"
 
-#: dist/prefs.js:1104 dist/prefs.js:1206 dist/prefs.js:1262
+#: dist/prefs.js:1104 dist/prefs.js:1206 dist/prefs.js:1262 dist/prefs.js:1258
 msgid "Span the focused window to the tile below"
 msgstr "Estendi la finestra selezionata al riquadro sottostante"
 
-#: dist/prefs.js:1110 dist/prefs.js:1212 dist/prefs.js:1268
+#: dist/prefs.js:1110 dist/prefs.js:1212 dist/prefs.js:1268 dist/prefs.js:1264
 msgid "Span window to all tiles"
 msgstr "Estendi la finestra a tutti i riquadri"
 
-#: dist/prefs.js:1111 dist/prefs.js:1213 dist/prefs.js:1269
+#: dist/prefs.js:1111 dist/prefs.js:1213 dist/prefs.js:1269 dist/prefs.js:1265
 msgid "Span the focused window to all the tiles"
 msgstr "Estendi la finestra selezionata a tutti i riquadri"
 
-#: dist/prefs.js:1117 dist/prefs.js:1219 dist/prefs.js:1275
+#: dist/prefs.js:1117 dist/prefs.js:1219 dist/prefs.js:1275 dist/prefs.js:1271
 msgid "Untile focused window"
 msgstr "Sgancia la finestra selezionata"
 
-#: dist/prefs.js:1125 dist/prefs.js:1227 dist/prefs.js:1283
+#: dist/prefs.js:1125 dist/prefs.js:1227 dist/prefs.js:1283 dist/prefs.js:1279
 msgid "Move window to the center"
 msgstr "Sposta la finestra al centro"
 
-#: dist/prefs.js:1127 dist/prefs.js:1229 dist/prefs.js:1285
+#: dist/prefs.js:1127 dist/prefs.js:1229 dist/prefs.js:1285 dist/prefs.js:1281
 msgid "Move the focused window to the center of the screen"
 msgstr "Sposta la finestra selezionata al centro dello schermo"
 
-#: dist/prefs.js:1136 dist/prefs.js:1238 dist/prefs.js:1294
+#: dist/prefs.js:1136 dist/prefs.js:1238 dist/prefs.js:1294 dist/prefs.js:1290
 msgid "Focus window to the right"
 msgstr "Seleziona finestra a destra"
 
-#: dist/prefs.js:1138 dist/prefs.js:1240 dist/prefs.js:1296
+#: dist/prefs.js:1138 dist/prefs.js:1240 dist/prefs.js:1296 dist/prefs.js:1292
 msgid "Focus the window to the right of the current focused window"
 msgstr "Seleziona la finestra a destra della finestra attualmente selezionata"
 
-#: dist/prefs.js:1145 dist/prefs.js:1247 dist/prefs.js:1303
+#: dist/prefs.js:1145 dist/prefs.js:1247 dist/prefs.js:1303 dist/prefs.js:1299
 msgid "Focus window to the left"
 msgstr "Seleziona finestra a sinistra"
 
-#: dist/prefs.js:1146 dist/prefs.js:1248 dist/prefs.js:1304
+#: dist/prefs.js:1146 dist/prefs.js:1248 dist/prefs.js:1304 dist/prefs.js:1300
 msgid "Focus the window to the left of the current focused window"
 msgstr ""
 "Seleziona la finestra a sinistra della finestra attualmente selezionata"
 
-#: dist/prefs.js:1152 dist/prefs.js:1254 dist/prefs.js:1310
+#: dist/prefs.js:1152 dist/prefs.js:1254 dist/prefs.js:1310 dist/prefs.js:1306
 msgid "Focus window above"
 msgstr "Seleziona finestra in alto"
 
-#: dist/prefs.js:1153 dist/prefs.js:1255 dist/prefs.js:1311
+#: dist/prefs.js:1153 dist/prefs.js:1255 dist/prefs.js:1311 dist/prefs.js:1307
 msgid "Focus the window above the current focused window"
 msgstr "Seleziona la finestra in alto alla finestra attualmente selezionata"
 
-#: dist/prefs.js:1159 dist/prefs.js:1261 dist/prefs.js:1317
+#: dist/prefs.js:1159 dist/prefs.js:1261 dist/prefs.js:1317 dist/prefs.js:1313
 msgid "Focus window below"
 msgstr "Seleziona la finestra in basso"
 
-#: dist/prefs.js:1160 dist/prefs.js:1262 dist/prefs.js:1318
+#: dist/prefs.js:1160 dist/prefs.js:1262 dist/prefs.js:1318 dist/prefs.js:1314
 msgid "Focus the window below the current focused window"
 msgstr "Seleziona la finestra in basso alla finestra attualmente selezionata"
 
-#: dist/prefs.js:1187 dist/prefs.js:1303 dist/prefs.js:1359
+#: dist/prefs.js:1187 dist/prefs.js:1303 dist/prefs.js:1359 dist/prefs.js:1355
 msgid "View and Customize all the Shortcuts"
 msgstr "Visualizza e personalizza tutte le scorciatoie"
 
 #: dist/prefs.js:1215 dist/prefs.js:1216 dist/prefs.js:1331 dist/prefs.js:1332
-#: dist/prefs.js:1387 dist/prefs.js:1388
+#: dist/prefs.js:1387 dist/prefs.js:1388 dist/prefs.js:1383 dist/prefs.js:1384
 msgid "View and Customize Shortcuts"
 msgstr "Visualizza e personalizza le scorciatoie"
 
-#: dist/prefs.js:1237 dist/prefs.js:1353 dist/prefs.js:1417
+#: dist/prefs.js:1237 dist/prefs.js:1353 dist/prefs.js:1417 dist/prefs.js:1413
 msgid "Import, export and reset"
 msgstr "Importa, esporta e resetta"
 
-#: dist/prefs.js:1239 dist/prefs.js:1355 dist/prefs.js:1419
+#: dist/prefs.js:1239 dist/prefs.js:1355 dist/prefs.js:1419 dist/prefs.js:1415
 msgid "Import, export and reset the settings of Tiling Shell"
 msgstr "Importa, esporta e resetta le impostazioni di Tiling Shell"
 
 #: dist/prefs.js:1244 dist/prefs.js:1245 dist/prefs.js:1360 dist/prefs.js:1361
-#: dist/prefs.js:1424 dist/prefs.js:1425
+#: dist/prefs.js:1424 dist/prefs.js:1425 dist/prefs.js:1420 dist/prefs.js:1421
 msgid "Export settings"
 msgstr "Esporta le impostazioni"
 
-#: dist/prefs.js:1246 dist/prefs.js:1362 dist/prefs.js:1426
+#: dist/prefs.js:1246 dist/prefs.js:1362 dist/prefs.js:1426 dist/prefs.js:1422
 msgid "Export settings to a file"
 msgstr "Esporta le impostazioni in un file"
 
-#: dist/prefs.js:1249 dist/prefs.js:1365 dist/prefs.js:1429
+#: dist/prefs.js:1249 dist/prefs.js:1365 dist/prefs.js:1429 dist/prefs.js:1425
 msgid "Export settings to a text file"
 msgstr "Esporta le impostazioni in un file di testo"
 
 #: dist/prefs.js:1302 dist/prefs.js:1303 dist/prefs.js:1418 dist/prefs.js:1419
-#: dist/prefs.js:1482 dist/prefs.js:1483
+#: dist/prefs.js:1482 dist/prefs.js:1483 dist/prefs.js:1476 dist/prefs.js:1477
 msgid "Import settings"
 msgstr "Importa le impostazioni"
 
-#: dist/prefs.js:1304 dist/prefs.js:1420 dist/prefs.js:1484
+#: dist/prefs.js:1304 dist/prefs.js:1420 dist/prefs.js:1484 dist/prefs.js:1478
 msgid "Import settings from a file"
 msgstr "Importa le impostazioni da un file"
 
-#: dist/prefs.js:1307 dist/prefs.js:1423 dist/prefs.js:1487
+#: dist/prefs.js:1307 dist/prefs.js:1423 dist/prefs.js:1487 dist/prefs.js:1481
 msgid "Select a text file to import from"
 msgstr "Seleziona un file di testo dal quale importare le impostazioni"
 
 #: dist/prefs.js:1351 dist/prefs.js:1352 dist/prefs.js:1467 dist/prefs.js:1468
-#: dist/prefs.js:1531 dist/prefs.js:1532
+#: dist/prefs.js:1531 dist/prefs.js:1532 dist/prefs.js:1523 dist/prefs.js:1524
 msgid "Reset settings"
 msgstr "Resetta le impostazioni"
 
-#: dist/prefs.js:1353 dist/prefs.js:1469 dist/prefs.js:1533
+#: dist/prefs.js:1353 dist/prefs.js:1469 dist/prefs.js:1533 dist/prefs.js:1525
 msgid "Bring back the default settings"
 msgstr "Ripristina le impostazioni predefinite"
 
-#: dist/prefs.js:1368 dist/prefs.js:1484 dist/prefs.js:1548
+#: dist/prefs.js:1368 dist/prefs.js:1484 dist/prefs.js:1548 dist/prefs.js:1540
 msgid "Donate on ko-fi"
 msgstr "Fai una donazione"
 
-#: dist/prefs.js:1374 dist/prefs.js:1490 dist/prefs.js:1554
+#: dist/prefs.js:1374 dist/prefs.js:1490 dist/prefs.js:1554 dist/prefs.js:1546
 msgid "Report a bug"
 msgstr "Segnala un bug"
 
-#: dist/prefs.js:1380 dist/prefs.js:1496 dist/prefs.js:1560
+#: dist/prefs.js:1380 dist/prefs.js:1496 dist/prefs.js:1560 dist/prefs.js:1552
 msgid "Request a feature"
 msgstr "Richiedi una funzionalità"
 
-#: dist/prefs.js:1388 dist/prefs.js:1504 dist/prefs.js:1568
+#: dist/prefs.js:1388 dist/prefs.js:1504 dist/prefs.js:1568 dist/prefs.js:1560
 msgid "Have issues, you want to suggest a new feature or contribute?"
 msgstr "Hai problemi, vuoi suggerire una nuova funzionalità o contribuire?"
 
-#: dist/prefs.js:1395 dist/prefs.js:1511 dist/prefs.js:1575
+#: dist/prefs.js:1395 dist/prefs.js:1511 dist/prefs.js:1575 dist/prefs.js:1567
 msgid "Open a new issue on"
 msgstr "Apri una nuova issue su"
 
 #: dist/extension.js:4500 dist/extension.js:5361 dist/extension.js:5652
+#: dist/extension.js:5658 dist/extension.js:5656
 msgid "Edit Layouts"
 msgstr "Modifica layouts"
 
 #: dist/extension.js:4510 dist/extension.js:5371 dist/extension.js:5662
+#: dist/extension.js:5668 dist/extension.js:5666
 msgid "New Layout"
 msgstr "Nuovo layout"
 
 #: dist/extension.js:4691 dist/extension.js:5558 dist/extension.js:5849
+#: dist/extension.js:5855 dist/extension.js:5853
 msgid "to split a tile"
 msgstr "per dividere un riquadro"
 
 #: dist/extension.js:4730 dist/extension.js:5597 dist/extension.js:5888
+#: dist/extension.js:5894 dist/extension.js:5892
 msgid "to split a tile vertically"
 msgstr "per dividere un riquadro verticalmente"
 
 #: dist/extension.js:4750 dist/extension.js:5617 dist/extension.js:5908
+#: dist/extension.js:5914 dist/extension.js:5912
 msgid "to delete a tile"
 msgstr "per cancellare un riquadro"
 
 #: dist/extension.js:4775 dist/extension.js:5642 dist/extension.js:5933
+#: dist/extension.js:5939 dist/extension.js:5937
 msgid "use the indicator button to save or cancel"
 msgstr "usa l'icona sul pannello superiore per salvare o annullare"
 
@@ -547,29 +556,29 @@ msgstr "Border radius intelligente"
 msgid "Dynamically adapt to the window’s actual border radius"
 msgstr "Adatta dinamicamente al border radius della finestra"
 
-#: dist/prefs.js:1141 dist/prefs.js:1410
+#: dist/prefs.js:1141 dist/prefs.js:1410 dist/prefs.js:1406
 msgid "Enable next/previous window focus to wrap around"
 msgstr "Permetti al focus del successore/precedente di ricominciare da capo"
 
-#: dist/prefs.js:1143 dist/prefs.js:1412
+#: dist/prefs.js:1143 dist/prefs.js:1412 dist/prefs.js:1408
 msgid "When focusing next or previous window, wrap around at the window edge"
 msgstr ""
 "Quando passi il focus alla finestra successiva o precedente, ricomincia da "
 "capo se non ci sono altre finestre"
 
-#: dist/prefs.js:1268 dist/prefs.js:1324
+#: dist/prefs.js:1268 dist/prefs.js:1324 dist/prefs.js:1320
 msgid "Focus next window"
 msgstr "Seleziona finestra successiva"
 
-#: dist/prefs.js:1269 dist/prefs.js:1325
+#: dist/prefs.js:1269 dist/prefs.js:1325 dist/prefs.js:1321
 msgid "Focus the window next to the current focused window"
 msgstr "Seleziona la finestra successiva alla finestra attualmente selezionata"
 
-#: dist/prefs.js:1275 dist/prefs.js:1331
+#: dist/prefs.js:1275 dist/prefs.js:1331 dist/prefs.js:1327
 msgid "Focus previous window"
 msgstr "Seleziona finestra precedente"
 
-#: dist/prefs.js:1276 dist/prefs.js:1332
+#: dist/prefs.js:1276 dist/prefs.js:1332 dist/prefs.js:1328
 msgid "Focus the window prior to the current focused window"
 msgstr "Seleziona la finestra precedente alla finestra attualmente selezionata"
 
@@ -588,7 +597,9 @@ msgstr "Abilita il suggerimento delle finestre quando usi il sistema di tiling"
 #: dist/prefs.js:1020
 msgid ""
 "Provides smart suggestions to fill empty tiles when using the tiling system"
-msgstr "Fornisce suggerimenti intelligenti per riempire i riquadri vuoti quando viene usato il sistema di tiling"
+msgstr ""
+"Fornisce suggerimenti intelligenti per riempire i riquadri vuoti quando "
+"viene usato il sistema di tiling"
 
 #: dist/prefs.js:1026
 msgid "Enable window suggestions for the snap assistant"
@@ -597,12 +608,70 @@ msgstr "Abilita il suggerimento delle finestre quando usi lo snap assistant"
 #: dist/prefs.js:1028
 msgid ""
 "Offers suggestions to populate empty tiles when using the snap assistant"
-msgstr "Offre suggerimenti per popolare i riquadri vuoti quando viene usato lo snap assistant"
+msgstr ""
+"Offre suggerimenti per popolare i riquadri vuoti quando viene usato lo snap "
+"assistant"
 
 #: dist/prefs.js:1034
 msgid "Enable window suggestions for screen edge snapping"
-msgstr "Abilita il suggerimento delle finestre quando usi i bordi attivi dello schermo"
+msgstr ""
+"Abilita il suggerimento delle finestre quando usi i bordi attivi dello "
+"schermo"
 
 #: dist/prefs.js:1036
 msgid "Suggests windows to occupy empty tiles when snapping to screen edges"
-msgstr "Suggerisce le finestre per occupare i riquadri vuoti quando usi i bordi attivi dello schermo"
+msgstr ""
+"Suggerisce le finestre per occupare i riquadri vuoti quando usi i bordi "
+"attivi dello schermo"
+
+#: dist/prefs.js:1438 dist/prefs.js:1432
+msgid "Text file"
+msgstr "File di testo"
+
+#: dist/prefs.js:1800 dist/prefs.js:1823 dist/prefs.js:1796 dist/prefs.js:1819
+msgid "New accelerator…"
+msgstr "Nuova scorciatoia"
+
+#: dist/prefs.js:1826 dist/prefs.js:1822
+msgid "Use Backspace to clear"
+msgstr ""
+
+#: dist/extension.js:5743
+msgid "Menu"
+msgstr "Menu"
+
+#: dist/extension.js:5750
+msgid "Info"
+msgstr "Info"
+
+#: dist/extension.js:5809
+#, fuzzy
+msgid "Select the layout to edit"
+msgstr "Apre l'editor dei layouts"
+
+#: dist/extension.js:5829
+msgid "Close"
+msgstr "Chiudi"
+
+#: dist/extension.js:5957
+msgid "How to use the editor"
+msgstr "Come usare l'editor"
+
+#: dist/extension.js:5966
+msgid "Start editing"
+msgstr "Inizia la modifica"
+
+#: dist/extension.js:6801
+#, fuzzy
+msgid "Move to best tile"
+msgstr "Sposta la finestra nel riquadro sinistro"
+
+#: dist/extension.js:6821
+#, fuzzy
+msgid "Move to leftmost tile"
+msgstr "Sposta la finestra nel riquadro sinistro"
+
+#: dist/extension.js:6840
+#, fuzzy
+msgid "Move to rightmost tile"
+msgstr "Sposta la finestra nel riquadro destro"

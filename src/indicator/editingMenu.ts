@@ -4,6 +4,7 @@ import * as IndicatorUtils from './utils';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import CurrentMenu from './currentMenu';
 import { _ } from '../translations';
+import { setWidgetOrientation } from '@utils/ui';
 
 export default class EditingMenu implements CurrentMenu {
     private readonly _indicator: Indicator;
@@ -12,11 +13,11 @@ export default class EditingMenu implements CurrentMenu {
         this._indicator = indicator;
 
         const boxLayout = new St.BoxLayout({
-            vertical: true,
             styleClass: 'buttons-box-layout',
             xExpand: true,
             style: 'spacing: 8px',
         });
+        setWidgetOrientation(boxLayout, true);
 
         const openMenuBtn = IndicatorUtils.createButton(
             'menu-symbolic',

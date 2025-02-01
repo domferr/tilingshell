@@ -5,8 +5,6 @@ import SignalHandling from './signalHandling';
 import { GObject, Meta, Gio } from '@gi.ext';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { logger } from './logger';
-import { getWindows } from './ui';
-import ExtendedWindow from '@components/tilingsystem/extendedWindow';
 
 const debug = logger('GlobalState');
 
@@ -129,24 +127,23 @@ export default class GlobalState extends GObject.Object {
                         n_workspaces - 2,
                     );
 
-                const secondLastWsLayoutsId = secondLastWs
-                    ? this._selected_layouts.get(secondLastWs) ?? []
-                    : [];
-                debug(
-                    `second-last workspace length ${secondLastWsLayoutsId.length}`,
-                );
-
                 // the new workspace must start with the same layout of the last workspace
                 // use the layout at index 0 if for some reason we cannot find the layout
                 // of the last workspace
-                const layout: Layout =
-                    this._layouts.find((lay) =>
-                        secondLastWsLayoutsId.find((id) => id === lay.id),
-                    ) ?? this._layouts[0];
+                const secondLastWsLayoutsId = secondLastWs
+                    ? this._selected_layouts.get(secondLastWs) ?? []
+                    : [];
+                if (secondLastWsLayoutsId.length === 0) {
+                    secondLastWsLayoutsId.push(
+                        ...Main.layoutManager.monitors.map(
+                            () => this._layouts[0].id,
+                        ),
+                    );
+                }
 
                 this._selected_layouts.set(
                     newWs,
-                    Main.layoutManager.monitors.map(() => layout.id),
+                    secondLastWsLayoutsId, // Main.layoutManager.monitors.map(() => layout.id),
                 );
 
                 const to_be_saved: string[][] = [];

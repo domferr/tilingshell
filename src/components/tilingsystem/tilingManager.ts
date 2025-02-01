@@ -318,6 +318,7 @@ export class TilingManager {
         direction: KeyBindingsDirection,
         force: boolean,
         spanFlag: boolean,
+        clamp: boolean,
     ): boolean {
         let destination: { rect: Mtk.Rectangle; tile: Tile } | undefined;
         if (spanFlag && window.get_maximized()) return false;
@@ -372,9 +373,17 @@ export class TilingManager {
                 tile: TileUtils.build_tile(rect, this._workArea),
             };
         } else if (window.get_monitor() === this._monitor.index) {
+            const maxGap = Math.max(
+                tilingLayout.innerGaps.right,
+                tilingLayout.innerGaps.left,
+                tilingLayout.innerGaps.right,
+                tilingLayout.innerGaps.bottom,
+            );
             destination = tilingLayout.findNearestTileDirection(
                 windowRectCopy,
                 direction,
+                clamp,
+                3 * maxGap,
             );
         } else {
             destination = tilingLayout.findNearestTile(windowRectCopy);
@@ -384,6 +393,8 @@ export class TilingManager {
         if (
             window.get_monitor() === this._monitor.index &&
             destination &&
+            !window.maximizedHorizontally &&
+            !window.maximizedVertically &&
             (window as ExtendedWindow).assignedTile &&
             (window as ExtendedWindow).assignedTile?.x === destination.tile.x &&
             (window as ExtendedWindow).assignedTile?.y === destination.tile.y &&

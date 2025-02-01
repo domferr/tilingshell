@@ -2,13 +2,13 @@
 
 [![release](https://img.shields.io/badge/Release_v16-blue?style=for-the-badge)]([https://ko-fi.com/domferr](https://github.com/domferr/tilingshell/releases))
 ![](https://img.shields.io/github/license/domferr/tilingshell?style=for-the-badge)
-![](https://img.shields.io/badge/GNOME-42--47-e04196?style=for-the-badge&logo=gnome&logoColor=white)
+![](https://img.shields.io/badge/GNOME-42--48-e04196?style=for-the-badge&logo=gnome&logoColor=white)
 [![kofi](https://img.shields.io/badge/Donate_on_Ko--fi-purple?logo=ko-fi&style=for-the-badge)](https://ko-fi.com/domferr)
-[![kofi](https://img.shields.io/badge/Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white)](https://patreon.com/domferr)
+[![patreon](https://img.shields.io/badge/Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white)](https://patreon.com/domferr)
 
 # Tiling Shell #
 
-This is a Gnome Shell extension implementing modern windows tiling system by extending GNOME's default 2 columns to any layout you want! Can be installed on Gnome Shells from **40 to 47** on X11 and Wayland: the most recent GNOME Shell is supported, and older releases will include all the features and bug fixes!
+This is a Gnome Shell extension implementing modern windows tiling system by extending GNOME's default 2 columns to any layout you want! Can be installed on Gnome Shells from **42 to 48** on X11 and Wayland: the most recent GNOME Shell is supported, and older releases will include all the features and bug fixes!
 
 - 🤩 First and only extension that provides Windows 11's **snap assistant**
 - 🖥️🖥️ **multiple monitors support**, even with different scaling factors!
@@ -39,6 +39,9 @@ Have issues, you want to suggest a new feature or contribute? Please open a new 
 | [⬇️](#layout-editor) **Layout editor** | [⬇️](#smart-resize) **Smart resize** | [⬇️](#tile-with-keyboard) **Tile with Keyboard** | [⬇️](#edge-tiling) **Edge Tiling** |
 | [⬇️](#tiling-buttons) **Tiling Buttons** | [⬇️](#per-workspace-layout) **Per-workspace layout** | [⬇️](#auto-tiling) **Auto-tiling** | [⬇️](#tiling-context-menu) **Tiling context menu** |
 | [⬇️](#smart-border-radius) **Smart border radius** | [⬇️](#windows-suggestions) **Windows Suggestions** 
+
+## 🎉🎉 Tiling Shell's AWESOME Supporters!
+Thank you to the :star2: **amazing** <a href="https://patreon.com/domferr"><img src="https://img.shields.io/badge/Patreons-F96854?logo=patreon&logoColor=white)" height="14px"/><a/> and **everyone** who donated on <a href="https://ko-fi.com/domferr"><img src="https://img.shields.io/badge/_Ko--fi-794bc4?logo=ko-fi&logoColor=white" height="14px"/><a/>! :medal_sports:Tomoyuki Kashiro and Markus Huggler on Patreon:medal_sports: and Nick, thy-fi, iatanas0v, Chris, wbezs, DaneshManoharan, Tamas, Ivan Banha and many more on Ko-fi! You are on a mission to **make Linux window management better for everyone**!
 
 ### Tiling System ###
 When grabbing and moving a window, press <kbd>CTRL</kbd> key to show the tiling layout (you can choose another key from the preferences). When moving on a tile, it will highlight. Ungrab the window to place that window on the highlighted tile.
@@ -159,6 +162,7 @@ Right-click on a window to use the auto-tile buttons and the snap assistant from
 ### Smart border radius ###
 
 In GNOME, different windows may have different border radius. Drawing a border around the focused window is hard because it is not possible to know the window border radius. All the existing extensions just draw a border with a static value, making the UI less polished. Tiling Shell, **dynamically** computes the focused window border radius at runtime. Moreover, if you have an extension or anything else who customize the border radius, the focused window border radius adapts as well! This can be enabled/disabled from the extension's preferences too.
+
 
 <p align="center">
 <img src="https://github.com/user-attachments/assets/cfaca5f9-d9b2-4739-9426-1aebb5f33c29" width=304 />

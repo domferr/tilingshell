@@ -29,7 +29,6 @@ export const createIconButton = (
         xExpand: true,
         style: 'padding-left: 5px !important; padding-right: 5px !important;',
         child: new St.BoxLayout({
-            vertical: false, // horizontal box layout
             clipToAllocation: true,
             xAlign: Clutter.ActorAlign.CENTER,
             yAlign: Clutter.ActorAlign.CENTER,

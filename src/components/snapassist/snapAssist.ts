@@ -69,7 +69,6 @@ class SnapAssistContent extends St.BoxLayout {
             name: 'snap_assist_content',
             xAlign: Clutter.ActorAlign.CENTER,
             yAlign: Clutter.ActorAlign.CENTER,
-            vertical: false,
             reactive: true,
             styleClass: 'popup-menu-content snap-assistant',
         });

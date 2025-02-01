@@ -8,7 +8,11 @@ import Layout from '@/components/layout/Layout';
 import Tile from '@/components/layout/Tile';
 import * as ModalDialog from 'resource:///org/gnome/shell/ui/modalDialog.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import { enableScalingFactorSupport, getMonitorScalingFactor } from '@utils/ui';
+import {
+    enableScalingFactorSupport,
+    getMonitorScalingFactor,
+    setWidgetOrientation,
+} from '@utils/ui';
 import { _ } from '../../translations';
 
 @registerGObjectClass
@@ -51,7 +55,6 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         );
 
         this._layoutsBoxLayout = new St.BoxLayout({
-            vertical: false, // horizontal box layout
             styleClass: 'layouts-box-layout',
             xAlign: Clutter.ActorAlign.CENTER,
         });
@@ -83,7 +86,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
     }
 
     private _makeLegendDialog(params: { onClose: () => void; path: string }) {
-        const suggestion1 = new St.BoxLayout({ vertical: false });
+        const suggestion1 = new St.BoxLayout();
         // LEFT-CLICK to split a tile
         suggestion1.add_child(
             new St.Label({
@@ -105,7 +108,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
             }),
         );
 
-        const suggestion2 = new St.BoxLayout({ vertical: false });
+        const suggestion2 = new St.BoxLayout();
         // LEFT-CLICK + CTRL to split a tile vertically
         suggestion2.add_child(
             new St.Label({
@@ -146,7 +149,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
             }),
         );
 
-        const suggestion3 = new St.BoxLayout({ vertical: false });
+        const suggestion3 = new St.BoxLayout();
         // RIGHT-CLICK to delete a tile
         suggestion3.add_child(
             new St.Label({
@@ -169,7 +172,6 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         );
 
         const suggestion4 = new St.BoxLayout({
-            vertical: false,
             xExpand: true,
             margin_top: 16,
         });
@@ -196,9 +198,9 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         );
 
         const legend = new St.BoxLayout({
-            vertical: true,
             styleClass: 'legend',
         });
+        setWidgetOrientation(legend, true);
         legend.add_child(suggestion1);
         legend.add_child(suggestion2);
         legend.add_child(suggestion3);
@@ -237,10 +239,10 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
 
         params.layouts.forEach((lay, btnInd) => {
             const box = new St.BoxLayout({
-                vertical: true,
                 xAlign: Clutter.ActorAlign.CENTER,
                 styleClass: 'layout-button-container',
             });
+            setWidgetOrientation(box, true);
             this._layoutsBoxLayout.add_child(box);
             const btn = new LayoutButton(
                 box,
@@ -282,10 +284,10 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         });
 
         const box = new St.BoxLayout({
-            vertical: true,
             xAlign: Clutter.ActorAlign.CENTER,
             styleClass: 'layout-button-container',
         });
+        setWidgetOrientation(box, true);
         this._layoutsBoxLayout.add_child(box);
         const newLayoutBtn = new LayoutButton(
             box,

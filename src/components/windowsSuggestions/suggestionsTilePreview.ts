@@ -1,7 +1,7 @@
 import { registerGObjectClass } from '@/utils/gjs';
 import { GObject, St, Clutter, Mtk } from '@gi.ext';
 import TilePreview from '../tilepreview/tilePreview';
-import { buildBlurEffect } from '@utils/ui';
+import { buildBlurEffect, setWidgetOrientation } from '@utils/ui';
 import Tile from '@components/layout/Tile';
 import MasonryLayoutManager from './masonryLayoutManager';
 
@@ -24,7 +24,7 @@ export default class SuggestionsTilePreview extends TilePreview {
     };
 
     private _blur: boolean;
-    private _container: St.Widget;
+    private _container: St.BoxLayout;
     private _scrollView: St.ScrollView;
 
     constructor(params: {
@@ -60,11 +60,11 @@ export default class SuggestionsTilePreview extends TilePreview {
         this.layout_manager = new Clutter.BinLayout();
 
         this._container = new St.BoxLayout({
-            vertical: true,
             x_expand: true,
             y_align: Clutter.ActorAlign.CENTER,
             style: `spacing: ${MASONRY_LAYOUT_SPACING}px;`,
         });
+        setWidgetOrientation(this._container, true);
         this._scrollView = new St.ScrollView({
             style_class: 'vfade',
             vscrollbar_policy: St.PolicyType.AUTOMATIC,
@@ -186,7 +186,6 @@ export default class SuggestionsTilePreview extends TilePreview {
         // add each row
         placements.forEach((row) => {
             const rowBox = new St.BoxLayout({
-                vertical: false,
                 x_align: Clutter.ActorAlign.CENTER,
                 style: `spacing: ${MASONRY_LAYOUT_SPACING}px;`,
             });

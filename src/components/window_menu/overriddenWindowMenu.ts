@@ -11,6 +11,7 @@ import {
     enableScalingFactorSupport,
     getMonitorScalingFactor,
     getWindows,
+    setWidgetOrientation,
 } from '@utils/ui';
 import ExtendedWindow from '@components/tilingsystem/extendedWindow';
 import TileUtils from '@components/layout/TileUtils';
@@ -235,9 +236,9 @@ export default class OverriddenWindowMenu extends GObject.Object {
             yAlign: Clutter.ActorAlign.CENTER,
             xExpand: true,
             yExpand: true,
-            vertical: true,
             style: 'spacing: 16px !important',
         });
+        setWidgetOrientation(container, true);
         layoutsPopupMenu.add_child(container);
         const layoutsPerRow = 4;
         const rows: St.BoxLayout[] = [];
