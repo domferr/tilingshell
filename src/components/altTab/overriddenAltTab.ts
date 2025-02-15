@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as AltTab from 'resource:///org/gnome/shell/ui/altTab.js';
-import { St, Meta } from '@gi.ext';
+import { St, Meta, Clutter } from '@gi.ext';
 import { logger } from '@utils/logger';
-import MetaWindowGroup from './MetaWindowGroup';
 import ExtendedWindow from '@components/tilingsystem/extendedWindow';
 import MultipleWindowsIcon from './MultipleWindowsIcon';
 import { buildMargin } from '@utils/ui';
@@ -19,6 +19,10 @@ export default class OverriddenAltTab {
     } | null;
     private static _enabled: boolean = false;
 
+    // AltTab has these private fields
+    private _switcherList: any;
+    private _items: any;
+
     static get(): OverriddenAltTab {
         if (this._instance === null) this._instance = new OverriddenAltTab();
         return this._instance;
@@ -31,6 +35,7 @@ export default class OverriddenAltTab {
         const owm = this.get();
 
         OverriddenAltTab._old_show = AltTab.WindowSwitcherPopup.prototype.show;
+        // @ts-expect-error "This is expected"
         AltTab.WindowSwitcherPopup.prototype.show = owm.newShow;
 
         this._enabled = true;
@@ -40,6 +45,7 @@ export default class OverriddenAltTab {
         // if it is not enabled, do not disable
         if (!this._enabled) return;
 
+        // @ts-expect-error "This is expected"
         AltTab.WindowSwitcherPopup.prototype.show = OverriddenAltTab._old_show;
         this._old_show = null;
 
@@ -53,17 +59,19 @@ export default class OverriddenAltTab {
 
     // the function will be treated as a method of class WindowMenu
     private newShow(backward: boolean, binding: any, mask: any): boolean {
-        const oldFunction = OverriddenAltTab._old_show?.bind(this);
+        // allow the list to show NON-squared widgets
         this._switcherList._list.get_layout_manager().homogeneous = false;
         this._switcherList._squareItems = false;
+
         // Call original show function
+        const oldFunction = OverriddenAltTab._old_show?.bind(this);
         const res = !oldFunction || oldFunction(backward, binding, mask);
-        debug('this._switcherList._squareItems', this._switcherList._squareItems);
+
         const tiledWindows: Meta.Window[] = (
             this._getWindowList() as Meta.Window[]
         ).filter((win) => (win as ExtendedWindow).assignedTile);
 
-        // if (tiledWindows.length <= 1) return res;
+        if (tiledWindows.length <= 1) return res;
 
         const tiles = tiledWindows
             .map((win) => (win as ExtendedWindow).assignedTile)
@@ -73,8 +81,10 @@ export default class OverriddenAltTab {
         const height = this._items[0].height;
         const width = Math.floor((height * 16) / 9);
         const gaps =
-            GAPS * St.ThemeContext.get_for_stage(global.stage).scale_factor;
-        debug(height, width);
+            GAPS *
+            St.ThemeContext.get_for_stage(global.stage as Clutter.Stage)
+                .scale_factor;
+
         // Create new group entry
         const groupWindowsIcon = new MultipleWindowsIcon({
             tiles,
@@ -88,16 +98,14 @@ export default class OverriddenAltTab {
             }),
             windows: tiledWindows,
         });
-        groupWindowsIcon.label = new St.Label({
-            text: 'Tiled Windows',
-        });
-        // gnome shell accesses to this window, we need to abstract operations to work for a group of windows instead of one
-        groupWindowsIcon.window = new MetaWindowGroup(tiledWindows);
 
         // Append the group item to the list
         this._switcherList.addItem(groupWindowsIcon, groupWindowsIcon.label);
         this._items.push(groupWindowsIcon);
 
         return res;
+    }
+    private _getWindowList(): Meta.Window[] {
+        throw new Error('Method not implemented.');
     }
 }

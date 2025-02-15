@@ -19,8 +19,7 @@ export default class TilePreview extends St.Widget {
     protected _rect: Mtk.Rectangle;
     protected _showing: boolean;
     protected _tile: Tile;
-
-    private _gaps: Clutter.Margin;
+    protected _gaps: Clutter.Margin;
 
     constructor(params: Partial<TilePreviewConstructorProperties>) {
         super(params);

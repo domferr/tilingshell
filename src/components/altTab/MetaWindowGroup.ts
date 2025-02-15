@@ -19,12 +19,15 @@ export default class MetaWindowGroup {
                 if (prop in target) return Reflect.get(target, prop, receiver);
 
                 // If the property exists on a Meta.Window instance, proxy the call to all windows
+                // @ts-expect-error "This is expected"
                 if (typeof this._windows[0]?.[prop] === 'function') {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     return (...args: any[]) => {
                         // debug(`Called function: ${String(prop)}`);
 
                         // Execute the method on each window in the group
                         this._windows.forEach((win) =>
+                            // @ts-expect-error "This is expected"
                             // eslint-disable-next-line @typescript-eslint/ban-types
                             (win[prop] as Function)(...args),
                         );
@@ -32,6 +35,7 @@ export default class MetaWindowGroup {
                 }
 
                 // If it's a property (not a function), return the value from the first window
+                // @ts-expect-error "This is expected"
                 return this._windows[0]?.[prop];
             },
         });

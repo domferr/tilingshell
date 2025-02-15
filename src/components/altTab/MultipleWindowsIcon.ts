@@ -1,16 +1,21 @@
 import { registerGObjectClass } from '@utils/gjs';
-import { Clutter, Mtk, Meta } from '@gi.ext';
+import { Clutter, Mtk, Meta, St } from '@gi.ext';
 import LayoutWidget from '@components/layout/LayoutWidget';
 import Tile from '@components/layout/Tile';
 import Layout from '@components/layout/Layout';
 import { buildMarginOf, buildRectangle } from '@utils/ui';
 import { logger } from '@utils/logger';
-import TilePreview from '@components/tilepreview/tilePreview';
+import TilePreviewWithWindow from './tilePreviewWithWindow';
+import MetaWindowGroup from './MetaWindowGroup';
+import { _ } from '../../translations';
 
 const debug = logger('MultipleWindowsIcon');
 
 @registerGObjectClass
-export default class MultipleWindowsIcon extends LayoutWidget<TilePreview> {
+export default class MultipleWindowsIcon extends LayoutWidget<TilePreviewWithWindow> {
+    private _label: St.Label;
+    private _window: MetaWindowGroup;
+
     constructor(params: {
         width: number;
         height: number;
@@ -48,6 +53,12 @@ export default class MultipleWindowsIcon extends LayoutWidget<TilePreview> {
             });
             preview.add_child(winClone);
         });
+
+        this._label = new St.Label({
+            text: _('Tiled windows'),
+        });
+        // gnome shell accesses to this window, we need to abstract operations to work for a group of windows instead of one
+        this._window = new MetaWindowGroup(params.windows);
     }
 
     buildTile(
@@ -55,7 +66,15 @@ export default class MultipleWindowsIcon extends LayoutWidget<TilePreview> {
         rect: Mtk.Rectangle,
         gaps: Clutter.Margin,
         tile: Tile,
-    ): TilePreview {
-        return new TilePreview({ parent, rect, gaps, tile });
+    ): TilePreviewWithWindow {
+        return new TilePreviewWithWindow({ parent, rect, gaps, tile });
+    }
+
+    public get window() {
+        return this._window;
+    }
+
+    public get label() {
+        return this._label;
     }
 }
