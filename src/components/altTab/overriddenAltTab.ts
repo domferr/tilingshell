@@ -63,7 +63,7 @@ export default class OverriddenAltTab {
             this._getWindowList() as Meta.Window[]
         ).filter((win) => (win as ExtendedWindow).assignedTile);
 
-        if (tiledWindows.length <= 1) return res;
+        // if (tiledWindows.length <= 1) return res;
 
         const tiles = tiledWindows
             .map((win) => (win as ExtendedWindow).assignedTile)
@@ -71,7 +71,7 @@ export default class OverriddenAltTab {
 
         const inner_gaps = Settings.get_inner_gaps();
         const height = this._items[0].height;
-        const width = (height * 16) / 9;
+        const width = Math.floor((height * 16) / 9);
         const gaps =
             GAPS * St.ThemeContext.get_for_stage(global.stage).scale_factor;
         debug(height, width);
