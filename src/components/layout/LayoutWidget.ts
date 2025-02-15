@@ -16,11 +16,11 @@ const debug = logger('LayoutWidget');
 // export module LayoutWidget {
 export interface LayoutWidgetConstructorProperties
     extends Partial<St.Widget.ConstructorProps> {
-    parent: Clutter.Actor;
+    parent?: Clutter.Actor;
     layout: Layout;
     innerGaps: Clutter.Margin;
     outerGaps: Clutter.Margin;
-    containerRect: Mtk.Rectangle;
+    containerRect?: Mtk.Rectangle;
     scalingFactor?: number;
 }
 // }
@@ -39,7 +39,7 @@ export default class LayoutWidget<
 
     constructor(params: LayoutWidgetConstructorProperties) {
         super({ styleClass: params.styleClass || '' });
-        params.parent.add_child(this);
+        if (params.parent) params.parent.add_child(this);
         this._scalingFactor = 1;
         if (params.scalingFactor) this.scalingFactor = params.scalingFactor;
 
