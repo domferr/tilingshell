@@ -47,6 +47,9 @@ export default class KeyBindings extends GObject.Object {
             'focus-window': {
                 param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, FocusSwitchDirection
             },
+            'highlight-current-window': {
+                param_types: [Meta.Display.$gtype], // Meta.Display,
+            },
         },
     };
 
@@ -221,6 +224,16 @@ export default class KeyBindings extends GObject.Object {
                 this.emit('focus-window', display, FocusSwitchDirection.PREV);
             },
         );
+
+        Main.wm.addKeybinding(
+            Settings.SETTING_HIGHLIGHT_CURRENT_WINDOW,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('highlight-current-window', display);
+            },
+        );
     }
 
     private _overrideNatives(extensionSettings: Gio.Settings) {
@@ -316,6 +329,7 @@ export default class KeyBindings extends GObject.Object {
         Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_RIGHT);
         Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_NEXT);
         Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_PREV);
+        Main.wm.removeKeybinding(Settings.SETTING_HIGHLIGHT_CURRENT_WINDOW);
     }
 
     private _restoreNatives() {

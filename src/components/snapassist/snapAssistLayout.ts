@@ -1,33 +1,30 @@
 import { registerGObjectClass } from '@/utils/gjs';
-import { buildRectangle, getScalingFactorOf } from '@/utils/ui';
-import { Clutter, Mtk } from '@gi.ext';
+import { Clutter, Mtk, St } from '@gi.ext';
 import LayoutWidget from '../layout/LayoutWidget';
-import Layout from '../layout/Layout';
 import Tile from '../layout/Tile';
 import SnapAssistTile from './snapAssistTile';
+import Layout from '@components/layout/Layout';
+import { buildRectangle } from '@utils/ui';
 
 @registerGObjectClass
 export default class SnapAssistLayout extends LayoutWidget<SnapAssistTile> {
-    private static readonly _snapAssistHeight: number = 68;
-    private static readonly _snapAssistWidth: number = 120; // 16:9 ratio. -> (16*this._snapAssistHeight) / 9 and then rounded to int
-
-    constructor(parent: Clutter.Actor, layout: Layout, gaps: Clutter.Margin) {
+    constructor(
+        parent: St.Widget,
+        layout: Layout,
+        innerGaps: Clutter.Margin,
+        outerGaps: Clutter.Margin,
+        width: number,
+        height: number,
+    ) {
         super({
+            containerRect: buildRectangle({ x: 0, y: 0, width, height }),
             parent,
             layout,
-            innerGaps: gaps.copy(),
-            outerGaps: new Clutter.Margin(),
-            containerRect: buildRectangle(),
-            styleClass: 'snap-assist-layout',
+            innerGaps,
+            outerGaps,
         });
-
-        const [, scalingFactor] = getScalingFactorOf(this);
-        const width = SnapAssistLayout._snapAssistWidth * scalingFactor;
-        const height = SnapAssistLayout._snapAssistHeight * scalingFactor;
-
-        super.relayout({
-            containerRect: buildRectangle({ x: 0, y: 0, width, height }),
-        });
+        this.set_size(width, height);
+        super.relayout();
     }
 
     buildTile(

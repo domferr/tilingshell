@@ -9,14 +9,21 @@ import GlobalState from '@utils/globalState';
 import SignalHandling from '@utils/signalHandling';
 import {
     buildBlurEffect,
-    buildMargin,
+    buildMarginOf,
     enableScalingFactorSupport,
     getMonitorScalingFactor,
     getScalingFactorOf,
 } from '@utils/ui';
+import { logger } from '@utils/logger';
 
 export const SNAP_ASSIST_SIGNAL = 'snap-assist';
+
 const GAPS = 4;
+// 16:9 ratio and then rounded to int
+const SNAP_ASSIST_LAYOUT_WIDTH = 120;
+const SNAP_ASSIST_LAYOUT_HEIGHT = 68;
+
+const debug = logger('SnapAssist');
 
 @registerGObjectClass
 class SnapAssistContent extends St.BoxLayout {
@@ -58,7 +65,7 @@ class SnapAssistContent extends St.BoxLayout {
     private _snapAssistLayouts: SnapAssistLayout[];
     private _isEnlarged = false;
     private _hoveredInfo: [SnapAssistTile, SnapAssistLayout] | undefined;
-    private _bottomPadding: number;
+    private _padding: number;
     private _blur: boolean;
     private _snapAssistantThreshold: number;
     private _snapAssistantAnimationTime: number;
@@ -79,7 +86,7 @@ class SnapAssistContent extends St.BoxLayout {
         this._snapAssistLayouts = [];
         this._isEnlarged = false;
         this._showing = true;
-        this._bottomPadding = 0;
+        this._padding = 0;
         this._blur = false;
         this._snapAssistantAnimationTime = 100;
         this._monitorIndex = monitorIndex;
@@ -164,16 +171,17 @@ class SnapAssistContent extends St.BoxLayout {
         this.set_style(null);
 
         const [alreadyScaled, finalScalingFactor] = getScalingFactorOf(this);
-        this._bottomPadding =
+        this._padding =
             (alreadyScaled ? 1 : finalScalingFactor) *
-            (this.get_theme_node().get_padding(St.Side.BOTTOM) /
+            (this.get_theme_node().get_length('padding-value') /
                 (alreadyScaled ? finalScalingFactor : 1));
+
         const backgroundColor = this.get_theme_node()
             .get_background_color()
             .copy();
         const alpha = this._blur ? 0.7 : backgroundColor.alpha;
         this.set_style(`
-            padding: ${this._bottomPadding}px !important;
+            padding: ${this._padding}px;
             background-color: rgba(${backgroundColor.red}, ${backgroundColor.green}, ${backgroundColor.blue}, ${alpha}) !important;
         `);
     }
@@ -202,9 +210,9 @@ class SnapAssistContent extends St.BoxLayout {
                   0,
                   this._snapAssistantThreshold -
                       this.height / 2 +
-                      this._bottomPadding,
+                      this._padding,
               )
-            : -this.height + this._bottomPadding;
+            : -this.height + this._padding;
     }
 
     private open(ease: boolean = false) {
@@ -231,21 +239,24 @@ class SnapAssistContent extends St.BoxLayout {
 
         const [, scalingFactor] = getScalingFactorOf(this);
 
-        const inner_gaps = Settings.get_inner_gaps(scalingFactor);
-        const layoutGaps = buildMargin({
-            top: inner_gaps.top === 0 ? 0 : GAPS,
-            bottom: inner_gaps.bottom === 0 ? 0 : GAPS,
-            left: inner_gaps.left === 0 ? 0 : GAPS,
-            right: inner_gaps.right === 0 ? 0 : GAPS,
-        });
+        const layoutGaps = buildMarginOf(GAPS);
 
+        const width = SNAP_ASSIST_LAYOUT_WIDTH * scalingFactor;
+        const height = SNAP_ASSIST_LAYOUT_HEIGHT * scalingFactor;
         // build the layouts inside the snap assistant. Place a spacer between each layout
         this._snapAssistLayouts = layouts.map((lay, ind) => {
-            const saLay = new SnapAssistLayout(this, lay, layoutGaps);
+            const saLay = new SnapAssistLayout(
+                this,
+                lay,
+                layoutGaps,
+                new Clutter.Margin(),
+                width,
+                height,
+            );
             // build and place a spacer
             if (ind < layouts.length - 1) {
                 this.add_child(
-                    new St.Widget({ width: this._bottomPadding, height: 1 }),
+                    new St.Widget({ width: this._padding, height: 1 }),
                 );
             }
             return saLay;
@@ -341,10 +352,7 @@ class SnapAssistContent extends St.BoxLayout {
         this.open(ease);
     }
 
-    private handleTileHovering(currPointerPos: {
-        x: number;
-        y: number;
-    }): boolean {
+    private handleTileHovering(cursorPos: { x: number; y: number }): boolean {
         if (!this._isEnlarged) {
             const changed = this._hoveredInfo !== undefined;
             if (this._hoveredInfo) this._hoveredInfo[0].set_hover(false);
@@ -355,9 +363,10 @@ class SnapAssistContent extends St.BoxLayout {
 
         let newTileHovered: SnapAssistTile | undefined;
         let layoutHovered: SnapAssistLayout | undefined;
-        for (let index = 0; index < this._snapAssistLayouts.length; index++) {
+        const layoutsLen = this._snapAssistLayouts.length;
+        for (let index = 0; index < layoutsLen; index++) {
             newTileHovered =
-                this._snapAssistLayouts[index].getTileBelow(currPointerPos);
+                this._snapAssistLayouts[index].getTileBelow(cursorPos);
             if (newTileHovered) {
                 layoutHovered = this._snapAssistLayouts[index];
                 break;

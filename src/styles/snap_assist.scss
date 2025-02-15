@@ -1,19 +1,20 @@
-$snap-assist-tile-border-width: 2px;
+$snap-assist-tile-border-width: 1px;
 $snap-assist-tile-border-radius: 6px;
 
 .snap-assistant {
     box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px;
     border: 0;
     border-radius: $base_border_radius + 2;
-    padding: to_em(16px);
+    padding-value: 16px;
 }
 
 .snap-assist-tile {
     transition: 300ms ease all;
     border-radius-value: $snap-assist-tile-border-radius;
+    border-width-value: $snap-assist-tile-border-width;
+    border-style: solid;
     // light theme as default
-    border-width: $snap-assist-tile-border-width;
-    border-color: rgba(255, 255, 255, 0.4);
+    border-color: rgba(255, 255, 255, 0.2);
     background-color: rgba(255, 255, 255, 0.25);
 }
 
@@ -25,13 +26,9 @@ $snap-assist-tile-border-radius: 6px;
 .snap-assist-tile.dark {
     border-color: rgba(128, 128, 128, 0.65);
     background-color: rgba(180, 180, 180, 0.45);
-    /*border-color: #8e8e8e;
-    background-color: #e0e0e0;*/
 }
 
 .snap-assist-tile.dark:hover {
-    /*border-color: #777777;
-    background-color: #a2a2a2;*/
     border-color: rgba(94, 94, 94, 0.7);
     background-color: rgba(154, 154, 154, 0.6);
 }

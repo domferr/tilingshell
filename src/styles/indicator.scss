@@ -13,11 +13,7 @@
 
     .snap-assist-tile {
         border-radius-value: $snap-assist-tile-border-radius - 1;
-        border-width: calc($snap-assist-tile-border-width / 2);
-    }
-
-    .layout-button {
-        border-width: calc($snap-assist-tile-border-width / 2);
+        border-width-value: calc($snap-assist-tile-border-width / 2);
     }
 }
 

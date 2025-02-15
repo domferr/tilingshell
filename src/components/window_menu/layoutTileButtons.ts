@@ -20,7 +20,7 @@ export default class LayoutTileButtons extends LayoutWidget<SnapAssistTileButton
             layout,
             containerRect: buildRectangle(),
             innerGaps: buildMarginOf(gapSize),
-            outerGaps: new Clutter.Margin(),
+            outerGaps: buildMarginOf(gapSize),
             styleClass: 'window-menu-layout',
         });
 

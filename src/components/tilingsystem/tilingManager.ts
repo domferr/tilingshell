@@ -9,6 +9,7 @@ import {
     getScalingFactorOf,
     getWindows,
     isPointInsideRect,
+    isTileOnContainerBorder,
     squaredEuclideanDistance,
 } from '@/utils/ui';
 import TilingLayout from '@/components/tilingsystem/tilingLayout';
@@ -302,6 +303,15 @@ export class TilingManager {
                 if (Settings.ENABLE_AUTO_TILING) this._autoTile(window, false);
             },
         );
+
+        // forget assigned tile when window is maximized
+        this._signals.connect(
+            TilingShellWindowManager.get(),
+            'maximized',
+            (_, window: Meta.Window) => {
+                delete (window as ExtendedWindow).assignedTile;
+            },
+        );
     }
 
     public onUntileWindow(window: Meta.Window, force: boolean): void {
@@ -373,7 +383,8 @@ export class TilingManager {
                 tile: TileUtils.build_tile(rect, this._workArea),
             };
         } else if (window.get_monitor() === this._monitor.index) {
-            const maxGap = Math.max(
+            const enlargeFactor = Math.max(
+                64, // if the gaps are all 0 we choose 8 instead
                 tilingLayout.innerGaps.right,
                 tilingLayout.innerGaps.left,
                 tilingLayout.innerGaps.right,
@@ -383,7 +394,7 @@ export class TilingManager {
                 windowRectCopy,
                 direction,
                 clamp,
-                3 * maxGap,
+                enlargeFactor,
             );
         } else {
             destination = tilingLayout.findNearestTile(windowRectCopy);
@@ -437,10 +448,12 @@ export class TilingManager {
 
         this._easeWindowRect(window, destination.rect, false, force);
 
-        // ensure the assigned tile is a COPY
-        (window as ExtendedWindow).assignedTile = new Tile({
-            ...destination.tile,
-        });
+        if (direction !== KeyBindingsDirection.NODIRECTION) {
+            // ensure the assigned tile is a COPY
+            (window as ExtendedWindow).assignedTile = new Tile({
+                ...destination.tile,
+            });
+        }
         return true;
     }
 
@@ -748,16 +761,7 @@ export class TilingManager {
         }
         tilingLayout.hoverTilesInRect(selectionRect, !allowSpanMultipleTiles);
 
-        this._selectedTilesPreview.gaps = buildTileGaps(
-            selectionRect,
-            tilingLayout.innerGaps,
-            tilingLayout.outerGaps,
-            this._workArea,
-            this._enableScaling
-                ? getScalingFactorOf(tilingLayout)[1]
-                : undefined,
-        );
-        this._selectedTilesPreview.openAbove(window, true, selectionRect);
+        this.openSelectionTilePreview(selectionRect, true, true, window);
 
         return GLib.SOURCE_CONTINUE;
     }
@@ -1022,20 +1026,66 @@ export class TilingManager {
         const tilingLayout = this._workspaceTilingLayout.get(currentWs);
         if (!tilingLayout) return;
 
+        this._selectedTilesPreview
+            .get_parent()
+            ?.set_child_above_sibling(this._selectedTilesPreview, null);
+
+        this.openSelectionTilePreview(scaledRect, false, true, undefined);
+        this._snapAssistingInfo.update(layoutId);
+    }
+
+    private openSelectionTilePreview(
+        position: Mtk.Rectangle,
+        isAboveLayout: boolean,
+        ease: boolean,
+        window?: Meta.Window,
+    ) {
+        const currentWs = global.workspaceManager.get_active_workspace();
+        const tilingLayout = this._workspaceTilingLayout.get(currentWs);
+        if (!tilingLayout) return;
+
         this._selectedTilesPreview.gaps = buildTileGaps(
-            scaledRect,
+            position,
             tilingLayout.innerGaps,
             tilingLayout.outerGaps,
             this._workArea,
             this._enableScaling
                 ? getScalingFactorOf(tilingLayout)[1]
                 : undefined,
-        );
+        ).gaps;
         this._selectedTilesPreview
             .get_parent()
             ?.set_child_above_sibling(this._selectedTilesPreview, null);
-        this._selectedTilesPreview.open(true, scaledRect);
-        this._snapAssistingInfo.update(layoutId);
+
+        const gaps = this._selectedTilesPreview.gaps;
+        if (isAboveLayout) {
+            this._selectedTilesPreview.updateBorderRadius(
+                gaps.top > 0,
+                gaps.right > 0,
+                gaps.bottom > 0,
+                gaps.left > 0,
+            );
+        } else {
+            const { isTop, isRight, isBottom, isLeft } =
+                isTileOnContainerBorder(
+                    buildRectangle({
+                        x: position.x + gaps.left,
+                        y: position.y + gaps.top,
+                        width: position.width - gaps.left - gaps.right,
+                        height: position.height - gaps.top - gaps.bottom,
+                    }),
+                    this._workArea,
+                );
+            this._selectedTilesPreview.updateBorderRadius(
+                !isTop,
+                !isRight,
+                !isBottom,
+                !isLeft,
+            );
+        }
+        if (window)
+            this._selectedTilesPreview.openAbove(window, ease, position);
+        else this._selectedTilesPreview.open(ease, position);
     }
 
     /**
@@ -1073,7 +1123,7 @@ export class TilingManager {
             this._enableScaling
                 ? getScalingFactorOf(tilingLayout)[1]
                 : undefined,
-        );
+        ).gaps;
 
         if (!this._selectedTilesPreview.showing) {
             const { left, right, top, bottom } =
@@ -1089,7 +1139,7 @@ export class TilingManager {
             this._selectedTilesPreview.open(false, initialRect);
         }
 
-        this._selectedTilesPreview.openAbove(window, true, edgeTile);
+        this.openSelectionTilePreview(edgeTile, false, true, window);
     }
 
     private _easeWindowRectFromTile(
@@ -1134,7 +1184,7 @@ export class TilingManager {
             this._enableScaling
                 ? getScalingFactorOf(tilingLayout)[1]
                 : undefined,
-        );
+        ).gaps;
 
         const destinationRect = buildRectangle({
             x: scaledRect.x + gaps.left,

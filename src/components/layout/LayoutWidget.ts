@@ -4,6 +4,7 @@ import {
     buildRectangle,
     buildTileGaps,
     enableScalingFactorSupport,
+    isTileOnContainerBorder,
 } from '@/utils/ui';
 import { logger } from '@utils/logger';
 import Layout from './Layout';
@@ -16,11 +17,11 @@ const debug = logger('LayoutWidget');
 // export module LayoutWidget {
 export interface LayoutWidgetConstructorProperties
     extends Partial<St.Widget.ConstructorProps> {
-    parent: Clutter.Actor;
+    parent?: Clutter.Actor;
     layout: Layout;
     innerGaps: Clutter.Margin;
     outerGaps: Clutter.Margin;
-    containerRect: Mtk.Rectangle;
+    containerRect?: Mtk.Rectangle;
     scalingFactor?: number;
 }
 // }
@@ -39,7 +40,7 @@ export default class LayoutWidget<
 
     constructor(params: LayoutWidgetConstructorProperties) {
         super({ styleClass: params.styleClass || '' });
-        params.parent.add_child(this);
+        if (params.parent) params.parent.add_child(this);
         this._scalingFactor = 1;
         if (params.scalingFactor) this.scalingFactor = params.scalingFactor;
 
@@ -72,15 +73,43 @@ export default class LayoutWidget<
     }
 
     protected draw_layout(): void {
+        const containerWithoutOuterGaps = buildRectangle({
+            x: this._outerGaps.left + this._containerRect.x,
+            y: this._outerGaps.top + this._containerRect.y,
+            width:
+                this._containerRect.width -
+                this._outerGaps.left -
+                this._outerGaps.right,
+            height:
+                this._containerRect.height -
+                this._outerGaps.top -
+                this._outerGaps.bottom,
+        });
         this._previews = this._layout.tiles.map((tile) => {
-            const tileRect = TileUtils.apply_props(tile, this._containerRect);
-            const tileMargin = buildTileGaps(
+            const tileRect = TileUtils.apply_props(
+                tile,
+                containerWithoutOuterGaps,
+            );
+            const { gaps, isTop, isRight, isBottom, isLeft } = buildTileGaps(
                 tileRect,
                 this._innerGaps,
                 this._outerGaps,
-                this._containerRect,
+                containerWithoutOuterGaps,
             );
-            return this.buildTile(this, tileRect, tileMargin, tile);
+
+            if (isTop) {
+                tileRect.height += this._outerGaps.top;
+                tileRect.y -= this._outerGaps.top;
+            }
+            if (isLeft) {
+                tileRect.width += this._outerGaps.left;
+                tileRect.x -= this._outerGaps.left;
+            }
+            if (isRight) tileRect.width += this._outerGaps.right;
+
+            if (isBottom) tileRect.height += this._outerGaps.bottom;
+
+            return this.buildTile(this, tileRect, gaps, tile);
         });
     }
 

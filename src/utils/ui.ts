@@ -28,13 +28,15 @@ export const clampPointInsideRect = (
     };
 };
 
-export const buildTileGaps = (
+export const isTileOnContainerBorder = (
     tilePos: Mtk.Rectangle,
-    innerGaps: Clutter.Margin,
-    outerGaps: Clutter.Margin,
     container: Mtk.Rectangle,
-    scalingFactor: number = 1,
-): Clutter.Margin => {
+): {
+    isTop: boolean;
+    isRight: boolean;
+    isLeft: boolean;
+    isBottom: boolean;
+} => {
     // compare two values and return true if their are equal with a max error of 2
     const almostEqual = (first: number, second: number) =>
         Math.abs(first - second) <= 1;
@@ -48,6 +50,33 @@ export const buildTileGaps = (
         tilePos.y + tilePos.height,
         container.y + container.height,
     );
+    return {
+        isTop,
+        isRight,
+        isBottom,
+        isLeft,
+    };
+};
+
+export type TileGapsInfo = {
+    gaps: Clutter.Margin;
+    isTop: boolean;
+    isRight: boolean;
+    isBottom: boolean;
+    isLeft: boolean;
+};
+
+export const buildTileGaps = (
+    tilePos: Mtk.Rectangle,
+    innerGaps: Clutter.Margin,
+    outerGaps: Clutter.Margin,
+    container: Mtk.Rectangle,
+    scalingFactor: number = 1,
+): TileGapsInfo => {
+    const { isTop, isRight, isBottom, isLeft } = isTileOnContainerBorder(
+        tilePos,
+        container,
+    );
     const margin = new Clutter.Margin();
     margin.top = (isTop ? outerGaps.top : innerGaps.top / 2) * scalingFactor;
     margin.bottom =
@@ -56,7 +85,14 @@ export const buildTileGaps = (
         (isLeft ? outerGaps.left : innerGaps.left / 2) * scalingFactor;
     margin.right =
         (isRight ? outerGaps.right : innerGaps.right / 2) * scalingFactor;
-    return margin;
+
+    return {
+        gaps: margin,
+        isTop,
+        isRight,
+        isBottom,
+        isLeft,
+    };
 };
 
 export const getMonitorScalingFactor = (monitorIndex: number) => {
