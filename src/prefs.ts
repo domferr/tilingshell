@@ -334,9 +334,6 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         windowsSuggestionsGroup.add(screenEdgesWindowSuggestionRow);
 
-        snapAssistWindowSuggestionRow.set_sensitive(false);
-        snapAssistWindowSuggestionRow.set_tooltip_text('To be released soon!');
-
         prefsPage.add(windowsSuggestionsGroup);
 
         // Layouts section
