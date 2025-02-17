@@ -383,6 +383,7 @@ export class TilingManager {
             };
         } else if (window.get_monitor() === this._monitor.index) {
             const maxGap = Math.max(
+                2, // if the gaps are all 0 we choose 2 instead
                 tilingLayout.innerGaps.right,
                 tilingLayout.innerGaps.left,
                 tilingLayout.innerGaps.right,
