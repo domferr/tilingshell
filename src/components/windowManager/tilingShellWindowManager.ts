@@ -17,8 +17,12 @@ class CachedWindowProperties {
     public update(window: Meta.Window, manager: TilingShellWindowManager) {
         const newMaximized =
             window.maximizedVertically && window.maximizedHorizontally;
-        if (this._is_initialized && this.maximized && !newMaximized)
-            manager.emit('unmaximized', window);
+        if (this._is_initialized) {
+            if (this.maximized && !newMaximized)
+                manager.emit('unmaximized', window);
+            else if (!this.maximized && newMaximized)
+                manager.emit('maximized', window);
+        }
 
         this.maximized = newMaximized;
     }
@@ -34,6 +38,9 @@ export default class TilingShellWindowManager extends GObject.Object {
         GTypeName: 'TilingShellWindowManager',
         Signals: {
             unmaximized: {
+                param_types: [Meta.Window.$gtype],
+            },
+            maximized: {
                 param_types: [Meta.Window.$gtype],
             },
         },
@@ -64,17 +71,6 @@ export default class TilingShellWindowManager extends GObject.Object {
             (winActor.metaWindow as WindowWithCachedProps).__ts_cached =
                 new CachedWindowProperties(winActor.metaWindow, this);
         });
-
-        this._signals.connect(
-            global.windowManager,
-            'minimize',
-            (_, actor: Meta.WindowActor) => {
-                (actor.metaWindow as WindowWithCachedProps).__ts_cached?.update(
-                    actor.metaWindow,
-                    this,
-                );
-            },
-        );
 
         this._signals.connect(
             global.display,

@@ -302,6 +302,15 @@ export class TilingManager {
                 if (Settings.ENABLE_AUTO_TILING) this._autoTile(window, false);
             },
         );
+
+        // forget assigned tile when window is maximized
+        this._signals.connect(
+            TilingShellWindowManager.get(),
+            'maximized',
+            (_, window: Meta.Window) => {
+                delete (window as ExtendedWindow).assignedTile;
+            },
+        );
     }
 
     public onUntileWindow(window: Meta.Window, force: boolean): void {
