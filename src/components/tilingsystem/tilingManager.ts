@@ -447,10 +447,12 @@ export class TilingManager {
 
         this._easeWindowRect(window, destination.rect, false, force);
 
-        // ensure the assigned tile is a COPY
-        (window as ExtendedWindow).assignedTile = new Tile({
-            ...destination.tile,
-        });
+        if (direction !== KeyBindingsDirection.NODIRECTION) {
+            // ensure the assigned tile is a COPY
+            (window as ExtendedWindow).assignedTile = new Tile({
+                ...destination.tile,
+            });
+        }
         return true;
     }
 
