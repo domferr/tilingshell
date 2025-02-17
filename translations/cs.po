@@ -1,0 +1,667 @@
+# Czech translation for Tilling Shell
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Amerey <info@amerey.eu>, 2024.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-01 12:59+0100\n"
+"PO-Revision-Date: 2025-02-17 17:19+0100\n"
+"Last-Translator: Amerey <info@amerey.eu>\n"
+"Language-Team: \n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.4.4\n"
+
+#: dist/prefs.js:664 dist/prefs.js:751 dist/prefs.js:781
+msgid "General"
+msgstr "Obecné"
+
+#: dist/prefs.js:669 dist/prefs.js:756 dist/prefs.js:786
+msgid "Appearance"
+msgstr "Vzhled"
+
+#: dist/prefs.js:670 dist/prefs.js:757 dist/prefs.js:787
+msgid "Configure the appearance of Tiling Shell"
+msgstr "Nastavení vzhledu Tiling Shell"
+
+#: dist/prefs.js:675 dist/prefs.js:762 dist/prefs.js:792
+msgid "Show Indicator"
+msgstr "Zobrazit ikonu"
+
+#: dist/prefs.js:676 dist/prefs.js:763 dist/prefs.js:793
+msgid "Whether to show the panel indicator"
+msgstr "Zda se má zobrazit ikona na panelu"
+
+#: dist/prefs.js:681 dist/prefs.js:768 dist/prefs.js:798
+msgid "Inner gaps"
+msgstr "Vnitřní mezery"
+
+#: dist/prefs.js:682 dist/prefs.js:769 dist/prefs.js:799
+msgid "Gaps between windows"
+msgstr "Mezery mezi okny"
+
+#: dist/prefs.js:687 dist/prefs.js:774 dist/prefs.js:804
+msgid "Outer gaps"
+msgstr "Vnější mezery"
+
+#: dist/prefs.js:688 dist/prefs.js:775 dist/prefs.js:805
+msgid "Gaps between a window and the monitor borders"
+msgstr "Mezery mezi oknem a okrajem monitoru"
+
+#: dist/prefs.js:692 dist/prefs.js:779 dist/prefs.js:809
+msgid "Blur (experimental feature)"
+msgstr "Rozostření (experimentální funkce)"
+
+#: dist/prefs.js:694 dist/prefs.js:781 dist/prefs.js:811
+msgid "Apply blur effect to Snap Assistant and tile previews"
+msgstr "Použít efekt rozostření na asistenta přichycení a náhledy dlaždic"
+
+#: dist/prefs.js:700 dist/prefs.js:787 dist/prefs.js:817
+msgid "Snap Assistant threshold"
+msgstr "Vzdálenost asistenta přichycení"
+
+#: dist/prefs.js:702 dist/prefs.js:789 dist/prefs.js:819
+msgid "Minimum distance from the Snap Assistant to the pointer to open it"
+msgstr ""
+"Minimální vzdálenost od asistenta přichycení k ukazateli pro jeho otevření"
+
+#: dist/prefs.js:711 dist/prefs.js:798 dist/prefs.js:828
+msgid "Snap Assistant"
+msgstr "Asistent přichycení"
+
+#: dist/prefs.js:712 dist/prefs.js:799 dist/prefs.js:829
+msgid "Apply blur effect to Snap Assistant"
+msgstr "Použít efekt rozostření na asistenta přichycení"
+
+#: dist/prefs.js:718 dist/prefs.js:805 dist/prefs.js:835
+msgid "Selected tile preview"
+msgstr "Náhled vybrané dlaždice"
+
+#: dist/prefs.js:719 dist/prefs.js:806 dist/prefs.js:836
+msgid "Apply blur effect to selected tile preview"
+msgstr "Použít efekt rozostření na vybraný náhled dlaždice"
+
+#: dist/prefs.js:723 dist/prefs.js:810 dist/prefs.js:840
+msgid "Window border"
+msgstr "Ohraničení okna"
+
+#: dist/prefs.js:724 dist/prefs.js:731 dist/prefs.js:811 dist/prefs.js:825
+#: dist/prefs.js:841 dist/prefs.js:848
+msgid "Show a border around focused window"
+msgstr "Zobrazení ohraničení kolem vybraného okna"
+
+#: dist/prefs.js:730 dist/prefs.js:824 dist/prefs.js:847
+msgid "Enable"
+msgstr "Povolit"
+
+#: dist/prefs.js:737 dist/prefs.js:831 dist/prefs.js:861
+msgid "Width"
+msgstr "Šířka"
+
+#: dist/prefs.js:738 dist/prefs.js:832 dist/prefs.js:862
+msgid "The size of the border"
+msgstr "Velikost ohraničení"
+
+#: dist/prefs.js:744 dist/prefs.js:838 dist/prefs.js:868
+msgid "Border color"
+msgstr "Barva ohraničení"
+
+#: dist/prefs.js:745 dist/prefs.js:839 dist/prefs.js:869
+msgid "Choose the color of the border"
+msgstr "Vyberte barvu ohraničení"
+
+#: dist/prefs.js:751 dist/prefs.js:845 dist/prefs.js:875
+msgid "Animations"
+msgstr "Animace"
+
+#: dist/prefs.js:752 dist/prefs.js:846 dist/prefs.js:876
+msgid "Customize animations"
+msgstr "Přizpůsobení animací"
+
+#: dist/prefs.js:758 dist/prefs.js:852 dist/prefs.js:882
+msgid "Snap assistant animation time"
+msgstr "Doba animace asistenta přichycení"
+
+#: dist/prefs.js:759 dist/prefs.js:853 dist/prefs.js:883
+msgid "The snap assistant animation time in milliseconds"
+msgstr "Doba animace v milisekundách"
+
+#: dist/prefs.js:767 dist/prefs.js:861 dist/prefs.js:891
+msgid "Tiles animation time"
+msgstr "Doba animace dlaždic"
+
+#: dist/prefs.js:768 dist/prefs.js:862 dist/prefs.js:892
+msgid "The tiles animation time in milliseconds"
+msgstr "Doba animace v milisekundách"
+
+#: dist/prefs.js:774 dist/prefs.js:868 dist/prefs.js:898
+msgid "Behaviour"
+msgstr "Chování"
+
+#: dist/prefs.js:775 dist/prefs.js:869 dist/prefs.js:899
+msgid "Configure the behaviour of Tiling Shell"
+msgstr "Nastavení chování Tiling Shell"
+
+#: dist/prefs.js:780 dist/prefs.js:874 dist/prefs.js:904
+msgid "Enable Snap Assistant"
+msgstr "Povolit asistenta přichycení"
+
+#: dist/prefs.js:781 dist/prefs.js:875 dist/prefs.js:905
+msgid "Move the window on top of the screen to snap assist it"
+msgstr ""
+"Přesunutím okna k horní části obrazovky mužete vybrat pozici přichycení"
+
+#: dist/prefs.js:786 dist/prefs.js:880 dist/prefs.js:910
+msgid "Enable Tiling System"
+msgstr "Povolit systém dlaždic"
+
+#: dist/prefs.js:787 dist/prefs.js:881 dist/prefs.js:911
+msgid "Hold the activation key while moving a window to tile it"
+msgstr "Podržte aktivační klávesu a přesouvejte okno pro přichycení k dláždici"
+
+#: dist/prefs.js:805 dist/prefs.js:899 dist/prefs.js:929
+msgid "Span multiple tiles"
+msgstr "Rozvržení přes více dlaždic"
+
+#: dist/prefs.js:806 dist/prefs.js:900 dist/prefs.js:930
+msgid "Hold the activation key to span multiple tiles"
+msgstr "Podržte aktivační klávesu, abyste překlenuli více dlaždic"
+
+#: dist/prefs.js:821 dist/prefs.js:915 dist/prefs.js:945
+msgid "Enable auto-resize of the complementing tiled windows"
+msgstr "Povolit automatickou změnu velikosti doplňujících dlaždicových oken"
+
+#: dist/prefs.js:823 dist/prefs.js:917 dist/prefs.js:947
+msgid ""
+"When a tiled window is resized, auto-resize the other tiled windows near it"
+msgstr ""
+"Když se změní velikost dlaždicového okna, automaticky změníte velikost "
+"ostatních dlaždicových oken poblíž"
+
+#: dist/prefs.js:829 dist/prefs.js:923 dist/prefs.js:953
+msgid "Restore window size"
+msgstr "Obnovit velikost okna"
+
+#: dist/prefs.js:831 dist/prefs.js:925 dist/prefs.js:955
+msgid "Whether to restore the windows to their original size when untiled"
+msgstr "Zda vrátit okna do původní velikosti, když nejsou v dlaždicích"
+
+#: dist/prefs.js:837 dist/prefs.js:931 dist/prefs.js:961
+msgid "Add snap assistant and auto-tile buttons to window menu"
+msgstr ""
+"Přidat do nabídky okna asistenta přichycení a tlačítka automatického "
+"rozložení"
+
+#: dist/prefs.js:839 dist/prefs.js:933 dist/prefs.js:963
+msgid ""
+"Add snap assistant and auto-tile buttons in the menu that shows up when you "
+"right click on a window title"
+msgstr ""
+"Když kliknete pravým tlačítkem myši na název okna, zobrazí se v nabídce "
+"tlačítka asistenta přichycení a automatického rozložení"
+
+#: dist/prefs.js:844 dist/prefs.js:938 dist/prefs.js:968
+msgid "Screen Edges"
+msgstr "Okraje obrazovky"
+
+#: dist/prefs.js:846 dist/prefs.js:940 dist/prefs.js:970
+msgid ""
+"Drag windows against the top, left and right screen edges to resize them"
+msgstr ""
+"Přetažením oken proti hornímu, levému a pravému okraji obrazovky změníte "
+"jejich velikost"
+
+#: dist/prefs.js:860 dist/prefs.js:954 dist/prefs.js:984
+msgid "Drag against top edge to maximize window"
+msgstr "Tažením proti hornímu okraji okno maximalizujete"
+
+#: dist/prefs.js:861 dist/prefs.js:955 dist/prefs.js:985
+msgid "Drag windows against the top edge to maximize them"
+msgstr "Přetáhněte okna proti hornímu okraji, abyste je maximalizovali"
+
+#: dist/prefs.js:870 dist/prefs.js:964 dist/prefs.js:994
+msgid "Quarter tiling activation area"
+msgstr "Plocha pro aktivaci dláždic"
+
+#: dist/prefs.js:871 dist/prefs.js:965 dist/prefs.js:995
+#, javascript-format
+msgid "Activation area to trigger quarter tiling (% of the screen)"
+msgstr "Aktivační oblast pro spuštění dláždic (% obrazovky)"
+
+#: dist/prefs.js:888 dist/prefs.js:982 dist/prefs.js:1046
+msgid "Layouts"
+msgstr "Rozvržení"
+
+#: dist/prefs.js:889 dist/prefs.js:983 dist/prefs.js:1047
+msgid "Configure the layouts of Tiling Shell"
+msgstr "Nastavení rozvržení Tiling Shell"
+
+#: dist/prefs.js:893 dist/prefs.js:894 dist/prefs.js:987 dist/prefs.js:988
+#: dist/prefs.js:1051 dist/prefs.js:1052
+msgid "Edit layouts"
+msgstr "Upravit rozvržení"
+
+#: dist/prefs.js:895 dist/prefs.js:989 dist/prefs.js:1053
+msgid "Open the layouts editor"
+msgstr "Otevřete editor rozvržení"
+
+#: dist/prefs.js:900 dist/prefs.js:901 dist/prefs.js:905 dist/prefs.js:994
+#: dist/prefs.js:995 dist/prefs.js:999 dist/prefs.js:1058 dist/prefs.js:1059
+#: dist/prefs.js:1063
+msgid "Export layouts"
+msgstr "Exportovat rozvržení"
+
+#: dist/prefs.js:902 dist/prefs.js:996 dist/prefs.js:1060
+msgid "Export layouts to a file"
+msgstr "Exportujte rozvržení do souboru"
+
+#: dist/prefs.js:909 dist/prefs.js:966 dist/prefs.js:1253 dist/prefs.js:1311
+#: dist/prefs.js:1003 dist/prefs.js:1060 dist/prefs.js:1369 dist/prefs.js:1427
+#: dist/prefs.js:1067 dist/prefs.js:1124 dist/prefs.js:1433 dist/prefs.js:1491
+#: dist/extension.js:5767 dist/prefs.js:1122 dist/prefs.js:1429
+#: dist/prefs.js:1485
+msgid "Cancel"
+msgstr "Zrušit"
+
+#: dist/prefs.js:910 dist/prefs.js:1254 dist/prefs.js:1004 dist/prefs.js:1370
+#: dist/prefs.js:1068 dist/prefs.js:1434 dist/extension.js:5757
+#: dist/prefs.js:1066 dist/prefs.js:1428
+msgid "Save"
+msgstr "Uložit"
+
+#: dist/prefs.js:957 dist/prefs.js:958 dist/prefs.js:1051 dist/prefs.js:1052
+#: dist/prefs.js:1115 dist/prefs.js:1116 dist/prefs.js:1113 dist/prefs.js:1114
+msgid "Import layouts"
+msgstr "Importovat rozvržení"
+
+#: dist/prefs.js:959 dist/prefs.js:1053 dist/prefs.js:1117 dist/prefs.js:1115
+msgid "Import layouts from a file"
+msgstr "Importujte rozvržení ze souboru"
+
+#: dist/prefs.js:962 dist/prefs.js:1056 dist/prefs.js:1120 dist/prefs.js:1118
+msgid "Select layouts file"
+msgstr "Vyberte soubor rozvržení"
+
+#: dist/prefs.js:967 dist/prefs.js:1312 dist/prefs.js:1061 dist/prefs.js:1428
+#: dist/prefs.js:1125 dist/prefs.js:1492 dist/prefs.js:1121 dist/prefs.js:1484
+msgid "Open"
+msgstr "Otevřít"
+
+#: dist/prefs.js:1015 dist/prefs.js:1016 dist/prefs.js:1109 dist/prefs.js:1110
+#: dist/prefs.js:1173 dist/prefs.js:1174 dist/prefs.js:1169 dist/prefs.js:1170
+msgid "Reset layouts"
+msgstr "Resetovat rozvržení"
+
+#: dist/prefs.js:1017 dist/prefs.js:1111 dist/prefs.js:1175 dist/prefs.js:1171
+msgid "Bring back the default layouts"
+msgstr "Obnovte výchozí rozvržení"
+
+#: dist/prefs.js:1030 dist/prefs.js:1124 dist/prefs.js:1188 dist/prefs.js:1184
+msgid "Keybindings"
+msgstr "Klávesové zkratky"
+
+#: dist/prefs.js:1032 dist/prefs.js:1126 dist/prefs.js:1190 dist/prefs.js:1186
+msgid "Use hotkeys to perform actions on the focused window"
+msgstr "Pomocí klávesových zkratek provádějte akce na vybraném okně"
+
+#: dist/prefs.js:1050 dist/prefs.js:1152 dist/prefs.js:1208 dist/prefs.js:1204
+msgid "Move window to right tile"
+msgstr "Přesunout okno na pravou dlaždici"
+
+#: dist/prefs.js:1052 dist/prefs.js:1154 dist/prefs.js:1210 dist/prefs.js:1206
+msgid "Move the focused window to the tile on its right"
+msgstr "Přesuňte vybrané okno na dlaždici napravo"
+
+#: dist/prefs.js:1061 dist/prefs.js:1163 dist/prefs.js:1219 dist/prefs.js:1215
+msgid "Move window to left tile"
+msgstr "Přesunout okno na levou dlaždici"
+
+#: dist/prefs.js:1062 dist/prefs.js:1164 dist/prefs.js:1220 dist/prefs.js:1216
+msgid "Move the focused window to the tile on its left"
+msgstr "Přesuňte vybrané okno na dlaždici nalevo"
+
+#: dist/prefs.js:1068 dist/prefs.js:1170 dist/prefs.js:1226 dist/prefs.js:1222
+msgid "Move window to tile above"
+msgstr "Přesunout okno na dlaždici výše"
+
+#: dist/prefs.js:1069 dist/prefs.js:1171 dist/prefs.js:1227 dist/prefs.js:1223
+msgid "Move the focused window to the tile above"
+msgstr "Přesuňte vybrané okno na dlaždici výše"
+
+#: dist/prefs.js:1075 dist/prefs.js:1177 dist/prefs.js:1233 dist/prefs.js:1229
+msgid "Move window to tile below"
+msgstr "Přesunout okno na dlaždici níže"
+
+#: dist/prefs.js:1076 dist/prefs.js:1178 dist/prefs.js:1234 dist/prefs.js:1230
+msgid "Move the focused window to the tile below"
+msgstr "Přesuňte vybrané okno na dlaždici níže"
+
+#: dist/prefs.js:1082 dist/prefs.js:1184 dist/prefs.js:1240 dist/prefs.js:1236
+msgid "Span window to right tile"
+msgstr "Roztáhnout okno na pravou dlaždici"
+
+#: dist/prefs.js:1083 dist/prefs.js:1185 dist/prefs.js:1241 dist/prefs.js:1237
+msgid "Span the focused window to the tile on its right"
+msgstr "Roztáhněte vybrané okno na dlaždici napravo"
+
+#: dist/prefs.js:1089 dist/prefs.js:1191 dist/prefs.js:1247 dist/prefs.js:1243
+msgid "Span window to left tile"
+msgstr "Roztáhnout okno na levou dlaždici"
+
+#: dist/prefs.js:1090 dist/prefs.js:1192 dist/prefs.js:1248 dist/prefs.js:1244
+msgid "Span the focused window to the tile on its left"
+msgstr "Roztáhněte vybrané okno na dlaždici nalevo"
+
+#: dist/prefs.js:1096 dist/prefs.js:1198 dist/prefs.js:1254 dist/prefs.js:1250
+msgid "Span window above"
+msgstr "Roztáhnout okno výše"
+
+#: dist/prefs.js:1097 dist/prefs.js:1199 dist/prefs.js:1255 dist/prefs.js:1251
+msgid "Span the focused window to the tile above"
+msgstr "Roztáhněte vybrané okno na dlaždici výše"
+
+#: dist/prefs.js:1103 dist/prefs.js:1205 dist/prefs.js:1261 dist/prefs.js:1257
+msgid "Span window down"
+msgstr "Roztáhnout okno níže"
+
+#: dist/prefs.js:1104 dist/prefs.js:1206 dist/prefs.js:1262 dist/prefs.js:1258
+msgid "Span the focused window to the tile below"
+msgstr "Roztáhněte vybrané okno na dlaždici níže"
+
+#: dist/prefs.js:1110 dist/prefs.js:1212 dist/prefs.js:1268 dist/prefs.js:1264
+msgid "Span window to all tiles"
+msgstr "Roztáhnout okno na všechny dlaždice"
+
+#: dist/prefs.js:1111 dist/prefs.js:1213 dist/prefs.js:1269 dist/prefs.js:1265
+msgid "Span the focused window to all the tiles"
+msgstr "Roztáhněte vybrané okno na všechny dlaždice"
+
+#: dist/prefs.js:1117 dist/prefs.js:1219 dist/prefs.js:1275 dist/prefs.js:1271
+msgid "Untile focused window"
+msgstr "Odpojit vybrané okno z dlaždic"
+
+#: dist/prefs.js:1125 dist/prefs.js:1227 dist/prefs.js:1283 dist/prefs.js:1279
+msgid "Move window to the center"
+msgstr "Přesunout okno do středu"
+
+#: dist/prefs.js:1127 dist/prefs.js:1229 dist/prefs.js:1285 dist/prefs.js:1281
+msgid "Move the focused window to the center of the screen"
+msgstr "Přesuňte vybrané okno do středu obrazovky"
+
+#: dist/prefs.js:1136 dist/prefs.js:1238 dist/prefs.js:1294 dist/prefs.js:1290
+msgid "Focus window to the right"
+msgstr "Vybrat okno napravo"
+
+#: dist/prefs.js:1138 dist/prefs.js:1240 dist/prefs.js:1296 dist/prefs.js:1292
+msgid "Focus the window to the right of the current focused window"
+msgstr "Vyberte okno napravo od aktuálně aktivního okna"
+
+#: dist/prefs.js:1145 dist/prefs.js:1247 dist/prefs.js:1303 dist/prefs.js:1299
+msgid "Focus window to the left"
+msgstr "Vybrat okno nalevo"
+
+#: dist/prefs.js:1146 dist/prefs.js:1248 dist/prefs.js:1304 dist/prefs.js:1300
+msgid "Focus the window to the left of the current focused window"
+msgstr "Vyberte okno nalevo od aktuálně aktivního okna"
+
+#: dist/prefs.js:1152 dist/prefs.js:1254 dist/prefs.js:1310 dist/prefs.js:1306
+msgid "Focus window above"
+msgstr "Vybrat okno nahoře"
+
+#: dist/prefs.js:1153 dist/prefs.js:1255 dist/prefs.js:1311 dist/prefs.js:1307
+msgid "Focus the window above the current focused window"
+msgstr "Vyberte okno nad aktuálně aktivním oknem"
+
+#: dist/prefs.js:1159 dist/prefs.js:1261 dist/prefs.js:1317 dist/prefs.js:1313
+msgid "Focus window below"
+msgstr "Vybrat okno dole"
+
+#: dist/prefs.js:1160 dist/prefs.js:1262 dist/prefs.js:1318 dist/prefs.js:1314
+msgid "Focus the window below the current focused window"
+msgstr "Vyberte okno pod aktuálně aktivním oknem"
+
+#: dist/prefs.js:1187 dist/prefs.js:1303 dist/prefs.js:1359 dist/prefs.js:1355
+msgid "View and Customize all the Shortcuts"
+msgstr "Zobrazit a přizpůsobit všechny zkratky"
+
+#: dist/prefs.js:1215 dist/prefs.js:1216 dist/prefs.js:1331 dist/prefs.js:1332
+#: dist/prefs.js:1387 dist/prefs.js:1388 dist/prefs.js:1383 dist/prefs.js:1384
+msgid "View and Customize Shortcuts"
+msgstr "Zobrazit a přizpůsobit zkratky"
+
+#: dist/prefs.js:1237 dist/prefs.js:1353 dist/prefs.js:1417 dist/prefs.js:1413
+msgid "Import, export and reset"
+msgstr "Import, export a reset"
+
+#: dist/prefs.js:1239 dist/prefs.js:1355 dist/prefs.js:1419 dist/prefs.js:1415
+msgid "Import, export and reset the settings of Tiling Shell"
+msgstr "Importujte, exportujte a resetujte nastavení Tiling Shell"
+
+#: dist/prefs.js:1244 dist/prefs.js:1245 dist/prefs.js:1360 dist/prefs.js:1361
+#: dist/prefs.js:1424 dist/prefs.js:1425 dist/prefs.js:1420 dist/prefs.js:1421
+msgid "Export settings"
+msgstr "Export nastavení"
+
+#: dist/prefs.js:1246 dist/prefs.js:1362 dist/prefs.js:1426 dist/prefs.js:1422
+msgid "Export settings to a file"
+msgstr "Exportujte nastavení do souboru"
+
+#: dist/prefs.js:1249 dist/prefs.js:1365 dist/prefs.js:1429 dist/prefs.js:1425
+msgid "Export settings to a text file"
+msgstr "Export nastavení do textového souboru"
+
+#: dist/prefs.js:1302 dist/prefs.js:1303 dist/prefs.js:1418 dist/prefs.js:1419
+#: dist/prefs.js:1482 dist/prefs.js:1483 dist/prefs.js:1476 dist/prefs.js:1477
+msgid "Import settings"
+msgstr "Import nastavení"
+
+#: dist/prefs.js:1304 dist/prefs.js:1420 dist/prefs.js:1484 dist/prefs.js:1478
+msgid "Import settings from a file"
+msgstr "Importujte nastavení ze souboru"
+
+#: dist/prefs.js:1307 dist/prefs.js:1423 dist/prefs.js:1487 dist/prefs.js:1481
+msgid "Select a text file to import from"
+msgstr "Vyberte textový soubor, ze kterého chcete importovat"
+
+#: dist/prefs.js:1351 dist/prefs.js:1352 dist/prefs.js:1467 dist/prefs.js:1468
+#: dist/prefs.js:1531 dist/prefs.js:1532 dist/prefs.js:1523 dist/prefs.js:1524
+msgid "Reset settings"
+msgstr "Resetovat nastavení"
+
+#: dist/prefs.js:1353 dist/prefs.js:1469 dist/prefs.js:1533 dist/prefs.js:1525
+msgid "Bring back the default settings"
+msgstr "Obnovte výchozí nastavení"
+
+#: dist/prefs.js:1368 dist/prefs.js:1484 dist/prefs.js:1548 dist/prefs.js:1540
+msgid "Donate on ko-fi"
+msgstr "Darovat na ko-fi"
+
+#: dist/prefs.js:1374 dist/prefs.js:1490 dist/prefs.js:1554 dist/prefs.js:1546
+msgid "Report a bug"
+msgstr "Nahlásit chybu"
+
+#: dist/prefs.js:1380 dist/prefs.js:1496 dist/prefs.js:1560 dist/prefs.js:1552
+msgid "Request a feature"
+msgstr "Žádost o funkci"
+
+#: dist/prefs.js:1388 dist/prefs.js:1504 dist/prefs.js:1568 dist/prefs.js:1560
+msgid "Have issues, you want to suggest a new feature or contribute?"
+msgstr "Máte problémy, chcete navrhnout novou funkci nebo přispět?"
+
+#: dist/prefs.js:1395 dist/prefs.js:1511 dist/prefs.js:1575 dist/prefs.js:1567
+msgid "Open a new issue on"
+msgstr "Otevřít nový problém na"
+
+#: dist/extension.js:4500 dist/extension.js:5361 dist/extension.js:5652
+#: dist/extension.js:5658 dist/extension.js:5656
+msgid "Edit Layouts"
+msgstr "Upravit rozvržení"
+
+#: dist/extension.js:4510 dist/extension.js:5371 dist/extension.js:5662
+#: dist/extension.js:5668 dist/extension.js:5666
+msgid "New Layout"
+msgstr "Nové rozvržení"
+
+#: dist/extension.js:4691 dist/extension.js:5558 dist/extension.js:5849
+#: dist/extension.js:5855 dist/extension.js:5853
+msgid "to split a tile"
+msgstr "rozdělí dlaždici"
+
+#: dist/extension.js:4730 dist/extension.js:5597 dist/extension.js:5888
+#: dist/extension.js:5894 dist/extension.js:5892
+msgid "to split a tile vertically"
+msgstr "rozdělí dlaždici vertikálně"
+
+#: dist/extension.js:4750 dist/extension.js:5617 dist/extension.js:5908
+#: dist/extension.js:5914 dist/extension.js:5912
+msgid "to delete a tile"
+msgstr "smaže dlaždici"
+
+#: dist/extension.js:4775 dist/extension.js:5642 dist/extension.js:5933
+#: dist/extension.js:5939 dist/extension.js:5937
+msgid "use the indicator button to save or cancel"
+msgstr "použijte ikonu pro uložení nebo zrušení"
+
+#: dist/prefs.js:815 dist/prefs.js:909 dist/prefs.js:939
+msgid "Enable Auto Tiling"
+msgstr "Povolit automatické dlaždice"
+
+#: dist/prefs.js:816 dist/prefs.js:910 dist/prefs.js:940
+msgid "Automatically tile new windows to the best tile"
+msgstr "Automaticky vložte nová okna na nejvhodnějsí dlaždice"
+
+#: dist/prefs.js:795 dist/prefs.js:889 dist/prefs.js:919
+msgid "Tiling System deactivation key"
+msgstr "Klávesa pro deaktivaci systému dlaždic"
+
+#: dist/prefs.js:797 dist/prefs.js:891 dist/prefs.js:921
+msgid ""
+"Hold the deactivation key while moving a window to deactivate the tiling "
+"system"
+msgstr ""
+"Podržte deaktivační klávesu při pohybu okna pro deaktivaci systému dláždic"
+
+#: dist/prefs.js:817 dist/prefs.js:854
+msgid "Smart border radius"
+msgstr "Inteligentní poloměr ohraničení"
+
+#: dist/prefs.js:818 dist/prefs.js:855
+msgid "Dynamically adapt to the window’s actual border radius"
+msgstr "Dynamicky se přizpůsobí skutečnému poloměru okraje okna"
+
+#: dist/prefs.js:1141 dist/prefs.js:1410 dist/prefs.js:1406
+msgid "Enable next/previous window focus to wrap around"
+msgstr "Povolit další/předchozí vybrání okna"
+
+#: dist/prefs.js:1143 dist/prefs.js:1412 dist/prefs.js:1408
+msgid "When focusing next or previous window, wrap around at the window edge"
+msgstr "Při vybrání dalšího nebo předchozího okna zalomí okraje okna"
+
+#: dist/prefs.js:1268 dist/prefs.js:1324 dist/prefs.js:1320
+msgid "Focus next window"
+msgstr "Vybrat následující okno"
+
+#: dist/prefs.js:1269 dist/prefs.js:1325 dist/prefs.js:1321
+msgid "Focus the window next to the current focused window"
+msgstr "Vyberte okno za aktuálně aktivním oknem"
+
+#: dist/prefs.js:1275 dist/prefs.js:1331 dist/prefs.js:1327
+msgid "Focus previous window"
+msgstr "Vybrat předchozí okno"
+
+#: dist/prefs.js:1276 dist/prefs.js:1332 dist/prefs.js:1328
+msgid "Focus the window prior to the current focused window"
+msgstr "Vyberte okno před aktuálně aktivním oknem"
+
+#: dist/prefs.js:1012
+msgid "Windows suggestions"
+msgstr "Návrhy oken"
+
+#: dist/prefs.js:1013
+msgid "Enable and disable windows suggestions"
+msgstr "Povolit a zakázat návrhy oken"
+
+#: dist/prefs.js:1018
+msgid "Enable window suggestions for the tiling system"
+msgstr "Povolit návrhy oken pro systém dlaždic"
+
+#: dist/prefs.js:1020
+msgid ""
+"Provides smart suggestions to fill empty tiles when using the tiling system"
+msgstr ""
+"Poskytuje chytré návrhy, jak vyplnit prázdné dlaždice při použití systému "
+"obkladů"
+
+#: dist/prefs.js:1026
+msgid "Enable window suggestions for the snap assistant"
+msgstr "Povolit návrhy oken pro asistenta přichycení"
+
+#: dist/prefs.js:1028
+msgid ""
+"Offers suggestions to populate empty tiles when using the snap assistant"
+msgstr ""
+"Nabízí návrhy k vyplnění prázdných dlaždic při použití asistenta přichycení"
+
+#: dist/prefs.js:1034
+msgid "Enable window suggestions for screen edge snapping"
+msgstr "Povolit návrhy oken pro přichycení okrajů obrazovky"
+
+#: dist/prefs.js:1036
+msgid "Suggests windows to occupy empty tiles when snapping to screen edges"
+msgstr ""
+"Navrhuje, aby okna obsadila prázdné dlaždice při přichycení k okrajům "
+"obrazovky"
+
+#: dist/prefs.js:1438 dist/prefs.js:1432
+msgid "Text file"
+msgstr "Textový soubor"
+
+#: dist/prefs.js:1800 dist/prefs.js:1823 dist/prefs.js:1796 dist/prefs.js:1819
+msgid "New accelerator…"
+msgstr "Nový akcelerátor…"
+
+#: dist/prefs.js:1826 dist/prefs.js:1822
+msgid "Use Backspace to clear"
+msgstr "K vymazání použijte Backspace"
+
+#: dist/extension.js:5743
+msgid "Menu"
+msgstr "Menu"
+
+#: dist/extension.js:5750
+msgid "Info"
+msgstr "Informace"
+
+#: dist/extension.js:5809
+msgid "Select the layout to edit"
+msgstr "Vyberte rozvržení, které chcete upravit"
+
+#: dist/extension.js:5829
+msgid "Close"
+msgstr "Zavřít"
+
+#: dist/extension.js:5957
+msgid "How to use the editor"
+msgstr "Jak používat editor"
+
+#: dist/extension.js:5966
+msgid "Start editing"
+msgstr "Začít upravovat"
+
+#: dist/extension.js:6801
+msgid "Move to best tile"
+msgstr "Přesunout na nejlepší dlaždici"
+
+#: dist/extension.js:6821
+msgid "Move to leftmost tile"
+msgstr "Přesunout na dlaždici, která je nejvíce vlevo"
+
+#: dist/extension.js:6840
+msgid "Move to rightmost tile"
+msgstr "Přesunout na dlaždici, která je nejvíce vpravo"
