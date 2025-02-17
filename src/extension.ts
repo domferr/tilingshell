@@ -5,6 +5,7 @@ import { logger } from '@utils/logger';
 import {
     filterUnfocusableWindows,
     getMonitors,
+    getWindows,
     squaredEuclideanDistance,
 } from '@/utils/ui';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -263,6 +264,23 @@ export default class TilingShellExtension extends Extension {
                     dir: KeyBindingsDirection,
                 ) => {
                     this._onKeyboardFocusWinDirection(dp, dir);
+                },
+            );
+            this._signals.connect(
+                this._keybindings,
+                'highlight-current-window',
+                (kb: KeyBindings, dp: Meta.Display) => {
+                    const focus_window = dp.get_focus_window();
+                    getWindows(
+                        global.workspaceManager.get_active_workspace(),
+                    ).forEach((win) => {
+                        if (win !== focus_window && win.can_minimize())
+                            win.minimize();
+                    });
+                    Main.activateWindow(
+                        focus_window,
+                        global.get_current_time(),
+                    );
                 },
             );
         }

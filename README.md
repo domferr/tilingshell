@@ -232,3 +232,72 @@ To uninstall, first disable the extension and then remove it. To disable via the
 ## Contributing
 
 Feel free to submit [issues](https://github.com/domferr/tilingshell/issues/new/choose) and [Pull Requests](https://github.com/domferr/tilingshell/pulls)!
+
+### How to add new keybindings
+
+1. Edit the file `resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml` and add a new key with a name, default empty value and a summary. For example, add the following if the name is `highlight-current-window` and the summary is `Minimize all the other windows and show only the focused window`:
+```xml
+<key type="as" name="highlight-current-window">
+  <default><![CDATA[['']]]></default>
+  <summary>Minimize all the other windows and show only the focused window</summary>
+</key>
+```
+
+2. Edit the file `src/settings/settings.ts` and add a static constant at the end of the list of the static constants (for example [here](https://github.com/domferr/tilingshell/blob/8a1f21620d5d8f1db7c5b6b45c0ef0c483801420/src/settings/settings.ts#L138)). The static constant must be a string equal to the key name. The constant name must start with `SETTING_` and must be the key name capitalized and using underscores. For example if the key name is `highlight-current-window`, add this to the file:
+```js
+static SETTING_HIGHLIGHT_CURRENT_WINDOW = 'highlight-current-window';
+```
+
+3. Edit the file `src/keybindings.ts` by adding a new signal with a name equal to the key name. Be sure to put `Meta.Display.$gtype` followed by all the parameter types you need (if any). For example, if the key name is `highlight-current-window` and it doesn't need any parameter, add this:
+```js
+'highlight-current-window': {
+    param_types: [Meta.Display.$gtype], // Meta.Display,
+},
+```
+
+4. The idea is that, when the user presses the keybindings, the Keybinding singleton class will emit that signal. To achieve that, edit the file `src/keybindings.ts` by emitting the signal when the keybindings are used, for example [here](https://github.com/domferr/tilingshell/blob/8a1f21620d5d8f1db7c5b6b45c0ef0c483801420/src/keybindings.ts#L223). For example if the key name is `highlight-current-window`, add this:
+```js
+Main.wm.addKeybinding(
+    Settings.SETTING_HIGHLIGHT_CURRENT_WINDOW,
+    extensionSettings,
+    Meta.KeyBindingFlags.NONE,
+    Shell.ActionMode.NORMAL,
+    (display: Meta.Display) => {
+        this.emit('highlight-current-window', display);
+    },
+);
+```
+You can put after `display` all the parameters you need (if any).
+
+5. Ensure you disable the keybindings when the extension is disabled. To achieve that edit the file `src/keybindings.ts` to remove the keybindings, for example [here](https://github.com/domferr/tilingshell/blob/8a1f21620d5d8f1db7c5b6b45c0ef0c483801420/src/keybindings.ts#L318). For example, if the key name is `highlight-current-window` then add this:
+```js
+Main.wm.removeKeybinding(Settings.SETTING_HIGHLIGHT_CURRENT_WINDOW);
+```
+
+6. You can now listen to the keybindings from everywhere by just connecting to the signal. A good place to do so is in the `src/extension.ts` file, for example [here](https://github.com/domferr/tilingshell/blob/8a1f21620d5d8f1db7c5b6b45c0ef0c483801420/src/extension.ts#L264). For example, if the key name is `highlight-current-window` then add this:
+```js
+this._signals.connect(
+  this._keybindings,
+  'highlight-current-window',
+  (kb: KeyBindings, dp: Meta.Display) => {
+      // handle the keybinding and perform the actions you want
+      // to happen when the keybinding is used by the user
+      ...
+  },
+);
+```
+
+7. Edit the file `src/prefs.ts` to allow the user to choose its preferred keybindings. This can be easily done by adding a new entry in the `keybindings` array. For example by adding a new entry [here](https://github.com/domferr/tilingshell/blob/8a1f21620d5d8f1db7c5b6b45c0ef0c483801420/src/prefs.ts#L639). For example, if the key name is `highlight-current-window` then add this:
+```js
+[
+    Settings.SETTING_HIGHLIGHT_CURRENT_WINDOW,
+    _('Highlight focused window'),
+    _('Minimize all the other windows and show only the focused window'),
+    false,
+    false,
+],
+```
+The first element is the settings key, the second element is the title and the third is the description. The fourth is a boolean used by the preferences to store if that setting is set or not. The last is a boolean that indicates whether or not this setting must be on the main page, otherwise it can be accessed by expanding the list of available keybindings. However, any keybinding set by the user is always put on the main page.
+_Please use the same description you wrote in the schema at step 1._
+
+For any problem, doubts or if you are stuck, feel free to open a pull request with what you have already done. I'm more than happy to help!

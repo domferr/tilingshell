@@ -634,6 +634,15 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 false,
                 false,
             ],
+            [
+                Settings.SETTING_HIGHLIGHT_CURRENT_WINDOW,
+                _('Highlight focused window'),
+                _(
+                    'Minimize all the other windows and show only the focused window',
+                ),
+                false,
+                false,
+            ],
         ];
 
         // set if the keybinding was set or not by the user
