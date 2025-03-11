@@ -617,7 +617,7 @@ msgstr "Plik tekstowy"
 
 #: dist/prefs.js:1800 dist/prefs.js:1823 dist/prefs.js:1796 dist/prefs.js:1819
 msgid "New accelerator…"
-msgstr ""
+msgstr "Nowy skrót"
 
 #: dist/prefs.js:1826 dist/prefs.js:1822
 msgid "Use Backspace to clear"
