@@ -223,7 +223,6 @@ msgid "Quarter tiling activation area"
 msgstr "Strefa aktywacji ćwierciowania"
 
 #: dist/prefs.js:871 dist/prefs.js:965 dist/prefs.js:995
-#, javascript-format
 msgid "Activation area to trigger quarter tiling (% of the screen)"
 msgstr "Rozmiar aktywnej strefy do ćwierciowania (Wymagany % ekranu)"
 

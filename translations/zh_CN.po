@@ -219,10 +219,8 @@ msgid "Quarter tiling activation area"
 msgstr "四角平铺激活区域"
 
 #: dist/prefs.js:871 dist/prefs.js:965 dist/prefs.js:995
-#, javascript-format
 msgid "Activation area to trigger quarter tiling (% of the screen)"
-msgstr ""
-"四角平铺激活区域（%屏幕高度）\n"
+msgstr "四角平铺激活区域（%屏幕高度）\n"
 "（译者注：当移动窗口到屏幕左右边缘时，可以激活四角平铺）"
 
 #: dist/prefs.js:888 dist/prefs.js:982 dist/prefs.js:1046
