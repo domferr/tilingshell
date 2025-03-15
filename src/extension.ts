@@ -23,7 +23,6 @@ import KeyBindings, {
 import SettingsOverride from '@settings/settingsOverride';
 import { ResizingManager } from '@components/tilingsystem/resizeManager';
 import OverriddenWindowMenu from '@components/window_menu/overriddenWindowMenu';
-import OverriddenAltTab from '@components/altTab/overriddenAltTab';
 import Tile from '@components/layout/Tile';
 import { WindowBorderManager } from '@components/windowBorderManager';
 import TilingShellWindowManager from '@components/windowManager/tilingShellWindowManager';
@@ -130,7 +129,7 @@ export default class TilingShellExtension extends Extension {
 
         if (Settings.OVERRIDE_WINDOW_MENU) OverriddenWindowMenu.enable();
 
-        OverriddenAltTab.enable();
+        // TODO OverriddenAltTab.enable();
 
         debug('extension is enabled');
     }
@@ -710,7 +709,7 @@ export default class TilingShellExtension extends Extension {
         this._fractionalScalingEnabled = false;
 
         OverriddenWindowMenu.destroy();
-        OverriddenAltTab.destroy();
+        // TODO OverriddenAltTab.destroy();
 
         // restore native edge tiling and all the overridden settings
         SettingsOverride.destroy();
