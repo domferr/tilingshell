@@ -90,7 +90,14 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
         gaps: Clutter.Margin,
         tile: Tile,
     ): DynamicTilePreview {
-        return new DynamicTilePreview({ parent, rect, gaps, tile }, true);
+        const prev = new DynamicTilePreview({ parent, rect, gaps, tile }, true);
+        prev.updateBorderRadius(
+            prev.gaps.top > 0,
+            prev.gaps.right > 0,
+            prev.gaps.bottom > 0,
+            prev.gaps.left > 0,
+        );
+        return prev;
     }
 
     public get showing(): boolean {

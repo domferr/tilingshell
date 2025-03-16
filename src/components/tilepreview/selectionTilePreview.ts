@@ -28,7 +28,6 @@ export default class SelectionTilePreview extends TilePreview {
     constructor(params: {
         parent: Clutter.Actor;
         tile?: Tile;
-        containerRect?: Mtk.Rectangle;
         rect?: Mtk.Rectangle;
         gaps?: Clutter.Margin;
     }) {

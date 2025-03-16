@@ -98,6 +98,16 @@ export default class SuggestionsTilePreview extends TilePreview {
         this._recolor();*/
     }
 
+    public override set gaps(newGaps: Clutter.Margin) {
+        super.gaps = newGaps;
+        this.updateBorderRadius(
+            this._gaps.top > 0,
+            this._gaps.right > 0,
+            this._gaps.bottom > 0,
+            this._gaps.left > 0,
+        );
+    }
+
     _init() {
         super._init();
 

@@ -4,6 +4,7 @@ import Tile from '../layout/Tile';
 import Slider from './slider';
 import TileUtils from '../layout/TileUtils';
 import { registerGObjectClass } from '@utils/gjs';
+import { buildTileGaps } from '@utils/ui';
 
 @registerGObjectClass
 export default class EditableTilePreview extends TilePreview {
@@ -48,6 +49,16 @@ export default class EditableTilePreview extends TilePreview {
         this._updateLabelText();
 
         this.connect('destroy', this._onDestroy.bind(this));
+    }
+
+    public override set gaps(newGaps: Clutter.Margin) {
+        super.gaps = newGaps;
+        this.updateBorderRadius(
+            this._gaps.top > 0,
+            this._gaps.right > 0,
+            this._gaps.bottom > 0,
+            this._gaps.left > 0,
+        );
     }
 
     public getSlider(side: St.Side): Slider | null {
@@ -98,11 +109,15 @@ export default class EditableTilePreview extends TilePreview {
         y,
         width,
         height,
+        innerGaps,
+        outerGaps,
     }: {
         x: number;
         y: number;
         width: number;
         height: number;
+        innerGaps?: Clutter.Margin;
+        outerGaps?: Clutter.Margin;
     }) {
         const oldSize = this._rect.copy();
         this._tile.x = x;
@@ -110,6 +125,14 @@ export default class EditableTilePreview extends TilePreview {
         this._tile.width = width;
         this._tile.height = height;
         this._rect = TileUtils.apply_props(this._tile, this._containerRect);
+        if (innerGaps && outerGaps) {
+            this.gaps = buildTileGaps(
+                this._rect,
+                innerGaps,
+                outerGaps,
+                this._containerRect,
+            );
+        }
 
         this.set_size(this.innerWidth, this.innerHeight);
         this.set_position(this.innerX, this.innerY);

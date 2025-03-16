@@ -43,25 +43,25 @@ export default class TilePreview extends St.Widget {
         this._gaps.right = gaps.right * scalingFactor;
         this._gaps.bottom = gaps.bottom * scalingFactor;
         this._gaps.left = gaps.left * scalingFactor;
-        debug(
-            this._gaps.top,
-            this._gaps.right,
-            this._gaps.bottom,
-            this._gaps.left,
-        );
+    }
 
+    public updateBorderRadius(
+        hasNeighborTop: boolean,
+        hasNeighborRight: boolean,
+        hasNeighborBottom: boolean,
+        hasNeighborLeft: boolean,
+    ) {
         this.remove_style_class_name('top-left-border-radius');
         this.remove_style_class_name('top-right-border-radius');
         this.remove_style_class_name('bottom-right-border-radius');
         this.remove_style_class_name('bottom-left-border-radius');
         this.remove_style_class_name('custom-tile-preview');
 
-        const topLeft = this._gaps.top > 0 && this._gaps.left > 0;
-        const topRight = this._gaps.top > 0 && this._gaps.right > 0;
-        const bottomRight = this._gaps.bottom > 0 && this._gaps.right > 0;
-        const bottomLeft = this._gaps.bottom > 0 && this._gaps.left > 0;
-        /* if (topLeft && topRight && bottomRight && bottomLeft)
-            this.add_style_class_name('custom-tile-preview');*/
+        const topLeft = hasNeighborTop && hasNeighborLeft;
+        const topRight = hasNeighborTop && hasNeighborRight;
+        const bottomRight = hasNeighborBottom && hasNeighborRight;
+        const bottomLeft = hasNeighborBottom && hasNeighborLeft;
+
         if (topLeft) this.add_style_class_name('top-left-border-radius');
         if (topRight) this.add_style_class_name('top-right-border-radius');
         if (bottomRight)
