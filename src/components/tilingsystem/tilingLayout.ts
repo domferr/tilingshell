@@ -9,12 +9,11 @@ import Tile from '../layout/Tile';
 import {
     buildRectangle,
     buildTileGaps,
-    clampPointInsideRect,
     isPointInsideRect,
     squaredEuclideanDistance,
 } from '@utils/ui';
 import TileUtils from '@components/layout/TileUtils';
-import { logger, rect_to_string } from '@utils/logger';
+import { logger } from '@utils/logger';
 import GlobalState from '@utils/globalState';
 import { KeyBindingsDirection } from '@keybindings';
 

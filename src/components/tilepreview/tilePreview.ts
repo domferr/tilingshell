@@ -3,6 +3,9 @@ import { registerGObjectClass } from '@/utils/gjs';
 import { buildRectangle, getScalingFactorOf } from '@utils/ui';
 import GlobalState from '@utils/globalState';
 import Tile from '@components/layout/Tile';
+import { logger } from '@utils/logger';
+
+const debug = logger('TilePreview');
 
 // export module TilePreview {
 export interface TilePreviewConstructorProperties
@@ -40,15 +43,30 @@ export default class TilePreview extends St.Widget {
         this._gaps.right = gaps.right * scalingFactor;
         this._gaps.bottom = gaps.bottom * scalingFactor;
         this._gaps.left = gaps.left * scalingFactor;
+        debug(
+            this._gaps.top,
+            this._gaps.right,
+            this._gaps.bottom,
+            this._gaps.left,
+        );
 
-        if (
-            this._gaps.top === 0 &&
-            this._gaps.bottom === 0 &&
-            this._gaps.right === 0 &&
-            this._gaps.left === 0
-        )
-            this.remove_style_class_name('custom-tile-preview');
-        else this.add_style_class_name('custom-tile-preview');
+        this.remove_style_class_name('top-left-border-radius');
+        this.remove_style_class_name('top-right-border-radius');
+        this.remove_style_class_name('bottom-right-border-radius');
+        this.remove_style_class_name('bottom-left-border-radius');
+        this.remove_style_class_name('custom-tile-preview');
+
+        const topLeft = this._gaps.top > 0 && this._gaps.left > 0;
+        const topRight = this._gaps.top > 0 && this._gaps.right > 0;
+        const bottomRight = this._gaps.bottom > 0 && this._gaps.right > 0;
+        const bottomLeft = this._gaps.bottom > 0 && this._gaps.left > 0;
+        /* if (topLeft && topRight && bottomRight && bottomLeft)
+            this.add_style_class_name('custom-tile-preview');*/
+        if (topLeft) this.add_style_class_name('top-left-border-radius');
+        if (topRight) this.add_style_class_name('top-right-border-radius');
+        if (bottomRight)
+            this.add_style_class_name('bottom-right-border-radius');
+        if (bottomLeft) this.add_style_class_name('bottom-left-border-radius');
     }
 
     public get gaps(): Clutter.Margin {
@@ -61,7 +79,7 @@ export default class TilePreview extends St.Widget {
 
     _init() {
         super._init();
-        this.set_style_class_name('tile-preview custom-tile-preview');
+        this.set_style_class_name('tile-preview');
         this.hide();
     }
 
