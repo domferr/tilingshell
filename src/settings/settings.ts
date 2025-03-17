@@ -101,8 +101,17 @@ export default class Settings {
     static KEY_OVERRIDE_WINDOW_MENU = 'override-window-menu';
     static KEY_SNAP_ASSISTANT_THRESHOLD = 'snap-assistant-threshold';
     static KEY_ENABLE_WINDOW_BORDER = 'enable-window-border';
-    static KEY_INNER_GAPS = 'inner-gaps';
-    static KEY_OUTER_GAPS = 'outer-gaps';
+
+    static KEY_INNER_GAPS_TOP = 'inner-gaps-top';
+    static KEY_INNER_GAPS_BOTTOM = 'inner-gaps-bottom';
+    static KEY_INNER_GAPS_LEFT = 'inner-gaps-left';
+    static KEY_INNER_GAPS_RIGHT = 'inner-gaps-right';
+    
+    static KEY_OUTER_GAPS_TOP = 'outer-gaps-top';
+    static KEY_OUTER_GAPS_BOTTOM = 'outer-gaps-bottom';
+    static KEY_OUTER_GAPS_LEFT = 'outer-gaps-left';
+    static KEY_OUTER_GAPS_RIGHT = 'outer-gaps-right';
+
     static KEY_SNAP_ASSISTANT_ANIMATION_TIME = 'snap-assistant-animation-time';
     static KEY_TILE_PREVIEW_ANIMATION_TIME = 'tile-preview-animation-time';
     static KEY_SETTING_LAYOUTS_JSON = 'layouts-json';
@@ -226,20 +235,68 @@ export default class Settings {
         set_activationkey(Settings.KEY_TILING_SYSTEM_DEACTIVATION_KEY, val);
     }
 
-    static get INNER_GAPS(): number {
-        return get_unsigned_number(Settings.KEY_INNER_GAPS);
+    static get INNER_GAPS_TOP(): number {
+        return get_unsigned_number(Settings.KEY_INNER_GAPS_TOP);
     }
 
-    static set INNER_GAPS(val: number) {
-        set_unsigned_number(Settings.KEY_INNER_GAPS, val);
+    static set INNER_GAPS_TOP(val: number) {
+        set_unsigned_number(Settings.KEY_INNER_GAPS_TOP, val);
     }
 
-    static get OUTER_GAPS(): number {
-        return get_unsigned_number(Settings.KEY_OUTER_GAPS);
+    static get INNER_GAPS_BOTTOM(): number {
+        return get_unsigned_number(Settings.KEY_INNER_GAPS_BOTTOM);
     }
 
-    static set OUTER_GAPS(val: number) {
-        set_unsigned_number(Settings.KEY_OUTER_GAPS, val);
+    static set INNER_GAPS_BOTTOM(val: number) {
+        set_unsigned_number(Settings.KEY_INNER_GAPS_BOTTOM, val);
+    }
+
+    static get INNER_GAPS_LEFT(): number {
+        return get_unsigned_number(Settings.KEY_INNER_GAPS_LEFT);
+    }
+
+    static set INNER_GAPS_LEFT(val: number) {
+        set_unsigned_number(Settings.KEY_INNER_GAPS_LEFT, val);
+    }
+
+    static get INNER_GAPS_RIGHT(): number {
+        return get_unsigned_number(Settings.KEY_INNER_GAPS_RIGHT);
+    }
+
+    static set INNER_GAPS_RIGHT(val: number) {
+        set_unsigned_number(Settings.KEY_INNER_GAPS_RIGHT, val);
+    }
+
+    static get OUTER_GAPS_TOP(): number {
+        return get_unsigned_number(Settings.KEY_OUTER_GAPS_TOP);
+    }
+
+    static set OUTER_GAPS_TOP(val: number) {
+        set_unsigned_number(Settings.KEY_OUTER_GAPS_TOP, val);
+    }
+
+    static get OUTER_GAPS_BOTTOM(): number {
+        return get_unsigned_number(Settings.KEY_OUTER_GAPS_BOTTOM);
+    }
+
+    static set OUTER_GAPS_BOTTOM(val: number) {
+        set_unsigned_number(Settings.KEY_OUTER_GAPS_BOTTOM, val);
+    }
+
+    static get OUTER_GAPS_LEFT(): number {
+        return get_unsigned_number(Settings.KEY_OUTER_GAPS_LEFT);
+    }
+
+    static set OUTER_GAPS_LEFT(val: number) {
+        set_unsigned_number(Settings.KEY_OUTER_GAPS_LEFT, val);
+    }
+
+    static get OUTER_GAPS_RIGHT(): number {
+        return get_unsigned_number(Settings.KEY_OUTER_GAPS_RIGHT);
+    }
+
+    static set OUTER_GAPS_RIGHT(val: number) {
+        set_unsigned_number(Settings.KEY_OUTER_GAPS_RIGHT, val);
     }
 
     static get SPAN_MULTIPLE_TILES(): boolean {
@@ -445,12 +502,16 @@ export default class Settings {
         right: number;
     } {
         // get the gaps settings and scale by scale factor
-        const value = this.INNER_GAPS * scaleFactor;
+        const valueTop = this.INNER_GAPS_TOP * scaleFactor;
+        const valueBottom = this.INNER_GAPS_BOTTOM * scaleFactor;
+        const valueLeft = this.INNER_GAPS_LEFT * scaleFactor;
+        const valueRight = this.INNER_GAPS_RIGHT * scaleFactor;
+
         return {
-            top: value,
-            bottom: value,
-            left: value,
-            right: value,
+            top: valueTop,
+            bottom: valueBottom,
+            left: valueLeft,
+            right: valueRight,
         };
     }
 
@@ -461,12 +522,16 @@ export default class Settings {
         right: number;
     } {
         // get the gaps settings and scale by scale factor
-        const value = this.OUTER_GAPS * scaleFactor;
+        const valueTop = this.OUTER_GAPS_TOP * scaleFactor;
+        const valueBottom = this.OUTER_GAPS_BOTTOM * scaleFactor;
+        const valueLeft = this.OUTER_GAPS_LEFT * scaleFactor;
+        const valueRight = this.OUTER_GAPS_RIGHT * scaleFactor;
+
         return {
-            top: value,
-            bottom: value,
-            left: value,
-            right: value,
+            top: valueTop,
+            bottom: valueBottom,
+            left: valueLeft,
+            right: valueRight,
         };
     }
 
