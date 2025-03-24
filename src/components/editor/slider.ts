@@ -89,10 +89,14 @@ export default class Slider extends St.Button {
     }
 
     private get preferredCursor(): Meta.Cursor {
+        // These constants were renamed in Gnome 48 from NORTH/WEST_* to N/W_*
+        const horizCursor = Meta.Cursor.WEST_RESIZE ?? Meta.Cursor.W_RESIZE;
+        const vertCursor = Meta.Cursor.NORTH_RESIZE ?? Meta.Cursor.N_RESIZE;
+
         return this.hover || this._dragging
             ? this._horizontalDir
-                ? Meta.Cursor.WEST_RESIZE
-                : Meta.Cursor.NORTH_RESIZE
+                ? horizCursor
+                : vertCursor
             : Meta.Cursor.DEFAULT;
     }
 
