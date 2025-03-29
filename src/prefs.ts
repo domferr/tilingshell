@@ -60,19 +60,81 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         appearenceGroup.add(showIndicatorRow);
 
-        const innerGapsRow = this._buildSpinButtonRow(
-            Settings.KEY_INNER_GAPS,
-            _('Inner gaps'),
-            _('Gaps between windows'),
-        );
+        // Expandable inner gaps row (dropdown)
+        const innerGapsRow = new Adw.ExpanderRow({
+            title: _('Inner gaps'),
+            subtitle: _('Gaps between windows'),
+        });
         appearenceGroup.add(innerGapsRow);
 
-        const outerGapsRow = this._buildSpinButtonRow(
-            Settings.KEY_OUTER_GAPS,
-            _('Outer gaps'),
-            _('Gaps between a window and the monitor borders'),
+        // Inner gaps controls
+        innerGapsRow.add_row(
+            this._buildSpinButtonRow(
+                Settings.KEY_INNER_GAPS_LEFT,
+                _('Left'),
+                _('Gap on the left side between windows'),
+            )
         );
+        innerGapsRow.add_row(
+            this._buildSpinButtonRow(
+                Settings.KEY_INNER_GAPS_RIGHT,
+                _('Right'),
+                _('Gap on the right side between windows'),
+            )
+        );
+        innerGapsRow.add_row(
+            this._buildSpinButtonRow(
+                Settings.KEY_INNER_GAPS_TOP,
+                _('Top'),
+                _('Gap at the top between windows'),
+            )
+        );
+        innerGapsRow.add_row(
+            this._buildSpinButtonRow(
+                Settings.KEY_INNER_GAPS_BOTTOM,
+                _('Bottom'),
+                _('Gap at the bottom between windows'),
+            )
+        );
+
+        // Expandable outer gaps row (dropdown)
+        const outerGapsRow = new Adw.ExpanderRow({
+            title: _('Outer gaps'),
+            subtitle: _('Gaps between windows and monitor borders'),
+        });
         appearenceGroup.add(outerGapsRow);
+
+        // Outer gaps controls
+        outerGapsRow.add_row(
+            this._buildSpinButtonRow(
+                Settings.KEY_OUTER_GAPS_LEFT,
+                _('Left'),
+                _('Gap between windows and left monitor border'),
+            )
+        );
+        outerGapsRow.add_row(
+            this._buildSpinButtonRow(
+                Settings.KEY_OUTER_GAPS_RIGHT,
+                _('Right'),
+                _('Gap between windows and right monitor border'),
+            )
+        );
+        outerGapsRow.add_row(
+            this._buildSpinButtonRow(
+                Settings.KEY_OUTER_GAPS_TOP,
+                _('Top'),
+                _('Gap between windows and top monitor border'),
+            )
+        );
+        outerGapsRow.add_row(
+            this._buildSpinButtonRow(
+                Settings.KEY_OUTER_GAPS_BOTTOM,
+                _('Bottom'),
+                _('Gap between windows and bottom monitor border'),
+            )
+        );
+
+
 
         const blurRow = new Adw.ExpanderRow({
             title: _('Blur (experimental feature)'),
