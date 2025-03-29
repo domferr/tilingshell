@@ -180,7 +180,7 @@ export default class LayoutEditor extends St.Widget {
             this._innerGaps,
             this._outerGaps,
             this._containerRect,
-        );
+        ).gaps;
         const editableTile = new EditableTilePreview({
             parent: this,
             tile,
@@ -323,7 +323,11 @@ export default class LayoutEditor extends St.Widget {
         for (const slider of editableTile.getAllSliders()) {
             if (slider === null) continue;
 
-            const success = slider.deleteSlider(editableTile);
+            const success = slider.deleteSlider(
+                editableTile,
+                this._innerGaps,
+                this._outerGaps,
+            );
             if (success) {
                 this._layout.tiles = this._layout.tiles.filter(
                     (tile) => tile !== editableTile.tile,

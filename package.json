@@ -1,6 +1,6 @@
 {
   "name": "tilingshell",
-  "version": "16.2",
+  "version": "16.3",
   "author": "Domenico Ferraro <ferraro.domenico125@gmail.com>",
   "private": true,
   "license": "GPL v2.0",
@@ -16,7 +16,7 @@
     "wayland-session": "dbus-run-session -- env MUTTER_DEBUG_NUM_DUMMY_MONITORS=1 MUTTER_DEBUG_DUMMY_MODE_SPECS=1920x1080 gnome-shell --nested --wayland",
     "dev:wayland": "npm run build && npm run install:extension && npm run wayland-session",
     "build:translations": "for file in $(ls translations/*.po); do mkdir -p resources/locale/$(basename $file .po)/LC_MESSAGES; msgfmt -c $file -o resources/locale/$(basename $file .po)/LC_MESSAGES/tilingshell.mo; done",
-    "create:translations": "xgettext --from-code=UTF-8 --output=translations/tilingshell@ferrarodomenico.com.pot -j --language=javascript --force-po dist/prefs.js dist/extension.js",
+    "create:translations": "rm -f translations/tilingshell@ferrarodomenico.com.pot && xgettext --from-code=UTF-8 --output=translations/tilingshell@ferrarodomenico.com.pot --language=javascript --force-po dist/prefs.js dist/extension.js",
     "merge:translations": "for file in $(ls translations/*.po); do msgmerge -U $file translations/tilingshell@ferrarodomenico.com.pot --backup=none; done",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

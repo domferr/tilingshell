@@ -9,12 +9,11 @@ import Tile from '../layout/Tile';
 import {
     buildRectangle,
     buildTileGaps,
-    clampPointInsideRect,
     isPointInsideRect,
     squaredEuclideanDistance,
 } from '@utils/ui';
 import TileUtils from '@components/layout/TileUtils';
-import { logger, rect_to_string } from '@utils/logger';
+import { logger } from '@utils/logger';
 import GlobalState from '@utils/globalState';
 import { KeyBindingsDirection } from '@keybindings';
 
@@ -91,7 +90,14 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
         gaps: Clutter.Margin,
         tile: Tile,
     ): DynamicTilePreview {
-        return new DynamicTilePreview({ parent, rect, gaps, tile }, true);
+        const prev = new DynamicTilePreview({ parent, rect, gaps, tile }, true);
+        prev.updateBorderRadius(
+            prev.gaps.top > 0,
+            prev.gaps.right > 0,
+            prev.gaps.bottom > 0,
+            prev.gaps.left > 0,
+        );
+        return prev;
     }
 
     public get showing(): boolean {
@@ -216,7 +222,7 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
                             this._innerGaps,
                             this._outerGaps,
                             this._containerRect,
-                        );
+                        ).gaps;
                         const innerPreview = new DynamicTilePreview(
                             {
                                 parent: this,
@@ -386,7 +392,7 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
                 break;
         }
 
-        // if the point to search is outside the container we can already return undefined
+        // if the point to search is outside the container
         if (
             sourceCoords.x < this._containerRect.x ||
             sourceCoords.x >
@@ -394,8 +400,8 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
             sourceCoords.y < this._containerRect.y ||
             sourceCoords.y > this._containerRect.height + this._containerRect.y
         ) {
-            if (!clamp) return undefined;
-            // return undefined;
+            if (!clamp) return undefined; // we can already return undefined
+
             sourceCoords.x = Math.clamp(
                 sourceCoords.x,
                 this._containerRect.x,

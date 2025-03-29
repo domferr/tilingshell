@@ -135,6 +135,7 @@ export default class Settings {
     static SETTING_FOCUS_WINDOW_DOWN = 'focus-window-down';
     static SETTING_FOCUS_WINDOW_NEXT = 'focus-window-next';
     static SETTING_FOCUS_WINDOW_PREV = 'focus-window-prev';
+    static SETTING_HIGHLIGHT_CURRENT_WINDOW = 'highlight-current-window';
 
     static initialize(settings: Gio.Settings) {
         if (this._is_initialized) return;

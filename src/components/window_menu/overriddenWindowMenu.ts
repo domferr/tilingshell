@@ -22,6 +22,7 @@ import { _ } from '../../translations';
 
 const LAYOUT_ICON_WIDTH = 46;
 const LAYOUT_ICON_HEIGHT = 32;
+const INNER_GAPS = 2;
 
 export function buildMenuWithLayoutIcon(
     title: string,
@@ -134,7 +135,6 @@ export default class OverriddenWindowMenu extends GObject.Object {
         const enableScaling =
             window.get_monitor() === Main.layoutManager.primaryIndex;
         const scalingFactor = getMonitorScalingFactor(window.get_monitor());
-        const gaps = Settings.get_inner_gaps(1).top > 0 ? 2 : 0;
 
         if (vacantTiles.length > 0) {
             vacantTiles.sort((a, b) => a.x - b.x);
@@ -169,7 +169,7 @@ export default class OverriddenWindowMenu extends GObject.Object {
                 vacantPopupMenu,
                 [vacantTiles[bestTileIndex]],
                 tiles,
-                gaps,
+                INNER_GAPS,
             );
             vacantPopupMenu.connect('activate', () => {
                 OverriddenWindowMenu.get().emit(
@@ -191,7 +191,7 @@ export default class OverriddenWindowMenu extends GObject.Object {
                 vacantLeftPopupMenu,
                 [vacantTiles[0]],
                 tiles,
-                gaps,
+                INNER_GAPS,
             );
             vacantLeftPopupMenu.connect('activate', () => {
                 OverriddenWindowMenu.get().emit(
@@ -214,7 +214,7 @@ export default class OverriddenWindowMenu extends GObject.Object {
                 vacantRightPopupMenu,
                 [tilesFromRightToLeft[0]],
                 tiles,
-                gaps,
+                INNER_GAPS,
             );
             vacantRightPopupMenu.connect('activate', () => {
                 OverriddenWindowMenu.get().emit(
@@ -263,7 +263,7 @@ export default class OverriddenWindowMenu extends GObject.Object {
             const layoutWidget = new LayoutTileButtons(
                 row,
                 lay,
-                gaps,
+                INNER_GAPS,
                 layoutHeight,
                 layoutWidth,
             );

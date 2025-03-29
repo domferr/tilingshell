@@ -5,6 +5,7 @@ import { logger } from '@utils/logger';
 import {
     filterUnfocusableWindows,
     getMonitors,
+    getWindows,
     squaredEuclideanDistance,
 } from '@/utils/ui';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -127,6 +128,8 @@ export default class TilingShellExtension extends Extension {
         this._dbus.enable(this);
 
         if (Settings.OVERRIDE_WINDOW_MENU) OverriddenWindowMenu.enable();
+
+        // TODO OverriddenAltTab.enable();
 
         debug('extension is enabled');
     }
@@ -260,6 +263,23 @@ export default class TilingShellExtension extends Extension {
                     dir: KeyBindingsDirection,
                 ) => {
                     this._onKeyboardFocusWinDirection(dp, dir);
+                },
+            );
+            this._signals.connect(
+                this._keybindings,
+                'highlight-current-window',
+                (kb: KeyBindings, dp: Meta.Display) => {
+                    const focus_window = dp.get_focus_window();
+                    getWindows(
+                        global.workspaceManager.get_active_workspace(),
+                    ).forEach((win) => {
+                        if (win !== focus_window && win.can_minimize())
+                            win.minimize();
+                    });
+                    Main.activateWindow(
+                        focus_window,
+                        global.get_current_time(),
+                    );
                 },
             );
         }
@@ -412,7 +432,8 @@ export default class TilingShellExtension extends Extension {
             !focus_window ||
             !focus_window.has_focus() ||
             (focus_window.get_wm_class() &&
-                focus_window.get_wm_class() === 'gjs')
+                focus_window.get_wm_class() === 'gjs') ||
+            focus_window.is_fullscreen()
         )
             return;
 
@@ -509,12 +530,10 @@ export default class TilingShellExtension extends Extension {
         direction: KeyBindingsDirection | FocusSwitchDirection,
     ) {
         const focus_window = display.get_focus_window();
-        const focusParent = focus_window.get_transient_for() || focus_window;
 
         if (
             !focus_window ||
             !focus_window.has_focus() ||
-            focusParent.windowType !== Meta.WindowType.NORMAL ||
             (focus_window.get_wm_class() &&
                 focus_window.get_wm_class() === 'gjs')
         )
@@ -583,12 +602,10 @@ export default class TilingShellExtension extends Extension {
         direction: FocusSwitchDirection,
     ) {
         const focus_window = display.get_focus_window();
-        const focusParent = focus_window.get_transient_for() || focus_window;
 
         if (
             !focus_window ||
             !focus_window.has_focus() ||
-            focusParent.windowType !== Meta.WindowType.NORMAL ||
             (focus_window.get_wm_class() &&
                 focus_window.get_wm_class() === 'gjs')
         )
@@ -597,6 +614,7 @@ export default class TilingShellExtension extends Extension {
         const windowList = filterUnfocusableWindows(
             focus_window.get_workspace().list_windows(),
         );
+        const focusParent = focus_window.get_transient_for() || focus_window;
         const focusedIdx = windowList.findIndex((win) => {
             // in case we are iterating over a modal dialog for our focused window
             return win === focusParent;
@@ -689,6 +707,7 @@ export default class TilingShellExtension extends Extension {
         this._fractionalScalingEnabled = false;
 
         OverriddenWindowMenu.destroy();
+        // TODO OverriddenAltTab.destroy();
 
         // restore native edge tiling and all the overridden settings
         SettingsOverride.destroy();

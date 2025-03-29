@@ -89,10 +89,14 @@ export default class Slider extends St.Button {
     }
 
     private get preferredCursor(): Meta.Cursor {
+        // These constants were renamed in Gnome 48 from NORTH/WEST_* to N/W_*
+        const horizCursor = Meta.Cursor.WEST_RESIZE ?? Meta.Cursor.W_RESIZE;
+        const vertCursor = Meta.Cursor.NORTH_RESIZE ?? Meta.Cursor.N_RESIZE;
+
         return this.hover || this._dragging
             ? this._horizontalDir
-                ? Meta.Cursor.WEST_RESIZE
-                : Meta.Cursor.NORTH_RESIZE
+                ? horizCursor
+                : vertCursor
             : Meta.Cursor.DEFAULT;
     }
 
@@ -247,7 +251,11 @@ export default class Slider extends St.Button {
             ?.push(tile.connect('destroy', this._onTileDeleted.bind(this)));
     }
 
-    public deleteSlider(tileToDelete: EditableTilePreview): boolean {
+    public deleteSlider(
+        tileToDelete: EditableTilePreview,
+        innerGaps: Clutter.Margin,
+        outerGaps: Clutter.Margin,
+    ): boolean {
         const isNext = this._horizontalDir
             ? this.x <= tileToDelete.rect.x
             : this.y <= tileToDelete.rect.y;
@@ -265,28 +273,29 @@ export default class Slider extends St.Button {
               ? St.Side.BOTTOM
               : St.Side.TOP;
         // extend the tiles on the opposite side of the tile to be deleted
-        (isNext ? this._previousTiles : this._nextTiles).forEach(
-            (tileToExtend) => {
-                tileToExtend.updateTile({
-                    x:
-                        !isNext && this._horizontalDir
-                            ? tileToDelete.tile.x
-                            : tileToExtend.tile.x,
-                    y:
-                        !isNext && !this._horizontalDir
-                            ? tileToDelete.tile.y
-                            : tileToExtend.tile.y,
-                    width: this._horizontalDir
-                        ? tileToExtend.tile.width + tileToDelete.tile.width
-                        : tileToExtend.tile.width,
-                    height: this._horizontalDir
-                        ? tileToExtend.tile.height
-                        : tileToExtend.tile.height + tileToDelete.tile.height,
-                });
-                tileToExtend.removeSlider(oppositeSide);
-                tileToDelete.getSlider(oppositeSide)?.addTile(tileToExtend);
-            },
-        );
+        const extendTilesArray = isNext ? this._previousTiles : this._nextTiles;
+        extendTilesArray.forEach((tileToExtend) => {
+            tileToExtend.updateTile({
+                x:
+                    !isNext && this._horizontalDir
+                        ? tileToDelete.tile.x
+                        : tileToExtend.tile.x,
+                y:
+                    !isNext && !this._horizontalDir
+                        ? tileToDelete.tile.y
+                        : tileToExtend.tile.y,
+                width: this._horizontalDir
+                    ? tileToExtend.tile.width + tileToDelete.tile.width
+                    : tileToExtend.tile.width,
+                height: this._horizontalDir
+                    ? tileToExtend.tile.height
+                    : tileToExtend.tile.height + tileToDelete.tile.height,
+                innerGaps,
+                outerGaps,
+            });
+            tileToExtend.removeSlider(oppositeSide);
+            tileToDelete.getSlider(oppositeSide)?.addTile(tileToExtend);
+        });
 
         return true;
     }

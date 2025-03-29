@@ -12,6 +12,18 @@ export default class TileUtils {
         });
     }
 
+    static apply_props_relative_to(
+        tile: Tile,
+        container: Mtk.Rectangle,
+    ): Mtk.Rectangle {
+        return buildRectangle({
+            x: Math.round(container.width * tile.x),
+            y: Math.round(container.height * tile.y),
+            width: Math.round(container.width * tile.width),
+            height: Math.round(container.height * tile.height),
+        });
+    }
+
     static build_tile(rect: Mtk.Rectangle, container: Mtk.Rectangle): Tile {
         return new Tile({
             x: (rect.x - container.x) / container.width,

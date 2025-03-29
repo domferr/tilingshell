@@ -282,7 +282,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
 
         const quarterTiling = this._buildScaleRow(
             _('Quarter tiling activation area'),
-            _('Activation area to trigger quarter tiling (% of the screen)'),
+            _('Activation area to trigger quarter tiling (%% of the screen)'),
             (sc: Gtk.Scale) => {
                 Settings.QUARTER_TILING_THRESHOLD = sc.get_value();
             },
@@ -333,9 +333,6 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             ),
         );
         windowsSuggestionsGroup.add(screenEdgesWindowSuggestionRow);
-
-        snapAssistWindowSuggestionRow.set_sensitive(false);
-        snapAssistWindowSuggestionRow.set_tooltip_text('To be released soon!');
 
         prefsPage.add(windowsSuggestionsGroup);
 
@@ -634,6 +631,15 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 Settings.SETTING_FOCUS_WINDOW_PREV,
                 _('Focus previous window'),
                 _('Focus the window prior to the current focused window'),
+                false,
+                false,
+            ],
+            [
+                Settings.SETTING_HIGHLIGHT_CURRENT_WINDOW,
+                _('Highlight focused window'),
+                _(
+                    'Minimize all the other windows and show only the focused window',
+                ),
                 false,
                 false,
             ],
