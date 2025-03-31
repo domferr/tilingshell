@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-29 11:41+0100\n"
-"PO-Revision-Date: 2025-02-17 17:19+0100\n"
+"PO-Revision-Date: 2025-03-30 22:34+0200\n"
 "Last-Translator: Amerey <info@amerey.eu>\n"
 "Language-Team: \n"
 "Language: cs\n"
@@ -256,9 +256,9 @@ msgid "Quarter tiling activation area"
 msgstr "Plocha pro aktivaci dláždic"
 
 #: dist/prefs.js:999
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "Activation area to trigger quarter tiling (%% of the screen)"
-msgstr "Aktivační oblast pro spuštění dláždic (% obrazovky)"
+msgstr "Aktivační oblast pro spuštění dláždic (%% obrazovky)"
 
 #: dist/prefs.js:1016
 msgid "Windows suggestions"
@@ -496,14 +496,12 @@ msgid "Focus the window prior to the current focused window"
 msgstr "Vyberte okno před aktuálně aktivním oknem"
 
 #: dist/prefs.js:1334
-#, fuzzy
 msgid "Highlight focused window"
-msgstr "Odpojit vybrané okno z dlaždic"
+msgstr "Zvýraznit vybrané okno"
 
 #: dist/prefs.js:1336
-#, fuzzy
 msgid "Minimize all the other windows and show only the focused window"
-msgstr "Pomocí klávesových zkratek provádějte akce na vybraném okně"
+msgstr "Minimalizovat všechna ostatní okna a zobrazit pouze vybrané okno"
 
 #: dist/prefs.js:1364
 msgid "View and Customize all the Shortcuts"
