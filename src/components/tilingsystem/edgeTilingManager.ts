@@ -3,9 +3,10 @@ import {
     isPointInsideRect,
     clampPointInsideRect,
 } from '@utils/ui';
-import { GObject, Mtk } from '@gi.ext';
+import { GObject, Mtk, St } from '@gi.ext';
 import Settings from '@settings/settings';
 import { registerGObjectClass } from '@utils/gjs';
+import { logger } from '@utils/logger';
 
 const EDGE_TILING_OFFSET = 16;
 const TOP_EDGE_TILING_OFFSET = 8;
@@ -77,9 +78,12 @@ export default class EdgeTilingManager extends GObject.Object {
     }
 
     private _updateActivationZones() {
-        const width = this._workArea.width * this._quarterActivationPercentage;
-        const height =
-            this._workArea.height * this._quarterActivationPercentage;
+        const width = Math.ceil(
+            this._workArea.width * this._quarterActivationPercentage,
+        );
+        const height = Math.ceil(
+            this._workArea.height * this._quarterActivationPercentage,
+        );
 
         this._topLeft.x = this._workArea.x;
         this._topLeft.y = this._workArea.y;
