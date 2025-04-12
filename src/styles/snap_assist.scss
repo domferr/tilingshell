@@ -1,10 +1,12 @@
+@use "constants";
+
 $snap-assist-tile-border-width: 1px;
 $snap-assist-tile-border-radius: 6px;
 
 .snap-assistant {
     box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px;
     border: 0;
-    border-radius: $base_border_radius + 2;
+    border-radius: constants.$base_border_radius + 2;
     padding-value: 16px;
 }
 

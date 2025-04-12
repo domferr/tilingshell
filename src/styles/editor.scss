@@ -1,3 +1,6 @@
+@use "constants";
+@use "functions";
+
 .layout-editor {
     background-color: rgba(255, 255, 255, 0.14);
 }
@@ -25,12 +28,13 @@
     }
 
     .delete-layout-button {
-        padding: $base_padding;
+        padding: constants.$base_padding;
     }
 
     .editor-dialog-title {
         text-align: center;
-        @extend %title_2;
+        font-weight: 800;
+        @include functions.fontsize(15pt);
     }
 
     .legend {
@@ -38,11 +42,11 @@
     }
 
     .kbd {
-        @include fontsize($base_font_size);
+        @include functions.fontsize(constants.$base_font_size);
         font-weight: bold;
         text-align: center;
         font-family: monospace;
-        padding: calc($base-padding / 3) calc($base-padding * 2);
+        padding: calc(constants.$base-padding / 3) calc(constants.$base-padding * 2);
         box-shadow: inset 0px -3px 0px 0px rgba(0, 0, 0, 0.2);
     }
 }

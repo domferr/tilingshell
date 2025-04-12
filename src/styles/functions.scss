@@ -1,0 +1,20 @@
+@use "sass:math";
+// Function to convert px values to em
+// From https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/main/data/theme/gnome-shell-sass/_drawing.scss#L6
+@function to_em($input, $base: 16px) {
+    // multiplied and divided by 1000 to make up for round() shortcoming
+    $em_value: calc($input / $base) * 1.091 * 1000;
+    @return calc(math.round($em_value) / 1000) * 1em;
+}
+
+
+
+// From https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/main/data/theme/gnome-shell-sass/_drawing.scss#L66
+// Mixin to convert provided font size in pt to em units
+@mixin fontsize($size, $base: 16px, $unit: pt) {
+    // if pt, convert into unitless value with the assumption: 1pt = 1.091px
+    $adjusted_size: if($unit == pt, $size * 1.091, $size) * 1000;
+    $rounded_size: calc(math.round(calc($adjusted_size / $base)) / 1000);
+    font-size: $rounded_size * 1em;
+    // font-size: round($size) + pt;
+}

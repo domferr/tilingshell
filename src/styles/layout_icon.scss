@@ -1,7 +1,9 @@
+@use "snap_assist";
+
 .layout-icon {
     .snap-assist-tile {
-        border-radius-value: $snap-assist-tile-border-radius - 1;
-        border-width-value: calc($snap-assist-tile-border-width / 2);
+        border-radius-value: snap_assist.$snap-assist-tile-border-radius - 1;
+        border-width-value: calc(snap_assist.$snap-assist-tile-border-width / 2);
         border-color: rgba(255, 255, 255, 0.2);
         background-color: rgba(255, 255, 255, 0.2);
     }
