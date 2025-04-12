@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { registerGObjectClass } from '@/utils/gjs';
 import { Shell } from '@gi.ext';
 import TilePreview from './tilePreview';
@@ -14,7 +13,7 @@ export default class BlurTilePreview extends TilePreview {
         const sigma = 36;
         this.add_effect(
             new Shell.BlurEffect({
-                // @ts-ignore
+                // @ts-expect-error "sigma is available"
                 sigma,
                 // radius: sigma * 2,
                 brightness: 1,
