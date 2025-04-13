@@ -131,7 +131,7 @@ export default class GlobalState extends GObject.Object {
                 // use the layout at index 0 if for some reason we cannot find the layout
                 // of the last workspace
                 const secondLastWsLayoutsId = secondLastWs
-                    ? this._selected_layouts.get(secondLastWs) ?? []
+                    ? (this._selected_layouts.get(secondLastWs) ?? [])
                     : [];
                 if (secondLastWsLayoutsId.length === 0) {
                     secondLastWsLayoutsId.push(

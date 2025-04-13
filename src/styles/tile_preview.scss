@@ -1,5 +1,40 @@
+@use "constants";
+
 .custom-tile-preview {
-    border-radius: $base_border_radius;
+    border-radius: constants.$base_border_radius;
+}
+
+.top-left-border-radius {
+    border-radius: constants.$base_border_radius 0 0 0;
+}
+.top-right-border-radius {
+    border-radius: 0 constants.$base_border_radius 0 0;
+}
+.bottom-right-border-radius {
+    border-radius: 0 0 constants.$base_border_radius 0;
+}
+.bottom-left-border-radius {
+    border-radius: 0 0 0 constants.$base_border_radius;
+}
+
+.top-left-border-radius.top-right-border-radius {
+    border-radius: constants.$base_border_radius constants.$base_border_radius 0 0;
+}
+
+.top-right-border-radius.bottom-right-border-radius {
+    border-radius: 0 constants.$base_border_radius constants.$base_border_radius 0;
+}
+
+.bottom-right-border-radius.bottom-left-border-radius  {
+    border-radius: 0 0 constants.$base_border_radius constants.$base_border_radius;
+}
+
+.top-left-border-radius.bottom-left-border-radius {
+    border-radius: constants.$base_border_radius 0 0 constants.$base_border_radius;
+}
+
+.top-left-border-radius.top-right-border-radius.bottom-right-border-radius.bottom-left-border-radius {
+    border-radius: constants.$base_border_radius;
 }
 
 .top-left-border-radius {

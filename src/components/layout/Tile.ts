@@ -1,7 +1,6 @@
 import { GObject } from '@gi.shared'; // gi.shared because it is imported by Layout which is also imported in prefs.ts
 
 export default class Tile {
-    // @ts-expect-error "GObject has TYPE_JSOBJECT"
     static $gtype = GObject.TYPE_JSOBJECT;
 
     x: number;

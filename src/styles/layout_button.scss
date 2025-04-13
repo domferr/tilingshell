@@ -1,12 +1,15 @@
+@use "constants";
+@use "snap_assist";
+
 .layouts-box-layout {
     spacing: 12px;
 }
 
 .layout-button {
     transition: 100ms ease all;
-    padding: calc($base_padding / 2);
-    border-radius: $snap-assist-tile-border-radius;
-    border-width: $snap-assist-tile-border-width;
+    padding: calc(constants.$base_padding / 2);
+    border-radius: snap_assist.$snap-assist-tile-border-radius;
+    border-width: snap_assist.$snap-assist-tile-border-width;
     border-color: transparent;
 
     .snap-assist-tile {

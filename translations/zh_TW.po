@@ -1,7 +1,7 @@
-# Czech translation for Tilling Shell
+# SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# Amerey <info@amerey.eu>, 2024.
+# taijuin <taijuin@gmail.com>, 2025.
 #
 #, fuzzy
 msgid ""
@@ -9,635 +9,594 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-29 11:41+0100\n"
-"PO-Revision-Date: 2025-03-30 22:34+0200\n"
-"Last-Translator: Amerey <info@amerey.eu>\n"
+"PO-Revision-Date: 2025-04-03 18:17+0800\n"
+"Last-Translator: taijuin <taijuin@gmail.com>\n"
 "Language-Team: \n"
-"Language: cs\n"
+"Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4.4\n"
+"X-Generator: Poedit 3.6\n"
 
 #: dist/prefs.js:785
 msgid "General"
-msgstr "Obecné"
+msgstr "一般"
 
 #: dist/prefs.js:790
 msgid "Appearance"
-msgstr "Vzhled"
+msgstr "外觀"
 
 #: dist/prefs.js:791
 msgid "Configure the appearance of Tiling Shell"
-msgstr "Nastavení vzhledu Tiling Shell"
+msgstr "設定 Tiling Shell 的外觀"
 
 #: dist/prefs.js:796
 msgid "Show Indicator"
-msgstr "Zobrazit ikonu"
+msgstr "顯示指示器"
 
 #: dist/prefs.js:797
 msgid "Whether to show the panel indicator"
-msgstr "Zda se má zobrazit ikona na panelu"
+msgstr "是否顯示面板指示器"
 
 #: dist/prefs.js:802
 msgid "Inner gaps"
-msgstr "Vnitřní mezery"
+msgstr "內部間距"
 
 #: dist/prefs.js:803
 msgid "Gaps between windows"
-msgstr "Mezery mezi okny"
+msgstr "視窗之間的間距"
 
 #: dist/prefs.js:808
 msgid "Outer gaps"
-msgstr "Vnější mezery"
+msgstr "外部間距"
 
 #: dist/prefs.js:809
 msgid "Gaps between a window and the monitor borders"
-msgstr "Mezery mezi oknem a okrajem monitoru"
+msgstr "視窗與顯示器邊框之間的間距"
 
 #: dist/prefs.js:813
 msgid "Blur (experimental feature)"
-msgstr "Rozostření (experimentální funkce)"
+msgstr "模糊（實驗性功能）"
 
 #: dist/prefs.js:815
 msgid "Apply blur effect to Snap Assistant and tile previews"
-msgstr "Použít efekt rozostření na asistenta přichycení a náhledy dlaždic"
+msgstr "將模糊效果套用至「貼齊小幫手」與區塊預覽"
 
 #: dist/prefs.js:821
 msgid "Snap Assistant threshold"
-msgstr "Vzdálenost asistenta přichycení"
+msgstr "貼齊小幫手的靈敏度"
 
 #: dist/prefs.js:823
 msgid "Minimum distance from the Snap Assistant to the pointer to open it"
-msgstr ""
-"Minimální vzdálenost od asistenta přichycení k ukazateli pro jeho otevření"
+msgstr "貼齊小幫手感知拖曳視窗之游標靠近的距離"
 
 #: dist/prefs.js:832
 msgid "Snap Assistant"
-msgstr "Asistent přichycení"
+msgstr "貼齊小幫手"
 
 #: dist/prefs.js:833
 msgid "Apply blur effect to Snap Assistant"
-msgstr "Použít efekt rozostření na asistenta přichycení"
+msgstr "將模糊效果套用至貼齊小幫手"
 
 #: dist/prefs.js:839
 msgid "Selected tile preview"
-msgstr "Náhled vybrané dlaždice"
+msgstr "所選區塊預覽"
 
 #: dist/prefs.js:840
 msgid "Apply blur effect to selected tile preview"
-msgstr "Použít efekt rozostření na vybraný náhled dlaždice"
+msgstr "將模糊效果套用至所選區塊預覽"
 
 #: dist/prefs.js:844
 msgid "Window border"
-msgstr "Ohraničení okna"
+msgstr "視窗邊框"
 
 #: dist/prefs.js:845 dist/prefs.js:852
 msgid "Show a border around focused window"
-msgstr "Zobrazení ohraničení kolem vybraného okna"
+msgstr "在焦點視窗周圍顯示邊框"
 
 #: dist/prefs.js:851
 msgid "Enable"
-msgstr "Povolit"
+msgstr "啟用"
 
 #: dist/prefs.js:858
 msgid "Smart border radius"
-msgstr "Inteligentní poloměr ohraničení"
+msgstr "智慧型邊框半徑"
 
 #: dist/prefs.js:859
 msgid "Dynamically adapt to the window’s actual border radius"
-msgstr "Dynamicky se přizpůsobí skutečnému poloměru okraje okna"
+msgstr "動態適應視窗的實際邊框半徑"
 
 #: dist/prefs.js:865
 msgid "Width"
-msgstr "Šířka"
+msgstr "寬度"
 
 #: dist/prefs.js:866
 msgid "The size of the border"
-msgstr "Velikost ohraničení"
+msgstr "邊框的大小"
 
 #: dist/prefs.js:872
 msgid "Border color"
-msgstr "Barva ohraničení"
+msgstr "邊框顏色"
 
 #: dist/prefs.js:873
 msgid "Choose the color of the border"
-msgstr "Vyberte barvu ohraničení"
+msgstr "選擇邊框的顏色"
 
 #: dist/prefs.js:879
 msgid "Animations"
-msgstr "Animace"
+msgstr "動畫"
 
 #: dist/prefs.js:880
 msgid "Customize animations"
-msgstr "Přizpůsobení animací"
+msgstr "自訂動畫"
 
 #: dist/prefs.js:886
 msgid "Snap assistant animation time"
-msgstr "Doba animace asistenta přichycení"
+msgstr "貼齊小幫手動畫時間"
 
 #: dist/prefs.js:887
 msgid "The snap assistant animation time in milliseconds"
-msgstr "Doba animace v milisekundách"
+msgstr "貼齊小幫手到達定位所需時間（以毫秒為單位）"
 
 #: dist/prefs.js:895
 msgid "Tiles animation time"
-msgstr "Doba animace dlaždic"
+msgstr "區塊動畫時間"
 
 #: dist/prefs.js:896
 msgid "The tiles animation time in milliseconds"
-msgstr "Doba animace v milisekundách"
+msgstr "切換所選區塊時，切換其預覽所需時間（以毫秒為單位）"
 
 #: dist/prefs.js:902
 msgid "Behaviour"
-msgstr "Chování"
+msgstr "行為"
 
 #: dist/prefs.js:903
 msgid "Configure the behaviour of Tiling Shell"
-msgstr "Nastavení chování Tiling Shell"
+msgstr "設定 Tiling Shell 的行為"
 
 #: dist/prefs.js:908
 msgid "Enable Snap Assistant"
-msgstr "Povolit asistenta přichycení"
+msgstr "啟用「貼齊小幫手」"
 
 #: dist/prefs.js:909
 msgid "Move the window on top of the screen to snap assist it"
-msgstr ""
-"Přesunutím okna k horní části obrazovky mužete vybrat pozici přichycení"
+msgstr "將視窗移到螢幕中間頂端以輔助它貼齊"
 
 #: dist/prefs.js:914
 msgid "Enable Tiling System"
-msgstr "Povolit systém dlaždic"
+msgstr "啟用平鋪系統"
 
 #: dist/prefs.js:915
 msgid "Hold the activation key while moving a window to tile it"
-msgstr "Podržte aktivační klávesu a přesouvejte okno pro přichycení k dláždici"
+msgstr "移動視窗時按住啟動鍵以平鋪視窗"
 
 #: dist/prefs.js:923
 msgid "Tiling System deactivation key"
-msgstr "Klávesa pro deaktivaci systému dlaždic"
+msgstr "平鋪系統停用鍵"
 
 #: dist/prefs.js:925
 msgid ""
 "Hold the deactivation key while moving a window to deactivate the tiling "
 "system"
-msgstr ""
-"Podržte deaktivační klávesu při pohybu okna pro deaktivaci systému dláždic"
+msgstr "移動視窗時按住停用鍵，可停用平鋪系統"
 
 #: dist/prefs.js:933
 msgid "Span multiple tiles"
-msgstr "Rozvržení přes více dlaždic"
+msgstr "橫跨多個區塊"
 
 #: dist/prefs.js:934
 msgid "Hold the activation key to span multiple tiles"
-msgstr "Podržte aktivační klávesu, abyste překlenuli více dlaždic"
+msgstr "按住啟動鍵可跨越多個區塊"
 
 #: dist/prefs.js:943
 msgid "Enable Auto Tiling"
-msgstr "Povolit automatické dlaždice"
+msgstr "啟用自動平鋪"
 
 #: dist/prefs.js:944
 msgid "Automatically tile new windows to the best tile"
-msgstr "Automaticky vložte nová okna na nejvhodnějsí dlaždice"
+msgstr "自動將新視窗平鋪到最佳區塊位置"
 
 #: dist/prefs.js:949
 msgid "Enable auto-resize of the complementing tiled windows"
-msgstr "Povolit automatickou změnu velikosti doplňujících dlaždicových oken"
+msgstr "啟用自動調整互補平鋪視窗的大小"
 
 #: dist/prefs.js:951
 msgid ""
 "When a tiled window is resized, auto-resize the other tiled windows near it"
-msgstr ""
-"Když se změní velikost dlaždicového okna, automaticky změníte velikost "
-"ostatních dlaždicových oken poblíž"
+msgstr "調整平鋪視窗的大小時，自動調整其附近其他平鋪視窗的大小"
 
 #: dist/prefs.js:957
 msgid "Restore window size"
-msgstr "Obnovit velikost okna"
+msgstr "還原視窗大小"
 
 #: dist/prefs.js:959
 msgid "Whether to restore the windows to their original size when untiled"
-msgstr "Zda vrátit okna do původní velikosti, když nejsou v dlaždicích"
+msgstr "是否將視窗還原為未平鋪時的原始大小"
 
 #: dist/prefs.js:965
 msgid "Add snap assistant and auto-tile buttons to window menu"
-msgstr ""
-"Přidat do nabídky okna asistenta přichycení a tlačítka automatického "
-"rozložení"
+msgstr "在視窗選單中加入「貼齊小幫手」和自動平鋪按鈕"
 
 #: dist/prefs.js:967
 msgid ""
 "Add snap assistant and auto-tile buttons in the menu that shows up when you "
 "right click on a window title"
 msgstr ""
-"Když kliknete pravým tlačítkem myši na název okna, zobrazí se v nabídce "
-"tlačítka asistenta přichycení a automatického rozložení"
+"當您在視窗標題上按一下滑鼠右鍵時，在顯示的功能表中加入「貼齊小幫手」和自動平"
+"鋪按鈕"
 
 #: dist/prefs.js:972
 msgid "Screen Edges"
-msgstr "Okraje obrazovky"
+msgstr "螢幕邊緣"
 
 #: dist/prefs.js:974
 msgid ""
 "Drag windows against the top, left and right screen edges to resize them"
-msgstr ""
-"Přetažením oken proti hornímu, levému a pravému okraji obrazovky změníte "
-"jejich velikost"
+msgstr "將視窗拖曳到螢幕頂端、左邊和右邊以調整視窗大小"
 
 #: dist/prefs.js:988
 msgid "Drag against top edge to maximize window"
-msgstr "Tažením proti hornímu okraji okno maximalizujete"
+msgstr "拖曳頂端邊緣以最大化視窗"
 
 #: dist/prefs.js:989
 msgid "Drag windows against the top edge to maximize them"
-msgstr "Přetáhněte okna proti hornímu okraji, abyste je maximalizovali"
+msgstr "將視窗拖曳到頂端邊緣，使其最大化"
 
 #: dist/prefs.js:998
 msgid "Quarter tiling activation area"
-msgstr "Plocha pro aktivaci dláždic"
+msgstr "四分之一平鋪啟動區"
 
 #: dist/prefs.js:999
 #, javascript-format
 msgid "Activation area to trigger quarter tiling (%% of the screen)"
-msgstr "Aktivační oblast pro spuštění dláždic (%% obrazovky)"
+msgstr "觸發四分之一平鋪的啟動區域（佔螢幕百分比）"
 
 #: dist/prefs.js:1016
 msgid "Windows suggestions"
-msgstr "Návrhy oken"
+msgstr "視窗建議"
 
 #: dist/prefs.js:1017
 msgid "Enable and disable windows suggestions"
-msgstr "Povolit a zakázat návrhy oken"
+msgstr "啟用和停用視窗建議"
 
 #: dist/prefs.js:1022
 msgid "Enable window suggestions for the tiling system"
-msgstr "Povolit návrhy oken pro systém dlaždic"
+msgstr "啟用平鋪系統的視窗建議"
 
 #: dist/prefs.js:1024
 msgid ""
 "Provides smart suggestions to fill empty tiles when using the tiling system"
-msgstr ""
-"Poskytuje chytré návrhy, jak vyplnit prázdné dlaždice při použití systému "
-"obkladů"
+msgstr "使用平鋪系統時，提供填滿空白區塊的智慧型建議"
 
 #: dist/prefs.js:1030
 msgid "Enable window suggestions for the snap assistant"
-msgstr "Povolit návrhy oken pro asistenta přichycení"
+msgstr "啟用「貼齊小幫手」的視窗建議"
 
 #: dist/prefs.js:1032
 msgid ""
 "Offers suggestions to populate empty tiles when using the snap assistant"
-msgstr ""
-"Nabízí návrhy k vyplnění prázdných dlaždic při použití asistenta přichycení"
+msgstr "使用「貼齊小幫手」時，提供填入空白區塊的建議"
 
 #: dist/prefs.js:1038
 msgid "Enable window suggestions for screen edge snapping"
-msgstr "Povolit návrhy oken pro přichycení okrajů obrazovky"
+msgstr "啟用螢幕邊緣貼齊的視窗建議"
 
 #: dist/prefs.js:1040
 msgid "Suggests windows to occupy empty tiles when snapping to screen edges"
-msgstr ""
-"Navrhuje, aby okna obsadila prázdné dlaždice při přichycení k okrajům "
-"obrazovky"
+msgstr "當貼齊至螢幕邊緣時，會建議視窗佔用空白區塊"
 
 #: dist/prefs.js:1046
 msgid "Layouts"
-msgstr "Rozvržení"
+msgstr "版面配置"
 
 #: dist/prefs.js:1047
 msgid "Configure the layouts of Tiling Shell"
-msgstr "Nastavení rozvržení Tiling Shell"
+msgstr "設定 Tiling Shell 的版面配置"
 
 #: dist/prefs.js:1051 dist/prefs.js:1052
 msgid "Edit layouts"
-msgstr "Upravit rozvržení"
+msgstr "編輯版面配置"
 
 #: dist/prefs.js:1053
 msgid "Open the layouts editor"
-msgstr "Otevřete editor rozvržení"
+msgstr "開啟版面配置編輯器"
 
 #: dist/prefs.js:1058 dist/prefs.js:1059 dist/prefs.js:1063
 msgid "Export layouts"
-msgstr "Exportovat rozvržení"
+msgstr "匯出版面配置"
 
 #: dist/prefs.js:1060
 msgid "Export layouts to a file"
-msgstr "Exportujte rozvržení do souboru"
+msgstr "將版面配置匯出到檔案"
 
 #: dist/prefs.js:1066 dist/prefs.js:1437
 msgid "Save"
-msgstr "Uložit"
+msgstr "儲存"
 
 #: dist/prefs.js:1067 dist/prefs.js:1122 dist/prefs.js:1438 dist/prefs.js:1494
 msgid "Cancel"
-msgstr "Zrušit"
+msgstr "取消"
 
 #: dist/prefs.js:1113 dist/prefs.js:1114
 msgid "Import layouts"
-msgstr "Importovat rozvržení"
+msgstr "匯入版面配置"
 
 #: dist/prefs.js:1115
 msgid "Import layouts from a file"
-msgstr "Importujte rozvržení ze souboru"
+msgstr "從檔案匯入版面配置"
 
 #: dist/prefs.js:1118
 msgid "Select layouts file"
-msgstr "Vyberte soubor rozvržení"
+msgstr "選取版面配置檔"
 
 #: dist/prefs.js:1121 dist/prefs.js:1493
 msgid "Open"
-msgstr "Otevřít"
+msgstr "開啟"
 
 #: dist/prefs.js:1169 dist/prefs.js:1170
 msgid "Reset layouts"
-msgstr "Resetovat rozvržení"
+msgstr "重設版面配置"
 
 #: dist/prefs.js:1171
 msgid "Bring back the default layouts"
-msgstr "Obnovte výchozí rozvržení"
+msgstr "恢復預設版面配置"
 
 #: dist/prefs.js:1184
 msgid "Keybindings"
-msgstr "Klávesové zkratky"
+msgstr "按鍵綁定"
 
 #: dist/prefs.js:1186
 msgid "Use hotkeys to perform actions on the focused window"
-msgstr "Pomocí klávesových zkratek provádějte akce na vybraném okně"
+msgstr "使用熱鍵對焦點視窗執行動作"
 
 #: dist/prefs.js:1204
 msgid "Move window to right tile"
-msgstr "Přesunout okno na pravou dlaždici"
+msgstr "將視窗移到右側區塊"
 
 #: dist/prefs.js:1206
 msgid "Move the focused window to the tile on its right"
-msgstr "Přesuňte vybrané okno na dlaždici napravo"
+msgstr "將聚焦的視窗移至其右側的區塊上"
 
 #: dist/prefs.js:1215
 msgid "Move window to left tile"
-msgstr "Přesunout okno na levou dlaždici"
+msgstr "將視窗移到左側區塊"
 
 #: dist/prefs.js:1216
 msgid "Move the focused window to the tile on its left"
-msgstr "Přesuňte vybrané okno na dlaždici nalevo"
+msgstr "將對焦的視窗移至其左側的區塊上"
 
 #: dist/prefs.js:1222
 msgid "Move window to tile above"
-msgstr "Přesunout okno na dlaždici výše"
+msgstr "將視窗移到上方區塊"
 
 #: dist/prefs.js:1223
 msgid "Move the focused window to the tile above"
-msgstr "Přesuňte vybrané okno na dlaždici výše"
+msgstr "將聚焦的視窗移至其上方的區塊上"
 
 #: dist/prefs.js:1229
 msgid "Move window to tile below"
-msgstr "Přesunout okno na dlaždici níže"
+msgstr "將視窗移到下方區塊"
 
 #: dist/prefs.js:1230
 msgid "Move the focused window to the tile below"
-msgstr "Přesuňte vybrané okno na dlaždici níže"
+msgstr "將聚焦的視窗移至其下方的區塊上"
 
 #: dist/prefs.js:1236
 msgid "Span window to right tile"
-msgstr "Roztáhnout okno na pravou dlaždici"
+msgstr "跨越視窗到右側區塊"
 
 #: dist/prefs.js:1237
 msgid "Span the focused window to the tile on its right"
-msgstr "Roztáhněte vybrané okno na dlaždici napravo"
+msgstr "將聚焦的視窗跨越至右側的區塊"
 
 #: dist/prefs.js:1243
 msgid "Span window to left tile"
-msgstr "Roztáhnout okno na levou dlaždici"
+msgstr "跨越視窗到左側區塊"
 
 #: dist/prefs.js:1244
 msgid "Span the focused window to the tile on its left"
-msgstr "Roztáhněte vybrané okno na dlaždici nalevo"
+msgstr "將聚焦的視窗跨越至左側的區塊"
 
 #: dist/prefs.js:1250
 msgid "Span window above"
-msgstr "Roztáhnout okno výše"
+msgstr "向上橫跨視窗"
 
 #: dist/prefs.js:1251
 msgid "Span the focused window to the tile above"
-msgstr "Roztáhněte vybrané okno na dlaždici výše"
+msgstr "將聚焦的視窗跨越至上方的區塊"
 
 #: dist/prefs.js:1257
 msgid "Span window down"
-msgstr "Roztáhnout okno níže"
+msgstr "向下橫跨視窗"
 
 #: dist/prefs.js:1258
 msgid "Span the focused window to the tile below"
-msgstr "Roztáhněte vybrané okno na dlaždici níže"
+msgstr "將聚焦的視窗跨越至下方的區塊"
 
 #: dist/prefs.js:1264
 msgid "Span window to all tiles"
-msgstr "Roztáhnout okno na všechny dlaždice"
+msgstr "跨越視窗至所有區塊"
 
 #: dist/prefs.js:1265
 msgid "Span the focused window to all the tiles"
-msgstr "Roztáhněte vybrané okno na všechny dlaždice"
+msgstr "將聚焦的視窗跨越至所有區塊"
 
 #: dist/prefs.js:1271
 msgid "Untile focused window"
-msgstr "Odpojit vybrané okno z dlaždic"
+msgstr "未平鋪焦點的視窗"
 
 #: dist/prefs.js:1279
 msgid "Move window to the center"
-msgstr "Přesunout okno do středu"
+msgstr "將視窗移到中央"
 
 #: dist/prefs.js:1281
 msgid "Move the focused window to the center of the screen"
-msgstr "Přesuňte vybrané okno do středu obrazovky"
+msgstr "將聚焦的視窗移至螢幕中央"
 
 #: dist/prefs.js:1290
 msgid "Focus window to the right"
-msgstr "Vybrat okno napravo"
+msgstr "焦點視窗向右"
 
 #: dist/prefs.js:1292
 msgid "Focus the window to the right of the current focused window"
-msgstr "Vyberte okno napravo od aktuálně aktivního okna"
+msgstr "將視窗對焦到目前對焦視窗右邊的視窗"
 
 #: dist/prefs.js:1299
 msgid "Focus window to the left"
-msgstr "Vybrat okno nalevo"
+msgstr "焦點視窗向左移動"
 
 #: dist/prefs.js:1300
 msgid "Focus the window to the left of the current focused window"
-msgstr "Vyberte okno nalevo od aktuálně aktivního okna"
+msgstr "對焦目前對焦視窗左側的視窗"
 
 #: dist/prefs.js:1306
 msgid "Focus window above"
-msgstr "Vybrat okno nahoře"
+msgstr "上方的對焦視窗"
 
 #: dist/prefs.js:1307
 msgid "Focus the window above the current focused window"
-msgstr "Vyberte okno nad aktuálně aktivním oknem"
+msgstr "將視窗對焦於目前對焦的視窗上方"
 
 #: dist/prefs.js:1313
 msgid "Focus window below"
-msgstr "Vybrat okno dole"
+msgstr "對焦視窗下方"
 
 #: dist/prefs.js:1314
 msgid "Focus the window below the current focused window"
-msgstr "Vyberte okno pod aktuálně aktivním oknem"
+msgstr "對焦目前對焦視窗下方的視窗"
 
 #: dist/prefs.js:1320
 msgid "Focus next window"
-msgstr "Vybrat následující okno"
+msgstr "聚焦下一個視窗"
 
 #: dist/prefs.js:1321
 msgid "Focus the window next to the current focused window"
-msgstr "Vyberte okno za aktuálně aktivním oknem"
+msgstr "對焦目前對焦視窗旁邊的視窗"
 
 #: dist/prefs.js:1327
 msgid "Focus previous window"
-msgstr "Vybrat předchozí okno"
+msgstr "對焦上一個視窗"
 
 #: dist/prefs.js:1328
 msgid "Focus the window prior to the current focused window"
-msgstr "Vyberte okno před aktuálně aktivním oknem"
+msgstr "對焦目前對焦視窗之前的視窗"
 
 #: dist/prefs.js:1334
 msgid "Highlight focused window"
-msgstr "Zvýraznit vybrané okno"
+msgstr "高亮顯示焦點視窗"
 
 #: dist/prefs.js:1336
 msgid "Minimize all the other windows and show only the focused window"
-msgstr "Minimalizovat všechna ostatní okna a zobrazit pouze vybrané okno"
+msgstr "最小化所有其他視窗，只顯示焦點視窗"
 
 #: dist/prefs.js:1364
 msgid "View and Customize all the Shortcuts"
-msgstr "Zobrazit a přizpůsobit všechny zkratky"
+msgstr "檢視並自訂所有快捷鍵"
 
 #: dist/prefs.js:1392 dist/prefs.js:1393
 msgid "View and Customize Shortcuts"
-msgstr "Zobrazit a přizpůsobit zkratky"
+msgstr "檢視和自訂快捷鍵"
 
 #: dist/prefs.js:1415
 msgid "Enable next/previous window focus to wrap around"
-msgstr "Povolit další/předchozí vybrání okna"
+msgstr "啟用下一個/上一個視窗焦點環繞"
 
 #: dist/prefs.js:1417
 msgid "When focusing next or previous window, wrap around at the window edge"
-msgstr "Při vybrání dalšího nebo předchozího okna zalomí okraje okna"
+msgstr "對焦下一個或上一個視窗時，環繞視窗邊緣"
 
 #: dist/prefs.js:1422
 msgid "Import, export and reset"
-msgstr "Import, export a reset"
+msgstr "匯入、匯出及重設"
 
 #: dist/prefs.js:1424
 msgid "Import, export and reset the settings of Tiling Shell"
-msgstr "Importujte, exportujte a resetujte nastavení Tiling Shell"
+msgstr "匯入、匯出及重設 Tiling Shell 的設定"
 
 #: dist/prefs.js:1429 dist/prefs.js:1430
 msgid "Export settings"
-msgstr "Export nastavení"
+msgstr "匯出設定"
 
 #: dist/prefs.js:1431
 msgid "Export settings to a file"
-msgstr "Exportujte nastavení do souboru"
+msgstr "將設定匯出至檔案"
 
 #: dist/prefs.js:1434
 msgid "Export settings to a text file"
-msgstr "Export nastavení do textového souboru"
+msgstr "將設定匯出到文字檔"
 
 #: dist/prefs.js:1441
 msgid "Text file"
-msgstr "Textový soubor"
+msgstr "文字檔"
 
 #: dist/prefs.js:1485 dist/prefs.js:1486
 msgid "Import settings"
-msgstr "Import nastavení"
+msgstr "匯入設定"
 
 #: dist/prefs.js:1487
 msgid "Import settings from a file"
-msgstr "Importujte nastavení ze souboru"
+msgstr "從檔案匯入設定"
 
 #: dist/prefs.js:1490
 msgid "Select a text file to import from"
-msgstr "Vyberte textový soubor, ze kterého chcete importovat"
+msgstr "選擇要匯入的文字檔"
 
 #: dist/prefs.js:1532 dist/prefs.js:1533
 msgid "Reset settings"
-msgstr "Resetovat nastavení"
+msgstr "重設設定"
 
 #: dist/prefs.js:1534
 msgid "Bring back the default settings"
-msgstr "Obnovte výchozí nastavení"
+msgstr "恢復預設設定"
 
 #: dist/prefs.js:1549
 msgid "Donate on ko-fi"
-msgstr "Darovat na ko-fi"
+msgstr "在 ko-fi 上捐款"
 
 #: dist/prefs.js:1555
 msgid "Report a bug"
-msgstr "Nahlásit chybu"
+msgstr "回報錯誤"
 
 #: dist/prefs.js:1561
 msgid "Request a feature"
-msgstr "Žádost o funkci"
+msgstr "要求功能"
 
 #: dist/prefs.js:1569
 msgid "Have issues, you want to suggest a new feature or contribute?"
-msgstr "Máte problémy, chcete navrhnout novou funkci nebo přispět?"
+msgstr "有問題、想建議新功能或貢獻心力？"
 
 #: dist/prefs.js:1576
 msgid "Open a new issue on"
-msgstr "Otevřít nový problém na"
+msgstr "開啟一個新的議題"
 
 #: dist/prefs.js:1805 dist/prefs.js:1828
 msgid "New accelerator…"
-msgstr "Nový akcelerátor…"
+msgstr "新增快捷鍵…"
 
 #: dist/prefs.js:1831
 msgid "Use Backspace to clear"
-msgstr "K vymazání použijte Backspace"
+msgstr "使用 Backspace 清除"
 
 #: dist/extension.js:5873
 msgid "Edit Layouts"
-msgstr "Upravit rozvržení"
+msgstr "編輯版面配置"
 
 #: dist/extension.js:5883
 msgid "New Layout"
-msgstr "Nové rozvržení"
+msgstr "新增版面配置"
 
 #: dist/extension.js:6068
 msgid "to split a tile"
-msgstr "rozdělí dlaždici"
+msgstr "分割區塊"
 
 #: dist/extension.js:6107
 msgid "to split a tile vertically"
-msgstr "rozdělí dlaždici vertikálně"
+msgstr "垂直分割區塊"
 
 #: dist/extension.js:6127
 msgid "to delete a tile"
-msgstr "smaže dlaždici"
+msgstr "刪除區塊"
 
 #: dist/extension.js:6151
 msgid "use the indicator button to save or cancel"
-msgstr "použijte ikonu pro uložení nebo zrušení"
-
-#~ msgid "Menu"
-#~ msgstr "Menu"
-
-#~ msgid "Info"
-#~ msgstr "Informace"
-
-#~ msgid "Select the layout to edit"
-#~ msgstr "Vyberte rozvržení, které chcete upravit"
-
-#~ msgid "Close"
-#~ msgstr "Zavřít"
-
-#~ msgid "How to use the editor"
-#~ msgstr "Jak používat editor"
-
-#~ msgid "Start editing"
-#~ msgstr "Začít upravovat"
-
-#~ msgid "Move to best tile"
-#~ msgstr "Přesunout na nejlepší dlaždici"
-
-#~ msgid "Move to leftmost tile"
-#~ msgstr "Přesunout na dlaždici, která je nejvíce vlevo"
-
-#~ msgid "Move to rightmost tile"
-#~ msgstr "Přesunout na dlaždici, která je nejvíce vpravo"
+msgstr "使用指示器按鈕儲存或取消"
