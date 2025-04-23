@@ -172,6 +172,11 @@
             <summary>Enable window suggestions for screen edge snapping</summary>
             <description>Suggests windows to occupy empty tiles when snapping to screen edges.</description>
         </key>
+        <key name="enable-multi-tile-window-suggestions" type="b">
+            <default>false</default>
+            <summary>Enable multi-tile window suggestions</summary>
+            <description>Displays window suggestions in all available tiles after a snap.</description>
+        </key>
 
         <!-- keybindings -->
 		<key type="as" name="move-window-right">
