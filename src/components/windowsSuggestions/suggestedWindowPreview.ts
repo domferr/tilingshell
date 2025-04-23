@@ -242,8 +242,7 @@ export default class SuggestedWindowPreview extends Shell.WindowPreview {
     }
 
     _addWindow(metaWindow: Meta.Window) {
-        this.clone =
-            this.windowContainer.layout_manager.add_window(metaWindow);
+        this.clone = this.windowContainer.layout_manager.add_window(metaWindow);
         // if (!clone) return;
 
         /* // We expect this to be used for all interaction rather than

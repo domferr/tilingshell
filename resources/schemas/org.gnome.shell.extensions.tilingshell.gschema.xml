@@ -172,6 +172,11 @@
             <summary>Enable window suggestions for screen edge snapping</summary>
             <description>Suggests windows to occupy empty tiles when snapping to screen edges.</description>
         </key>
+        <key name="edge-snap-mode" type="s">
+            <default>'default'</default>
+            <summary>Edge snap behavior</summary>
+            <description>Controls how windows snap to screen edges:\n'default' (corners snap to quarters, edges to halves),\n'adaptive' (snap to layout tiles by column),\n'granular' (snap to exact tile under cursor).</description>
+        </key>
 
         <!-- keybindings -->
 		<key type="as" name="move-window-right">
