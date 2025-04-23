@@ -1,3 +1,4 @@
+// eslint-disable-next-line spaced-comment
 /*!
  * Tiling Shell: advanced and modern window management for GNOME
  *
@@ -19,9 +20,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Gtk, Adw, Gio, GLib, Gdk, GObject } from './gi/prefs';
-import Settings from './settings/settings';
-import { ActivationKey, EdgeSnapMode } from './settings/settings';
+import { Gtk, Adw, Gio, GLib, Gdk, GObject } from '@gi.prefs';
+import Settings, { ActivationKey } from './settings/settings';
 import { logger } from './utils/logger';
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 import Layout from './components/layout/Layout';
@@ -29,6 +29,8 @@ import SettingsExport from './settings/settingsExport';
 import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 // @ts-expect-error "Module exists"
 import * as Config from 'resource:///org/gnome/Shell/Extensions/js/misc/config.js';
+
+import { EdgeSnapMode } from '@settings/settings';
 
 const debug = logger('prefs');
 const RESOURCES_PREFIX = "/org/gnome/Shell/Extensions/tilingshell"; // must match the prefix in resources.gresources.xml
@@ -369,9 +371,9 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         });
 
         const edgeSnapModeModel = new Gtk.StringList();
-        edgeSnapModeModel.append(_('Fixed quarters layout'));
-        edgeSnapModeModel.append(_('Fill available space'));
-        edgeSnapModeModel.append(_('Follow currently selected layout'));
+        edgeSnapModeModel.append(_('Default - snap to quarters and halves'));
+        edgeSnapModeModel.append(_('Adaptive - snap to corners and edges'));
+        edgeSnapModeModel.append(_('Granular - snap to exact tile'));
 
         const edgeSnapModeDropdown = new Gtk.DropDown({
             model: edgeSnapModeModel,
