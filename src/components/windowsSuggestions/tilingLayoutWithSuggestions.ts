@@ -12,6 +12,7 @@ import LayoutWidget from '@components/layout/LayoutWidget';
 import SignalHandling from '@utils/signalHandling';
 import SuggestionsTilePreview from '@components/windowsSuggestions/suggestionsTilePreview';
 import TilingShellWindowManager from '@components/windowManager/tilingShellWindowManager';
+import Settings from '@settings/settings';
 
 const debug = logger('TilingLayoutWithSuggestions');
 
@@ -137,12 +138,33 @@ export default class TilingLayoutWithSuggestions extends LayoutWidget<Suggestion
             return;
         }
 
-        // find the leftmost preview
+        // If multi-tile mode is enabled, show windows in all previews
+        if (Settings.ENABLE_MULTI_TILE_WINDOW_SUGGESTIONS) {
+            // Show windows in all previews at once
+            this._previews.forEach((preview) => {
+                this._showWindowsInPreview(
+                    preview,
+                    nontiledWindows,
+                    monitorIndex,
+                );
+            });
+            return;
+        }
+
+        // Original single-tile mode logic - find the leftmost preview
         let preview = this._previews[0];
         this._previews.forEach((prev) => {
             if (prev.x < preview.x) preview = prev;
         });
 
+        this._showWindowsInPreview(preview, nontiledWindows, monitorIndex);
+    }
+
+    private _showWindowsInPreview(
+        preview: SuggestionsTilePreview,
+        nontiledWindows: Meta.Window[],
+        monitorIndex: number,
+    ): void {
         const clones = nontiledWindows.map((nonTiledWin) => {
             const winClone = new SuggestedWindowPreview(nonTiledWin);
             const winActor =
@@ -242,7 +264,30 @@ export default class TilingLayoutWithSuggestions extends LayoutWidget<Suggestion
                 this._oldPreviews.push(...removed);
                 nontiledWindows.splice(nontiledWindows.indexOf(nonTiledWin), 1);
                 preview.close(true);
-                this._recursivelyShowPopup(nontiledWindows, monitorIndex);
+
+                // In multi-tile mode, only close if all previews are filled or no more windows
+                if (Settings.ENABLE_MULTI_TILE_WINDOW_SUGGESTIONS) {
+                    if (
+                        this._previews.length === 0 ||
+                        nontiledWindows.length === 0
+                    ) {
+                        this.close();
+                    } else {
+                        // Remove the window from all other previews since it's now assigned
+                        this._previews.forEach((prev) => {
+                            prev.removeAllWindows();
+                            this._showWindowsInPreview(
+                                prev,
+                                nontiledWindows,
+                                monitorIndex,
+                            );
+                        });
+                    }
+                } else {
+                    // Original behavior: recursively show popup on the next vacant tile
+                    this._recursivelyShowPopup(nontiledWindows, monitorIndex);
+                }
+
                 return Clutter.EVENT_STOP; // Blocca la propagazione
             });
             return winClone;
