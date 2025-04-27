@@ -92,7 +92,7 @@ export default class TilingShellExtension extends Extension {
         // disable native edge tiling
         if (Settings.ACTIVE_SCREEN_EDGES) {
             SettingsOverride.get().override(
-                new Gio.Settings({ schema_id: 'org.gnome.mutter' }),
+                new Gio.Settings({ schemaId: 'org.gnome.mutter' }),
                 'edge-tiling',
                 new GLib.Variant('b', false),
             );
@@ -291,7 +291,7 @@ export default class TilingShellExtension extends Extension {
             Settings.KEY_ACTIVE_SCREEN_EDGES,
             () => {
                 const gioSettings = new Gio.Settings({
-                    schema_id: 'org.gnome.mutter',
+                    schemaId: 'org.gnome.mutter',
                 });
                 if (Settings.ACTIVE_SCREEN_EDGES) {
                     debug('disable native edge tiling');
@@ -506,7 +506,6 @@ export default class TilingShellExtension extends Extension {
                 focus_window.maximizedVertically) &&
             direction === KeyBindingsDirection.UP
         ) {
-            // @ts-expect-error "Main.wm has skipNextEffect function"
             Main.wm.skipNextEffect(focus_window.get_compositor_private());
             focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
             (focus_window as ExtendedWindow).assignedTile = undefined;

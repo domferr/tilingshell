@@ -36,7 +36,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
      *
      * @param {Adw.PreferencesWindow} window - The preferences window
      */
-    fillPreferencesWindow(window: Adw.PreferencesWindow) {
+    fillPreferencesWindow(window: Adw.PreferencesWindow): Promise<void> {
         Settings.initialize(this.getSettings());
 
         const prefsPage = new Adw.PreferencesPage({
@@ -920,6 +920,8 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         window.connect('close-request', () => {
             Settings.destroy();
         });
+
+        return Promise.resolve();
     }
 
     _buildSwitchRow(

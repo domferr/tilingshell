@@ -1,9 +1,11 @@
+@use "snap_assist";
+
 .window-menu-layout {
     .snap-assist-tile {
         border-color: rgba(255, 255, 255, 0.2);
         background-color: rgba(255, 255, 255, 0.2);
-        border-radius-value: $snap-assist-tile-border-radius - 2;
-        border-width-value: calc($snap-assist-tile-border-width / 2);
+        border-radius-value: snap_assist.$snap-assist-tile-border-radius - 2;
+        border-width-value: calc(snap_assist.$snap-assist-tile-border-width / 2);
     }
 
     .snap-assist-tile.dark {

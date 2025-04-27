@@ -1,6 +1,6 @@
 {
   "name": "tilingshell",
-  "version": "16.3",
+  "version": "16.4",
   "author": "Domenico Ferraro <ferraro.domenico125@gmail.com>",
   "private": true,
   "license": "GPL v2.0",
@@ -36,7 +36,6 @@
     "typescript-eslint": "^7.15.0"
   },
   "dependencies": {
-    "@girs/gjs": "^3.3.0",
-    "@girs/gnome-shell": "^46.0.0-beta6"
+    "@girs/gnome-shell": "^48.0.2"
   }
 }

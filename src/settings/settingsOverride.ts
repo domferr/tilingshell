@@ -84,7 +84,7 @@ export default class SettingsOverride {
         const oldValue = schemaMap.has(keyToOverride)
             ? schemaMap.get(keyToOverride)
             : giosettings.get_value(keyToOverride);
-        // @ts-expect-error "Variant has a type which is not known here"
+
         const res = giosettings.set_value(keyToOverride, newValue);
         if (!res) return null;
 
@@ -107,7 +107,6 @@ export default class SettingsOverride {
         const oldValue = overridden.get(keyToOverride);
         if (!oldValue) return null;
 
-        // @ts-expect-error "Variant has an unkown type"
         const res = giosettings.set_value(keyToOverride, oldValue);
 
         if (res) {
@@ -133,7 +132,6 @@ export default class SettingsOverride {
 
                 const toDelete: string[] = [];
                 overridden.forEach((oldValue: GLib.Variant, key: string) => {
-                    // @ts-expect-error "Variant has an unkown type"
                     const done = giosettings.set_value(key, oldValue);
                     if (done) toDelete.push(key);
                 });

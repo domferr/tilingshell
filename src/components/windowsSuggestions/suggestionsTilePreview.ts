@@ -1,7 +1,7 @@
 import { registerGObjectClass } from '@/utils/gjs';
 import { GObject, St, Clutter, Mtk } from '@gi.ext';
 import TilePreview from '../tilepreview/tilePreview';
-import { buildBlurEffect, setWidgetOrientation } from '@utils/ui';
+import { buildBlurEffect, widgetOrientation } from '@utils/ui';
 import Tile from '@components/layout/Tile';
 import MasonryLayoutManager from './masonryLayoutManager';
 
@@ -63,8 +63,8 @@ export default class SuggestionsTilePreview extends TilePreview {
             x_expand: true,
             y_align: Clutter.ActorAlign.CENTER,
             style: `spacing: ${MASONRY_LAYOUT_SPACING}px;`,
+            ...widgetOrientation(true),
         });
-        setWidgetOrientation(this._container, true);
         this._scrollView = new St.ScrollView({
             style_class: 'vfade',
             vscrollbar_policy: St.PolicyType.AUTOMATIC,
@@ -82,8 +82,18 @@ export default class SuggestionsTilePreview extends TilePreview {
         else this._scrollView.add_child(this._container);
         this.add_child(this._scrollView);
 
-        this._scrollView.get_hscroll_bar().opacity = 0;
-        this._scrollView.get_vscroll_bar().opacity = 0;
+        // From GNOME 48 we don't have get_hscroll_bar() anymore
+        if (
+            // @ts-expect-error "get_hscroll_bar is valid for GNOME < 48"
+            this._scrollView.get_hscroll_bar &&
+            // @ts-expect-error "get_vscroll_bar is valid for GNOME < 48"
+            this._scrollView.get_vscroll_bar
+        ) {
+            // @ts-expect-error "get_hscroll_bar is valid for GNOME < 48"
+            this._scrollView.get_hscroll_bar().opacity = 0;
+            // @ts-expect-error "get_vscroll_bar is valid for GNOME < 48"
+            this._scrollView.get_vscroll_bar().opacity = 0;
+        }
     }
 
     set blur(value: boolean) {
@@ -137,27 +147,45 @@ export default class SuggestionsTilePreview extends TilePreview {
     }
 
     private _showScrollBars(): void {
-        [
-            this._scrollView.get_hscroll_bar(),
-            this._scrollView.get_vscroll_bar(),
-        ].forEach((bar) =>
-            bar?.ease({
-                opacity: 255,
-                duration: SCROLLBARS_SHOW_ANIM_DURATION,
-            }),
-        );
+        if (
+            // @ts-expect-error "get_hscroll_bar is valid for GNOME < 48"
+            this._scrollView.get_hscroll_bar &&
+            // @ts-expect-error "get_vscroll_bar is valid for GNOME < 48"
+            this._scrollView.get_vscroll_bar
+        ) {
+            [
+                // @ts-expect-error "get_hscroll_bar is valid for GNOME < 48"
+                this._scrollView.get_hscroll_bar(),
+                // @ts-expect-error "get_vscroll_bar is valid for GNOME < 48"
+                this._scrollView.get_vscroll_bar(),
+            ].forEach((bar) =>
+                bar?.ease({
+                    opacity: 255,
+                    duration: SCROLLBARS_SHOW_ANIM_DURATION,
+                }),
+            );
+        }
     }
 
     private _hideScrollBars(): void {
-        [
-            this._scrollView.get_hscroll_bar(),
-            this._scrollView.get_vscroll_bar(),
-        ].forEach((bar) =>
-            bar?.ease({
-                opacity: 0,
-                duration: SCROLLBARS_SHOW_ANIM_DURATION,
-            }),
-        );
+        if (
+            // @ts-expect-error "get_hscroll_bar is valid for GNOME < 48"
+            this._scrollView.get_hscroll_bar &&
+            // @ts-expect-error "get_vscroll_bar is valid for GNOME < 48"
+            this._scrollView.get_vscroll_bar
+        ) {
+            [
+                // @ts-expect-error "get_hscroll_bar is valid for GNOME < 48"
+                this._scrollView.get_hscroll_bar(),
+                // @ts-expect-error "get_vscroll_bar is valid for GNOME < 48"
+                this._scrollView.get_vscroll_bar(),
+            ].forEach((bar) =>
+                bar?.ease({
+                    opacity: 0,
+                    duration: SCROLLBARS_SHOW_ANIM_DURATION,
+                }),
+            );
+        }
     }
 
     vfunc_enter_event(event: Clutter.Event) {

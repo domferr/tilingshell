@@ -90,7 +90,9 @@ export default class Slider extends St.Button {
 
     private get preferredCursor(): Meta.Cursor {
         // These constants were renamed in Gnome 48 from NORTH/WEST_* to N/W_*
+        // @ts-expect-error "WEST_RESIZE is valid for GNOME < 48"
         const horizCursor = Meta.Cursor.WEST_RESIZE ?? Meta.Cursor.W_RESIZE;
+        // @ts-expect-error "NORTH_RESIZE is valid for GNOME < 48"
         const vertCursor = Meta.Cursor.NORTH_RESIZE ?? Meta.Cursor.N_RESIZE;
 
         return this.hover || this._dragging
@@ -326,7 +328,6 @@ export default class Slider extends St.Button {
         this._dragging = true;
         global.display.set_cursor(this.preferredCursor);
 
-        // @ts-expect-error "global.stage has grab function"
         this._grab = global.stage.grab(this);
 
         const [stageX, stageY] = getEventCoords(event);

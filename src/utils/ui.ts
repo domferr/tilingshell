@@ -132,17 +132,6 @@ export const getScalingFactorSupportString = (monitorScalingFactor: number) => {
     return `scaling-reference: 1px; monitor-scaling-factor: ${monitorScalingFactor}px`;
 };
 
-export function getWindowsOfMonitor(monitor: Monitor): Meta.Window[] {
-    return global.workspaceManager
-        .get_active_workspace()
-        .list_windows()
-        .filter(
-            (win) =>
-                win.get_window_type() === Meta.WindowType.NORMAL &&
-                Main.layoutManager.monitors[win.get_monitor()] === monitor,
-        );
-}
-
 export function buildMarginOf(value: number): Clutter.Margin {
     const margin = new Clutter.Margin();
     margin.top = value;
@@ -234,6 +223,17 @@ export function getWindows(workspace?: Meta.Workspace): Meta.Window[] {
     );
 }
 
+export function getWindowsOfMonitor(monitor: Monitor): Meta.Window[] {
+    return global.workspaceManager
+        .get_active_workspace()
+        .list_windows()
+        .filter(
+            (win) =>
+                win.get_window_type() === Meta.WindowType.NORMAL &&
+                Main.layoutManager.monitors[win.get_monitor()] === monitor,
+        );
+}
+
 export function squaredEuclideanDistance(
     pointA: { x: number; y: number },
     pointB: { x: number; y: number },
@@ -245,15 +245,15 @@ export function squaredEuclideanDistance(
 }
 
 // Compatibility for GNOME 48+ where 'vertical' was deprecated in favor of 'orientation'
-export function setWidgetOrientation(
-    widget: { vertical?: boolean; orientation?: Clutter.Orientation },
-    vertical: boolean,
-) {
-    if (widget.orientation) {
-        widget.orientation = vertical
-            ? Clutter.Orientation.VERTICAL
-            : Clutter.Orientation.HORIZONTAL;
-    } else {
-        widget.vertical = vertical;
+export function widgetOrientation(vertical: boolean) {
+    // if orientation is supported
+    if (St.BoxLayout.prototype.get_orientation !== undefined) {
+        return {
+            orientation: vertical
+                ? Clutter.Orientation.VERTICAL
+                : Clutter.Orientation.HORIZONTAL,
+        };
     }
+
+    return { vertical };
 }

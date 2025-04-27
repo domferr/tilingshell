@@ -1,3 +1,6 @@
+@use "functions";
+@use "snap_assist";
+
 .indicator-menu-item {
     background-color: transparent !important;
 
@@ -12,8 +15,8 @@
     }
 
     .snap-assist-tile {
-        border-radius-value: $snap-assist-tile-border-radius - 1;
-        border-width-value: calc($snap-assist-tile-border-width / 2);
+        border-radius-value: snap_assist.$snap-assist-tile-border-radius - 1;
+        border-width-value: calc(snap_assist.$snap-assist-tile-border-width / 2);
     }
 }
 
@@ -23,6 +26,6 @@
 
 .monitor-layouts-title {
     //font-family: monospace;
-    @include fontsize(9pt);
+    @include functions.fontsize(9pt);
     text-align: center;
 }
