@@ -307,9 +307,9 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         });
 
         const edgeSnapModeModel = new Gtk.StringList();
-        edgeSnapModeModel.append(_('Default - snap to quarters and halves'));
-        edgeSnapModeModel.append(_('Adaptive - snap to corners and edges'));
-        edgeSnapModeModel.append(_('Granular - snap to exact tile'));
+        edgeSnapModeModel.append(_('Fixed quarters layout'));
+        edgeSnapModeModel.append(_('Fill available space'));
+        edgeSnapModeModel.append(_('Follow currently selected layout'));
 
         const edgeSnapModeDropdown = new Gtk.DropDown({
             model: edgeSnapModeModel,
