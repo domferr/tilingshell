@@ -11,7 +11,7 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {
     enableScalingFactorSupport,
     getMonitorScalingFactor,
-    setWidgetOrientation,
+    widgetOrientation,
 } from '@utils/ui';
 import { _ } from '../../translations';
 
@@ -199,8 +199,8 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
 
         const legend = new St.BoxLayout({
             styleClass: 'legend',
+            ...widgetOrientation(true),
         });
-        setWidgetOrientation(legend, true);
         legend.add_child(suggestion1);
         legend.add_child(suggestion2);
         legend.add_child(suggestion3);
@@ -241,8 +241,8 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
             const box = new St.BoxLayout({
                 xAlign: Clutter.ActorAlign.CENTER,
                 styleClass: 'layout-button-container',
+                ...widgetOrientation(true),
             });
-            setWidgetOrientation(box, true);
             this._layoutsBoxLayout.add_child(box);
             const btn = new LayoutButton(
                 box,
@@ -286,8 +286,8 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         const box = new St.BoxLayout({
             xAlign: Clutter.ActorAlign.CENTER,
             styleClass: 'layout-button-container',
+            ...widgetOrientation(true),
         });
-        setWidgetOrientation(box, true);
         this._layoutsBoxLayout.add_child(box);
         const newLayoutBtn = new LayoutButton(
             box,

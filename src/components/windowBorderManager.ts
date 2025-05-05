@@ -82,7 +82,6 @@ class WindowBorder extends St.Bin {
             this._window.get_compositor_private() as Meta.WindowActor;
 
         // scale and translate like the window actor
-        // @ts-expect-error "For some reason GObject.Binding is not recognized"
         this._bindings = [
             'scale-x',
             'scale-y',

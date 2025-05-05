@@ -642,7 +642,6 @@ export default class Settings {
         const result = GLib.Variant.new_array(null, variants);
         this._settings?.set_value(
             Settings.KEY_SETTING_SELECTED_LAYOUTS,
-            // @ts-expect-error "'result' is of a correct variant type"
             result,
         );
     }

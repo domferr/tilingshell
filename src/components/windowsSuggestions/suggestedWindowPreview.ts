@@ -37,6 +37,9 @@ export default class SuggestedWindowPreview extends Shell.WindowPreview {
     private _windowActor: Meta.WindowActor;
     private _title: St.Label;
     private _previewContainer: St.Widget;
+    private _stackAbove: Clutter.Actor | null;
+    private _destroyed: boolean;
+    private _idleHideOverlayId: number;
 
     constructor(metaWindow: Meta.Window) {
         super({
@@ -44,9 +47,14 @@ export default class SuggestedWindowPreview extends Shell.WindowPreview {
             can_focus: true,
             accessible_role: Atk.Role.PUSH_BUTTON,
             offscreen_redirect: Clutter.OffscreenRedirect.AUTOMATIC_FOR_OPACITY,
+            windowContainer: new Clutter.Actor({
+                pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
+            }),
         });
         this._metaWindow = metaWindow;
         this._windowActor = metaWindow.get_compositor_private();
+        this._destroyed = false;
+        this._idleHideOverlayId = 0;
 
         this._previewContainer = new St.Widget({
             style_class: 'popup-window-preview-container',
@@ -54,18 +62,14 @@ export default class SuggestedWindowPreview extends Shell.WindowPreview {
             layoutManager: new Clutter.BinLayout(),
             xAlign: Clutter.ActorAlign.CENTER,
         });
-        const windowContainer = new Clutter.Actor({
-            pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
-        });
-        this.window_container = windowContainer;
 
         // gjs currently can't handle setting an actors layout manager during
         // the initialization of the actor if that layout manager keeps track
         // of its container, so set the layout manager after creating the
         // container
-        windowContainer.layout_manager = new Shell.WindowPreviewLayout();
+        this.windowContainer.layout_manager = new Shell.WindowPreviewLayout();
         this.add_child(this._previewContainer);
-        this._previewContainer.add_child(windowContainer);
+        this._previewContainer.add_child(this.windowContainer);
 
         this._addWindow(metaWindow);
 
@@ -152,7 +156,7 @@ export default class SuggestedWindowPreview extends Shell.WindowPreview {
     }
 
     public get_window_clone(): Clutter.Actor | undefined {
-        return this.window_container;
+        return this.windowContainer;
     }
 
     private _getCaption() {
@@ -239,7 +243,7 @@ export default class SuggestedWindowPreview extends Shell.WindowPreview {
 
     _addWindow(metaWindow: Meta.Window) {
         this.clone =
-            this.window_container.layout_manager.add_window(metaWindow);
+            this.windowContainer.layout_manager.add_window(metaWindow);
         // if (!clone) return;
 
         /* // We expect this to be used for all interaction rather than
@@ -265,7 +269,7 @@ export default class SuggestedWindowPreview extends Shell.WindowPreview {
     }
 
     _hasAttachedDialogs() {
-        return this.window_container.layout_manager.get_windows().length > 1;
+        return this.windowContainer.layout_manager.get_windows().length > 1;
     }
 
     _updateAttachedDialogs() {
@@ -284,17 +288,17 @@ export default class SuggestedWindowPreview extends Shell.WindowPreview {
 
     // Find the actor just below us, respecting reparenting done by DND code
     _getActualStackAbove() {
-        if (this._stackAbove == null) return null;
+        if (this._stackAbove === null) return null;
 
         return this._stackAbove;
     }
 
-    setStackAbove(actor) {
+    setStackAbove(actor: Clutter.Actor | null) {
         this._stackAbove = actor;
 
         const parent = this.get_parent();
         const actualAbove = this._getActualStackAbove();
-        if (actualAbove == null) parent.set_child_below_sibling(this, null);
+        if (actualAbove === null) parent.set_child_below_sibling(this, null);
         else parent.set_child_above_sibling(this, actualAbove);
     }
 

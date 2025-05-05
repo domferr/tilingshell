@@ -1,0 +1,7 @@
+@use "functions";
+
+// From https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/43.0/data/theme/gnome-shell-sass/_common.scss
+$base_font_size: 11pt; // font size
+$base_padding: functions.to_em(6px); //6px;
+$base_margin: 4px;
+$base_border_radius: 8px; //to_em(8px);
