@@ -1,13 +1,14 @@
 #
 # pkly @github <>, 2025.
+# Adam Lewicki <a.lewick95@gmail.com>, 2025.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Tiling Shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-29 11:41+0100\n"
-"PO-Revision-Date: 2025-03-04 20:11+0100\n"
-"Last-Translator: pkly @github <>\n"
+"PO-Revision-Date: 2025-05-05 21:19+0200\n"
+"Last-Translator: Adam Lewicki <a.lewick95@gmail.com>\n"
 "Language-Team: Polish\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -15,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2);\n"
-"X-Generator: Gtranslator 47.1\n"
+"X-Generator: Gtranslator 48.0\n"
 
 #: dist/prefs.js:785
 msgid "General"
@@ -27,15 +28,15 @@ msgstr "Wygląd"
 
 #: dist/prefs.js:791
 msgid "Configure the appearance of Tiling Shell"
-msgstr "Skonfiguruj wygląd Tiling Shell"
+msgstr "Skonfiguruj wygląd Układania okien"
 
 #: dist/prefs.js:796
 msgid "Show Indicator"
-msgstr "Pokaż ikonę"
+msgstr "Pokaż wskaźnik"
 
 #: dist/prefs.js:797
 msgid "Whether to show the panel indicator"
-msgstr "Czy pokazywać ikonę w panelu"
+msgstr "Pokazywanie ikony wskaźnika na panelu"
 
 #: dist/prefs.js:802
 msgid "Inner gaps"
@@ -55,31 +56,32 @@ msgstr "Przerwy pomiędzy oknami i granicami monitora"
 
 #: dist/prefs.js:813
 msgid "Blur (experimental feature)"
-msgstr "Rozmycie (eksperymentalne)"
+msgstr "Rozmycie (funkcja eksperymentalna)"
 
 #: dist/prefs.js:815
 msgid "Apply blur effect to Snap Assistant and tile previews"
-msgstr "Dodaj efekt rozmycia do Asystenta Snap"
+msgstr "Zastosuj efekt rozmycia do Asystenta przyciągania i podglądów kafelków"
 
 #: dist/prefs.js:821
 msgid "Snap Assistant threshold"
-msgstr "Progi Asystenta Snap"
+msgstr "Progi Asystenta przyciągania"
 
 #: dist/prefs.js:823
 msgid "Minimum distance from the Snap Assistant to the pointer to open it"
-msgstr "Minimalny dystant od Asystenta Snap do myszy aby włączyć"
+msgstr ""
+"Minimalna odległość otwarcia względem wskaźnika od Asystenta przyciągania"
 
 #: dist/prefs.js:832
 msgid "Snap Assistant"
-msgstr "Asystent Snap"
+msgstr "Asystent przyciągania"
 
 #: dist/prefs.js:833
 msgid "Apply blur effect to Snap Assistant"
-msgstr "Zastosuj efekt rozmycia do Asystenta Snap"
+msgstr "Zastosuj efekt rozmycia do Asystenta przyciągania"
 
 #: dist/prefs.js:839
 msgid "Selected tile preview"
-msgstr "Podgląd zaznaczonej strefy"
+msgstr "Podgląd wybra kafelka"
 
 #: dist/prefs.js:840
 msgid "Apply blur effect to selected tile preview"
@@ -99,11 +101,11 @@ msgstr "Włącz"
 
 #: dist/prefs.js:858
 msgid "Smart border radius"
-msgstr "Mądry radius obramowania"
+msgstr "Inteligentny promień obramowania"
 
 #: dist/prefs.js:859
 msgid "Dynamically adapt to the window’s actual border radius"
-msgstr "Dynamicznie dopasowuje się do rzeczywistego radius obramowania"
+msgstr "Dynamicznie dopasowuj do rzeczywistego promienia obramowania okna"
 
 #: dist/prefs.js:865
 msgid "Width"
@@ -127,15 +129,15 @@ msgstr "Animacje"
 
 #: dist/prefs.js:880
 msgid "Customize animations"
-msgstr "Zmień animacje"
+msgstr "Dostosuj animacje"
 
 #: dist/prefs.js:886
 msgid "Snap assistant animation time"
-msgstr "Czas animacji Asystenta Snap"
+msgstr "Czas trwania animacji Asystenta przyciągania"
 
 #: dist/prefs.js:887
 msgid "The snap assistant animation time in milliseconds"
-msgstr "Czas animacji Asystenta Snap w milisekundach"
+msgstr "Czas trwania animacji Asystenta przyciągania w milisekundach"
 
 #: dist/prefs.js:895
 msgid "Tiles animation time"
@@ -143,7 +145,7 @@ msgstr "Czas animacji"
 
 #: dist/prefs.js:896
 msgid "The tiles animation time in milliseconds"
-msgstr "Czas animacji strefy w milisekundach"
+msgstr "Czas trwania animacji kafelków w milisekundach"
 
 #: dist/prefs.js:902
 msgid "Behaviour"
@@ -151,82 +153,85 @@ msgstr "Zachowanie"
 
 #: dist/prefs.js:903
 msgid "Configure the behaviour of Tiling Shell"
-msgstr "Zmień zachowanie Tiling Shell"
+msgstr "Skonfiguruj zachowanie Układania okien"
 
 #: dist/prefs.js:908
 msgid "Enable Snap Assistant"
-msgstr "Włącz Asystenta Snap"
+msgstr "Włącz Asystenta przyciągania"
 
 #: dist/prefs.js:909
 msgid "Move the window on top of the screen to snap assist it"
-msgstr "Przesuń okno do góry ekranu aby użyć snap assist"
+msgstr ""
+"Przesuń okno na górną krawędź ekranu, aby wywołać Asystenta przyciągania"
 
 #: dist/prefs.js:914
 msgid "Enable Tiling System"
-msgstr "Włącz system stref"
+msgstr "Włącz system układania okien"
 
 #: dist/prefs.js:915
 msgid "Hold the activation key while moving a window to tile it"
-msgstr "Przytrzymaj klawisz przy poruszaniu oknem aby wypełnić strefę"
+msgstr "Przytrzymaj klawisz aktywacji podczas przesuwania okna, aby je ułożyć"
 
 #: dist/prefs.js:923
 msgid "Tiling System deactivation key"
-msgstr "Klawisz dezaktywacji strefowania"
+msgstr "Klawisz deaktywacji systemu układania okien"
 
 #: dist/prefs.js:925
 msgid ""
 "Hold the deactivation key while moving a window to deactivate the tiling "
 "system"
 msgstr ""
-"Przytrzymaj klawisz dezaktywacji poruszając oknem aby wyłączyć system "
-"strefowania"
+"Przytrzymaj klawisz deaktywacji podczas przesuwania okna, aby wyłączyć "
+"system układania okien"
 
 #: dist/prefs.js:933
 msgid "Span multiple tiles"
-msgstr "Zajmij wiele stref"
+msgstr "Rozciągnij na wiele kafelków"
 
 #: dist/prefs.js:934
 msgid "Hold the activation key to span multiple tiles"
-msgstr "Przytrzymaj klawisz aby zająć wiele stref"
+msgstr "Przytrzymaj klawisz aktywacji, aby rozciągnąć na wiele kafelków."
 
 #: dist/prefs.js:943
 msgid "Enable Auto Tiling"
-msgstr "Włącz auto strefowanie"
+msgstr "Włącz automatyczne układanie"
 
 #: dist/prefs.js:944
 msgid "Automatically tile new windows to the best tile"
-msgstr "Automatycznie umieszcza ona w najlepszej dostępnej strefie"
+msgstr "Automatycznie układaj nowe okna do najlepszego kafelka"
 
 #: dist/prefs.js:949
 msgid "Enable auto-resize of the complementing tiled windows"
-msgstr "Włącz automatyczną zmiarę rozmiaru okien w bliskich strefach"
+msgstr "Włącz automatyczną zmianę rozmiaru sąsiednich ułożonych okien"
 
 #: dist/prefs.js:951
 msgid ""
 "When a tiled window is resized, auto-resize the other tiled windows near it"
 msgstr ""
-"Kiedy okno w strefie zmienia rozmiar, automatycznie zmień rozmiar okien w "
-"pobliskich strefach"
+"Gdy rozmiar ułożonego okna jest zmieniany, automatycznie zmień rozmiar "
+"sąsiednich ułożonych okien"
 
 #: dist/prefs.js:957
 msgid "Restore window size"
-msgstr "Przywróć oryginalny rozmiar okna"
+msgstr "Przywróć rozmiar okna"
 
 #: dist/prefs.js:959
 msgid "Whether to restore the windows to their original size when untiled"
-msgstr "Przywróć oryginalny rozmiar okna kiedy okno opuszcza strefę"
+msgstr "Przywracaj okna do ich oryginalnego rozmiaru po usunięciu z układu"
 
 #: dist/prefs.js:965
 msgid "Add snap assistant and auto-tile buttons to window menu"
-msgstr "Dodaj guziki Asystenta Snap i auto-strefowanie do menu okna"
+msgstr ""
+"Dodaj przyciski Asystenta przyciągania i automatycznego układania do menu "
+"okna"
 
 #: dist/prefs.js:967
 msgid ""
 "Add snap assistant and auto-tile buttons in the menu that shows up when you "
 "right click on a window title"
 msgstr ""
-"Dodaj guziki Asystenta Snap i auto-strefowania w menu, które pojawia się po "
-"prawym kliknięciu w tytuł okna"
+"Dodaj przyciski Asystenta przyciągania i automatycznego układania do menu "
+"wyświetlanego po kliknięciu prawym przyciskiem myszy na pasku tytułu okna"
 
 #: dist/prefs.js:972
 msgid "Screen Edges"
@@ -235,24 +240,26 @@ msgstr "Krawędzie ekranu"
 #: dist/prefs.js:974
 msgid ""
 "Drag windows against the top, left and right screen edges to resize them"
-msgstr "Przeciągnij okno do krawędzi ekranu aby zmienić ich rozmiar"
+msgstr ""
+"Przeciągnij okna do górnej, lewej lub prawej krawędzi ekranu, aby zmienić "
+"ich rozmiar"
 
 #: dist/prefs.js:988
 msgid "Drag against top edge to maximize window"
-msgstr "Przeciągnij do górnej krawędzi ekranu aby je zmaksymalizować"
+msgstr "Przeciągnij do górnej krawędzi, aby zmaksymalizować okno"
 
 #: dist/prefs.js:989
 msgid "Drag windows against the top edge to maximize them"
-msgstr "Przeciągnij okno do górnej krawędzi ekranu aby je zmaksymalizować"
+msgstr "Przeciągnij okna do górnej krawędzi, aby je zmaksymalizować"
 
 #: dist/prefs.js:998
 msgid "Quarter tiling activation area"
-msgstr "Strefa aktywacji ćwierciowania"
+msgstr "Obszar aktywacji ćwiartkowego układania"
 
 #: dist/prefs.js:999
-#, fuzzy, javascript-format
+#, javascript-format
 msgid "Activation area to trigger quarter tiling (%% of the screen)"
-msgstr "Rozmiar aktywnej strefy do ćwierciowania (Wymagany % ekranu)"
+msgstr "Obszar aktywacji ćwiartkowego układania (%% ekranu)"
 
 #: dist/prefs.js:1016
 msgid "Windows suggestions"
@@ -264,31 +271,35 @@ msgstr "Włącz i wyłącz sugestie okien"
 
 #: dist/prefs.js:1022
 msgid "Enable window suggestions for the tiling system"
-msgstr "Włącz sugestie okien dla systemu stref"
+msgstr "Włącz podpowiedzi okien dla systemu układania"
 
 #: dist/prefs.js:1024
 msgid ""
 "Provides smart suggestions to fill empty tiles when using the tiling system"
-msgstr "Podaje sugestie aby wypełnić puste strefy kiedy używasz systemu stref"
+msgstr ""
+"Wyświetlaj inteligentne podpowiedzi wypełniania pustych kafelków podczas "
+"korzystania z systemu układania"
 
 #: dist/prefs.js:1030
 msgid "Enable window suggestions for the snap assistant"
-msgstr "Włącz sugestie okien dla asystenta snap"
+msgstr "Włącz podpowiedzi okien dla Asystenta przyciągania"
 
 #: dist/prefs.js:1032
 msgid ""
 "Offers suggestions to populate empty tiles when using the snap assistant"
-msgstr "Podaje sugestie aby wypełnić puste strefy kiedy używasz asystenta snap"
+msgstr ""
+"Wyświetlaj podpowiedzi wypełniania pustych kafelków podczas korzystania z "
+"Asystenta przyciągania"
 
 #: dist/prefs.js:1038
 msgid "Enable window suggestions for screen edge snapping"
-msgstr "Włącz sugestie okien dla przyczepiania do krawędzi ekranu"
+msgstr "Włącz podpowiedzi okien dla przyciągania do krawędzi ekranu"
 
 #: dist/prefs.js:1040
 msgid "Suggests windows to occupy empty tiles when snapping to screen edges"
 msgstr ""
-"Podaje sugestie aby wypełnić puste strefy kiedy używasz przyczepiania do "
-"krawędzi ekranu"
+"Sugeruj okna do zajęcia pustych kafelków podczas przyciągania do krawędzi "
+"ekranu"
 
 #: dist/prefs.js:1046
 msgid "Layouts"
@@ -296,7 +307,7 @@ msgstr "Układy"
 
 #: dist/prefs.js:1047
 msgid "Configure the layouts of Tiling Shell"
-msgstr "Konfiguruj układy Tiling Shell"
+msgstr "Skonfiguruj układy Układania okien"
 
 #: dist/prefs.js:1051 dist/prefs.js:1052
 msgid "Edit layouts"
@@ -352,91 +363,91 @@ msgstr "Skróty klawiszowe"
 
 #: dist/prefs.js:1186
 msgid "Use hotkeys to perform actions on the focused window"
-msgstr "Użyj klawiszu skrótu aby wykonywać akcje na aktywnym oknie"
+msgstr "Używaj skrótów klawiszowych do wykonywania akcji na aktywnym oknie"
 
 #: dist/prefs.js:1204
 msgid "Move window to right tile"
-msgstr "Przesuń okno do prawej strefy"
+msgstr "Przenieś okno do prawego kafelka"
 
 #: dist/prefs.js:1206
 msgid "Move the focused window to the tile on its right"
-msgstr "Przesuń aktywne okno do strefy po jej prawej stronie"
+msgstr "Przenieś aktywne okno do kafelka po prawej"
 
 #: dist/prefs.js:1215
 msgid "Move window to left tile"
-msgstr "Przesuń okno do lewej strefy"
+msgstr "Przenieś okno do lewego kafelka"
 
 #: dist/prefs.js:1216
 msgid "Move the focused window to the tile on its left"
-msgstr "Przesuń aktywne okno do strefy po jej lewej stronie"
+msgstr "Przenieś aktywne okno do kafelka po lewej"
 
 #: dist/prefs.js:1222
 msgid "Move window to tile above"
-msgstr "Przesuń okno do strefy powyżej"
+msgstr "Przenieś okno do kafelka powyżej"
 
 #: dist/prefs.js:1223
 msgid "Move the focused window to the tile above"
-msgstr "Przesuń aktywne okno do strefy powyżej"
+msgstr "Przenieś aktywne okno do kafelka powyżej"
 
 #: dist/prefs.js:1229
 msgid "Move window to tile below"
-msgstr "Przesuń okno do strefy poniżej"
+msgstr "Przenieś okno do kafelka poniżej"
 
 #: dist/prefs.js:1230
 msgid "Move the focused window to the tile below"
-msgstr "Przesuń aktywne okno do strefy poniżej"
+msgstr "Przenieś aktywne okno do kafelka poniżej"
 
 #: dist/prefs.js:1236
 msgid "Span window to right tile"
-msgstr "Rozciągnij okno do prawej strefy"
+msgstr "Rozciągnij okno na prawy kafelek"
 
 #: dist/prefs.js:1237
 msgid "Span the focused window to the tile on its right"
-msgstr "Rozciągnij aktywne okno do strefy po jej prawej stronie"
+msgstr "Rozciągnij aktywne okno na kafelek po prawej."
 
 #: dist/prefs.js:1243
 msgid "Span window to left tile"
-msgstr "Rozciągnij okno do lewej strefy"
+msgstr "Rozciągnij okno na lewy kafelek"
 
 #: dist/prefs.js:1244
 msgid "Span the focused window to the tile on its left"
-msgstr "Rozciągnij aktywne okno do strefy po jej lewej stronie"
+msgstr "Rozciągnij aktywne okno na kafelek po lewej"
 
 #: dist/prefs.js:1250
 msgid "Span window above"
-msgstr "Rozciągnij okno do strefy powyżej"
+msgstr "Rozciągnij okno na kafelek powyżej"
 
 #: dist/prefs.js:1251
 msgid "Span the focused window to the tile above"
-msgstr "Rozciągnij aktywne okno do strefy powyżej"
+msgstr "Rozciągnij aktywne okno na kafelek powyżej"
 
 #: dist/prefs.js:1257
 msgid "Span window down"
-msgstr "Rozciągnij okno do strefy poniżej"
+msgstr "Rozciągnij okno na kafelek poniżej"
 
 #: dist/prefs.js:1258
 msgid "Span the focused window to the tile below"
-msgstr "Rozciągnij aktywne okno do strefy poniżej"
+msgstr "Rozciągnij aktywne okno na kafelek poniżej"
 
 #: dist/prefs.js:1264
 msgid "Span window to all tiles"
-msgstr "Rozciągnij okno do wszystkich stref"
+msgstr "Rozciągnij okno na wszystkie kafelki"
 
 #: dist/prefs.js:1265
 msgid "Span the focused window to all the tiles"
-msgstr "Rozciągnij aktywne okno do zajęcia wszystkich stref"
+msgstr "Rozciągnij aktywne okno na wszystkie kafelki"
 
 #: dist/prefs.js:1271
 msgid "Untile focused window"
-msgstr "Wyciągnij aktywne okno ze stref"
+msgstr "Usuń aktywne okno z układu"
 
 #: dist/prefs.js:1279
 msgid "Move window to the center"
-msgstr "Przesuń okno do środka"
+msgstr "Przenieś okno na środek"
 
 #: dist/prefs.js:1281
 msgid "Move the focused window to the center of the screen"
-msgstr "Przesuń aktywne okno do środka ekranu"
+msgstr "Przenieś aktywne okno na środek ekranu"
 
 #: dist/prefs.js:1290
 msgid "Focus window to the right"
@@ -487,32 +498,30 @@ msgid "Focus the window prior to the current focused window"
 msgstr "Aktywuj poprzednie okno obok aktualnie aktywnego"
 
 #: dist/prefs.js:1334
-#, fuzzy
 msgid "Highlight focused window"
-msgstr "Wyciągnij aktywne okno ze stref"
+msgstr "Podświetl aktywne okno"
 
 #: dist/prefs.js:1336
-#, fuzzy
 msgid "Minimize all the other windows and show only the focused window"
-msgstr "Użyj klawiszu skrótu aby wykonywać akcje na aktywnym oknie"
+msgstr "Zminimalizuj wszystkie inne okna i pokaż tylko aktywne okno"
 
 #: dist/prefs.js:1364
 msgid "View and Customize all the Shortcuts"
-msgstr "Pokaż i zmień wszystkie skróty"
+msgstr "Wyświetl i dostosuj wszystkie skróty"
 
 #: dist/prefs.js:1392 dist/prefs.js:1393
 msgid "View and Customize Shortcuts"
-msgstr "Pokaż i zmień skróty"
+msgstr "Wyświetl i dostosuj skróty"
 
 #: dist/prefs.js:1415
 msgid "Enable next/previous window focus to wrap around"
-msgstr "Włącz następne/poprzednie aktywne okno do wrapowania"
+msgstr "Włącz zawijanie aktywnego okna do następnego/poprzedniego"
 
 #: dist/prefs.js:1417
 msgid "When focusing next or previous window, wrap around at the window edge"
 msgstr ""
-"Kiedy aktywne jest następne lub poprzednie okno, powróć do drugiej strony "
-"ekranu"
+"Podczas przełączania na następne lub poprzednie aktywne okno, zawijaj po "
+"osiągnięciu krawędzi okien"
 
 #: dist/prefs.js:1422
 msgid "Import, export and reset"
@@ -520,7 +529,7 @@ msgstr "Import, eksport i reset"
 
 #: dist/prefs.js:1424
 msgid "Import, export and reset the settings of Tiling Shell"
-msgstr "Importuj, eksportuj i resetuj ustawienia Tiling Shell"
+msgstr "Importuj, eksportuj i resetuj ustawienia Układania okien"
 
 #: dist/prefs.js:1429 dist/prefs.js:1430
 msgid "Export settings"
@@ -568,23 +577,23 @@ msgstr "Zgłoś błąd"
 
 #: dist/prefs.js:1561
 msgid "Request a feature"
-msgstr "Poproś o feature"
+msgstr "Zgłoś propozycję funkcji"
 
 #: dist/prefs.js:1569
 msgid "Have issues, you want to suggest a new feature or contribute?"
-msgstr "Masz problemy? Chcesz zgłosić problem lub pomóc w developmencie?"
+msgstr "Masz problemy, chcesz zasugerować nową funkcję lub wnieść swój wkład?"
 
 #: dist/prefs.js:1576
 msgid "Open a new issue on"
-msgstr "Otwórz nowy issue na"
+msgstr "Otwórz nowe zgłoszenie na"
 
 #: dist/prefs.js:1805 dist/prefs.js:1828
 msgid "New accelerator…"
-msgstr "Nowy skrót"
+msgstr "Nowy skrót..."
 
 #: dist/prefs.js:1831
 msgid "Use Backspace to clear"
-msgstr "Użyj Backspace aby wyczyścić"
+msgstr "Użyj Backspace, aby wyczyścić"
 
 #: dist/extension.js:5873
 msgid "Edit Layouts"
@@ -596,19 +605,19 @@ msgstr "Nowy układ"
 
 #: dist/extension.js:6068
 msgid "to split a tile"
-msgstr "aby podzielić strefę"
+msgstr "aby podzielić kafelek"
 
 #: dist/extension.js:6107
 msgid "to split a tile vertically"
-msgstr "aby podzielić strefę wertykalnie"
+msgstr "aby podzielić kafelek pionowo"
 
 #: dist/extension.js:6127
 msgid "to delete a tile"
-msgstr "aby usunąć strefę"
+msgstr "aby usunąć kafelek"
 
 #: dist/extension.js:6151
 msgid "use the indicator button to save or cancel"
-msgstr "użyj ikony w panelu aby zapisać lub anulować"
+msgstr "użyj przycisku wskaźnika, aby zapisać lub anulować"
 
 #~ msgid "Menu"
 #~ msgstr "Menu"
