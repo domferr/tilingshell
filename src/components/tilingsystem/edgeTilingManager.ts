@@ -9,7 +9,7 @@ import { registerGObjectClass } from '@utils/gjs';
 import { logger } from '@utils/logger';
 
 const EDGE_TILING_OFFSET = 16;
-const TOP_EDGE_TILING_OFFSET = 8;
+const VERTICAL_EDGE_TILING_OFFSET = 8;
 const QUARTER_PERCENTAGE = 0.5;
 
 @registerGObjectClass
@@ -128,11 +128,11 @@ export default class EdgeTilingManager extends GObject.Object {
     }): boolean {
         return (
             pointerPos.x <= this._workArea.x + EDGE_TILING_OFFSET ||
-            pointerPos.y <= this._workArea.y + TOP_EDGE_TILING_OFFSET ||
+            pointerPos.y <= this._workArea.y + VERTICAL_EDGE_TILING_OFFSET ||
             pointerPos.x >=
                 this._workArea.x + this._workArea.width - EDGE_TILING_OFFSET ||
             pointerPos.y >=
-                this._workArea.y + this._workArea.height - EDGE_TILING_OFFSET
+                this._workArea.y + this._workArea.height - VERTICAL_EDGE_TILING_OFFSET
         );
     }
 

@@ -4,7 +4,7 @@ import SnapAssistTile from './snapAssistTile';
 import SnapAssistLayout from './snapAssistLayout';
 import Layout from '../layout/Layout';
 import Tile from '../layout/Tile';
-import Settings from '@settings/settings';
+import Settings, { AssistantPosition } from '@settings/settings';
 import GlobalState from '@utils/globalState';
 import SignalHandling from '@utils/signalHandling';
 import {
@@ -37,6 +37,15 @@ class SnapAssistContent extends St.BoxLayout {
                 GObject.ParamFlags.READWRITE,
                 false,
             ),
+            snapAssistantPosition: GObject.ParamSpec.int(
+                'snapAssistantPosition',
+                'snapAssistantPosition',
+                'Position of snap assistant',
+                GObject.ParamFlags.READWRITE,
+                0,
+                2,
+                0
+            ),
             snapAssistantThreshold: GObject.ParamSpec.uint(
                 'snapAssistantThreshold',
                 'snapAssistantThreshold',
@@ -67,6 +76,7 @@ class SnapAssistContent extends St.BoxLayout {
     private _hoveredInfo: [SnapAssistTile, SnapAssistLayout] | undefined;
     private _padding: number;
     private _blur: boolean;
+    private _snapAssistantPosition: AssistantPosition;
     private _snapAssistantThreshold: number;
     private _snapAssistantAnimationTime: number;
     private _monitorIndex: number;
@@ -88,6 +98,7 @@ class SnapAssistContent extends St.BoxLayout {
         this._showing = true;
         this._padding = 0;
         this._blur = false;
+        this._snapAssistantPosition = AssistantPosition.TOP;
         this._snapAssistantAnimationTime = 100;
         this._monitorIndex = monitorIndex;
         this._snapAssistantThreshold =
@@ -97,6 +108,12 @@ class SnapAssistContent extends St.BoxLayout {
             Settings.KEY_ENABLE_BLUR_SNAP_ASSISTANT,
             this,
             'blur',
+            Gio.SettingsBindFlags.GET,
+        );
+        Settings.bind(
+            Settings.KEY_SNAP_ASSISTANT_POSITION,
+            this,
+            'snapAssistantPosition',
             Gio.SettingsBindFlags.GET,
         );
         Settings.bind(
@@ -141,6 +158,12 @@ class SnapAssistContent extends St.BoxLayout {
         this._blur = value;
         this.get_effect('blur')?.set_enabled(value);
         this._applyStyle();
+    }
+
+    private set snapAssistantPosition(value: AssistantPosition) {
+        if (value < AssistantPosition.TOP || value > AssistantPosition.BOTTOM)
+            value = AssistantPosition.TOP;
+        this._snapAssistantPosition = value;
     }
 
     private set snapAssistantThreshold(value: number) {
@@ -205,6 +228,15 @@ class SnapAssistContent extends St.BoxLayout {
     }
 
     private get _desiredY(): number {
+        if (this._snapAssistantPosition === AssistantPosition.BOTTOM)
+            return this._isEnlarged
+                ? Math.min(
+                    this._container.height - this.height,
+                    this._container.height - this._snapAssistantThreshold -
+                        this.height / 2 -
+                        this._padding,
+                )
+                : this._container.height - this._padding;
         return this._isEnlarged
             ? Math.max(
                   0,
@@ -316,10 +348,13 @@ class SnapAssistContent extends St.BoxLayout {
             }
         }
 
-        const height =
-            this.height + (this._isEnlarged ? 0 : this._snapAssistantThreshold);
-        const minY = this._container.y;
-        const maxY = this._container.y + this._desiredY + height;
+        const yThreshold = this._isEnlarged ? 0 : this._snapAssistantThreshold;
+        const minY = this._snapAssistantPosition === AssistantPosition.TOP
+            ? this._container.y
+            : this._container.y + this._desiredY - yThreshold;
+        const maxY = this._snapAssistantPosition === AssistantPosition.TOP
+            ? this._container.y + this._desiredY + this.height + yThreshold
+            : this._container.y + this._container.height;
         const minX = this._container.x + this.x - this._snapAssistantThreshold;
         const maxX =
             this._container.x +
@@ -413,7 +448,6 @@ export default class SnapAssist extends St.Widget {
         super();
         parent.add_child(this);
         this.workArea = workArea;
-        this.set_clip(0, 0, workArea.width, workArea.height);
         if (scalingFactor) enableScalingFactorSupport(this, scalingFactor);
 
         this._content = new SnapAssistContent(this, monitorIndex);
@@ -421,7 +455,8 @@ export default class SnapAssist extends St.Widget {
 
     public set workArea(newWorkArea: Mtk.Rectangle) {
         this.set_position(newWorkArea.x, newWorkArea.y);
-        this.set_width(newWorkArea.width);
+        // To put snap assistant at bottom, let the container fill the area.
+        this.set_size(newWorkArea.width, newWorkArea.height);
         this.set_clip(0, 0, newWorkArea.width, newWorkArea.height);
     }
 

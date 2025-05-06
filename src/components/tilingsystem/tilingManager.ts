@@ -695,6 +695,14 @@ export class TilingManager {
                 this._selectedTilesPreview.close(true);
             }
 
+            if (Settings.SNAP_ASSIST) {
+                this._snapAssist.onMovingWindow(
+                    window,
+                    true,
+                    currPointerPos,
+                );
+            }
+
             if (
                 Settings.ACTIVE_SCREEN_EDGES &&
                 !this._snapAssistingInfo.isSnapAssisting &&
@@ -704,19 +712,10 @@ export class TilingManager {
                     this._edgeTilingManager.startEdgeTiling(currPointerPos);
                 if (changed)
                     this._showEdgeTiling(window, rect, x, y, tilingLayout);
-                this._snapAssist.close(true);
             } else {
                 if (this._edgeTilingManager.isPerformingEdgeTiling()) {
                     this._selectedTilesPreview.close(true);
                     this._edgeTilingManager.abortEdgeTiling();
-                }
-
-                if (Settings.SNAP_ASSIST) {
-                    this._snapAssist.onMovingWindow(
-                        window,
-                        true,
-                        currPointerPos,
-                    );
                 }
             }
 

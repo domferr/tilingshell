@@ -24,8 +24,13 @@
         </key>
         <key name="enable-snap-assist" type="b">
             <default>true</default>
-            <summary>Enable snap assist</summary>
+            <summary>Enable snap assistant</summary>
             <description>Move the window on top of the screen to snap assist it.</description>
+        </key>
+        <key name="snap-assistant-position" type="i">
+            <default>0</default>
+            <summary>Position of snap assistant</summary>
+            <description>Position of snap assistant, 0 is TOP, 1 is BOTTOM.</description>
         </key>
         <key name="show-indicator" type="b">
             <default>true</default>

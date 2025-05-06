@@ -1,5 +1,5 @@
 import { Gtk, Adw, Gio, GLib, Gdk, GObject } from '@gi.prefs';
-import Settings, { ActivationKey } from './settings/settings';
+import Settings, { ActivationKey, AssistantPosition } from './settings/settings';
 import { logger } from './utils/logger';
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 import Layout from '@components/layout/Layout';
@@ -179,6 +179,11 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             Settings.KEY_SNAP_ASSIST,
             _('Enable Snap Assistant'),
             _('Move the window on top of the screen to snap assist it'),
+            this._buildAssistantPositionDropDown(
+                Settings.SNAP_ASSISTANT_POSITION,
+                (val: AssistantPosition) =>
+                    (Settings.SNAP_ASSISTANT_POSITION = val),
+            ),
         );
         behaviourGroup.add(snapAssistRow);
 
@@ -1056,6 +1061,35 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 index < 0 || index >= activationKeys.length
                     ? ActivationKey.NONE
                     : activationKeys[index];
+            onChange(selected);
+        });
+        if (styleClass) dropdown.add_css_class(styleClass);
+        dropdown.set_vexpand(false);
+        dropdown.set_valign(Gtk.Align.CENTER);
+        return dropdown;
+    }
+
+    _buildAssistantPositionDropDown(
+        initialValue: AssistantPosition,
+        onChange: (_: AssistantPosition) => void,
+        styleClass?: string,
+    ) {
+        const options = new Gtk.StringList();
+        const assistantPositions = [
+            AssistantPosition.TOP,
+            AssistantPosition.BOTTOM,
+        ];
+        assistantPositions.forEach((p) => options.append(AssistantPosition[p]));
+        const dropdown = new Gtk.DropDown({
+            model: options,
+            selected: initialValue,
+        });
+        dropdown.connect('notify::selected-item', (dd: Gtk.DropDown) => {
+            const index = dd.get_selected();
+            const selected =
+                index < 0 || index >= assistantPositions.length
+                    ? AssistantPostion.TOP
+                    : assistantPositions[index];
             onChange(selected);
         });
         if (styleClass) dropdown.add_css_class(styleClass);

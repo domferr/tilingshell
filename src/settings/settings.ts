@@ -9,6 +9,11 @@ export enum ActivationKey {
     SUPER,
 }
 
+export enum AssistantPosition {
+    TOP = 0,
+    BOTTOM,
+}
+
 /** ------------- Utility functions ------------- */
 function get_string(key: string): string {
     return (
@@ -99,6 +104,7 @@ export default class Settings {
     static KEY_ACTIVE_SCREEN_EDGES = 'active-screen-edges';
     static KEY_TOP_EDGE_MAXIMIZE = 'top-edge-maximize';
     static KEY_OVERRIDE_WINDOW_MENU = 'override-window-menu';
+    static KEY_SNAP_ASSISTANT_POSITION = 'snap-assistant-position';
     static KEY_SNAP_ASSISTANT_THRESHOLD = 'snap-assistant-threshold';
     static KEY_ENABLE_WINDOW_BORDER = 'enable-window-border';
     static KEY_INNER_GAPS = 'inner-gaps';
@@ -340,6 +346,14 @@ export default class Settings {
 
     static set OVERRIDE_WINDOW_MENU(val: boolean) {
         set_boolean(Settings.KEY_OVERRIDE_WINDOW_MENU, val);
+    }
+
+    static get SNAP_ASSISTANT_POSITION(): AssistantPosition {
+        return get_number(Settings.KEY_SNAP_ASSISTANT_POSITION);
+    }
+
+    static set SNAP_ASSISTANT_POSITION(val: AssistantPosition) {
+        set_number(Settings.KEY_SNAP_ASSISTANT_POSITION, val);
     }
 
     static get SNAP_ASSISTANT_THRESHOLD(): number {
