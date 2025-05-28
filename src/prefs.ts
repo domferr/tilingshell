@@ -643,6 +643,13 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 false,
                 false,
             ],
+            [
+                Settings.SETTING_CYCLE_LAYOUTS,
+                _('Cycle layouts'),
+                _('Cycle through available workspace layouts'),
+                false,
+                false,
+            ],
         ];
 
         // set if the keybinding was set or not by the user
