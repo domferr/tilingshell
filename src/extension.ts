@@ -28,6 +28,7 @@ import { WindowBorderManager } from '@components/windowBorderManager';
 import TilingShellWindowManager from '@components/windowManager/tilingShellWindowManager';
 import ExtendedWindow from '@components/tilingsystem/extendedWindow';
 import { Extension } from '@polyfill';
+import OverriddenAltTab from '@components/altTab/overriddenAltTab';
 
 const debug = logger('extension');
 
@@ -129,7 +130,7 @@ export default class TilingShellExtension extends Extension {
 
         if (Settings.OVERRIDE_WINDOW_MENU) OverriddenWindowMenu.enable();
 
-        // TODO OverriddenAltTab.enable();
+        OverriddenAltTab.enable();
 
         debug('extension is enabled');
     }
@@ -706,7 +707,7 @@ export default class TilingShellExtension extends Extension {
         this._fractionalScalingEnabled = false;
 
         OverriddenWindowMenu.destroy();
-        // TODO OverriddenAltTab.destroy();
+        OverriddenAltTab.destroy();
 
         // restore native edge tiling and all the overridden settings
         SettingsOverride.destroy();
