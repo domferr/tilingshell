@@ -28,6 +28,7 @@ import { WindowBorderManager } from '@components/windowBorderManager';
 import TilingShellWindowManager from '@components/windowManager/tilingShellWindowManager';
 import ExtendedWindow from '@components/tilingsystem/extendedWindow';
 import { Extension } from '@polyfill';
+import { LayoutSwitcherPopup } from '@components/layoutSwitcher/layoutSwitcher';
 import OverriddenAltTab from '@components/altTab/overriddenAltTab';
 
 const debug = logger('extension');
@@ -281,6 +282,21 @@ export default class TilingShellExtension extends Extension {
                         focus_window,
                         global.get_current_time(),
                     );
+                },
+            );
+            this._signals.connect(
+                this._keybindings,
+                'cycle-layouts',
+                (kb: KeyBindings, dp: Meta.Display) => {
+                    // Get current modifier state
+                    const keybindings = this.getSettings().get_strv(
+                        Settings.SETTING_CYCLE_LAYOUTS,
+                    );
+
+                    const switcher = new LayoutSwitcherPopup(keybindings);
+                    const shown = switcher.show();
+
+                    if (!shown) switcher.destroy();
                 },
             );
         }

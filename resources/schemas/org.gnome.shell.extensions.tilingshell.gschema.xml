@@ -246,6 +246,10 @@
 			<default><![CDATA[['']]]></default>
 			<summary>Minimize all the other windows and show only the focused window</summary>
 		</key>
+        <key type="as" name="cycle-layouts">
+            <default><![CDATA[['']]]></default>
+            <summary>Cycle through available workspace layouts</summary>
+        </key>
     </schema>
 
 </schemalist>

@@ -50,6 +50,9 @@ export default class KeyBindings extends GObject.Object {
             'highlight-current-window': {
                 param_types: [Meta.Display.$gtype], // Meta.Display,
             },
+            'cycle-layouts': {
+                param_types: [Meta.Display.$gtype], // Meta.Display
+            },
         },
     };
 
@@ -234,6 +237,16 @@ export default class KeyBindings extends GObject.Object {
                 this.emit('highlight-current-window', display);
             },
         );
+
+        Main.wm.addKeybinding(
+            Settings.SETTING_CYCLE_LAYOUTS,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('cycle-layouts', display);
+            },
+        );
     }
 
     private _overrideNatives(extensionSettings: Gio.Settings) {
@@ -330,6 +343,7 @@ export default class KeyBindings extends GObject.Object {
         Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_NEXT);
         Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_PREV);
         Main.wm.removeKeybinding(Settings.SETTING_HIGHLIGHT_CURRENT_WINDOW);
+        Main.wm.removeKeybinding(Settings.SETTING_CYCLE_LAYOUTS);
     }
 
     private _restoreNatives() {

@@ -1,0 +1,33 @@
+@use "constants";
+
+
+.layout-switcher-popup {
+    padding: 16px;
+}
+
+.layout-switcher-list {
+    spacing: 12px;
+    background-color: #151618;
+    box-shadow: 0 8px 8px 0 rgba(0,0,0,0.2);
+    padding: 8px;
+    border-radius: constants.$base_border_radius;
+
+    .layout-button {
+        background-color: #303030 !important;
+    }
+
+    .snap-assist-tile {
+        border-color: #5E6265 !important;
+        background-color: #313537 !important;
+    }
+
+    .snap-assist-tile:hover {
+        border-color: #D4D4D4 !important;
+        background-color: rgba(154, 154, 154, 0.6) !important;
+    }
+
+    .layout-button:checked .snap-assist-tile {
+        border-color: #D4D4D4 !important;
+        background-color: rgba(154, 154, 154, 0.6) !important;
+    }
+}
