@@ -133,6 +133,12 @@ export default class TilingShellExtension extends Extension {
 
         OverriddenAltTab.enable();
 
+        const switcher = new LayoutSwitcherPopup(
+            133,
+            !this._fractionalScalingEnabled,
+        );
+        //if (!switcher.show(false, '', 0)) switcher.destroy();
+
         debug('extension is enabled');
     }
 
@@ -288,7 +294,10 @@ export default class TilingShellExtension extends Extension {
                 this._keybindings,
                 'cycle-layouts',
                 (_: KeyBindings, dp: Meta.Display, action: number) => {
-                    const switcher = new LayoutSwitcherPopup(action);
+                    const switcher = new LayoutSwitcherPopup(
+                        action,
+                        !this._fractionalScalingEnabled,
+                    );
                     if (!switcher.show(false, '', 0)) switcher.destroy();
                 },
             );

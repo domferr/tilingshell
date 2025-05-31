@@ -244,7 +244,6 @@ export default class KeyBindings extends GObject.Object {
             Meta.KeyBindingFlags.NONE,
             Shell.ActionMode.NORMAL,
             (display: Meta.Display) => {
-                console.log('addKeybinding action is', action);
                 this.emit('cycle-layouts', display, action);
             },
         );

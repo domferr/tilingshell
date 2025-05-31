@@ -3,13 +3,18 @@ import LayoutButton from '@indicator/layoutButton';
 import GlobalState from '@utils/globalState';
 import Settings from '@settings/settings';
 import { St, Clutter } from '@gi.ext';
-import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import { enableScalingFactorSupport, getMonitorScalingFactor } from '@utils/ui';
+import {
+    enableScalingFactorSupport,
+    getMonitorScalingFactor,
+    widgetOrientation,
+} from '@utils/ui';
 import * as SwitcherPopup from 'resource:///org/gnome/shell/ui/switcherPopup.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { registerGObjectClass } from '@utils/gjs';
 
-const layoutHeight: number = 72;
-const layoutWidth: number = 128; // 16:9 ratio. -> (16*layoutHeight) / 9 and then rounded to int
+const LAYOUT_HEIGHT: number = 72;
+const LAYOUT_WIDTH: number = 128; // 16:9 ratio. -> (16*layoutHeight) / 9 and then rounded to int
+const GAPS = 3;
 
 @registerGObjectClass
 class LayoutSwitcherList extends SwitcherPopup.SwitcherList {
@@ -21,6 +26,7 @@ class LayoutSwitcherList extends SwitcherPopup.SwitcherList {
         monitorScalingFactor?: number,
     ) {
         super(false); // false since layouts won't be squared
+        this.add_style_class_name('layout-switcher-list');
         this._buttons = [];
         // we need to add this as child before adding the layouts
         // so those can call get_theme_node on their parent
@@ -34,7 +40,7 @@ class LayoutSwitcherList extends SwitcherPopup.SwitcherList {
     _addLayoutItem(layout: Layout) {
         const box = new St.BoxLayout({
             style_class: 'alt-tab-app',
-            vertical: true,
+            ...widgetOrientation(true),
         });
         this.addItem(box, new St.Widget());
 
@@ -42,9 +48,9 @@ class LayoutSwitcherList extends SwitcherPopup.SwitcherList {
             new LayoutButton(
                 box,
                 layout,
-                Settings.get_inner_gaps(1).top > 0 ? 2 : 0,
-                layoutHeight,
-                layoutWidth,
+                Settings.get_inner_gaps(1).top > 0 ? GAPS : 0,
+                LAYOUT_HEIGHT,
+                LAYOUT_WIDTH,
             ),
         );
     }
