@@ -287,16 +287,9 @@ export default class TilingShellExtension extends Extension {
             this._signals.connect(
                 this._keybindings,
                 'cycle-layouts',
-                (kb: KeyBindings, dp: Meta.Display) => {
-                    // Get current modifier state
-                    const keybindings = this.getSettings().get_strv(
-                        Settings.SETTING_CYCLE_LAYOUTS,
-                    );
-
-                    const switcher = new LayoutSwitcherPopup(keybindings);
-                    const shown = switcher.show();
-
-                    if (!shown) switcher.destroy();
+                (_: KeyBindings, dp: Meta.Display, action: number) => {
+                    const switcher = new LayoutSwitcherPopup(action);
+                    if (!switcher.show(false, '', 0)) switcher.destroy();
                 },
             );
         }
