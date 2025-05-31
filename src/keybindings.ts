@@ -1,5 +1,5 @@
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import { GObject, Meta, Gio, Shell, GLib } from '@gi.ext';
+import { GObject, Meta, Gio, Shell, GLib, Clutter } from '@gi.ext';
 import Settings from '@settings/settings';
 import SettingsOverride from '@settings/settingsOverride';
 import SignalHandling from '@utils/signalHandling';
@@ -51,7 +51,7 @@ export default class KeyBindings extends GObject.Object {
                 param_types: [Meta.Display.$gtype], // Meta.Display,
             },
             'cycle-layouts': {
-                param_types: [Meta.Display.$gtype], // Meta.Display
+                param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, number
             },
         },
     };
@@ -238,13 +238,14 @@ export default class KeyBindings extends GObject.Object {
             },
         );
 
-        Main.wm.addKeybinding(
+        const action = Main.wm.addKeybinding(
             Settings.SETTING_CYCLE_LAYOUTS,
             extensionSettings,
             Meta.KeyBindingFlags.NONE,
             Shell.ActionMode.NORMAL,
             (display: Meta.Display) => {
-                this.emit('cycle-layouts', display);
+                console.log('addKeybinding action is', action);
+                this.emit('cycle-layouts', display, action);
             },
         );
     }
