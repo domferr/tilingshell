@@ -18,6 +18,12 @@ const GAPS = 3;
 
 @registerGObjectClass
 class LayoutSwitcherList extends SwitcherPopup.SwitcherList {
+    // those are defined in the parent but we lack them in the type definition
+    // @esbuild-drop-next-line
+    private _items!: St.Widget[];
+    // @esbuild-drop-next-line
+    private _highlighted!: number;
+
     private _buttons: LayoutButton[];
 
     constructor(
@@ -25,6 +31,7 @@ class LayoutSwitcherList extends SwitcherPopup.SwitcherList {
         parent: LayoutSwitcherPopup,
         monitorScalingFactor?: number,
     ) {
+        // @ts-expect-error "Parent can take a boolean"
         super(false); // false since layouts won't be squared
         this.add_style_class_name('layout-switcher-list');
         this._buttons = [];
@@ -42,6 +49,7 @@ class LayoutSwitcherList extends SwitcherPopup.SwitcherList {
             style_class: 'alt-tab-app',
             ...widgetOrientation(true),
         });
+        // @ts-expect-error "addItem can take a St.Widget"
         this.addItem(box, new St.Widget());
 
         this._buttons.push(
@@ -65,16 +73,25 @@ class LayoutSwitcherList extends SwitcherPopup.SwitcherList {
         this._items[this._highlighted].remove_style_pseudo_class('selected');
     }
 
-    unhighlight(index: number): void {
+    public unhighlight(index: number): void {
         this._buttons[index].set_checked(false);
     }
 }
 
 @registerGObjectClass
 export class LayoutSwitcherPopup extends SwitcherPopup.SwitcherPopup {
+    // those are defined in the parent but we lack them in the type definition
+    // @esbuild-drop-next-line
+    private _switcherList: LayoutSwitcherList;
+    // @esbuild-drop-next-line
+    private _items!: Layout[];
+    // @esbuild-drop-next-line
+    private _selectedIndex!: number;
+
     private _action: number;
 
     constructor(action: number, enableScaling: boolean) {
+        // @ts-expect-error "Parent can take a list"
         super(GlobalState.get().layouts);
 
         this._action = action;

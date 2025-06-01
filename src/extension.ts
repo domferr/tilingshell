@@ -133,12 +133,6 @@ export default class TilingShellExtension extends Extension {
 
         OverriddenAltTab.enable();
 
-        const switcher = new LayoutSwitcherPopup(
-            133,
-            !this._fractionalScalingEnabled,
-        );
-        //if (!switcher.show(false, '', 0)) switcher.destroy();
-
         debug('extension is enabled');
     }
 
