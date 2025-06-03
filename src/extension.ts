@@ -1,6 +1,6 @@
 import './styles/stylesheet.scss';
 
-import { Gio, GLib, Meta } from '@gi.ext';
+import { Gio, GLib, Meta, Clutter } from '@gi.ext';
 import { logger } from '@utils/logger';
 import {
     filterUnfocusableWindows,
@@ -287,12 +287,18 @@ export default class TilingShellExtension extends Extension {
             this._signals.connect(
                 this._keybindings,
                 'cycle-layouts',
-                (_: KeyBindings, dp: Meta.Display, action: number) => {
+                (
+                    _: KeyBindings,
+                    dp: Meta.Display,
+                    action: number,
+                    mask: number,
+                ) => {
                     const switcher = new LayoutSwitcherPopup(
                         action,
                         !this._fractionalScalingEnabled,
                     );
-                    if (!switcher.show(false, '', 0)) switcher.destroy();
+
+                    if (!switcher.show(false, '', mask)) switcher.destroy();
                 },
             );
         }

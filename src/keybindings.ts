@@ -48,10 +48,14 @@ export default class KeyBindings extends GObject.Object {
                 param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, FocusSwitchDirection
             },
             'highlight-current-window': {
-                param_types: [Meta.Display.$gtype], // Meta.Display,
+                param_types: [Meta.Display.$gtype], // Meta.Display
             },
             'cycle-layouts': {
-                param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, number
+                param_types: [
+                    Meta.Display.$gtype,
+                    GObject.TYPE_INT,
+                    GObject.TYPE_INT,
+                ], // Meta.Display, number, number
             },
         },
     };
@@ -243,8 +247,9 @@ export default class KeyBindings extends GObject.Object {
             extensionSettings,
             Meta.KeyBindingFlags.NONE,
             Shell.ActionMode.NORMAL,
-            (display: Meta.Display) => {
-                this.emit('cycle-layouts', display, action);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (display: Meta.Display, _, event: any) => {
+                this.emit('cycle-layouts', display, action, event.get_mask());
             },
         );
     }
