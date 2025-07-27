@@ -195,8 +195,11 @@ export default class TilingLayoutWithSuggestions extends LayoutWidget<Suggestion
                 if (
                     nonTiledWin.maximizedHorizontally ||
                     nonTiledWin.maximizedVertically
-                )
-                    nonTiledWin.unmaximize(Meta.MaximizeFlags.BOTH);
+                ) {
+                    if (nonTiledWin.get_maximized) nonTiledWin.unmaximize(Meta.MaximizeFlags.BOTH);
+                    else nonTiledWin.unmaximize();
+                }
+
                 if (nonTiledWin.is_fullscreen())
                     nonTiledWin.unmake_fullscreen();
                 if (nonTiledWin.minimized) nonTiledWin.unminimize();

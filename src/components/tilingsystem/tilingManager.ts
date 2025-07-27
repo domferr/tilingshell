@@ -323,6 +323,16 @@ export class TilingManager {
         (window as ExtendedWindow).assignedTile = undefined;
     }
 
+    private maximizeWindow(window: Meta.Window): void {
+        if (window.get_maximized) window.maximize(Meta.MaximizeFlags.BOTH);
+        else window.maximize();
+    }
+
+    private unmaximizeWindow(window: Meta.Window): void {
+        if (window.get_maximized) window.unmaximize(Meta.MaximizeFlags.BOTH);
+        else window.unmaximize();
+    }
+
     public onKeyboardMoveWindow(
         window: Meta.Window,
         direction: KeyBindingsDirection,
@@ -331,7 +341,8 @@ export class TilingManager {
         clamp: boolean,
     ): boolean {
         let destination: { rect: Mtk.Rectangle; tile: Tile } | undefined;
-        if (spanFlag && window.get_maximized()) return false;
+        const isMaximized = window.maximizedHorizontally || window.maximizedVertically;
+        if (spanFlag && isMaximized) return false;
 
         const currentWs = window.get_workspace();
         const tilingLayout = this._workspaceTilingLayout.get(currentWs);
@@ -339,14 +350,14 @@ export class TilingManager {
         const windowRectCopy = window.get_frame_rect().copy();
         const extWin = window as ExtendedWindow;
 
-        if (window.get_maximized()) {
+        if (isMaximized) {
             switch (direction) {
                 case KeyBindingsDirection.NODIRECTION:
                 case KeyBindingsDirection.LEFT:
                 case KeyBindingsDirection.RIGHT:
                     break;
                 case KeyBindingsDirection.DOWN:
-                    window.unmaximize(Meta.MaximizeFlags.BOTH);
+                    this.unmaximizeWindow(window);
                     return true;
                 case KeyBindingsDirection.UP:
                     return false;
@@ -359,7 +370,7 @@ export class TilingManager {
             extWin.assignedTile &&
             extWin.assignedTile?.y === 0
         ) {
-            window.maximize(Meta.MaximizeFlags.BOTH);
+            this.maximizeWindow(window);
             return true;
         }
 
@@ -425,14 +436,12 @@ export class TilingManager {
                 direction === KeyBindingsDirection.UP &&
                 window.can_maximize()
             ) {
-                window.maximize(Meta.MaximizeFlags.BOTH);
+                this.maximizeWindow(window);
                 return true;
             }
             return false;
         }
 
-        const isMaximized =
-            window.maximizedHorizontally || window.maximizedVertically;
         if (!(window as ExtendedWindow).assignedTile && !isMaximized)
             (window as ExtendedWindow).originalSize = windowRectCopy;
 
@@ -444,7 +453,7 @@ export class TilingManager {
             );
         }
 
-        if (isMaximized) window.unmaximize(Meta.MaximizeFlags.BOTH);
+        if (isMaximized) this.unmaximizeWindow(window);
 
         this._easeWindowRect(window, destination.rect, false, force);
 
@@ -812,7 +821,7 @@ export class TilingManager {
             this._edgeTilingManager.needMaximize() &&
             window.can_maximize()
         )
-            window.maximize(Meta.MaximizeFlags.BOTH);
+            this.maximizeWindow(window);
 
         // disable edge-tiling
         const wasEdgeTiling = this._edgeTilingManager.isPerformingEdgeTiling();
@@ -834,7 +843,7 @@ export class TilingManager {
         if (desiredWindowRect.width <= 0 || desiredWindowRect.height <= 0)
             return;
 
-        if (window.get_maximized()) return;
+        if (window.maximizedHorizontally || window.maximizedVertically) return;
 
         (window as ExtendedWindow).originalSize = window
             .get_frame_rect()
@@ -1196,8 +1205,11 @@ export class TilingManager {
         // abort if there is an invalid selection
         if (destinationRect.width <= 0 || destinationRect.height <= 0) return;
 
-        const rememberOriginalSize = !window.get_maximized();
-        if (window.get_maximized()) window.unmaximize(Meta.MaximizeFlags.BOTH);
+        const isMaximized =
+            window.maximizedHorizontally || window.maximizedVertically;
+        const rememberOriginalSize = !isMaximized;
+        if (isMaximized)
+            this.unmaximizeWindow(window);
 
         if (rememberOriginalSize && !(window as ExtendedWindow).assignedTile) {
             (window as ExtendedWindow).originalSize = window
