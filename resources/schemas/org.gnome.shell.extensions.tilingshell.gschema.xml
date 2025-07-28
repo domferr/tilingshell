@@ -147,10 +147,15 @@
             <summary>Enable window border</summary>
             <description>Show a border around focused window.</description>
         </key>
-        <key name="window-border-color" type="s">
+        <key name="window-custom-border-color" type="s">
             <default>'#ec5e5e'</default>
-            <summary>Focused window border color</summary>
-            <description>The color of the focused window's border.</description>
+            <summary>Focused window border custom color</summary>
+            <description>Custom color for the focused window's border.</description>
+        </key>
+        <key name="window-use-custom-border-color" type="b">
+            <default>false</default>
+            <summary>Use custom color</summary>
+            <description>Use the color defined here for the focused window's border.</description>
         </key>
         <key name="window-border-width" type="u">
             <default>3</default>

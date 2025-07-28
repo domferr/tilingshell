@@ -158,11 +158,18 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             ),
         );
         windowBorderRow.add_row(
+            this._buildSwitchRow(
+                Settings.KEY_WINDOW_USE_CUSTOM_BORDER_COLOR,
+                _('Custom color'),
+                _('Use the color defined here for the border'),
+            ),
+        );
+        windowBorderRow.add_row(
             this._buildColorRow(
                 _('Border color'),
                 _('Choose the color of the border'),
-                this._getRGBAFromString(Settings.WINDOW_BORDER_COLOR),
-                (val: string) => (Settings.WINDOW_BORDER_COLOR = val),
+                this._getRGBAFromString(Settings.WINDOW_CUSTOM_BORDER_COLOR),
+                (val: string) => (Settings.WINDOW_CUSTOM_BORDER_COLOR = val),
             ),
         );
 

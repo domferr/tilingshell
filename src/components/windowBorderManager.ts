@@ -29,6 +29,7 @@ class WindowBorder extends St.Bin {
     private readonly _signals: SignalHandling;
 
     private _window: Meta.Window;
+    private _interfaceSettings: Gio.Settings;
     private _windowMonitor: number;
     private _bindings: GObject.Binding[];
     private _enableScaling: boolean;
@@ -45,6 +46,7 @@ class WindowBorder extends St.Bin {
         this._bindings = [];
         this._borderWidth = 1;
         this._window = win;
+        this._interfaceSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' });
         this._windowMonitor = win.get_monitor();
         this._enableScaling = enableScaling;
         this._delayedSmartBorderRadius = false;
@@ -322,6 +324,23 @@ class WindowBorder extends St.Bin {
     }
 
     public updateStyle(): void {
+        // get the system's accent color, fallback to user's custom color
+        let gnomeAccentColor = Settings.WINDOW_CUSTOM_BORDER_COLOR;
+        try {
+            const accentColorName = this._interfaceSettings.get_string('accent-color');
+            const gnomeAccentColorMapping: Record<string, string> = {
+            "blue": "#3378cc",
+            "teal": "#228293",
+            "green": "#378545",
+            "yellow": "#b27b06",
+            "orange": "#d25406",
+            "red": "#cc2c3f",
+            "pink": "#bd588b",
+            "purple": "#833d9b",
+            "slate": "#667688"
+            };
+            gnomeAccentColor = gnomeAccentColorMapping[accentColorName];
+        } catch(e) {gnomeAccentColor = "#000000"}
         // handle scale factor of the monitor
         const monitorScalingFactor = this._enableScaling
             ? getMonitorScalingFactor(this._window.get_monitor())
@@ -331,10 +350,12 @@ class WindowBorder extends St.Bin {
 
         const [alreadyScaled, scalingFactor] = getScalingFactorOf(this);
         // the value is already scaled if the border is on primary monitor
-        const borderWidth =
-            (alreadyScaled ? 1 : scalingFactor) *
-            (Settings.WINDOW_BORDER_WIDTH /
-                (alreadyScaled ? scalingFactor : 1));
+        const borderWidth = 
+        (alreadyScaled ? 1 : scalingFactor) *
+        (Settings.WINDOW_BORDER_WIDTH /
+            (alreadyScaled ? scalingFactor : 1));
+        const borderColor = Settings.WINDOW_USE_CUSTOM_BORDER_COLOR ?
+            Settings.WINDOW_CUSTOM_BORDER_COLOR : gnomeAccentColor;
         const radius = this._borderRadiusValue.map((val) => {
             const valWithBorder = val === 0 ? val : val + borderWidth;
             return (
@@ -347,7 +368,7 @@ class WindowBorder extends St.Bin {
             ? `${getScalingFactorSupportString(monitorScalingFactor)};`
             : '';
         this.set_style(
-            `border-color: ${Settings.WINDOW_BORDER_COLOR}; border-width: ${borderWidth}px; border-radius: ${radius[St.Corner.TOPLEFT]}px ${radius[St.Corner.TOPRIGHT]}px ${radius[St.Corner.BOTTOMRIGHT]}px ${radius[St.Corner.BOTTOMLEFT]}px; ${scalingFactorSupportString}`,
+            `border-color: ${borderColor}; border-width: ${borderWidth}px; border-radius: ${radius[St.Corner.TOPLEFT]}px ${radius[St.Corner.TOPRIGHT]}px ${radius[St.Corner.BOTTOMRIGHT]}px ${radius[St.Corner.BOTTOMLEFT]}px; ${scalingFactorSupportString}`,
         );
 
         if (this._borderWidth !== borderWidth) {
@@ -384,11 +405,13 @@ export class WindowBorderManager {
 
     private _border: WindowBorder | null;
     private _enableScaling: boolean;
+    private _interfaceSettings: Gio.Settings;
 
     constructor(enableScaling: boolean) {
         this._signals = new SignalHandling();
         this._border = null;
         this._enableScaling = enableScaling;
+        this._interfaceSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' });
     }
 
     public enable(): void {
@@ -412,10 +435,15 @@ export class WindowBorderManager {
             'notify::focus-window',
             this._onWindowFocused.bind(this),
         );
-        this._signals.connect(Settings, Settings.KEY_WINDOW_BORDER_COLOR, () =>
+        this._signals.connect(Settings, Settings.KEY_WINDOW_CUSTOM_BORDER_COLOR, () =>
             this._border?.updateStyle(),
         );
-
+        this._signals.connect(Settings, Settings.KEY_WINDOW_USE_CUSTOM_BORDER_COLOR, () =>
+            this._border?.updateStyle(),
+        );
+        this._interfaceSettings.connect('changed::accent-color', () => 
+            this._border?.updateStyle(),
+        );
         this._signals.connect(Settings, Settings.KEY_WINDOW_BORDER_WIDTH, () =>
             this._border?.updateStyle(),
         );
