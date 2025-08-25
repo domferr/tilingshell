@@ -21,6 +21,7 @@ import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
 import Layout from '@components/layout/Layout';
 import { _ } from '../translations';
 import { openPrefs } from '@polyfill';
+import LayoutUtils from '@components/layout/LayoutUtils';
 
 const debug = logger('DefaultMenu');
 
@@ -76,8 +77,11 @@ class LayoutsRow extends St.BoxLayout {
         const selectedIndex = layouts.findIndex((lay) => lay.id === selectedId);
         const hasGaps = Settings.get_inner_gaps(1).top > 0;
 
-        const layoutHeight: number = 36;
-        const layoutWidth: number = 64; // 16:9 ratio. -> (16*layoutHeight) / 9 and then rounded to int
+        const [layoutWidth, layoutHeight] = LayoutUtils.calc_size(
+            this,
+            this._monitor.index,
+            36,
+        );
 
         this._layoutsButtons = layouts.map((lay, ind) => {
             const btn = new LayoutButton(
