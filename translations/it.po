@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Tiling Shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-04-22 22:05+0200\n"
-"PO-Revision-Date: 2024-10-22 12:39+0200\n"
-"Last-Translator: Domenico Ferraro <ferraro.domenico125@gmail.com>\n"
+"PO-Revision-Date: 2025-09-14 12:39+0200\n"
+"Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -254,10 +254,9 @@ msgid "Quarter tiling activation area"
 msgstr "Area di attivazione della divisione in quarti"
 
 #: dist/prefs.js:997
-#, fuzzy, javascript-format
 msgid "Activation area to trigger quarter tiling (%% of the screen)"
 msgstr ""
-"Area di attivazione per attivare la divisione in quarti (% dello schermo)"
+"Area di attivazione per attivare la divisione in quarti (%% dello schermo)"
 
 #: dist/prefs.js:1014
 msgid "Windows suggestions"
@@ -500,15 +499,12 @@ msgid "Focus the window prior to the current focused window"
 msgstr "Seleziona la finestra precedente alla finestra attualmente selezionata"
 
 #: dist/prefs.js:1332
-#, fuzzy
 msgid "Highlight focused window"
-msgstr "Sgancia la finestra selezionata"
+msgstr "Evidenzia la finestra focalizzata"
 
 #: dist/prefs.js:1334
-#, fuzzy
 msgid "Minimize all the other windows and show only the focused window"
-msgstr ""
-"Usa i tasti di scelta rapida per eseguire azioni sulla finestra selezionata"
+msgstr "Riduci a icona tutte le altre finestre e mostra solo la finestra focalizzata"
 
 #: dist/prefs.js:1362
 msgid "View and Customize all the Shortcuts"
@@ -598,11 +594,11 @@ msgstr "Nuova scorciatoia"
 
 #: dist/prefs.js:1830
 msgid "Use Backspace to clear"
-msgstr ""
+msgstr "Usa Backspace per eliminare"
 
 #: dist/extension.js:5902
 msgid "Edit Layouts"
-msgstr "Modifica layouts"
+msgstr "Modifica layout"
 
 #: dist/extension.js:5912
 msgid "New Layout"
@@ -630,9 +626,8 @@ msgstr "usa l'icona sul pannello superiore per salvare o annullare"
 #~ msgid "Info"
 #~ msgstr "Info"
 
-#, fuzzy
 #~ msgid "Select the layout to edit"
-#~ msgstr "Apre l'editor dei layouts"
+#~ msgstr "Seleziona il layout da modificare"
 
 #~ msgid "Close"
 #~ msgstr "Chiudi"
@@ -643,14 +638,11 @@ msgstr "usa l'icona sul pannello superiore per salvare o annullare"
 #~ msgid "Start editing"
 #~ msgstr "Inizia la modifica"
 
-#, fuzzy
 #~ msgid "Move to best tile"
-#~ msgstr "Sposta la finestra nel riquadro sinistro"
+#~ msgstr "Sposta nel riquadro migliore"
 
-#, fuzzy
 #~ msgid "Move to leftmost tile"
-#~ msgstr "Sposta la finestra nel riquadro sinistro"
+#~ msgstr "Sposta nel riquadro più a sinistra"
 
-#, fuzzy
 #~ msgid "Move to rightmost tile"
-#~ msgstr "Sposta la finestra nel riquadro destro"
+#~ msgstr "Sposta nel riquadro più a destra"
