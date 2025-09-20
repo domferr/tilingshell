@@ -1,7 +1,8 @@
 import { registerGObjectClass } from '@/utils/gjs';
 import { GObject, St, Clutter, Mtk, Meta } from '@gi.ext';
 import EditableTilePreview from './editableTilePreview';
-import { getEventCoords, getScalingFactorOf } from '@utils/ui';
+import { getScalingFactorOf } from '@utils/ui';
+import { getEventCoords } from '@utils/gnomesupport';
 
 @registerGObjectClass
 export default class Slider extends St.Button {

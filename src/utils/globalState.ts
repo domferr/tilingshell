@@ -5,6 +5,8 @@ import SignalHandling from './signalHandling';
 import { GObject, Meta, Gio } from '@gi.ext';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { logger } from './logger';
+import { getWindows } from './ui';
+import ExtendedWindow from '@components/tilingsystem/extendedWindow';
 
 const debug = logger('GlobalState');
 
@@ -316,5 +318,46 @@ export default class GlobalState extends GObject.Object {
 
     public set tilePreviewAnimationTime(value: number) {
         this._tilePreviewAnimationTime = value;
+    }
+
+    public setSelectedLayoutOfMonitor(
+        layoutToSelectId: string,
+        monitorIndex: number,
+    ) {
+        // get the currently selected layouts
+        const selected = Settings.get_selected_layouts();
+        // select the layout for the given monitor
+        selected[global.workspaceManager.get_active_workspace_index()][
+            monitorIndex
+        ] = layoutToSelectId;
+
+        // if there are 2 or more workspaces, if the last workspace is empty
+        // it must follow the layout of the second-last workspace
+        // if we changed the second-last workspace we take care of changing
+        // the last workspace as well, if there aren't tiled windows (is empty)
+        const n_workspaces = global.workspaceManager.get_n_workspaces();
+        if (
+            global.workspaceManager.get_active_workspace_index() ===
+            n_workspaces - 2
+        ) {
+            const lastWs = global.workspaceManager.get_workspace_by_index(
+                n_workspaces - 1,
+            );
+            if (!lastWs) return;
+
+            // check if there are tiled windows on that monitor and in the last workspace
+            const tiledWindows = getWindows(lastWs).find(
+                (win) =>
+                    (win as ExtendedWindow).assignedTile &&
+                    win.get_monitor() === monitorIndex,
+            );
+            if (!tiledWindows) {
+                // the last workspace, on that monitor, is empty
+                // select the same layout for last workspace as well
+                selected[lastWs.index()][monitorIndex] = layoutToSelectId;
+            }
+        }
+
+        Settings.save_selected_layouts(selected);
     }
 }

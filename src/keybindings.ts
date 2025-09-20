@@ -1,5 +1,5 @@
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import { GObject, Meta, Gio, Shell, GLib } from '@gi.ext';
+import { GObject, Meta, Gio, Shell, GLib, Clutter } from '@gi.ext';
 import Settings from '@settings/settings';
 import SettingsOverride from '@settings/settingsOverride';
 import SignalHandling from '@utils/signalHandling';
@@ -48,7 +48,14 @@ export default class KeyBindings extends GObject.Object {
                 param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, FocusSwitchDirection
             },
             'highlight-current-window': {
-                param_types: [Meta.Display.$gtype], // Meta.Display,
+                param_types: [Meta.Display.$gtype], // Meta.Display
+            },
+            'cycle-layouts': {
+                param_types: [
+                    Meta.Display.$gtype,
+                    GObject.TYPE_INT,
+                    GObject.TYPE_INT,
+                ], // Meta.Display, number, number
             },
         },
     };
@@ -234,6 +241,17 @@ export default class KeyBindings extends GObject.Object {
                 this.emit('highlight-current-window', display);
             },
         );
+
+        const action = Main.wm.addKeybinding(
+            Settings.SETTING_CYCLE_LAYOUTS,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (display: Meta.Display, _, event: any) => {
+                this.emit('cycle-layouts', display, action, event.get_mask());
+            },
+        );
     }
 
     private _overrideNatives(extensionSettings: Gio.Settings) {
@@ -330,6 +348,7 @@ export default class KeyBindings extends GObject.Object {
         Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_NEXT);
         Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_PREV);
         Main.wm.removeKeybinding(Settings.SETTING_HIGHLIGHT_CURRENT_WINDOW);
+        Main.wm.removeKeybinding(Settings.SETTING_CYCLE_LAYOUTS);
     }
 
     private _restoreNatives() {

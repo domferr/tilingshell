@@ -90,6 +90,8 @@ export default class Settings {
     static KEY_SPAN_MULTIPLE_TILES = 'enable-span-multiple-tiles';
     static KEY_RESTORE_WINDOW_ORIGINAL_SIZE = 'restore-window-original-size';
     static KEY_WRAPAROUND_FOCUS = 'enable-wraparound-focus';
+    static KEY_ENABLE_DIRECTIONAL_FOCUS_TILED_ONLY =
+        'enable-directional-focus-tiled-only';
     static KEY_RESIZE_COMPLEMENTING_WINDOWS = 'resize-complementing-windows';
     static KEY_ENABLE_BLUR_SNAP_ASSISTANT = 'enable-blur-snap-assistant';
     static KEY_ENABLE_BLUR_SELECTED_TILEPREVIEW =
@@ -99,6 +101,7 @@ export default class Settings {
     static KEY_ACTIVE_SCREEN_EDGES = 'active-screen-edges';
     static KEY_TOP_EDGE_MAXIMIZE = 'top-edge-maximize';
     static KEY_OVERRIDE_WINDOW_MENU = 'override-window-menu';
+    static KEY_OVERRIDE_ALT_TAB = 'override-alt-tab';
     static KEY_SNAP_ASSISTANT_THRESHOLD = 'snap-assistant-threshold';
     static KEY_ENABLE_WINDOW_BORDER = 'enable-window-border';
     static KEY_INNER_GAPS = 'inner-gaps';
@@ -111,6 +114,7 @@ export default class Settings {
     static KEY_ENABLE_SMART_WINDOW_BORDER_RADIUS =
         'enable-smart-window-border-radius';
     static KEY_QUARTER_TILING_THRESHOLD = 'quarter-tiling-threshold';
+    static KEY_EDGE_TILING_OFFSET = 'edge-tiling-offset';
     static KEY_ENABLE_TILING_SYSTEM_WINDOWS_SUGGESTIONS =
         'enable-tiling-system-windows-suggestions';
     static KEY_ENABLE_SNAP_ASSISTANT_WINDOWS_SUGGESTIONS =
@@ -136,6 +140,7 @@ export default class Settings {
     static SETTING_FOCUS_WINDOW_NEXT = 'focus-window-next';
     static SETTING_FOCUS_WINDOW_PREV = 'focus-window-prev';
     static SETTING_HIGHLIGHT_CURRENT_WINDOW = 'highlight-current-window';
+    static SETTING_CYCLE_LAYOUTS = 'cycle-layouts';
 
     static initialize(settings: Gio.Settings) {
         if (this._is_initialized) return;
@@ -278,6 +283,14 @@ export default class Settings {
         set_boolean(Settings.KEY_WRAPAROUND_FOCUS, val);
     }
 
+    static get ENABLE_DIRECTIONAL_FOCUS_TILED_ONLY(): boolean {
+        return get_boolean(Settings.KEY_ENABLE_DIRECTIONAL_FOCUS_TILED_ONLY);
+    }
+
+    static set ENABLE_DIRECTIONAL_FOCUS_TILED_ONLY(val: boolean) {
+        set_boolean(Settings.KEY_ENABLE_DIRECTIONAL_FOCUS_TILED_ONLY, val);
+    }
+
     static get RESIZE_COMPLEMENTING_WINDOWS(): boolean {
         return get_boolean(Settings.KEY_RESIZE_COMPLEMENTING_WINDOWS);
     }
@@ -342,6 +355,14 @@ export default class Settings {
         set_boolean(Settings.KEY_OVERRIDE_WINDOW_MENU, val);
     }
 
+    static get OVERRIDE_ALT_TAB(): boolean {
+        return get_boolean(Settings.KEY_OVERRIDE_ALT_TAB);
+    }
+
+    static set OVERRIDE_ALT_TAB(val: boolean) {
+        set_boolean(Settings.KEY_OVERRIDE_ALT_TAB, val);
+    }
+
     static get SNAP_ASSISTANT_THRESHOLD(): number {
         return get_number(Settings.KEY_SNAP_ASSISTANT_THRESHOLD);
     }
@@ -356,6 +377,14 @@ export default class Settings {
 
     static set QUARTER_TILING_THRESHOLD(val: number) {
         set_unsigned_number(Settings.KEY_QUARTER_TILING_THRESHOLD, val);
+    }
+
+    static get EDGE_TILING_OFFSET(): number {
+        return get_unsigned_number(Settings.KEY_EDGE_TILING_OFFSET);
+    }
+
+    static set EDGE_TILING_OFFSET(val: number) {
+        set_unsigned_number(Settings.KEY_EDGE_TILING_OFFSET, val);
     }
 
     static get WINDOW_BORDER_COLOR(): string {

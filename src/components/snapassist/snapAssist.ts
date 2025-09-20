@@ -8,13 +8,13 @@ import Settings from '@settings/settings';
 import GlobalState from '@utils/globalState';
 import SignalHandling from '@utils/signalHandling';
 import {
-    buildBlurEffect,
     buildMarginOf,
     enableScalingFactorSupport,
     getMonitorScalingFactor,
     getScalingFactorOf,
 } from '@utils/ui';
 import { logger } from '@utils/logger';
+import { buildBlurEffect } from '@utils/gnomesupport';
 
 export const SNAP_ASSIST_SIGNAL = 'snap-assist';
 

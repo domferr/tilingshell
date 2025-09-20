@@ -4,7 +4,7 @@ import { St, Meta, Clutter } from '@gi.ext';
 import { logger } from '@utils/logger';
 import ExtendedWindow from '@components/tilingsystem/extendedWindow';
 import MultipleWindowsIcon from './MultipleWindowsIcon';
-import { buildMargin } from '@utils/ui';
+import { buildMargin, getWindows } from '@utils/ui';
 import Settings from '@settings/settings';
 
 const GAPS = 3;
@@ -102,10 +102,14 @@ export default class OverriddenAltTab {
         // Append the group item to the list
         this._switcherList.addItem(groupWindowsIcon, groupWindowsIcon.label);
         this._items.push(groupWindowsIcon);
+        groupWindowsIcon.window.onAllWindowsUnmanaged(() => {
+            this._switcherList._removeWindow(groupWindowsIcon.window);
+        });
 
         return res;
     }
+
     private _getWindowList(): Meta.Window[] {
-        throw new Error('Method not implemented.');
+        return getWindows();
     }
 }

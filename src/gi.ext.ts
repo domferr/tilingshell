@@ -7,6 +7,8 @@ import St from 'gi://St';
 import Graphene from 'gi://Graphene';
 import Atk from 'gi://Atk';
 import Pango from 'gi://Pango';
+// @ts-expect-error "Soup types not known yet"
+import Soup from 'gi://Soup';
 
 export {
     Clutter,
@@ -20,4 +22,5 @@ export {
     Graphene,
     Atk,
     Pango,
+    Soup,
 };

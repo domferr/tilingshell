@@ -8,7 +8,6 @@ import Settings from '@settings/settings';
 import { registerGObjectClass } from '@utils/gjs';
 import { logger } from '@utils/logger';
 
-const EDGE_TILING_OFFSET = 16;
 const TOP_EDGE_TILING_OFFSET = 8;
 const QUARTER_PERCENTAGE = 0.5;
 
@@ -26,10 +25,20 @@ export default class EdgeTilingManager extends GObject.Object {
                 50,
                 40,
             ),
+            edgeTilingOffset: GObject.ParamSpec.uint(
+                'edgeTilingOffset',
+                'edgeTilingOffset',
+                'Offset to trigger edge tiling',
+                GObject.ParamFlags.READWRITE,
+                1,
+                250,
+                16,
+            ),
         },
     };
     private _workArea: Mtk.Rectangle;
     private _quarterActivationPercentage: number;
+    private _edgeTilingOffset: number;
 
     // activation zones
     private _topLeft: Mtk.Rectangle;
@@ -61,11 +70,21 @@ export default class EdgeTilingManager extends GObject.Object {
             this,
             'quarterActivationPercentage',
         );
+        this._edgeTilingOffset = Settings.EDGE_TILING_OFFSET;
+        Settings.bind(
+            Settings.KEY_EDGE_TILING_OFFSET,
+            this,
+            'edgeTilingOffset',
+        );
     }
 
     private set quarterActivationPercentage(value: number) {
         this._quarterActivationPercentage = value / 100;
         this._updateActivationZones();
+    }
+
+    private set edgeTilingOffset(value: number) {
+        this._edgeTilingOffset = value;
     }
 
     public set workarea(newWorkArea: Mtk.Rectangle) {
@@ -127,12 +146,12 @@ export default class EdgeTilingManager extends GObject.Object {
         y: number;
     }): boolean {
         return (
-            pointerPos.x <= this._workArea.x + EDGE_TILING_OFFSET ||
+            pointerPos.x <= this._workArea.x + this._edgeTilingOffset ||
             pointerPos.y <= this._workArea.y + TOP_EDGE_TILING_OFFSET ||
             pointerPos.x >=
-                this._workArea.x + this._workArea.width - EDGE_TILING_OFFSET ||
+                this._workArea.x + this._workArea.width - this._edgeTilingOffset ||
             pointerPos.y >=
-                this._workArea.y + this._workArea.height - EDGE_TILING_OFFSET
+                this._workArea.y + this._workArea.height - this._edgeTilingOffset
         );
     }
 

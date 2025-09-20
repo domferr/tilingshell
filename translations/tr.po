@@ -1,234 +1,238 @@
+# Turkish translations for Tiling Shell.
+# Copyright (C) 2025 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the Tiling Shell package.
+# Osman KARAGÖZ <osmank3@gmail.com>, 2025.
+#
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Tiling Shell\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-22 22:05+0200\n"
-"PO-Revision-Date: 2025-09-14 12:39+0200\n"
-"Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
-"Language-Team: Italian <>\n"
-"Language: it\n"
+"POT-Creation-Date: 2025-07-20 13:21+0200\n"
+"PO-Revision-Date: 2025-05-09 10:05+0300\n"
+"Last-Translator: Osman KARAGÖZ <osmank3@gmail.com>\n"
+"Language-Team: \n"
+"Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.6\n"
 
 #: dist/prefs.js:805
 msgid "General"
-msgstr "Generale"
+msgstr "Genel"
 
 #: dist/prefs.js:810
 msgid "Appearance"
-msgstr "Aspetto"
+msgstr "Görünüm"
 
 #: dist/prefs.js:811
 msgid "Configure the appearance of Tiling Shell"
-msgstr "Configura l'aspetto di Tiling Shell"
+msgstr "Tiling Shell'in görünümünü yapılandır"
 
 #: dist/prefs.js:816
 msgid "Show Indicator"
-msgstr "Mostra icona"
+msgstr "Gösterge Düğmesini Göster"
 
 #: dist/prefs.js:817
 msgid "Whether to show the panel indicator"
-msgstr "Se mostrare l'indicatore del pannello oppure no"
+msgstr "Panelde gösterge düğmesinin gösterilip gösterilmeyeceği"
 
 #: dist/prefs.js:822
 msgid "Inner gaps"
-msgstr "Spazi interni"
+msgstr "İç boşluklar"
 
 #: dist/prefs.js:823
 msgid "Gaps between windows"
-msgstr "Spazi tra le finestre"
+msgstr "Pencereler arasındaki boşluklar"
 
 #: dist/prefs.js:828
 msgid "Outer gaps"
-msgstr "Spazi esterni"
+msgstr "Dış boşluklar"
 
 #: dist/prefs.js:829
 msgid "Gaps between a window and the monitor borders"
-msgstr "Spazi tra una finestra e i bordi del monitor"
+msgstr "Pencere ile ekran kenarları arasındaki boşluklar"
 
 #: dist/prefs.js:833
 msgid "Blur (experimental feature)"
-msgstr "Sfocatura (funzione sperimentale)"
+msgstr "Bulanıklık (deneysel özellik)"
 
 #: dist/prefs.js:835
 msgid "Apply blur effect to Snap Assistant and tile previews"
 msgstr ""
-"Applica l'effetto sfocatura allo Snap Assistant e alle anteprime dei riquadri"
+"Yerleşim Yardımcısına ve döşeme önizlemelerine bulanıklık efekti uygula"
 
 #: dist/prefs.js:841
 msgid "Snap Assistant threshold"
-msgstr "Soglia di attivazione dello Snap Assistant"
+msgstr "Yerleşim Yardımcısı eşiği"
 
 #: dist/prefs.js:843
 msgid "Minimum distance from the Snap Assistant to the pointer to open it"
-msgstr "Distanza minima dallo Snap Assistant al puntatore per aprirlo"
+msgstr "Yerleşim Yardımcısını açmak için işaretçi ile arasındaki en az mesafe"
 
 #: dist/prefs.js:852
 msgid "Snap Assistant"
-msgstr "Snap Assistant"
+msgstr "Yerleşim Yardımcısı"
 
 #: dist/prefs.js:853
 msgid "Apply blur effect to Snap Assistant"
-msgstr "Applica l'effetto sfocatura allo Snap Assistant"
+msgstr "Yerleşim Yardımcısına bulanıklık efekti uygula"
 
 #: dist/prefs.js:859
 msgid "Selected tile preview"
-msgstr "Anteprima del riquadro selezionato"
+msgstr "Seçili döşeme önizlemesi"
 
 #: dist/prefs.js:860
 msgid "Apply blur effect to selected tile preview"
-msgstr "Applica l'effetto sfocato all'anteprima del riquadro selezionato"
+msgstr "Seçili döşeme önizlemesine bulanıklık efekti uygula"
 
 #: dist/prefs.js:864
 msgid "Window border"
-msgstr "Bordo della finestra"
+msgstr "Pencere kenarlığı"
 
 #: dist/prefs.js:865 dist/prefs.js:872
 msgid "Show a border around focused window"
-msgstr "Mostra un bordo attorno alla finestra selezionata"
+msgstr "Odaklanan pencere etrafında kenarlık göster"
 
 #: dist/prefs.js:871
 msgid "Enable"
-msgstr "Abilita"
+msgstr "Etkinleştir"
 
 #: dist/prefs.js:878
 msgid "Smart border radius"
-msgstr "Border radius intelligente"
+msgstr "Akıllı köşe yuvalama"
 
 #: dist/prefs.js:879
+#, fuzzy
 msgid "Dynamically adapt to the window’s actual border radius"
-msgstr "Adatta dinamicamente al border radius della finestra"
+msgstr "Pencerenin gerçek köşe yuvarlaklığına dinamik olarak uyum sağlar"
 
 #: dist/prefs.js:885
 msgid "Width"
-msgstr "Larghezza"
+msgstr "Genişlik"
 
 #: dist/prefs.js:886
 msgid "The size of the border"
-msgstr "La dimensione del bordo"
+msgstr "Kenarlığın boyutu"
 
 #: dist/prefs.js:892
 msgid "Border color"
-msgstr "Colore bordo"
+msgstr "Kenarlık rengi"
 
 #: dist/prefs.js:893
 msgid "Choose the color of the border"
-msgstr "Scegli il colore del bordo"
+msgstr "Kenarlık rengini seçin"
 
 #: dist/prefs.js:899
 msgid "Animations"
-msgstr "Animazioni"
+msgstr "Animasyonlar"
 
 #: dist/prefs.js:900
 msgid "Customize animations"
-msgstr "Personalizza animazioni"
+msgstr "Animasyonları özelleştir"
 
 #: dist/prefs.js:906
 msgid "Snap assistant animation time"
-msgstr "Tempo di animazione dello Snap Assistant"
+msgstr "Yerleşim yardımcısı animasyon süresi"
 
 #: dist/prefs.js:907
 msgid "The snap assistant animation time in milliseconds"
-msgstr "Tempo di animazione delo Snap Assistant in millisecondi"
+msgstr "Yerleşim yardımcısı animasyon süresi (milisaniye cinsinden)"
 
 #: dist/prefs.js:915
 msgid "Tiles animation time"
-msgstr "Tempo di animazione dei riquadri"
+msgstr "Döşeme animasyon süresi"
 
 #: dist/prefs.js:916
 msgid "The tiles animation time in milliseconds"
-msgstr "Il tempo di animazione dei riquadri in millisecondi"
+msgstr "Döşeme animasyon süresi (milisaniye cinsinden)"
 
 #: dist/prefs.js:922
 msgid "Behaviour"
-msgstr "Comportamento"
+msgstr "Davranış"
 
 #: dist/prefs.js:923
 msgid "Configure the behaviour of Tiling Shell"
-msgstr "Configura il comportamento di Tiling Shell"
+msgstr "Tiling Shell'in davranışını yapılandır"
 
 #: dist/prefs.js:928
 msgid "Enable Snap Assistant"
-msgstr "Abilita Snap Assistant"
+msgstr "Yerleşim Yardımcısını Etkinleştir"
 
 #: dist/prefs.js:929
 msgid "Move the window on top of the screen to snap assist it"
-msgstr ""
-"Sposta la finestra nella parte superiore dello schermo per usare lo Snap "
-"Assistant"
+msgstr "Pencereyi ekranın üstüne taşıyarak yerleşim yardımcısını etkinleştir"
 
 #: dist/prefs.js:934
 msgid "Enable Tiling System"
-msgstr "Abilita sistema di tiling"
+msgstr "Döşeme Sistemini Etkinleştir"
 
 #: dist/prefs.js:935
 msgid "Hold the activation key while moving a window to tile it"
-msgstr ""
-"Tieni premuto il tasto di attivazione mentre sposti una finestra per "
-"affiancarla"
+msgstr "Bir pencereyi döşemek için taşırken etkinleştirme tuşunu basılı tutun"
 
 #: dist/prefs.js:943
 msgid "Tiling System deactivation key"
-msgstr "Tasto di disattivazione del sistema di tiling"
+msgstr "Döşeme Sistemi devre dışı bırakma tuşu"
 
 #: dist/prefs.js:945
 msgid ""
 "Hold the deactivation key while moving a window to deactivate the tiling "
 "system"
 msgstr ""
-"Tieni premuto il tasto di disattivazione mentre sposti una finestra per "
-"chiudere il sistema di tiling"
+"Döşeme sistemini devre dışı bırakmak için pencereyi taşırken devre dışı "
+"bırakma tuşunu basılı tutun"
 
 #: dist/prefs.js:953
 msgid "Span multiple tiles"
-msgstr "Unisci più riquadri"
+msgstr "Birden çok döşemeyi kapsa"
 
 #: dist/prefs.js:954
 msgid "Hold the activation key to span multiple tiles"
-msgstr "Tieni premuto il tasto di attivazione per unire più riquadri"
+msgstr "Birden çok döşemeyi kapsamak için etkinleştirme tuşunu basılı tutun"
 
 #: dist/prefs.js:963
 msgid "Enable Auto Tiling"
-msgstr "Abilita sistema di tiling automatico"
+msgstr "Otomatik Döşemeyi Etkinleştir"
 
 #: dist/prefs.js:964
 msgid "Automatically tile new windows to the best tile"
-msgstr "Posiziona automaticamente le nuove finestre nel migliore riquadro"
+msgstr "Yeni pencereleri en uygun döşemeye otomatik olarak yerleştir"
 
 #: dist/prefs.js:969
 msgid "Enable auto-resize of the complementing tiled windows"
-msgstr "Abilita il ridimensionamento automatico delle finestre affiancate"
+msgstr ""
+"Tamamlayıcı döşenmiş pencerelerin otomatik boyutlandırmasını etkinleştir"
 
 #: dist/prefs.js:971
 msgid ""
 "When a tiled window is resized, auto-resize the other tiled windows near it"
 msgstr ""
-"Quando una finestra viene ridimensionata, ridimensiona automaticamente le "
-"altre finestre affiancate ad essa"
+"Döşenmiş bir pencere yeniden boyutlandırıldığında, yakınındaki diğer "
+"döşenmiş pencereleri otomatik olarak yeniden boyutlandır"
 
 #: dist/prefs.js:977
 msgid "Restore window size"
-msgstr "Ripristina le dimensioni della finestra"
+msgstr "Pencere boyutunu geri yükle"
 
 #: dist/prefs.js:979
 msgid "Whether to restore the windows to their original size when untiled"
-msgstr "Se ripristinare le finestre alle dimensioni originali oppure no"
+msgstr ""
+"Döşeme kaldırıldığında pencerelerin orijinal boyutlarına geri yüklenip "
+"yüklenmeyeceği"
 
 #: dist/prefs.js:985
 msgid "Add snap assistant and auto-tile buttons to window menu"
-msgstr ""
-"Aggiungi lo Snap Assistant e i pulsanti di affiancamento automatico al menu "
-"della finestra"
+msgstr "Pencere menüsüne yerleşim yardımcısı ve otomatik döşeme düğmeleri ekle"
 
 #: dist/prefs.js:987
 msgid ""
 "Add snap assistant and auto-tile buttons in the menu that shows up when you "
 "right click on a window title"
 msgstr ""
-"Aggiungi lo Snap Assistant e i pulsanti di affiancamento automatico nel menu "
-"visualizzato quando si fa clic con il pulsante destro del mouse sul titolo "
-"di una finestra"
+"Bir pencere başlığına sağ tıkladığınızda açılan menüye yerleşim yardımcısı "
+"ve otomatik döşeme düğmeleri ekler"
 
 #: dist/prefs.js:993
 msgid "Add tiled windows to ALT+TAB menu"
@@ -242,294 +246,288 @@ msgstr ""
 
 #: dist/prefs.js:1000
 msgid "Screen Edges"
-msgstr "Bordi dello schermo"
+msgstr "Ekran Kenarları"
 
 #: dist/prefs.js:1002
 msgid ""
 "Drag windows against the top, left and right screen edges to resize them"
 msgstr ""
-"Trascina le finestre contro i bordi superiore, sinistro e destro dello "
-"schermo per ridimensionarle"
+"Pencereleri yeniden boyutlandırmak için üst, sol ve sağ ekran kenarlarına "
+"sürükleyin"
 
 #: dist/prefs.js:1016
 msgid "Drag against top edge to maximize window"
-msgstr "Trascina contro il bordo superiore per ingrandire la finestra"
+msgstr "Pencereyi büyütmek için üst kenara sürükleyin"
 
 #: dist/prefs.js:1017
 msgid "Drag windows against the top edge to maximize them"
-msgstr "Trascina le finestre contro il bordo superiore per massimizzarle"
+msgstr "Pencereleri büyütmek için üst kenara sürükleyin"
 
 #: dist/prefs.js:1026
 msgid "Quarter tiling activation area"
-msgstr "Area di attivazione della divisione in quarti"
+msgstr "Çeyrek döşeme etkinleştirme alanı"
 
-#: dist/prefs.js:997
+#: dist/prefs.js:1027
+#, fuzzy, javascript-format
 msgid "Activation area to trigger quarter tiling (%% of the screen)"
-msgstr ""
-"Area di attivazione per attivare la divisione in quarti (%% dello schermo)"
+msgstr "Çeyrek döşemeyi tetiklemek için etkinleştirme alanı (ekranın %'si)"
 
 #: dist/prefs.js:1043
 msgid "Edge tiling offset"
-msgstr "Distanza massima dal bordo"
+msgstr ""
 
 #: dist/prefs.js:1044
 msgid "Offset from the screen edge to trigger edge tiling (in pixels)"
 msgstr ""
-"Distanza massima dal bordo dello schermo, in pixels, per attivare la "
-"divisione in quarti"
 
 #: dist/prefs.js:1061
 msgid "Windows suggestions"
-msgstr "Finestre suggerite"
+msgstr "Pencere önerileri"
 
 #: dist/prefs.js:1062
 msgid "Enable and disable windows suggestions"
-msgstr "Abilita e disabilita il suggerimento delle finestre"
+msgstr "Pencere önerilerini etkinleştir ve devre dışı bırak"
 
 #: dist/prefs.js:1067
 msgid "Enable window suggestions for the tiling system"
-msgstr "Abilita il suggerimento delle finestre quando usi il sistema di tiling"
+msgstr "Döşeme sistemi için pencere önerilerini etkinleştir"
 
 #: dist/prefs.js:1069
 msgid ""
 "Provides smart suggestions to fill empty tiles when using the tiling system"
 msgstr ""
-"Fornisce suggerimenti intelligenti per riempire i riquadri vuoti quando "
-"viene usato il sistema di tiling"
+"Döşeme sistemi kullanılırken boş döşemeleri doldurmak için akıllı öneriler "
+"sağlar"
 
 #: dist/prefs.js:1075
 msgid "Enable window suggestions for the snap assistant"
-msgstr "Abilita il suggerimento delle finestre quando usi lo snap assistant"
+msgstr "Yerleşim yardımcısı için pencere önerilerini etkinleştir"
 
 #: dist/prefs.js:1077
 msgid ""
 "Offers suggestions to populate empty tiles when using the snap assistant"
 msgstr ""
-"Offre suggerimenti per popolare i riquadri vuoti quando viene usato lo snap "
-"assistant"
+"Yerleşim yardımcısı kullanılırken boş döşemeleri doldurmak için öneriler "
+"sunar"
 
 #: dist/prefs.js:1083
 msgid "Enable window suggestions for screen edge snapping"
-msgstr ""
-"Abilita il suggerimento delle finestre quando usi i bordi attivi dello "
-"schermo"
+msgstr "Ekran kenarına yapıştırma için pencere önerilerini etkinleştir"
 
 #: dist/prefs.js:1085
 msgid "Suggests windows to occupy empty tiles when snapping to screen edges"
 msgstr ""
-"Suggerisce le finestre per occupare i riquadri vuoti quando usi i bordi "
-"attivi dello schermo"
+"Ekran kenarlarına yapıştırırken boş döşemeleri doldurmak için pencere "
+"önerileri sunar"
 
 #: dist/prefs.js:1091
 msgid "Layouts"
-msgstr "Layouts"
+msgstr "Yerleşimler"
 
 #: dist/prefs.js:1092
 msgid "Configure the layouts of Tiling Shell"
-msgstr "Configura i layout di Tiling Shell"
+msgstr "Tiling Shell'in yerleşimlerini yapılandır"
 
 #: dist/prefs.js:1096 dist/prefs.js:1097
 msgid "Edit layouts"
-msgstr "Modifica layouts"
+msgstr "Yerleşimleri düzenle"
 
 #: dist/prefs.js:1098
 msgid "Open the layouts editor"
-msgstr "Apre l'editor dei layouts"
+msgstr "Yerleşim düzenleyiciyi aç"
 
 #: dist/prefs.js:1103 dist/prefs.js:1104 dist/prefs.js:1108
 msgid "Export layouts"
-msgstr "Esporta layouts"
+msgstr "Yerleşimleri dışa aktar"
 
 #: dist/prefs.js:1105
 msgid "Export layouts to a file"
-msgstr "Esporta layouts in un file"
+msgstr "Yerleşimleri bir dosyaya aktar"
 
 #: dist/prefs.js:1111 dist/prefs.js:1497
 msgid "Save"
-msgstr "Salva"
+msgstr "Kaydet"
 
 #: dist/prefs.js:1112 dist/prefs.js:1167 dist/prefs.js:1498 dist/prefs.js:1554
 msgid "Cancel"
-msgstr "Annulla"
+msgstr "Vazgeç"
 
 #: dist/prefs.js:1158 dist/prefs.js:1159
 msgid "Import layouts"
-msgstr "Importa layouts"
+msgstr "Yerleşimleri içe aktar"
 
 #: dist/prefs.js:1160
 msgid "Import layouts from a file"
-msgstr "Importa layouts da un file"
+msgstr "Bir dosyadan yerleşimleri içe aktar"
 
 #: dist/prefs.js:1163
 msgid "Select layouts file"
-msgstr "Seleziona file di layouts"
+msgstr "Yerleşim dosyasını seç"
 
 #: dist/prefs.js:1166 dist/prefs.js:1553
 msgid "Open"
-msgstr "Apri"
+msgstr "Aç"
 
 #: dist/prefs.js:1214 dist/prefs.js:1215
 msgid "Reset layouts"
-msgstr "Ripristina layouts"
+msgstr "Yerleşimleri sıfırla"
 
 #: dist/prefs.js:1216
 msgid "Bring back the default layouts"
-msgstr "Ripristina i layouts predefiniti"
+msgstr "Varsayılan yerleşimleri geri yükle"
 
 #: dist/prefs.js:1229
 msgid "Keybindings"
-msgstr "Scorciatoie da tastiera"
+msgstr "Klavye kısayolları"
 
 #: dist/prefs.js:1231
 msgid "Use hotkeys to perform actions on the focused window"
-msgstr ""
-"Usa i tasti di scelta rapida per eseguire azioni sulla finestra selezionata"
+msgstr "Odaklanan pencerede işlem yapmak için kısayol tuşlarını kullanın"
 
 #: dist/prefs.js:1249
 msgid "Move window to right tile"
-msgstr "Sposta la finestra nel riquadro destro"
+msgstr "Pencereyi sağ döşemeye taşı"
 
 #: dist/prefs.js:1251
 msgid "Move the focused window to the tile on its right"
-msgstr "Sposta la finestra selezionata sul riquadro alla sua destra"
+msgstr "Odaklanan pencereyi sağındaki döşemeye taşı"
 
 #: dist/prefs.js:1260
 msgid "Move window to left tile"
-msgstr "Sposta la finestra nel riquadro sinistro"
+msgstr "Pencereyi sol döşemeye taşı"
 
 #: dist/prefs.js:1261
 msgid "Move the focused window to the tile on its left"
-msgstr "Sposta la finestra selezionata sul riquadro alla sua sinistra"
+msgstr "Odaklanan pencereyi solundaki döşemeye taşı"
 
 #: dist/prefs.js:1267
 msgid "Move window to tile above"
-msgstr "Sposta la finestra nel riquadro sopra"
+msgstr "Pencereyi yukarıdaki döşemeye taşı"
 
 #: dist/prefs.js:1268
 msgid "Move the focused window to the tile above"
-msgstr "Sposta la finestra selezionata sul riquadro sopra"
+msgstr "Odaklanan pencereyi yukarıdaki döşemeye taşı"
 
 #: dist/prefs.js:1274
 msgid "Move window to tile below"
-msgstr "Sposta la finestra sul riquadro sottostante"
+msgstr "Pencereyi aşağıdaki döşemeye taşı"
 
 #: dist/prefs.js:1275
 msgid "Move the focused window to the tile below"
-msgstr "Sposta la finestra selezionata sul riquadro sottostante"
+msgstr "Odaklanan pencereyi aşağıdaki döşemeye taşı"
 
 #: dist/prefs.js:1281
 msgid "Span window to right tile"
-msgstr "Estendi la finestra al riquadro destro"
+msgstr "Pencereyi sağ döşemeye genişlet"
 
 #: dist/prefs.js:1282
 msgid "Span the focused window to the tile on its right"
-msgstr "Extendi la finestra selezionata sul riquadro alla sua destra"
+msgstr "Odaklanan pencereyi sağındaki döşemeye genişlet"
 
 #: dist/prefs.js:1288
 msgid "Span window to left tile"
-msgstr "Estendi la finestra al riquadro sinistro"
+msgstr "Pencereyi sol döşemeye genişlet"
 
 #: dist/prefs.js:1289
 msgid "Span the focused window to the tile on its left"
-msgstr "Estendi la finestra selezionata al riquadro alla sua sinistra"
+msgstr "Odaklanan pencereyi solundaki döşemeye genişlet"
 
 #: dist/prefs.js:1295
 msgid "Span window above"
-msgstr "Estendi finestra verso l'alto"
+msgstr "Pencereyi yukarıdaki döşemeye genişlet"
 
 #: dist/prefs.js:1296
 msgid "Span the focused window to the tile above"
-msgstr "Estendi la finestra selezionata al riquadro in alto"
+msgstr "Odaklanan pencereyi yukarıdaki döşemeye genişlet"
 
 #: dist/prefs.js:1302
 msgid "Span window down"
-msgstr "Estendi finestra verso il basso"
+msgstr "Pencereyi aşağıdaki döşemeye genişlet"
 
 #: dist/prefs.js:1303
 msgid "Span the focused window to the tile below"
-msgstr "Estendi la finestra selezionata al riquadro sottostante"
+msgstr "Odaklanan pencereyi aşağıdaki döşemeye genişlet"
 
 #: dist/prefs.js:1309
 msgid "Span window to all tiles"
-msgstr "Estendi la finestra a tutti i riquadri"
+msgstr "Pencereyi tüm döşemelere genişlet"
 
 #: dist/prefs.js:1310
 msgid "Span the focused window to all the tiles"
-msgstr "Estendi la finestra selezionata a tutti i riquadri"
+msgstr "Odaklanan pencereyi tüm döşemelere genişlet"
 
 #: dist/prefs.js:1316
 msgid "Untile focused window"
-msgstr "Sgancia la finestra selezionata"
+msgstr "Odaklanan pencereyi döşemeden çıkar"
 
 #: dist/prefs.js:1324
 msgid "Move window to the center"
-msgstr "Sposta la finestra al centro"
+msgstr "Pencereyi merkeze taşı"
 
 #: dist/prefs.js:1326
 msgid "Move the focused window to the center of the screen"
-msgstr "Sposta la finestra selezionata al centro dello schermo"
+msgstr "Odaklanan pencereyi ekranın merkezine taşı"
 
 #: dist/prefs.js:1335
 msgid "Focus window to the right"
-msgstr "Seleziona finestra a destra"
+msgstr "Sağdaki pencereye odaklan"
 
 #: dist/prefs.js:1337
 msgid "Focus the window to the right of the current focused window"
-msgstr "Seleziona la finestra a destra della finestra attualmente selezionata"
+msgstr "Geçerli odaklı pencerenin sağındaki pencereye odaklan"
 
 #: dist/prefs.js:1344
 msgid "Focus window to the left"
-msgstr "Seleziona finestra a sinistra"
+msgstr "Soldaki pencereye odaklan"
 
 #: dist/prefs.js:1345
 msgid "Focus the window to the left of the current focused window"
-msgstr ""
-"Seleziona la finestra a sinistra della finestra attualmente selezionata"
+msgstr "Geçerli odaklı pencerenin solundaki pencereye odaklan"
 
 #: dist/prefs.js:1351
 msgid "Focus window above"
-msgstr "Seleziona finestra in alto"
+msgstr "Yukarıdaki pencereye odaklan"
 
 #: dist/prefs.js:1352
 msgid "Focus the window above the current focused window"
-msgstr "Seleziona la finestra in alto alla finestra attualmente selezionata"
+msgstr "Geçerli odaklı pencerenin yukarısındaki pencereye odaklan"
 
 #: dist/prefs.js:1358
 msgid "Focus window below"
-msgstr "Seleziona la finestra in basso"
+msgstr "Aşağıdaki pencereye odaklan"
 
 #: dist/prefs.js:1359
 msgid "Focus the window below the current focused window"
-msgstr "Seleziona la finestra in basso alla finestra attualmente selezionata"
+msgstr "Geçerli odaklı pencerenin aşağısındaki pencereye odaklan"
 
 #: dist/prefs.js:1365
 msgid "Focus next window"
-msgstr "Seleziona finestra successiva"
+msgstr "Sonraki pencereye odaklan"
 
 #: dist/prefs.js:1366
 msgid "Focus the window next to the current focused window"
-msgstr "Seleziona la finestra successiva alla finestra attualmente selezionata"
+msgstr "Geçerli odaklı pencerenin yanındaki pencereye odaklan"
 
 #: dist/prefs.js:1372
 msgid "Focus previous window"
-msgstr "Seleziona finestra precedente"
+msgstr "Önceki pencereye odaklan"
 
 #: dist/prefs.js:1373
 msgid "Focus the window prior to the current focused window"
-msgstr "Seleziona la finestra precedente alla finestra attualmente selezionata"
+msgstr "Geçerli odaklı pencereden önceki pencereye odaklan"
 
-#: dist/prefs.js:1332
+#: dist/prefs.js:1379
 msgid "Highlight focused window"
-msgstr "Evidenzia la finestra focalizzata"
+msgstr "Odaklanan pencereyi vurgula"
 
-#: dist/prefs.js:1334
+#: dist/prefs.js:1381
 msgid "Minimize all the other windows and show only the focused window"
-msgstr "Riduci a icona tutte le altre finestre e mostra solo la finestra focalizzata"
+msgstr "Diğer tüm pencereleri küçült ve yalnızca odaklanan pencereyi göster"
 
 #: dist/prefs.js:1388
 #, fuzzy
 msgid "Cycle layouts"
-msgstr "Ripristina layouts"
+msgstr "Yerleşimleri sıfırla"
 
 #: dist/prefs.js:1389
 msgid "Cycle through available workspace layouts"
@@ -537,21 +535,19 @@ msgstr ""
 
 #: dist/prefs.js:1416
 msgid "View and Customize all the Shortcuts"
-msgstr "Visualizza e personalizza tutte le scorciatoie"
+msgstr "Tüm Kısayolları Görüntüle ve Özelleştir"
 
 #: dist/prefs.js:1444 dist/prefs.js:1445
 msgid "View and Customize Shortcuts"
-msgstr "Visualizza e personalizza le scorciatoie"
+msgstr "Kısayolları Görüntüle ve Özelleştir"
 
 #: dist/prefs.js:1467
 msgid "Enable next/previous window focus to wrap around"
-msgstr "Permetti al focus del successore/precedente di ricominciare da capo"
+msgstr "Sonraki/önceki pencere odaklamasının dönmesini etkinleştir"
 
 #: dist/prefs.js:1469
 msgid "When focusing next or previous window, wrap around at the window edge"
-msgstr ""
-"Quando passi il focus alla finestra successiva o precedente, ricomincia da "
-"capo se non ci sono altre finestre"
+msgstr "Sonraki veya önceki pencereye odaklanırken pencere kenarında dön"
 
 #: dist/prefs.js:1475
 msgid "Restrict directional focus to tiled windows"
@@ -563,123 +559,98 @@ msgstr ""
 
 #: dist/prefs.js:1482
 msgid "Import, export and reset"
-msgstr "Importa, esporta e resetta"
+msgstr "İçe aktar, dışa aktar ve sıfırla"
 
 #: dist/prefs.js:1484
 msgid "Import, export and reset the settings of Tiling Shell"
-msgstr "Importa, esporta e resetta le impostazioni di Tiling Shell"
+msgstr "Tiling Shell ayarlarını içe aktar, dışa aktar ve sıfırla"
 
 #: dist/prefs.js:1489 dist/prefs.js:1490
 msgid "Export settings"
-msgstr "Esporta le impostazioni"
+msgstr "Ayarları dışa aktar"
 
 #: dist/prefs.js:1491
 msgid "Export settings to a file"
-msgstr "Esporta le impostazioni in un file"
+msgstr "Ayarları bir dosyaya aktar"
 
 #: dist/prefs.js:1494
 msgid "Export settings to a text file"
-msgstr "Esporta le impostazioni in un file di testo"
+msgstr "Ayarları bir metin dosyasına aktar"
 
 #: dist/prefs.js:1501
 msgid "Text file"
-msgstr "File di testo"
+msgstr "Metin dosyası"
 
 #: dist/prefs.js:1545 dist/prefs.js:1546
 msgid "Import settings"
-msgstr "Importa le impostazioni"
+msgstr "Ayarları içe aktar"
 
 #: dist/prefs.js:1547
 msgid "Import settings from a file"
-msgstr "Importa le impostazioni da un file"
+msgstr "Ayarları bir dosyadan içe aktar"
 
 #: dist/prefs.js:1550
 msgid "Select a text file to import from"
-msgstr "Seleziona un file di testo dal quale importare le impostazioni"
+msgstr "İçe aktarılacak bir metin dosyası seçin"
 
 #: dist/prefs.js:1592 dist/prefs.js:1593
 msgid "Reset settings"
-msgstr "Resetta le impostazioni"
+msgstr "Ayarları sıfırla"
 
 #: dist/prefs.js:1594
 msgid "Bring back the default settings"
-msgstr "Ripristina le impostazioni predefinite"
+msgstr "Varsayılan ayarları geri yükle"
 
 #: dist/prefs.js:1609
 msgid "Donate on ko-fi"
-msgstr "Fai una donazione"
+msgstr "Ko-fi üzerinden bağış yap"
 
 #: dist/prefs.js:1615
 msgid "Report a bug"
-msgstr "Segnala un bug"
+msgstr "Hata bildir"
 
 #: dist/prefs.js:1621
 msgid "Request a feature"
-msgstr "Richiedi una funzionalità"
+msgstr "Özellik iste"
 
 #: dist/prefs.js:1629
 msgid "Have issues, you want to suggest a new feature or contribute?"
-msgstr "Hai problemi, vuoi suggerire una nuova funzionalità o contribuire?"
+msgstr ""
+"Sorunlarınız mı var, yeni bir özellik önermek veya katkıda bulunmak mı "
+"istiyorsunuz?"
 
 #: dist/prefs.js:1636
 msgid "Open a new issue on"
-msgstr "Apri una nuova issue su"
+msgstr "Yeni bir konu aç"
 
 #: dist/prefs.js:1866 dist/prefs.js:1889
 msgid "New accelerator…"
-msgstr "Nuova scorciatoia"
+msgstr "Yeni kısayol…"
 
 #: dist/prefs.js:1892
 msgid "Use Backspace to clear"
-msgstr "Usa Backspace per eliminare"
+msgstr "Temizlemek için Backspace kullan"
 
 #: dist/extension.js:5980
 msgid "Edit Layouts"
-msgstr "Modifica layout"
+msgstr "Yerleşimleri Düzenle"
 
 #: dist/extension.js:5990
 msgid "New Layout"
-msgstr "Nuovo layout"
+msgstr "Yeni Yerleşim"
 
 #: dist/extension.js:6175
 msgid "to split a tile"
-msgstr "per dividere un riquadro"
+msgstr "bir döşemeyi bölmek için"
 
 #: dist/extension.js:6214
 msgid "to split a tile vertically"
-msgstr "per dividere un riquadro verticalmente"
+msgstr "bir döşemeyi dikey olarak bölmek için"
 
 #: dist/extension.js:6234
 msgid "to delete a tile"
-msgstr "per cancellare un riquadro"
+msgstr "bir döşemeyi silmek için"
 
 #: dist/extension.js:6258
 msgid "use the indicator button to save or cancel"
-msgstr "usa l'icona sul pannello superiore per salvare o annullare"
-
-#~ msgid "Menu"
-#~ msgstr "Menu"
-
-#~ msgid "Info"
-#~ msgstr "Info"
-
-#~ msgid "Select the layout to edit"
-#~ msgstr "Seleziona il layout da modificare"
-
-#~ msgid "Close"
-#~ msgstr "Chiudi"
-
-#~ msgid "How to use the editor"
-#~ msgstr "Come usare l'editor"
-
-#~ msgid "Start editing"
-#~ msgstr "Inizia la modifica"
-
-#~ msgid "Move to best tile"
-#~ msgstr "Sposta nel riquadro migliore"
-
-#~ msgid "Move to leftmost tile"
-#~ msgstr "Sposta nel riquadro più a sinistra"
-
-#~ msgid "Move to rightmost tile"
-#~ msgstr "Sposta nel riquadro più a destra"
+msgstr "kaydetmek veya vazgeçmek için gösterge düğmesini kullanın"

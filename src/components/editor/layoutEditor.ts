@@ -7,7 +7,6 @@ import {
     buildRectangle,
     buildTileGaps,
     enableScalingFactorSupport,
-    getEventCoords,
     getMonitorScalingFactor,
     getWindowsOfMonitor,
 } from '@/utils/ui';
@@ -18,6 +17,7 @@ import EditableTilePreview from './editableTilePreview';
 import Tile from '../layout/Tile';
 import HoverLine from './hoverLine';
 import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
+import { getEventCoords } from '@utils/gnomesupport';
 
 @registerGObjectClass
 export default class LayoutEditor extends St.Widget {

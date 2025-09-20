@@ -72,6 +72,11 @@
             <summary>Enable next/previous window focus to wrap around</summary>
             <description>When focusing next or previous window, wrap around at the window edge</description>
         </key>
+        <key name="enable-directional-focus-tiled-only" type="b">
+            <default>false</default>
+            <summary>Restrict directional focus to tiled windows</summary>
+            <description>When using directional focus navigation, only consider tiled windows</description>
+        </key>
         <key name="resize-complementing-windows" type="b">
             <default>true</default>
             <summary>Enable auto-resize of the complementing tiled windows</summary>
@@ -117,6 +122,11 @@
             <summary>Add snap assistant and auto-tile buttons to window menu</summary>
             <description>Add snap assistant and auto-tile buttons in the menu that shows up when you right click on a window title.</description>
         </key>
+        <key name="override-alt-tab" type="b">
+            <default>true</default>
+            <summary>Add tiled windows group to alt+tab menu</summary>
+            <description>Add the tiled windows to the alt+tab menu to open all the tiled windows at once</description>
+        </key>
         <key name="snap-assistant-threshold" type="i">
             <default>54</default>
             <summary>Snap Assistant threshold</summary>
@@ -126,6 +136,11 @@
             <default>40</default>
             <summary>Quarter tiling threshold</summary>
             <description>Threshold to trigger quarter tiling.</description>
+        </key>
+        <key name="edge-tiling-offset" type="u">
+            <default>16</default>
+            <summary>Edge tiling offset</summary>
+            <description>Offset to trigger edge tiling (left and right edge).</description>
         </key>
         <key name="enable-window-border" type="b">
             <default>false</default>
@@ -246,6 +261,10 @@
 			<default><![CDATA[['']]]></default>
 			<summary>Minimize all the other windows and show only the focused window</summary>
 		</key>
+        <key type="as" name="cycle-layouts">
+            <default><![CDATA[['']]]></default>
+            <summary>Cycle through available workspace layouts</summary>
+        </key>
     </schema>
 
 </schemalist>

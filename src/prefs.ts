@@ -1,3 +1,25 @@
+// eslint-disable-next-line spaced-comment
+/*!
+ * Tiling Shell: advanced and modern window management for GNOME
+ *
+ * Copyright (C) 2025 Domenico Ferraro
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
 import { Gtk, Adw, Gio, GLib, Gdk, GObject } from '@gi.prefs';
 import Settings, { ActivationKey } from './settings/settings';
 import { logger } from './utils/logger';
@@ -251,6 +273,15 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         behaviourGroup.add(overrideWindowMenuRow);
 
+        const overrideAltTabRow = this._buildSwitchRow(
+            Settings.KEY_OVERRIDE_ALT_TAB,
+            _('Add tiled windows to ALT+TAB menu'),
+            _(
+                'Add the tiled windows to the ALT+TAB menu to open all the tiled windows at once',
+            ),
+        );
+        behaviourGroup.add(overrideAltTabRow);
+
         // Screen Edges section
         const activeScreenEdgesGroup = new Adw.PreferencesGroup({
             title: _('Screen Edges'),
@@ -297,6 +328,24 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             'sensitive',
         );
         activeScreenEdgesGroup.add(quarterTiling);
+
+        const edgeTilingOffset = this._buildScaleRow(
+            _('Edge tiling offset'),
+            _('Offset from the screen edge to trigger edge tiling (in pixels)'),
+            (sc: Gtk.Scale) => {
+                Settings.EDGE_TILING_OFFSET = sc.get_value();
+            },
+            Settings.EDGE_TILING_OFFSET,
+            1,
+            250,
+            1,
+        );
+        Settings.bind(
+            Settings.KEY_ACTIVE_SCREEN_EDGES,
+            edgeTilingOffset,
+            'sensitive',
+        );
+        activeScreenEdgesGroup.add(edgeTilingOffset);
 
         prefsPage.add(activeScreenEdgesGroup);
 
@@ -643,6 +692,13 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 false,
                 false,
             ],
+            [
+                Settings.SETTING_CYCLE_LAYOUTS,
+                _('Cycle layouts'),
+                _('Cycle through available workspace layouts'),
+                false,
+                false,
+            ],
         ];
 
         // set if the keybinding was set or not by the user
@@ -733,6 +789,15 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             ),
         );
         keybindingsGroup.add(wrapAroundRow);
+
+        const directionalFocusTiledWindows = this._buildSwitchRow(
+            Settings.KEY_ENABLE_DIRECTIONAL_FOCUS_TILED_ONLY,
+            _('Restrict directional focus to tiled windows'),
+            _(
+                'When using directional focus navigation, only consider tiled windows',
+            ),
+        );
+        keybindingsGroup.add(directionalFocusTiledWindows);
 
         // Import/export/reset section
         const importExportGroup = new Adw.PreferencesGroup({

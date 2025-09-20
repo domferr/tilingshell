@@ -1,10 +1,10 @@
-import { St, Clutter } from '@gi.ext';
+import { St } from '@gi.ext';
 import Indicator from './indicator';
 import * as IndicatorUtils from './utils';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import CurrentMenu from './currentMenu';
 import { _ } from '../translations';
-import { widgetOrientation } from '@utils/ui';
+import { widgetOrientation } from '@utils/gnomesupport';
 
 export default class EditingMenu implements CurrentMenu {
     private readonly _indicator: Indicator;
