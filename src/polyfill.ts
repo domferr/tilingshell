@@ -18,7 +18,7 @@ function openPrefs() {
 }
 
 function getIsMaximized(window: Meta.Window) {
-    if(window.get_maximized) {
+    if (window.get_maximized) {
         // GNOME <=48
         return window.get_maximized();
     }
