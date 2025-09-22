@@ -1,3 +1,5 @@
+import { Meta } from '@gi.ext';
+
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
 
 function openPrefs() {
@@ -15,4 +17,14 @@ function openPrefs() {
     }
 }
 
-export { Extension, openPrefs };
+function getIsMaximized(window: Meta.Window) {
+    if(window.get_maximized) {
+        // GNOME <=48
+        return window.get_maximized();
+    }
+
+    // GNOME 49+
+    return window.is_maximized();
+}
+
+export { Extension, openPrefs, getIsMaximized };

@@ -27,7 +27,7 @@ import Tile from '@components/layout/Tile';
 import { WindowBorderManager } from '@components/windowBorderManager';
 import TilingShellWindowManager from '@components/windowManager/tilingShellWindowManager';
 import ExtendedWindow from '@components/tilingsystem/extendedWindow';
-import { Extension } from '@polyfill';
+import { Extension, getIsMaximized } from '@polyfill';
 
 const debug = logger('extension');
 
@@ -357,7 +357,7 @@ export default class TilingShellExtension extends Extension {
         if (
             window.wmClass === null ||
             change !== Meta.SizeChange.MAXIMIZE || // handle maximize changes only
-            window.is_maximized() !== Meta.MaximizeFlags.BOTH || // handle maximized window only
+            getIsMaximized(window) !== Meta.MaximizeFlags.BOTH || // handle maximized window only
             window.is_attached_dialog() || // skip dialogs
             window.is_on_all_workspaces() ||
             window.windowType !== Meta.WindowType.NORMAL || // handle normal windows only
@@ -652,7 +652,7 @@ export default class TilingShellExtension extends Extension {
             return;
 
         // if the window is maximized, unmaximize it
-        if (focus_window.is_maximized())
+        if (getIsMaximized(focus_window))
             focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
 
         const monitorTilingManager =

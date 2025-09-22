@@ -28,6 +28,7 @@ import TouchPointer from './touchPointer';
 import { KeyBindingsDirection } from '@keybindings';
 import TilingShellWindowManager from '@components/windowManager/tilingShellWindowManager';
 import TilingLayoutWithSuggestions from '../windowsSuggestions/tilingLayoutWithSuggestions';
+import { getIsMaximized } from '@polyfill'
 
 const MINIMUM_DISTANCE_TO_RESTORE_ORIGINAL_SIZE = 90;
 
@@ -331,7 +332,7 @@ export class TilingManager {
         clamp: boolean,
     ): boolean {
         let destination: { rect: Mtk.Rectangle; tile: Tile } | undefined;
-        if (spanFlag && window.is_maximized()) return false;
+        if (spanFlag && getIsMaximized(window)) return false;
 
         const currentWs = window.get_workspace();
         const tilingLayout = this._workspaceTilingLayout.get(currentWs);
@@ -339,7 +340,7 @@ export class TilingManager {
         const windowRectCopy = window.get_frame_rect().copy();
         const extWin = window as ExtendedWindow;
 
-        if (window.is_maximized()) {
+        if (getIsMaximized(window)) {
             switch (direction) {
                 case KeyBindingsDirection.NODIRECTION:
                 case KeyBindingsDirection.LEFT:
@@ -834,7 +835,7 @@ export class TilingManager {
         if (desiredWindowRect.width <= 0 || desiredWindowRect.height <= 0)
             return;
 
-        if (window.is_maximized()) return;
+        if (getIsMaximized(window)) return;
 
         (window as ExtendedWindow).originalSize = window
             .get_frame_rect()
@@ -1196,8 +1197,8 @@ export class TilingManager {
         // abort if there is an invalid selection
         if (destinationRect.width <= 0 || destinationRect.height <= 0) return;
 
-        const rememberOriginalSize = !window.is_maximized();
-        if (window.is_maximized()) window.unmaximize(Meta.MaximizeFlags.BOTH);
+        const rememberOriginalSize = !getIsMaximized(window);
+        if (getIsMaximized(window)) window.unmaximize(Meta.MaximizeFlags.BOTH);
 
         if (rememberOriginalSize && !(window as ExtendedWindow).assignedTile) {
             (window as ExtendedWindow).originalSize = window
