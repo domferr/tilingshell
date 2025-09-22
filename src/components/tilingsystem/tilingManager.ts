@@ -331,7 +331,7 @@ export class TilingManager {
         clamp: boolean,
     ): boolean {
         let destination: { rect: Mtk.Rectangle; tile: Tile } | undefined;
-        if (spanFlag && window.get_maximized()) return false;
+        if (spanFlag && window.is_maximized()) return false;
 
         const currentWs = window.get_workspace();
         const tilingLayout = this._workspaceTilingLayout.get(currentWs);
@@ -339,7 +339,7 @@ export class TilingManager {
         const windowRectCopy = window.get_frame_rect().copy();
         const extWin = window as ExtendedWindow;
 
-        if (window.get_maximized()) {
+        if (window.is_maximized()) {
             switch (direction) {
                 case KeyBindingsDirection.NODIRECTION:
                 case KeyBindingsDirection.LEFT:
@@ -834,7 +834,7 @@ export class TilingManager {
         if (desiredWindowRect.width <= 0 || desiredWindowRect.height <= 0)
             return;
 
-        if (window.get_maximized()) return;
+        if (window.is_maximized()) return;
 
         (window as ExtendedWindow).originalSize = window
             .get_frame_rect()
@@ -1196,8 +1196,8 @@ export class TilingManager {
         // abort if there is an invalid selection
         if (destinationRect.width <= 0 || destinationRect.height <= 0) return;
 
-        const rememberOriginalSize = !window.get_maximized();
-        if (window.get_maximized()) window.unmaximize(Meta.MaximizeFlags.BOTH);
+        const rememberOriginalSize = !window.is_maximized();
+        if (window.is_maximized()) window.unmaximize(Meta.MaximizeFlags.BOTH);
 
         if (rememberOriginalSize && !(window as ExtendedWindow).assignedTile) {
             (window as ExtendedWindow).originalSize = window

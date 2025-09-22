@@ -357,7 +357,7 @@ export default class TilingShellExtension extends Extension {
         if (
             window.wmClass === null ||
             change !== Meta.SizeChange.MAXIMIZE || // handle maximize changes only
-            window.get_maximized() !== Meta.MaximizeFlags.BOTH || // handle maximized window only
+            window.is_maximized() !== Meta.MaximizeFlags.BOTH || // handle maximized window only
             window.is_attached_dialog() || // skip dialogs
             window.is_on_all_workspaces() ||
             window.windowType !== Meta.WindowType.NORMAL || // handle normal windows only
@@ -652,7 +652,7 @@ export default class TilingShellExtension extends Extension {
             return;
 
         // if the window is maximized, unmaximize it
-        if (focus_window.get_maximized())
+        if (focus_window.is_maximized())
             focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
 
         const monitorTilingManager =
