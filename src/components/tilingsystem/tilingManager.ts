@@ -28,7 +28,7 @@ import TouchPointer from './touchPointer';
 import { KeyBindingsDirection } from '@keybindings';
 import TilingShellWindowManager from '@components/windowManager/tilingShellWindowManager';
 import TilingLayoutWithSuggestions from '../windowsSuggestions/tilingLayoutWithSuggestions';
-import { getIsMaximized } from '@polyfill';
+import { getIsMaximized, setMaximizeFlags, setMaximizeFlags } from '@polyfill';
 
 const MINIMUM_DISTANCE_TO_RESTORE_ORIGINAL_SIZE = 90;
 
@@ -347,7 +347,7 @@ export class TilingManager {
                 case KeyBindingsDirection.RIGHT:
                     break;
                 case KeyBindingsDirection.DOWN:
-                    window.unmaximize(Meta.MaximizeFlags.BOTH);
+                    setUnmaximizeFlags(window, Meta.MaximizeFlags.BOTH);
                     return true;
                 case KeyBindingsDirection.UP:
                     return false;
@@ -360,7 +360,7 @@ export class TilingManager {
             extWin.assignedTile &&
             extWin.assignedTile?.y === 0
         ) {
-            window.maximize(Meta.MaximizeFlags.BOTH);
+            setMaximizeFlags(window, Meta.MaximizeFlags.BOTH);
             return true;
         }
 
@@ -426,7 +426,7 @@ export class TilingManager {
                 direction === KeyBindingsDirection.UP &&
                 window.can_maximize()
             ) {
-                window.maximize(Meta.MaximizeFlags.BOTH);
+                setMaximizeFlags(window, Meta.MaximizeFlags.BOTH);
                 return true;
             }
             return false;
@@ -445,7 +445,7 @@ export class TilingManager {
             );
         }
 
-        if (isMaximized) window.unmaximize(Meta.MaximizeFlags.BOTH);
+        if (isMaximized) setUnmaximizeFlags(window, Meta.MaximizeFlags.BOTH);
 
         this._easeWindowRect(window, destination.rect, false, force);
 
@@ -813,7 +813,7 @@ export class TilingManager {
             this._edgeTilingManager.needMaximize() &&
             window.can_maximize()
         )
-            window.maximize(Meta.MaximizeFlags.BOTH);
+            setMaximizeFlags(window, Meta.MaximizeFlags.BOTH);
 
         // disable edge-tiling
         const wasEdgeTiling = this._edgeTilingManager.isPerformingEdgeTiling();
@@ -1198,7 +1198,8 @@ export class TilingManager {
         if (destinationRect.width <= 0 || destinationRect.height <= 0) return;
 
         const rememberOriginalSize = !getIsMaximized(window);
-        if (getIsMaximized(window)) window.unmaximize(Meta.MaximizeFlags.BOTH);
+        if (getIsMaximized(window))
+            setUnmaximizeFlags(window, Meta.MaximizeFlags.BOTH);
 
         if (rememberOriginalSize && !(window as ExtendedWindow).assignedTile) {
             (window as ExtendedWindow).originalSize = window

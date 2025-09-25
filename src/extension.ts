@@ -27,7 +27,7 @@ import Tile from '@components/layout/Tile';
 import { WindowBorderManager } from '@components/windowBorderManager';
 import TilingShellWindowManager from '@components/windowManager/tilingShellWindowManager';
 import ExtendedWindow from '@components/tilingsystem/extendedWindow';
-import { Extension, getIsMaximized } from '@polyfill';
+import { Extension, getIsMaximized, setUnmaximizeFlags } from '@polyfill';
 
 const debug = logger('extension');
 
@@ -451,7 +451,7 @@ export default class TilingShellExtension extends Extension {
                 focus_window.maximizedVertically) &&
             direction === KeyBindingsDirection.DOWN
         ) {
-            focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
+            setUnmaximizeFlags(focus_window, Meta.MaximizeFlags.BOTH);
             return;
         }
 
@@ -464,7 +464,7 @@ export default class TilingShellExtension extends Extension {
             (focus_window.maximizedHorizontally ||
                 focus_window.maximizedVertically)
         ) {
-            focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
+            setUnmaximizeFlags(focus_window, Meta.MaximizeFlags.BOTH);
             return;
         }
 
@@ -507,7 +507,7 @@ export default class TilingShellExtension extends Extension {
             direction === KeyBindingsDirection.UP
         ) {
             Main.wm.skipNextEffect(focus_window.get_compositor_private());
-            focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
+            setUnmaximizeFlags(focus_window, Meta.MaximizeFlags.BOTH);
             (focus_window as ExtendedWindow).assignedTile = undefined;
         }
 
@@ -653,7 +653,7 @@ export default class TilingShellExtension extends Extension {
 
         // if the window is maximized, unmaximize it
         if (getIsMaximized(focus_window))
-            focus_window.unmaximize(Meta.MaximizeFlags.BOTH);
+            setUnmaximizeFlags(focus_window, Meta.MaximizeFlags.BOTH);
 
         const monitorTilingManager =
             this._tilingManagers[focus_window.get_monitor()];

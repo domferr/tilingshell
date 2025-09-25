@@ -27,4 +27,30 @@ function getIsMaximized(window: Meta.Window) {
     return window.is_maximized();
 }
 
-export { Extension, openPrefs, getIsMaximized };
+function setMaximizeFlags(window: Meta.Window, flags: Meta.MaximizeFlags) {
+    if (!window.set_maximize_flags) {
+        // GNOME <=48
+        return window.maximize(flags);
+    }
+
+    // GNOME 49+
+    return window.set_maximize_flags(flags);
+}
+
+function setUnmaximizeFlags(window: Meta.Window, flags: Meta.MaximizeFlags) {
+    if (!window.set_maximize_flags) {
+        // GNOME <=48
+        return window.unmaximize(flags);
+    }
+
+    // GNOME 49+
+    return window.set_unmaximize_flags(flags);
+}
+
+export {
+    Extension,
+    openPrefs,
+    getIsMaximized,
+    setMaximizeFlags,
+    setUnmaximizeFlags,
+};
