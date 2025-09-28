@@ -291,6 +291,17 @@ export default class TilingShellExtension extends Extension {
             );
             this._signals.connect(
                 this._keybindings,
+                'shift-focus-window',
+                (
+                    kb: KeyBindings,
+                    dp: Meta.Display,
+                    dir: FocusSwitchDirection,
+                ) => {
+                    this._onKeyboardFocusSwitchWin(dp, dir);
+                },
+            );
+            this._signals.connect(
+                this._keybindings,
                 'highlight-current-window',
                 (kb: KeyBindings, dp: Meta.Display) => {
                     const focus_window = dp.get_focus_window();
@@ -649,7 +660,7 @@ export default class TilingShellExtension extends Extension {
         bestWindow.activate(global.get_current_time());
     }
 
-    private _onKeyboardFocusWin(
+    private _getWindowsAndFocusAdjacent(
         display: Meta.Display,
         direction: FocusSwitchDirection,
     ) {
@@ -661,36 +672,107 @@ export default class TilingShellExtension extends Extension {
             (focus_window.get_wm_class() &&
                 focus_window.get_wm_class() === 'gjs')
         )
-            return;
+            return {};
 
         const windowList = filterUnfocusableWindows(
-            focus_window.get_workspace().list_windows(),
+            focus_window
+                .get_workspace()
+                .list_windows()
+                .sort((a, b) => {
+                    // goal is to have a stable ordering based on windows placement
+                    // This is "clock-like" -- not perfect, but roughly quadrant-ordered
+                    const aRect = a.get_frame_rect();
+                    const bRect = b.get_frame_rect();
+                    return (
+                        bRect.y - aRect.y ||
+                        aRect.x - bRect.x || // reversed
+                        bRect.width - aRect.width ||
+                        bRect.height - aRect.height ||
+                        b.get_stable_sequence() - a.get_stable_sequence()
+                    );
+                }),
         );
+        if (windowList.length < 2) return {};
+
         const focusParent = focus_window.get_transient_for() || focus_window;
         const focusedIdx = windowList.findIndex((win) => {
             // in case we are iterating over a modal dialog for our focused window
             return win === focusParent;
         });
 
-        let nextIndex = -1;
+        // default to staying same place
+        let nextIdx = focusedIdx;
         switch (direction) {
             case FocusSwitchDirection.PREV:
-                if (focusedIdx === 0 && Settings.WRAPAROUND_FOCUS) {
-                    windowList[windowList.length - 1].activate(
-                        global.get_current_time(),
-                    );
+                if (focusedIdx === 0) {
+                    if (Settings.WRAPAROUND_FOCUS)
+                        nextIdx = windowList.length - 1;
                 } else {
-                    windowList[focusedIdx - 1].activate(
-                        global.get_current_time(),
-                    );
+                    nextIdx = focusedIdx - 1;
                 }
                 break;
             case FocusSwitchDirection.NEXT:
-                nextIndex = (focusedIdx + 1) % windowList.length;
-                if (nextIndex > 0 || Settings.WRAPAROUND_FOCUS)
-                    windowList[nextIndex].activate(global.get_current_time());
+                nextIdx = (focusedIdx + 1) % windowList.length;
+                if (nextIdx === 0 && !Settings.WRAPAROUND_FOCUS)
+                    nextIdx = focusedIdx;
                 break;
         }
+        if (focusedIdx === nextIdx) return {};
+
+        return {
+            focus_window,
+            windowList,
+            focusedIdx,
+            nextIdx,
+        };
+    }
+
+    private _onKeyboardFocusWin(
+        display: Meta.Display,
+        direction: FocusSwitchDirection,
+    ) {
+        const focusWindowsContext = this._getWindowsAndFocusAdjacent(
+            display,
+            direction,
+        );
+        if (!focusWindowsContext.focus_window) return;
+
+        focusWindowsContext.windowList[focusWindowsContext.nextIdx].activate(
+            global.get_current_time(),
+        );
+    }
+
+    private _onKeyboardFocusSwitchWin(
+        display: Meta.Display,
+        direction: FocusSwitchDirection,
+    ) {
+        const focusWindowsContext = this._getWindowsAndFocusAdjacent(
+            display,
+            direction,
+        );
+        if (!focusWindowsContext.focus_window) return;
+
+        const nextWin =
+            focusWindowsContext.windowList[focusWindowsContext.nextIdx];
+        const focusRect = focusWindowsContext.focus_window.get_frame_rect();
+        const nextRect = nextWin.get_frame_rect();
+
+        nextWin.move_resize_frame(
+            false,
+            focusRect.x,
+            focusRect.y,
+            focusRect.width,
+            focusRect.height,
+        );
+        focusWindowsContext.focus_window.move_resize_frame(
+            true, // based on user action
+            nextRect.x,
+            nextRect.y,
+            nextRect.width,
+            nextRect.height,
+        );
+
+        focusWindowsContext.focus_window.activate(global.get_current_time());
     }
 
     private _onKeyboardUntileWindow(kb: KeyBindings, display: Meta.Display) {

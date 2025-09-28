@@ -47,6 +47,9 @@ export default class KeyBindings extends GObject.Object {
             'focus-window': {
                 param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, FocusSwitchDirection
             },
+            'shift-focus-window': {
+                param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, FocusSwitchDirection
+            },
             'highlight-current-window': {
                 param_types: [Meta.Display.$gtype], // Meta.Display
             },
@@ -233,6 +236,34 @@ export default class KeyBindings extends GObject.Object {
         );
 
         Main.wm.addKeybinding(
+            Settings.SETTING_SHIFT_FOCUS_WINDOW_NEXT,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit(
+                    'shift-focus-window',
+                    display,
+                    FocusSwitchDirection.NEXT,
+                );
+            },
+        );
+
+        Main.wm.addKeybinding(
+            Settings.SETTING_SHIFT_FOCUS_WINDOW_PREV,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit(
+                    'shift-focus-window',
+                    display,
+                    FocusSwitchDirection.PREV,
+                );
+            },
+        );
+
+        Main.wm.addKeybinding(
             Settings.SETTING_HIGHLIGHT_CURRENT_WINDOW,
             extensionSettings,
             Meta.KeyBindingFlags.NONE,
@@ -347,7 +378,11 @@ export default class KeyBindings extends GObject.Object {
         Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_RIGHT);
         Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_NEXT);
         Main.wm.removeKeybinding(Settings.SETTING_FOCUS_WINDOW_PREV);
+        Main.wm.removeKeybinding(Settings.SETTING_SHIFT_FOCUS_WINDOW_NEXT);
+        Main.wm.removeKeybinding(Settings.SETTING_SHIFT_FOCUS_WINDOW_PREV);
+
         Main.wm.removeKeybinding(Settings.SETTING_HIGHLIGHT_CURRENT_WINDOW);
+
         Main.wm.removeKeybinding(Settings.SETTING_CYCLE_LAYOUTS);
     }
 
