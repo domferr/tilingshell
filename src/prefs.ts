@@ -52,6 +52,8 @@ function buildPrefsWidget(): Gtk.Widget {
 }
 
 export default class TilingShellExtensionPreferences extends ExtensionPreferences {
+    private GNOME_VERSION_MAJOR = Number(Config.PACKAGE_VERSION.split('.')[0]);
+
     /**
      * This function is called when the preferences window is first created to fill
      * the `Adw.PreferencesWindow`.
@@ -161,20 +163,22 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             this._getRGBAFromString(Settings.WINDOW_BORDER_COLOR),
             (val: string) => (Settings.WINDOW_BORDER_COLOR = val),
         );
-        const customColorDropDown = this._buildCustomColorDropDown(
-            Settings.WINDOW_USE_CUSTOM_BORDER_COLOR,
-            (use_custom_color: boolean) => {
-                colorButton.set_visible(use_custom_color);
-                Settings.WINDOW_USE_CUSTOM_BORDER_COLOR = use_custom_color;
-            },
-        );
         const windowBorderColorRow = new Adw.ActionRow({
             title: _('Border color'),
             subtitle: _('Choose the color of the border'),
         });
         windowBorderColorRow.add_suffix(colorButton);
         colorButton.set_visible(Settings.WINDOW_USE_CUSTOM_BORDER_COLOR);
-        windowBorderColorRow.add_suffix(customColorDropDown);
+        if (this.GNOME_VERSION_MAJOR >= 47) {
+            const customColorDropDown = this._buildCustomColorDropDown(
+                Settings.WINDOW_USE_CUSTOM_BORDER_COLOR,
+                (use_custom_color: boolean) => {
+                    colorButton.set_visible(use_custom_color);
+                    Settings.WINDOW_USE_CUSTOM_BORDER_COLOR = use_custom_color;
+                },
+            );
+            windowBorderColorRow.add_suffix(customColorDropDown);
+        }
         windowBorderExpanderRow.add_row(windowBorderColorRow);
 
         const animationsRow = new Adw.ExpanderRow({
@@ -1271,12 +1275,9 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         window.connect('map', () => {
             fc.set_transient_for(window);
         });
-        const [major] = Config.PACKAGE_VERSION.split('.').map((s: string) =>
-            Number(s),
-        );
         // due to a bug, file chooser doesn't open on GNOME 42 when a filter is set
         // filter is then enabled for GNOME 43+
-        if (major >= 43) fc.set_filter(filter);
+        if (this.GNOME_VERSION_MAJOR >= 43) fc.set_filter(filter);
         fc.set_current_folder(Gio.File.new_for_path(GLib.get_home_dir()));
         fc.connect('response', onResponse);
 
@@ -1510,7 +1511,7 @@ const ShortcutSettingButton = class extends Gtk.Button {
         // Because the cairo module isn't real, we have to use these to ignore `any`.
         // We keep them to the minimum possible scope to catch real errors.
         /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 /* ctx.setLineCap(Cairo.LineCap.SQUARE);
         //@ts-ignore
         ctx.setAntialias(Cairo.Antialias.NONE);
