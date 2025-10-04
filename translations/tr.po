@@ -1,7 +1,7 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# taijuin <taijuin@gmail.com>, 2025.
+# Turkish translations for Tiling Shell.
+# Copyright (C) 2025 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the Tiling Shell package.
+# Osman KARAGÖZ <osmank3@gmail.com>, 2025.
 #
 #, fuzzy
 msgid ""
@@ -9,10 +9,10 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-09-20 16:40+0200\n"
-"PO-Revision-Date: 2025-04-03 18:17+0800\n"
-"Last-Translator: taijuin <taijuin@gmail.com>\n"
+"PO-Revision-Date: 2025-05-09 10:05+0300\n"
+"Last-Translator: Osman KARAGÖZ <osmank3@gmail.com>\n"
 "Language-Team: \n"
-"Language: zh_TW\n"
+"Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,210 +20,219 @@ msgstr ""
 
 #: dist/prefs.js:805
 msgid "General"
-msgstr "一般"
+msgstr "Genel"
 
 #: dist/prefs.js:810
 msgid "Appearance"
-msgstr "外觀"
+msgstr "Görünüm"
 
 #: dist/prefs.js:811
 msgid "Configure the appearance of Tiling Shell"
-msgstr "設定 Tiling Shell 的外觀"
+msgstr "Tiling Shell'in görünümünü yapılandır"
 
 #: dist/prefs.js:816
 msgid "Show Indicator"
-msgstr "顯示指示器"
+msgstr "Gösterge Düğmesini Göster"
 
 #: dist/prefs.js:817
 msgid "Whether to show the panel indicator"
-msgstr "是否顯示面板指示器"
+msgstr "Panelde gösterge düğmesinin gösterilip gösterilmeyeceği"
 
 #: dist/prefs.js:822
 msgid "Inner gaps"
-msgstr "內部間距"
+msgstr "İç boşluklar"
 
 #: dist/prefs.js:823
 msgid "Gaps between windows"
-msgstr "視窗之間的間距"
+msgstr "Pencereler arasındaki boşluklar"
 
 #: dist/prefs.js:828
 msgid "Outer gaps"
-msgstr "外部間距"
+msgstr "Dış boşluklar"
 
 #: dist/prefs.js:829
 msgid "Gaps between a window and the monitor borders"
-msgstr "視窗與顯示器邊框之間的間距"
+msgstr "Pencere ile ekran kenarları arasındaki boşluklar"
 
 #: dist/prefs.js:833
 msgid "Blur (experimental feature)"
-msgstr "模糊（實驗性功能）"
+msgstr "Bulanıklık (deneysel özellik)"
 
 #: dist/prefs.js:835
 msgid "Apply blur effect to Snap Assistant and tile previews"
-msgstr "將模糊效果套用至「貼齊小幫手」與區塊預覽"
+msgstr ""
+"Yerleşim Yardımcısına ve döşeme önizlemelerine bulanıklık efekti uygula"
 
 #: dist/prefs.js:841
 msgid "Snap Assistant threshold"
-msgstr "貼齊小幫手的靈敏度"
+msgstr "Yerleşim Yardımcısı eşiği"
 
 #: dist/prefs.js:843
 msgid "Minimum distance from the Snap Assistant to the pointer to open it"
-msgstr "貼齊小幫手感知拖曳視窗之游標靠近的距離"
+msgstr "Yerleşim Yardımcısını açmak için işaretçi ile arasındaki en az mesafe"
 
 #: dist/prefs.js:852
 msgid "Snap Assistant"
-msgstr "貼齊小幫手"
+msgstr "Yerleşim Yardımcısı"
 
 #: dist/prefs.js:853
 msgid "Apply blur effect to Snap Assistant"
-msgstr "將模糊效果套用至貼齊小幫手"
+msgstr "Yerleşim Yardımcısına bulanıklık efekti uygula"
 
 #: dist/prefs.js:859
 msgid "Selected tile preview"
-msgstr "所選區塊預覽"
+msgstr "Seçili döşeme önizlemesi"
 
 #: dist/prefs.js:860
 msgid "Apply blur effect to selected tile preview"
-msgstr "將模糊效果套用至所選區塊預覽"
+msgstr "Seçili döşeme önizlemesine bulanıklık efekti uygula"
 
 #: dist/prefs.js:864
 msgid "Window border"
-msgstr "視窗邊框"
+msgstr "Pencere kenarlığı"
 
 #: dist/prefs.js:865 dist/prefs.js:872
 msgid "Show a border around focused window"
-msgstr "在焦點視窗周圍顯示邊框"
+msgstr "Odaklanan pencere etrafında kenarlık göster"
 
 #: dist/prefs.js:871
 msgid "Enable"
-msgstr "啟用"
+msgstr "Etkinleştir"
 
 #: dist/prefs.js:878
 msgid "Smart border radius"
-msgstr "智慧型邊框半徑"
+msgstr "Akıllı köşe yuvalama"
 
 #: dist/prefs.js:879
+#, fuzzy
 msgid "Dynamically adapt to the window’s actual border radius"
-msgstr "動態適應視窗的實際邊框半徑"
+msgstr "Pencerenin gerçek köşe yuvarlaklığına dinamik olarak uyum sağlar"
 
 #: dist/prefs.js:885
 msgid "Width"
-msgstr "寬度"
+msgstr "Genişlik"
 
 #: dist/prefs.js:886
 msgid "The size of the border"
-msgstr "邊框的大小"
+msgstr "Kenarlığın boyutu"
 
 #: dist/prefs.js:892
 msgid "Border color"
-msgstr "邊框顏色"
+msgstr "Kenarlık rengi"
 
 #: dist/prefs.js:893
 msgid "Choose the color of the border"
-msgstr "選擇邊框的顏色"
+msgstr "Kenarlık rengini seçin"
 
 #: dist/prefs.js:899
 msgid "Animations"
-msgstr "動畫"
+msgstr "Animasyonlar"
 
 #: dist/prefs.js:900
 msgid "Customize animations"
-msgstr "自訂動畫"
+msgstr "Animasyonları özelleştir"
 
 #: dist/prefs.js:906
 msgid "Snap assistant animation time"
-msgstr "貼齊小幫手動畫時間"
+msgstr "Yerleşim yardımcısı animasyon süresi"
 
 #: dist/prefs.js:907
 msgid "The snap assistant animation time in milliseconds"
-msgstr "貼齊小幫手到達定位所需時間（以毫秒為單位）"
+msgstr "Yerleşim yardımcısı animasyon süresi (milisaniye cinsinden)"
 
 #: dist/prefs.js:915
 msgid "Tiles animation time"
-msgstr "區塊動畫時間"
+msgstr "Döşeme animasyon süresi"
 
 #: dist/prefs.js:916
 msgid "The tiles animation time in milliseconds"
-msgstr "切換所選區塊時，切換其預覽所需時間（以毫秒為單位）"
+msgstr "Döşeme animasyon süresi (milisaniye cinsinden)"
 
 #: dist/prefs.js:922
 msgid "Behaviour"
-msgstr "行為"
+msgstr "Davranış"
 
 #: dist/prefs.js:923
 msgid "Configure the behaviour of Tiling Shell"
-msgstr "設定 Tiling Shell 的行為"
+msgstr "Tiling Shell'in davranışını yapılandır"
 
 #: dist/prefs.js:928
 msgid "Enable Snap Assistant"
-msgstr "啟用「貼齊小幫手」"
+msgstr "Yerleşim Yardımcısını Etkinleştir"
 
 #: dist/prefs.js:929
 msgid "Move the window on top of the screen to snap assist it"
-msgstr "將視窗移到螢幕中間頂端以輔助它貼齊"
+msgstr "Pencereyi ekranın üstüne taşıyarak yerleşim yardımcısını etkinleştir"
 
 #: dist/prefs.js:934
 msgid "Enable Tiling System"
-msgstr "啟用平鋪系統"
+msgstr "Döşeme Sistemini Etkinleştir"
 
 #: dist/prefs.js:935
 msgid "Hold the activation key while moving a window to tile it"
-msgstr "移動視窗時按住啟動鍵以平鋪視窗"
+msgstr "Bir pencereyi döşemek için taşırken etkinleştirme tuşunu basılı tutun"
 
 #: dist/prefs.js:943
 msgid "Tiling System deactivation key"
-msgstr "平鋪系統停用鍵"
+msgstr "Döşeme Sistemi devre dışı bırakma tuşu"
 
 #: dist/prefs.js:945
 msgid ""
 "Hold the deactivation key while moving a window to deactivate the tiling "
 "system"
-msgstr "移動視窗時按住停用鍵，可停用平鋪系統"
+msgstr ""
+"Döşeme sistemini devre dışı bırakmak için pencereyi taşırken devre dışı "
+"bırakma tuşunu basılı tutun"
 
 #: dist/prefs.js:953
 msgid "Span multiple tiles"
-msgstr "橫跨多個區塊"
+msgstr "Birden çok döşemeyi kapsa"
 
 #: dist/prefs.js:954
 msgid "Hold the activation key to span multiple tiles"
-msgstr "按住啟動鍵可跨越多個區塊"
+msgstr "Birden çok döşemeyi kapsamak için etkinleştirme tuşunu basılı tutun"
 
 #: dist/prefs.js:963
 msgid "Enable Auto Tiling"
-msgstr "啟用自動平鋪"
+msgstr "Otomatik Döşemeyi Etkinleştir"
 
 #: dist/prefs.js:964
 msgid "Automatically tile new windows to the best tile"
-msgstr "自動將新視窗平鋪到最佳區塊位置"
+msgstr "Yeni pencereleri en uygun döşemeye otomatik olarak yerleştir"
 
 #: dist/prefs.js:969
 msgid "Enable auto-resize of the complementing tiled windows"
-msgstr "啟用自動調整互補平鋪視窗的大小"
+msgstr ""
+"Tamamlayıcı döşenmiş pencerelerin otomatik boyutlandırmasını etkinleştir"
 
 #: dist/prefs.js:971
 msgid ""
 "When a tiled window is resized, auto-resize the other tiled windows near it"
-msgstr "調整平鋪視窗的大小時，自動調整其附近其他平鋪視窗的大小"
+msgstr ""
+"Döşenmiş bir pencere yeniden boyutlandırıldığında, yakınındaki diğer "
+"döşenmiş pencereleri otomatik olarak yeniden boyutlandır"
 
 #: dist/prefs.js:977
 msgid "Restore window size"
-msgstr "還原視窗大小"
+msgstr "Pencere boyutunu geri yükle"
 
 #: dist/prefs.js:979
 msgid "Whether to restore the windows to their original size when untiled"
-msgstr "是否將視窗還原為未平鋪時的原始大小"
+msgstr ""
+"Döşeme kaldırıldığında pencerelerin orijinal boyutlarına geri yüklenip "
+"yüklenmeyeceği"
 
 #: dist/prefs.js:985
 msgid "Add snap assistant and auto-tile buttons to window menu"
-msgstr "在視窗選單中加入「貼齊小幫手」和自動平鋪按鈕"
+msgstr "Pencere menüsüne yerleşim yardımcısı ve otomatik döşeme düğmeleri ekle"
 
 #: dist/prefs.js:987
 msgid ""
 "Add snap assistant and auto-tile buttons in the menu that shows up when you "
 "right click on a window title"
 msgstr ""
-"當您在視窗標題上按一下滑鼠右鍵時，在顯示的功能表中加入「貼齊小幫手」和自動平"
-"鋪按鈕"
+"Bir pencere başlığına sağ tıkladığınızda açılan menüye yerleşim yardımcısı "
+"ve otomatik döşeme düğmeleri ekler"
 
 #: dist/prefs.js:993
 msgid "Add tiled windows to ALT+TAB menu"
@@ -237,29 +246,31 @@ msgstr ""
 
 #: dist/prefs.js:1000
 msgid "Screen Edges"
-msgstr "螢幕邊緣"
+msgstr "Ekran Kenarları"
 
 #: dist/prefs.js:1002
 msgid ""
 "Drag windows against the top, left and right screen edges to resize them"
-msgstr "將視窗拖曳到螢幕頂端、左邊和右邊以調整視窗大小"
+msgstr ""
+"Pencereleri yeniden boyutlandırmak için üst, sol ve sağ ekran kenarlarına "
+"sürükleyin"
 
 #: dist/prefs.js:1016
 msgid "Drag against top edge to maximize window"
-msgstr "拖曳頂端邊緣以最大化視窗"
+msgstr "Pencereyi büyütmek için üst kenara sürükleyin"
 
 #: dist/prefs.js:1017
 msgid "Drag windows against the top edge to maximize them"
-msgstr "將視窗拖曳到頂端邊緣，使其最大化"
+msgstr "Pencereleri büyütmek için üst kenara sürükleyin"
 
 #: dist/prefs.js:1026
 msgid "Quarter tiling activation area"
-msgstr "四分之一平鋪啟動區"
+msgstr "Çeyrek döşeme etkinleştirme alanı"
 
 #: dist/prefs.js:1027
-#, javascript-format
+#, fuzzy, javascript-format
 msgid "Activation area to trigger quarter tiling (%% of the screen)"
-msgstr "觸發四分之一平鋪的啟動區域（佔螢幕百分比）"
+msgstr "Çeyrek döşemeyi tetiklemek için etkinleştirme alanı (ekranın %'si)"
 
 #: dist/prefs.js:1043
 msgid "Edge tiling offset"
@@ -271,246 +282,252 @@ msgstr ""
 
 #: dist/prefs.js:1061
 msgid "Windows suggestions"
-msgstr "視窗建議"
+msgstr "Pencere önerileri"
 
 #: dist/prefs.js:1062
 msgid "Enable and disable windows suggestions"
-msgstr "啟用和停用視窗建議"
+msgstr "Pencere önerilerini etkinleştir ve devre dışı bırak"
 
 #: dist/prefs.js:1067
 msgid "Enable window suggestions for the tiling system"
-msgstr "啟用平鋪系統的視窗建議"
+msgstr "Döşeme sistemi için pencere önerilerini etkinleştir"
 
 #: dist/prefs.js:1069
 msgid ""
 "Provides smart suggestions to fill empty tiles when using the tiling system"
-msgstr "使用平鋪系統時，提供填滿空白區塊的智慧型建議"
+msgstr ""
+"Döşeme sistemi kullanılırken boş döşemeleri doldurmak için akıllı öneriler "
+"sağlar"
 
 #: dist/prefs.js:1075
 msgid "Enable window suggestions for the snap assistant"
-msgstr "啟用「貼齊小幫手」的視窗建議"
+msgstr "Yerleşim yardımcısı için pencere önerilerini etkinleştir"
 
 #: dist/prefs.js:1077
 msgid ""
 "Offers suggestions to populate empty tiles when using the snap assistant"
-msgstr "使用「貼齊小幫手」時，提供填入空白區塊的建議"
+msgstr ""
+"Yerleşim yardımcısı kullanılırken boş döşemeleri doldurmak için öneriler "
+"sunar"
 
 #: dist/prefs.js:1083
 msgid "Enable window suggestions for screen edge snapping"
-msgstr "啟用螢幕邊緣貼齊的視窗建議"
+msgstr "Ekran kenarına yapıştırma için pencere önerilerini etkinleştir"
 
 #: dist/prefs.js:1085
 msgid "Suggests windows to occupy empty tiles when snapping to screen edges"
-msgstr "當貼齊至螢幕邊緣時，會建議視窗佔用空白區塊"
+msgstr ""
+"Ekran kenarlarına yapıştırırken boş döşemeleri doldurmak için pencere "
+"önerileri sunar"
 
 #: dist/prefs.js:1091
 msgid "Layouts"
-msgstr "版面配置"
+msgstr "Yerleşimler"
 
 #: dist/prefs.js:1092
 msgid "Configure the layouts of Tiling Shell"
-msgstr "設定 Tiling Shell 的版面配置"
+msgstr "Tiling Shell'in yerleşimlerini yapılandır"
 
 #: dist/prefs.js:1096 dist/prefs.js:1097
 msgid "Edit layouts"
-msgstr "編輯版面配置"
+msgstr "Yerleşimleri düzenle"
 
 #: dist/prefs.js:1098
 msgid "Open the layouts editor"
-msgstr "開啟版面配置編輯器"
+msgstr "Yerleşim düzenleyiciyi aç"
 
 #: dist/prefs.js:1103 dist/prefs.js:1104 dist/prefs.js:1108
 msgid "Export layouts"
-msgstr "匯出版面配置"
+msgstr "Yerleşimleri dışa aktar"
 
 #: dist/prefs.js:1105
 msgid "Export layouts to a file"
-msgstr "將版面配置匯出到檔案"
+msgstr "Yerleşimleri bir dosyaya aktar"
 
 #: dist/prefs.js:1111 dist/prefs.js:1497
 msgid "Save"
-msgstr "儲存"
+msgstr "Kaydet"
 
 #: dist/prefs.js:1112 dist/prefs.js:1167 dist/prefs.js:1498 dist/prefs.js:1554
 msgid "Cancel"
-msgstr "取消"
+msgstr "Vazgeç"
 
 #: dist/prefs.js:1158 dist/prefs.js:1159
 msgid "Import layouts"
-msgstr "匯入版面配置"
+msgstr "Yerleşimleri içe aktar"
 
 #: dist/prefs.js:1160
 msgid "Import layouts from a file"
-msgstr "從檔案匯入版面配置"
+msgstr "Bir dosyadan yerleşimleri içe aktar"
 
 #: dist/prefs.js:1163
 msgid "Select layouts file"
-msgstr "選取版面配置檔"
+msgstr "Yerleşim dosyasını seç"
 
 #: dist/prefs.js:1166 dist/prefs.js:1553
 msgid "Open"
-msgstr "開啟"
+msgstr "Aç"
 
 #: dist/prefs.js:1214 dist/prefs.js:1215
 msgid "Reset layouts"
-msgstr "重設版面配置"
+msgstr "Yerleşimleri sıfırla"
 
 #: dist/prefs.js:1216
 msgid "Bring back the default layouts"
-msgstr "恢復預設版面配置"
+msgstr "Varsayılan yerleşimleri geri yükle"
 
 #: dist/prefs.js:1229
 msgid "Keybindings"
-msgstr "按鍵綁定"
+msgstr "Klavye kısayolları"
 
 #: dist/prefs.js:1231
 msgid "Use hotkeys to perform actions on the focused window"
-msgstr "使用熱鍵對焦點視窗執行動作"
+msgstr "Odaklanan pencerede işlem yapmak için kısayol tuşlarını kullanın"
 
 #: dist/prefs.js:1249
 msgid "Move window to right tile"
-msgstr "將視窗移到右側區塊"
+msgstr "Pencereyi sağ döşemeye taşı"
 
 #: dist/prefs.js:1251
 msgid "Move the focused window to the tile on its right"
-msgstr "將聚焦的視窗移至其右側的區塊上"
+msgstr "Odaklanan pencereyi sağındaki döşemeye taşı"
 
 #: dist/prefs.js:1260
 msgid "Move window to left tile"
-msgstr "將視窗移到左側區塊"
+msgstr "Pencereyi sol döşemeye taşı"
 
 #: dist/prefs.js:1261
 msgid "Move the focused window to the tile on its left"
-msgstr "將對焦的視窗移至其左側的區塊上"
+msgstr "Odaklanan pencereyi solundaki döşemeye taşı"
 
 #: dist/prefs.js:1267
 msgid "Move window to tile above"
-msgstr "將視窗移到上方區塊"
+msgstr "Pencereyi yukarıdaki döşemeye taşı"
 
 #: dist/prefs.js:1268
 msgid "Move the focused window to the tile above"
-msgstr "將聚焦的視窗移至其上方的區塊上"
+msgstr "Odaklanan pencereyi yukarıdaki döşemeye taşı"
 
 #: dist/prefs.js:1274
 msgid "Move window to tile below"
-msgstr "將視窗移到下方區塊"
+msgstr "Pencereyi aşağıdaki döşemeye taşı"
 
 #: dist/prefs.js:1275
 msgid "Move the focused window to the tile below"
-msgstr "將聚焦的視窗移至其下方的區塊上"
+msgstr "Odaklanan pencereyi aşağıdaki döşemeye taşı"
 
 #: dist/prefs.js:1281
 msgid "Span window to right tile"
-msgstr "跨越視窗到右側區塊"
+msgstr "Pencereyi sağ döşemeye genişlet"
 
 #: dist/prefs.js:1282
 msgid "Span the focused window to the tile on its right"
-msgstr "將聚焦的視窗跨越至右側的區塊"
+msgstr "Odaklanan pencereyi sağındaki döşemeye genişlet"
 
 #: dist/prefs.js:1288
 msgid "Span window to left tile"
-msgstr "跨越視窗到左側區塊"
+msgstr "Pencereyi sol döşemeye genişlet"
 
 #: dist/prefs.js:1289
 msgid "Span the focused window to the tile on its left"
-msgstr "將聚焦的視窗跨越至左側的區塊"
+msgstr "Odaklanan pencereyi solundaki döşemeye genişlet"
 
 #: dist/prefs.js:1295
 msgid "Span window above"
-msgstr "向上橫跨視窗"
+msgstr "Pencereyi yukarıdaki döşemeye genişlet"
 
 #: dist/prefs.js:1296
 msgid "Span the focused window to the tile above"
-msgstr "將聚焦的視窗跨越至上方的區塊"
+msgstr "Odaklanan pencereyi yukarıdaki döşemeye genişlet"
 
 #: dist/prefs.js:1302
 msgid "Span window down"
-msgstr "向下橫跨視窗"
+msgstr "Pencereyi aşağıdaki döşemeye genişlet"
 
 #: dist/prefs.js:1303
 msgid "Span the focused window to the tile below"
-msgstr "將聚焦的視窗跨越至下方的區塊"
+msgstr "Odaklanan pencereyi aşağıdaki döşemeye genişlet"
 
 #: dist/prefs.js:1309
 msgid "Span window to all tiles"
-msgstr "跨越視窗至所有區塊"
+msgstr "Pencereyi tüm döşemelere genişlet"
 
 #: dist/prefs.js:1310
 msgid "Span the focused window to all the tiles"
-msgstr "將聚焦的視窗跨越至所有區塊"
+msgstr "Odaklanan pencereyi tüm döşemelere genişlet"
 
 #: dist/prefs.js:1316
 msgid "Untile focused window"
-msgstr "未平鋪焦點的視窗"
+msgstr "Odaklanan pencereyi döşemeden çıkar"
 
 #: dist/prefs.js:1324
 msgid "Move window to the center"
-msgstr "將視窗移到中央"
+msgstr "Pencereyi merkeze taşı"
 
 #: dist/prefs.js:1326
 msgid "Move the focused window to the center of the screen"
-msgstr "將聚焦的視窗移至螢幕中央"
+msgstr "Odaklanan pencereyi ekranın merkezine taşı"
 
 #: dist/prefs.js:1335
 msgid "Focus window to the right"
-msgstr "焦點視窗向右"
+msgstr "Sağdaki pencereye odaklan"
 
 #: dist/prefs.js:1337
 msgid "Focus the window to the right of the current focused window"
-msgstr "將視窗對焦到目前對焦視窗右邊的視窗"
+msgstr "Geçerli odaklı pencerenin sağındaki pencereye odaklan"
 
 #: dist/prefs.js:1344
 msgid "Focus window to the left"
-msgstr "焦點視窗向左移動"
+msgstr "Soldaki pencereye odaklan"
 
 #: dist/prefs.js:1345
 msgid "Focus the window to the left of the current focused window"
-msgstr "對焦目前對焦視窗左側的視窗"
+msgstr "Geçerli odaklı pencerenin solundaki pencereye odaklan"
 
 #: dist/prefs.js:1351
 msgid "Focus window above"
-msgstr "上方的對焦視窗"
+msgstr "Yukarıdaki pencereye odaklan"
 
 #: dist/prefs.js:1352
 msgid "Focus the window above the current focused window"
-msgstr "將視窗對焦於目前對焦的視窗上方"
+msgstr "Geçerli odaklı pencerenin yukarısındaki pencereye odaklan"
 
 #: dist/prefs.js:1358
 msgid "Focus window below"
-msgstr "對焦視窗下方"
+msgstr "Aşağıdaki pencereye odaklan"
 
 #: dist/prefs.js:1359
 msgid "Focus the window below the current focused window"
-msgstr "對焦目前對焦視窗下方的視窗"
+msgstr "Geçerli odaklı pencerenin aşağısındaki pencereye odaklan"
 
 #: dist/prefs.js:1365
 msgid "Focus next window"
-msgstr "聚焦下一個視窗"
+msgstr "Sonraki pencereye odaklan"
 
 #: dist/prefs.js:1366
 msgid "Focus the window next to the current focused window"
-msgstr "對焦目前對焦視窗旁邊的視窗"
+msgstr "Geçerli odaklı pencerenin yanındaki pencereye odaklan"
 
 #: dist/prefs.js:1372
 msgid "Focus previous window"
-msgstr "對焦上一個視窗"
+msgstr "Önceki pencereye odaklan"
 
 #: dist/prefs.js:1373
 msgid "Focus the window prior to the current focused window"
-msgstr "對焦目前對焦視窗之前的視窗"
+msgstr "Geçerli odaklı pencereden önceki pencereye odaklan"
 
 #: dist/prefs.js:1379
 msgid "Highlight focused window"
-msgstr "高亮顯示焦點視窗"
+msgstr "Odaklanan pencereyi vurgula"
 
 #: dist/prefs.js:1381
 msgid "Minimize all the other windows and show only the focused window"
-msgstr "最小化所有其他視窗，只顯示焦點視窗"
+msgstr "Diğer tüm pencereleri küçült ve yalnızca odaklanan pencereyi göster"
 
 #: dist/prefs.js:1388
 #, fuzzy
 msgid "Cycle layouts"
-msgstr "重設版面配置"
+msgstr "Yerleşimleri sıfırla"
 
 #: dist/prefs.js:1389
 msgid "Cycle through available workspace layouts"
@@ -518,19 +535,19 @@ msgstr ""
 
 #: dist/prefs.js:1416
 msgid "View and Customize all the Shortcuts"
-msgstr "檢視並自訂所有快捷鍵"
+msgstr "Tüm Kısayolları Görüntüle ve Özelleştir"
 
 #: dist/prefs.js:1444 dist/prefs.js:1445
 msgid "View and Customize Shortcuts"
-msgstr "檢視和自訂快捷鍵"
+msgstr "Kısayolları Görüntüle ve Özelleştir"
 
 #: dist/prefs.js:1467
 msgid "Enable next/previous window focus to wrap around"
-msgstr "啟用下一個/上一個視窗焦點環繞"
+msgstr "Sonraki/önceki pencere odaklamasının dönmesini etkinleştir"
 
 #: dist/prefs.js:1469
 msgid "When focusing next or previous window, wrap around at the window edge"
-msgstr "對焦下一個或上一個視窗時，環繞視窗邊緣"
+msgstr "Sonraki veya önceki pencereye odaklanırken pencere kenarında dön"
 
 #: dist/prefs.js:1475
 msgid "Restrict directional focus to tiled windows"
@@ -542,96 +559,98 @@ msgstr ""
 
 #: dist/prefs.js:1482
 msgid "Import, export and reset"
-msgstr "匯入、匯出及重設"
+msgstr "İçe aktar, dışa aktar ve sıfırla"
 
 #: dist/prefs.js:1484
 msgid "Import, export and reset the settings of Tiling Shell"
-msgstr "匯入、匯出及重設 Tiling Shell 的設定"
+msgstr "Tiling Shell ayarlarını içe aktar, dışa aktar ve sıfırla"
 
 #: dist/prefs.js:1489 dist/prefs.js:1490
 msgid "Export settings"
-msgstr "匯出設定"
+msgstr "Ayarları dışa aktar"
 
 #: dist/prefs.js:1491
 msgid "Export settings to a file"
-msgstr "將設定匯出至檔案"
+msgstr "Ayarları bir dosyaya aktar"
 
 #: dist/prefs.js:1494
 msgid "Export settings to a text file"
-msgstr "將設定匯出到文字檔"
+msgstr "Ayarları bir metin dosyasına aktar"
 
 #: dist/prefs.js:1501
 msgid "Text file"
-msgstr "文字檔"
+msgstr "Metin dosyası"
 
 #: dist/prefs.js:1545 dist/prefs.js:1546
 msgid "Import settings"
-msgstr "匯入設定"
+msgstr "Ayarları içe aktar"
 
 #: dist/prefs.js:1547
 msgid "Import settings from a file"
-msgstr "從檔案匯入設定"
+msgstr "Ayarları bir dosyadan içe aktar"
 
 #: dist/prefs.js:1550
 msgid "Select a text file to import from"
-msgstr "選擇要匯入的文字檔"
+msgstr "İçe aktarılacak bir metin dosyası seçin"
 
 #: dist/prefs.js:1592 dist/prefs.js:1593
 msgid "Reset settings"
-msgstr "重設設定"
+msgstr "Ayarları sıfırla"
 
 #: dist/prefs.js:1594
 msgid "Bring back the default settings"
-msgstr "恢復預設設定"
+msgstr "Varsayılan ayarları geri yükle"
 
 #: dist/prefs.js:1609
 msgid "Donate on ko-fi"
-msgstr "在 ko-fi 上捐款"
+msgstr "Ko-fi üzerinden bağış yap"
 
 #: dist/prefs.js:1615
 msgid "Report a bug"
-msgstr "回報錯誤"
+msgstr "Hata bildir"
 
 #: dist/prefs.js:1621
 msgid "Request a feature"
-msgstr "要求功能"
+msgstr "Özellik iste"
 
 #: dist/prefs.js:1629
 msgid "Have issues, you want to suggest a new feature or contribute?"
-msgstr "有問題、想建議新功能或貢獻心力？"
+msgstr ""
+"Sorunlarınız mı var, yeni bir özellik önermek veya katkıda bulunmak mı "
+"istiyorsunuz?"
 
 #: dist/prefs.js:1636
 msgid "Open a new issue on"
-msgstr "開啟一個新的議題"
+msgstr "Yeni bir konu aç"
 
 #: dist/prefs.js:1866 dist/prefs.js:1889
 msgid "New accelerator…"
-msgstr "新增快捷鍵…"
+msgstr "Yeni kısayol…"
 
 #: dist/prefs.js:1892
 msgid "Use Backspace to clear"
-msgstr "使用 Backspace 清除"
+msgstr "Temizlemek için Backspace kullan"
 
 #: dist/extension.js:5990
 msgid "Edit Layouts"
-msgstr "編輯版面配置"
+msgstr "Yerleşimleri Düzenle"
 
 #: dist/extension.js:6000
 msgid "New Layout"
-msgstr "新增版面配置"
+msgstr "Yeni Yerleşim"
 
 #: dist/extension.js:6185
 msgid "to split a tile"
-msgstr "分割區塊"
+msgstr "bir döşemeyi bölmek için"
 
 #: dist/extension.js:6224
 msgid "to split a tile vertically"
-msgstr "垂直分割區塊"
+msgstr "bir döşemeyi dikey olarak bölmek için"
 
 #: dist/extension.js:6244
 msgid "to delete a tile"
-msgstr "刪除區塊"
+msgstr "bir döşemeyi silmek için"
 
 #: dist/extension.js:6268
 msgid "use the indicator button to save or cancel"
-msgstr "使用指示器按鈕儲存或取消"
+msgstr "kaydetmek veya vazgeçmek için gösterge düğmesini kullanın"

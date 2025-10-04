@@ -10,6 +10,7 @@ import MetaWindowGroup from './MetaWindowGroup';
 import { _ } from '../../translations';
 
 const debug = logger('MultipleWindowsIcon');
+const OUTER_GAPS = 2;
 
 @registerGObjectClass
 export default class MultipleWindowsIcon extends LayoutWidget<TilePreviewWithWindow> {
@@ -26,7 +27,7 @@ export default class MultipleWindowsIcon extends LayoutWidget<TilePreviewWithWin
         super({
             layout: new Layout(params.tiles, ''),
             innerGaps: params.innerGaps.copy(),
-            outerGaps: buildMarginOf(2),
+            outerGaps: buildMarginOf(OUTER_GAPS),
         });
         this.set_size(params.width, params.height);
         super.relayout({
@@ -59,6 +60,16 @@ export default class MultipleWindowsIcon extends LayoutWidget<TilePreviewWithWin
         });
         // gnome shell accesses to this window, we need to abstract operations to work for a group of windows instead of one
         this._window = new MetaWindowGroup(params.windows);
+
+        // if the rightmost tiled window doesn't reach the end of the icon
+        // let's shrink the width to make it happen
+        let rightMostPercentage = 0.0;
+        params.tiles.forEach((t) => {
+            if (t.x + t.width > rightMostPercentage)
+                rightMostPercentage = t.x + t.width;
+        });
+
+        this.set_width(params.width * rightMostPercentage);
     }
 
     buildTile(

@@ -4,7 +4,6 @@ import {
     buildRectangle,
     buildTileGaps,
     enableScalingFactorSupport,
-    isTileOnContainerBorder,
 } from '@/utils/ui';
 import { logger } from '@utils/logger';
 import Layout from './Layout';

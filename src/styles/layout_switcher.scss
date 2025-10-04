@@ -1,0 +1,8 @@
+@use "snap_assist";
+
+.layout-switcher-list {
+    .snap-assist-tile {
+        border-radius-value: snap_assist.$snap-assist-tile-border-radius;
+        border-width-value: snap_assist.$snap-assist-tile-border-width;
+    }
+}

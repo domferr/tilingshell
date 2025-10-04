@@ -2,13 +2,13 @@
 
 [![release](https://img.shields.io/badge/Release_v16-blue?style=for-the-badge)]([https://ko-fi.com/domferr](https://github.com/domferr/tilingshell/releases))
 ![](https://img.shields.io/github/license/domferr/tilingshell?style=for-the-badge)
-![](https://img.shields.io/badge/GNOME-42--48-e04196?style=for-the-badge&logo=gnome&logoColor=white)
+![](https://img.shields.io/badge/GNOME-42--49-e04196?style=for-the-badge&logo=gnome&logoColor=white)
 [![kofi](https://img.shields.io/badge/Donate_on_Ko--fi-purple?logo=ko-fi&style=for-the-badge)](https://ko-fi.com/domferr)
 [![patreon](https://img.shields.io/badge/Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white)](https://patreon.com/domferr)
 
 # Tiling Shell #
 
-This is a Gnome Shell extension implementing modern windows tiling system by extending GNOME's default 2 columns to any layout you want! Can be installed on Gnome Shells from **42 to 48** on X11 and Wayland: the most recent GNOME Shell is supported, and older releases will include all the features and bug fixes!
+This is a Gnome Shell extension implementing modern windows tiling system by extending GNOME's default 2 columns to any layout you want! Can be installed on Gnome Shells from **42 to 49** on X11 and Wayland: the most recent GNOME Shell is supported, and older releases will include all the features and bug fixes!
 
 - 🤩 First and only extension that provides Windows 11's **snap assistant**
 - 🖥️🖥️ **multiple monitors support**, even with different scaling factors!
@@ -41,7 +41,7 @@ Have issues, you want to suggest a new feature or contribute? Please open a new 
 | [⬇️](#smart-border-radius) **Smart border radius** | [⬇️](#windows-suggestions) **Windows Suggestions** 
 
 ## 🎉🎉 Tiling Shell's AWESOME Supporters!
-Thank you to the :star2: **amazing** <a href="https://patreon.com/domferr"><img src="https://img.shields.io/badge/Patreons-F96854?logo=patreon&logoColor=white)" height="14px"/><a/> and **everyone** who donated on <a href="https://ko-fi.com/domferr"><img src="https://img.shields.io/badge/_Ko--fi-794bc4?logo=ko-fi&logoColor=white" height="14px"/><a/>! :medal_sports:Sean, Markus Huggler, Kostja Palović and Jesse Dhillon on Patreon:medal_sports: and Nick, thy-fi, iatanas0v, Chris, wbezs, DaneshManoharan, Tamas, Ivan Banha and many more on Ko-fi! You are on a mission to **make Linux window management better for everyone**!
+Thank you to the :star2: **amazing** <a href="https://patreon.com/domferr"><img src="https://img.shields.io/badge/Patreons-F96854?logo=patreon&logoColor=white)" height="14px"/><a/> and **everyone** who donated on <a href="https://ko-fi.com/domferr"><img src="https://img.shields.io/badge/_Ko--fi-794bc4?logo=ko-fi&logoColor=white" height="14px"/><a/>! :medal_sports:Sean, Markus Huggler, Kostja Palović, Mike Empey, Miguel and Jesse Dhillon on Patreon:medal_sports: and Zorin OS, Nick, thy-fi, iatanas0v, Chris, wbezs, DaneshManoharan, Tamas, Ivan Banha and many more on Ko-fi! You are on a mission to **make Linux window management better for everyone**!
 
 ### Tiling System ###
 When grabbing and moving a window, press <kbd>CTRL</kbd> key to show the tiling layout (you can choose another key from the preferences). When moving on a tile, it will highlight. Ungrab the window to place that window on the highlighted tile.
@@ -301,3 +301,18 @@ The first element is the settings key, the second element is the title and the t
 _Please use the same description you wrote in the schema at step 1._
 
 For any problem, doubts or if you are stuck, feel free to open a pull request with what you have already done. I'm more than happy to help!
+
+## Vagrant
+
+```
+The private key to connect to the machine via SSH must be owned
+by the user running Vagrant. This is a strict requirement from
+SSH itself. Please fix the following key to be owned by the user
+running Vagrant:
+```
+
+If you are running on a NTFS file system then you have to move out the key:
+```
+mv /path/to/gnome46/virtualbox/private_key $HOME/.ssh/vagrant_key
+ln -sr $HOME/.ssh/vagrant_key /path/to/gnome46/virtualbox/private_key
+```

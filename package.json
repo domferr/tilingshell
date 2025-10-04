@@ -1,6 +1,6 @@
 {
   "name": "tilingshell",
-  "version": "16.4",
+  "version": "17.0",
   "author": "Domenico Ferraro <ferraro.domenico125@gmail.com>",
   "private": true,
   "license": "GPL v2.0",
@@ -21,21 +21,31 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prettier:check": "prettier --check \"**/*.{ts,scss}\"",
-    "prettier:fix": "prettier --write \"**/*.{ts,scss}\""
+    "prettier:fix": "prettier --write \"**/*.{ts,scss}\"",
+    "vm:sync": "vagrant rsync",
+    "dev:vm:gnome46": "npm run vm:sync gnome46; vagrant up gnome46",
+    "vm:destroy:gnome46": "vagrant destroy gnome46",
+    "vm:halt:gnome46": "vagrant halt gnome46",
+    "dev:vm:gnome47": "npm run vm:sync gnome47; vagrant up gnome47",
+    "vm:destroy:gnome47": "vagrant destroy gnome47",
+    "vm:halt:gnome47": "vagrant halt gnome47",
+    "dev:vm:gnome49": "npm run vm:sync gnome49; vagrant up gnome49",
+    "vm:destroy:gnome49": "vagrant destroy gnome49",
+    "vm:halt:gnome49": "vagrant halt gnome49"
   },
   "devDependencies": {
-    "esbuild": "^0.20.2",
-    "esbuild-sass-plugin": "^3.2.0",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.1.3",
-    "glob": "^10.3.12",
-    "globals": "^15.8.0",
-    "prettier": "^3.3.2",
-    "typescript": "^5.4.5",
-    "typescript-eslint": "^7.15.0"
+    "esbuild": "^0.25.10",
+    "esbuild-sass-plugin": "^3.3.1",
+    "eslint": "^9.36.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "glob": "^11.0.3",
+    "globals": "^16.4.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.44.1"
   },
   "dependencies": {
-    "@girs/gnome-shell": "^48.0.2"
+    "@girs/gnome-shell": "^49.0.1"
   }
 }

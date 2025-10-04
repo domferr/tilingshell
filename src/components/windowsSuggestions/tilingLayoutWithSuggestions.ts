@@ -12,6 +12,7 @@ import LayoutWidget from '@components/layout/LayoutWidget';
 import SignalHandling from '@utils/signalHandling';
 import SuggestionsTilePreview from '@components/windowsSuggestions/suggestionsTilePreview';
 import TilingShellWindowManager from '@components/windowManager/tilingShellWindowManager';
+import { unmaximizeWindow } from '@utils/gnomesupport';
 
 const debug = logger('TilingLayoutWithSuggestions');
 
@@ -196,7 +197,8 @@ export default class TilingLayoutWithSuggestions extends LayoutWidget<Suggestion
                     nonTiledWin.maximizedHorizontally ||
                     nonTiledWin.maximizedVertically
                 )
-                    nonTiledWin.unmaximize(Meta.MaximizeFlags.BOTH);
+                    unmaximizeWindow(nonTiledWin);
+
                 if (nonTiledWin.is_fullscreen())
                     nonTiledWin.unmake_fullscreen();
                 if (nonTiledWin.minimized) nonTiledWin.unminimize();

@@ -1,7 +1,7 @@
 import { registerGObjectClass } from '@/utils/gjs';
 import { GObject, St, Clutter, Mtk } from '@gi.ext';
 import TilePreview from '../tilepreview/tilePreview';
-import { buildBlurEffect, widgetOrientation } from '@utils/ui';
+import { buildBlurEffect, widgetOrientation } from '@utils/gnomesupport';
 import Tile from '@components/layout/Tile';
 import MasonryLayoutManager from './masonryLayoutManager';
 

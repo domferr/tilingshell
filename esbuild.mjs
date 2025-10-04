@@ -64,6 +64,12 @@ function fillPreferencesWindow(window) {
 }
 `;
 
+function preprocess(text) {
+    // drop lines tagged with "// @esbuild-drop-next-line"
+    text = text.replace(/\/\/\s*@esbuild-drop-next-line\s*\n.*?;/gs, '');
+    return text;
+}
+
 /// Converts imports on the form
 /// import { a, b, c } from 'gi://Source'
 ///
@@ -86,9 +92,6 @@ function convertImports(text) {
     // replace import of translation related code
     const regexTranslation = new RegExp(`import {(.*|\n.*)?gettext as _[^from]*[^;]*;`, 'gm');
     text = text.replaceAll(regexTranslation, "const { gettext: _, ngettext, pgettext } = imports.misc.extensionUtils;");
-
-    // replace import of all translation stuff made in translation.ts
-    //text = text.replaceAll('import { gettext as _, ngettext, pgettext } from "resource:///org/gnome/shell/extensions/extension.js";', "const { gettext: _, ngettext, pgettext } = imports.misc.extensionUtils;");
 
     const regexExportExtension = new RegExp(`export {((.|\n)*)(.+) as default((.|\n)*)};`, 'gm');
     text = text.replaceAll(regexExportExtension, "");
@@ -113,6 +116,10 @@ function convertImports(text) {
     return text;
 }
 
+function printError(text) {
+    console.error(`\x1b[31m${text}\x1b[0m`);
+}
+
 // build extension
 build({
     logLevel: "info",
@@ -131,30 +138,49 @@ build({
     external: ['gi://*', 'resource://*'],
     plugins: [sassPlugin()],
 }).then(() => {
+    // copy resources directory into the build directory
     fs.renameSync(path.resolve(distDir, "extension.css"), path.resolve(distDir, "stylesheet.css"));
     fs.cpSync(resourcesDir, distDir, { recursive: true });
+
+    const extFile = `${distDir}/extension.js`;
+    // run preprocessing step
+    console.log("   🛠️ ", "Preprocessing extension.js file...");
+    const preprocessedExt = preprocess(fs.readFileSync(extFile).toString());
+    fs.writeFileSync(extFile, preprocessedExt);
+
     // warn if you imported GTK libraries in GNOME Shell (Gdk, Gtk or Adw)
-    const extensionJSContent = fs.readFileSync(`${distDir}/extension.js`).toString().split('\n');
+    console.log("   🔍", "Verifying extension.js's imports are all allowed...");
+    const extensionJSContent = preprocessedExt.split('\n');
     ['Gdk', 'Gtk', 'Adw'].forEach(moduleName => {
         for (let lineNumber = 0; lineNumber < extensionJSContent.length; lineNumber++) {
             if (extensionJSContent[lineNumber].indexOf(`import ${moduleName}`) >= 0) {
-                console.error(`⚠️  Error: "${moduleName}" was imported in extension.js at line ${lineNumber}`);
+                printError(`      ⚠️  ERROR: "${moduleName}" was imported in extension.js at line ${lineNumber}`);
             }
         }
     });
+
+    const prefsFile = `${distDir}/prefs.js`;
+    // run preprocessing step
+    console.log("   🛠️ ", "Preprocessing prefs.js file...");
+    const preprocessedPrefs = preprocess(fs.readFileSync(prefsFile).toString());
+    fs.writeFileSync(prefsFile, preprocessedPrefs);
+
     // warn if you imported GNOME Shell libraries in Preferences (Clutter, Meta, St or Shell)
-    const prefsJSContent = fs.readFileSync(`${distDir}/prefs.js`).toString().split('\n');
+    console.log("   🔍", "Verifying prefs.js's imports are all allowed...");
+    const prefsJSContent = preprocessedPrefs.split('\n');
     ['Clutter', 'Meta', 'Mtk', 'St', 'Shell'].forEach(moduleName => {
         for (let lineNumber = 0; lineNumber < prefsJSContent.length; lineNumber++) {
             if (prefsJSContent[lineNumber].indexOf(`import ${moduleName}`) >= 0) {
-                console.error(`⚠️  Error: "${moduleName}" was imported in prefs.js at line ${lineNumber}`);
+                printError(`      ⚠️  ERROR: "${moduleName}" was imported in prefs.js at line ${lineNumber}`);
             }
         }
     });
 }).then(async () => {
     console.log("   💡", "Generating legacy version...");
+
     // duplicate the build into distLegacyDir
     fs.cpSync(distDir, distLegacyDir, { recursive: true });
+
     // for each js file in distLegacyDir, apply conversion
     const files = await glob(`${distLegacyDir}/**/*.js`, {});
     for (let file of files) {
@@ -173,12 +199,12 @@ build({
     const legacyShellVersions = metadataJson["shell-version"].filter(version => Number(version) <= 44);
     const nonLegacyShellVersions = metadataJson["shell-version"].filter(version => Number(version) > 44);
 
-    console.log("   🚀", "Updating metadata.json file...");
     // remove legacy versions from main version's metadata file
+    console.log("   🚀", "Updating metadata.json file...");
     metadataJson["shell-version"] = nonLegacyShellVersions;
     fs.writeFileSync(path.resolve(distDir, 'metadata.json'), JSON.stringify(metadataJson, null, 4));
 
-    // keep legacy versions only from legacy extension's metadata file
+    // keep legacy versions only in the legacy extension's metadata file
     metadataJson["shell-version"] = legacyShellVersions;
     fs.writeFileSync(path.resolve(distLegacyDir, 'metadata.json'), JSON.stringify(metadataJson, null, 4));
     console.log();

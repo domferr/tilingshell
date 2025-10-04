@@ -8,12 +8,9 @@ import Layout from '@/components/layout/Layout';
 import Tile from '@/components/layout/Tile';
 import * as ModalDialog from 'resource:///org/gnome/shell/ui/modalDialog.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import {
-    enableScalingFactorSupport,
-    getMonitorScalingFactor,
-    widgetOrientation,
-} from '@utils/ui';
+import { enableScalingFactorSupport, getMonitorScalingFactor } from '@utils/ui';
 import { _ } from '../../translations';
+import { widgetOrientation } from '@utils/gnomesupport';
 
 @registerGObjectClass
 export default class EditorDialog extends ModalDialog.ModalDialog {

@@ -7,7 +7,6 @@ import {
     getMonitors,
     getMonitorScalingFactor,
     getScalingFactorOf,
-    widgetOrientation,
 } from '@/utils/ui';
 import Settings from '@settings/settings';
 import * as IndicatorUtils from './utils';
@@ -22,6 +21,7 @@ import Layout from '@components/layout/Layout';
 import { _ } from '../translations';
 import { openPrefs } from '@polyfill';
 import LayoutUtils from '@components/layout/LayoutUtils';
+import { widgetOrientation } from '@utils/gnomesupport';
 
 const debug = logger('DefaultMenu');
 

@@ -56,3 +56,5 @@ dist_legacy/
 package-lock.json
 
 *tilingshell@ferrarodomenico.com.zip
+
+.vagrant

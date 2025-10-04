@@ -1,4 +1,4 @@
-import { St, Meta, Mtk, Clutter, Shell } from '@gi.ext';
+import { St, Meta, Mtk, Clutter } from '@gi.ext';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
 
@@ -166,28 +166,6 @@ export function buildRectangle(
     });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getEventCoords(event: any): number[] {
-    return event.get_coords ? event.get_coords() : [event.x, event.y]; // GNOME 40-44
-}
-
-export function buildBlurEffect(sigma: number): Shell.BlurEffect {
-    // changes in GNOME 46+
-    // The sigma in Shell.BlurEffect should be replaced by radius. Since the sigma value
-    // is radius / 2.0, the radius value will be sigma * 2.0.
-
-    const effect = new Shell.BlurEffect();
-    effect.set_mode(Shell.BlurMode.BACKGROUND); // blur what is behind the widget
-    effect.set_brightness(1);
-    if (effect.set_radius) {
-        effect.set_radius(sigma * 2);
-    } else {
-        // @ts-expect-error "set_sigma is available in old shell versions (<= 45)"
-        effect.set_sigma(sigma);
-    }
-    return effect;
-}
-
 function getTransientOrParent(window: Meta.Window): Meta.Window {
     const transient = window.get_transient_for();
     return window.is_attached_dialog() && transient !== null
@@ -242,18 +220,4 @@ export function squaredEuclideanDistance(
         (pointA.x - pointB.x) * (pointA.x - pointB.x) +
         (pointA.y - pointB.y) * (pointA.y - pointB.y)
     );
-}
-
-// Compatibility for GNOME 48+ where 'vertical' was deprecated in favor of 'orientation'
-export function widgetOrientation(vertical: boolean) {
-    // if orientation is supported
-    if (St.BoxLayout.prototype.get_orientation !== undefined) {
-        return {
-            orientation: vertical
-                ? Clutter.Orientation.VERTICAL
-                : Clutter.Orientation.HORIZONTAL,
-        };
-    }
-
-    return { vertical };
 }
