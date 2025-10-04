@@ -39,8 +39,6 @@ function init(meta) {
 `;
 
 const prefsBanner = `// For GNOME Shell version before 45
-const Config = imports.misc.config;
-
 class ExtensionPreferences {
     constructor(metadata) {
         this.metadata = metadata;
@@ -86,8 +84,8 @@ function convertImports(text) {
     // drop import of ExtensionPreferences class
     text = text.replaceAll('import { ExtensionPreferences } from "resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js";', "");
 
-    // drop import of Config from preferences
-    text = text.replaceAll('import * as Config from "resource:///org/gnome/Shell/Extensions/js/misc/config.js";', "");
+    // replace import of Config
+    text = text.replaceAll('import * as Config from "resource:///org/gnome/Shell/Extensions/js/misc/config.js";', "const Config = imports.misc.config;");
 
     // replace import of translation related code
     const regexTranslation = new RegExp(`import {(.*|\n.*)?gettext as _[^from]*[^;]*;`, 'gm');
