@@ -37,6 +37,7 @@ export function getEventCoords(event: any): number[] {
 }
 
 export function maximizeWindow(window: Meta.Window): void {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     window.get_maximized ? window.maximize(Meta.MaximizeFlags.BOTH):window.maximize();
 }
 

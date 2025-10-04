@@ -152,6 +152,11 @@
             <summary>Focused window border color</summary>
             <description>The color of the focused window's border.</description>
         </key>
+        <key name="window-use-custom-border-color" type="b">
+            <default>false</default>
+            <summary>Use custom color</summary>
+            <description>Use the color defined here for the focused window's border.</description>
+        </key>
         <key name="window-border-width" type="u">
             <default>3</default>
             <summary>Focused window border width</summary>
