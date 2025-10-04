@@ -85,9 +85,12 @@ export default class TilingShellExtension extends Extension {
     }
 
     private _validateSettings() {
-        if (Settings.LAST_VERSION_NAME_INSTALLED === '14.0') {
+        if (Settings.LAST_VERSION_NAME_INSTALLED === '17.0') {
             debug('apply compatibility changes');
-            Settings.save_selected_layouts([]);
+            // if users enabled window border, they set it custom in the past, so enable the custom border
+            // keep using the custom border instead of using the accent color by default
+            Settings.WINDOW_USE_CUSTOM_BORDER_COLOR =
+                Settings.ENABLE_WINDOW_BORDER;
         }
 
         // Setting used for compatibility changes if necessary

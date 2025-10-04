@@ -130,26 +130,26 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             ),
         );
 
-        const windowBorderRow = new Adw.ExpanderRow({
+        const windowBorderExpanderRow = new Adw.ExpanderRow({
             title: _('Window border'),
             subtitle: _('Show a border around focused window'),
         });
-        appearenceGroup.add(windowBorderRow);
-        windowBorderRow.add_row(
+        appearenceGroup.add(windowBorderExpanderRow);
+        windowBorderExpanderRow.add_row(
             this._buildSwitchRow(
                 Settings.KEY_ENABLE_WINDOW_BORDER,
                 _('Enable'),
                 _('Show a border around focused window'),
             ),
         );
-        windowBorderRow.add_row(
+        windowBorderExpanderRow.add_row(
             this._buildSwitchRow(
                 Settings.KEY_ENABLE_SMART_WINDOW_BORDER_RADIUS,
                 _('Smart border radius'),
                 _('Dynamically adapt to the window’s actual border radius'),
             ),
         );
-        windowBorderRow.add_row(
+        windowBorderExpanderRow.add_row(
             this._buildSpinButtonRow(
                 Settings.KEY_WINDOW_BORDER_WIDTH,
                 _('Width'),
@@ -157,21 +157,25 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 1,
             ),
         );
-        windowBorderRow.add_row(
-            this._buildSwitchRow(
-                Settings.KEY_WINDOW_USE_CUSTOM_BORDER_COLOR,
-                _('Custom color'),
-                _('Use the color defined here for the border'),
-            ),
+        const colorButton = this._buildColorButton(
+            this._getRGBAFromString(Settings.WINDOW_BORDER_COLOR),
+            (val: string) => (Settings.WINDOW_BORDER_COLOR = val),
         );
-        windowBorderRow.add_row(
-            this._buildColorRow(
-                _('Border color'),
-                _('Choose the color of the border'),
-                this._getRGBAFromString(Settings.WINDOW_CUSTOM_BORDER_COLOR),
-                (val: string) => (Settings.WINDOW_CUSTOM_BORDER_COLOR = val),
-            ),
+        const customColorDropDown = this._buildCustomColorDropDown(
+            Settings.WINDOW_USE_CUSTOM_BORDER_COLOR,
+            (use_custom_color: boolean) => {
+                colorButton.set_visible(use_custom_color);
+                Settings.WINDOW_USE_CUSTOM_BORDER_COLOR = use_custom_color;
+            },
         );
+        const windowBorderColorRow = new Adw.ActionRow({
+            title: _('Border color'),
+            subtitle: _('Choose the color of the border'),
+        });
+        windowBorderColorRow.add_suffix(colorButton);
+        colorButton.set_visible(Settings.WINDOW_USE_CUSTOM_BORDER_COLOR);
+        windowBorderColorRow.add_suffix(customColorDropDown);
+        windowBorderExpanderRow.add_row(windowBorderColorRow);
 
         const animationsRow = new Adw.ExpanderRow({
             title: _('Animations'),
@@ -1206,12 +1210,10 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         return rgba;
     }
 
-    _buildColorRow(
-        title: string,
-        subtitle: string,
+    _buildColorButton(
         rgba: Gdk.RGBA,
         onChange: (s: string) => void,
-    ): Adw.ActionRow {
+    ): Gtk.ColorButton {
         const colorButton = new Gtk.ColorButton({
             rgba,
             use_alpha: true,
@@ -1220,13 +1222,30 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         colorButton.connect('color-set', () => {
             onChange(colorButton.get_rgba().to_string());
         });
-        const adwRow = new Adw.ActionRow({
-            title,
-            subtitle,
-            activatableWidget: colorButton,
+        return colorButton;
+    }
+
+    _buildCustomColorDropDown(
+        initialValue: boolean,
+        onChange: (_: boolean) => void,
+        styleClass?: string,
+    ) {
+        const options = new Gtk.StringList();
+        options.append(_('Choose custom color')); // true
+        options.append(_('Use system accent color')); // false
+        const dropdown = new Gtk.DropDown({
+            model: options,
+            selected: initialValue ? 0 : 1,
         });
-        adwRow.add_suffix(colorButton);
-        return adwRow;
+        dropdown.connect('notify::selected-item', (dd: Gtk.DropDown) => {
+            const index = dd.get_selected();
+            const selected = index === 0; // 0 is true, which means to use custom color
+            onChange(selected);
+        });
+        if (styleClass) dropdown.add_css_class(styleClass);
+        dropdown.set_vexpand(false);
+        dropdown.set_valign(Gtk.Align.CENTER);
+        return dropdown;
     }
 
     _buildFileChooserDialog(
