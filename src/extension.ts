@@ -53,8 +53,7 @@ import { Extension } from '@polyfill';
 import OverriddenAltTab from '@components/altTab/overriddenAltTab';
 import { LayoutSwitcherPopup } from '@components/layoutSwitcher/layoutSwitcher';
 import { unmaximizeWindow } from '@utils/gnomesupport';
-// @ts-expect-error "Module exists"
-import * as Config from 'resource:///org/gnome/Shell/Extensions/js/misc/config.js';
+import * as Config from 'resource:///org/gnome/shell/misc/config.js';
 
 const debug = logger('extension');
 
