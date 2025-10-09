@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Tiling Shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-09-20 16:40+0200\n"
-"PO-Revision-Date: 2025-09-14 12:39+0200\n"
+"PO-Revision-Date: 2025-10-09 20:11+0200\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <>\n"
 "Language: it\n"
@@ -232,13 +232,15 @@ msgstr ""
 
 #: dist/prefs.js:993
 msgid "Add tiled windows to ALT+TAB menu"
-msgstr ""
+msgstr "Aggiungi finestre affiancate al menu ALT+TAB"
 
 #: dist/prefs.js:995
 msgid ""
 "Add the tiled windows to the ALT+TAB menu to open all the tiled windows at "
 "once"
 msgstr ""
+"Aggiungi le finestre affiancate al menu ALT+TAB per aprirle tutte "
+"contemporaneamente"
 
 #: dist/prefs.js:1000
 msgid "Screen Edges"
@@ -529,13 +531,12 @@ msgstr ""
 "Riduci a icona tutte le altre finestre e mostra solo la finestra focalizzata"
 
 #: dist/prefs.js:1388
-#, fuzzy
 msgid "Cycle layouts"
-msgstr "Ripristina layouts"
+msgstr "Scorri layouts"
 
 #: dist/prefs.js:1389
 msgid "Cycle through available workspace layouts"
-msgstr ""
+msgstr "Scorri i layout dell'area di lavoro disponibili"
 
 #: dist/prefs.js:1416
 msgid "View and Customize all the Shortcuts"
@@ -557,11 +558,13 @@ msgstr ""
 
 #: dist/prefs.js:1475
 msgid "Restrict directional focus to tiled windows"
-msgstr ""
+msgstr "Limita la messa a fuoco direzionale alle finestre affiancate"
 
 #: dist/prefs.js:1477
 msgid "When using directional focus navigation, only consider tiled windows"
 msgstr ""
+"Quando si utilizza la navigazione con messa a fuoco direzionale, considerare"
+"solo le finestre affiancate"
 
 #: dist/prefs.js:1482
 msgid "Import, export and reset"
