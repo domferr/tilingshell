@@ -126,6 +126,16 @@ Vagrant.configure("2") do |config|
     configure_gnome_vm(gnome46, "bento/fedora-40")
   end
 
+  # GNOME 47 on Fedora 41
+  config.vm.define "gnome47", primary: true do |gnome46|
+    configure_gnome_vm(gnome46, "bento/fedora-41")
+  end
+
+  # GNOME 48 on Fedora 42
+  config.vm.define "gnome48" do |gnome48|
+    configure_gnome_vm(gnome48, "bento/fedora-42")
+  end
+
   # GNOME 49 on Fedora 43
   config.vm.define "gnome49" do |gnome49|
     configure_gnome_vm(gnome49, "bento/fedora-43")

@@ -53,6 +53,7 @@ import { Extension } from '@polyfill';
 import OverriddenAltTab from '@components/altTab/overriddenAltTab';
 import { LayoutSwitcherPopup } from '@components/layoutSwitcher/layoutSwitcher';
 import { unmaximizeWindow } from '@utils/gnomesupport';
+import * as Config from 'resource:///org/gnome/shell/misc/config.js';
 
 const debug = logger('extension');
 
@@ -85,16 +86,21 @@ export default class TilingShellExtension extends Extension {
     }
 
     private _validateSettings() {
-        if (Settings.LAST_VERSION_NAME_INSTALLED === '14.0') {
+        if (Settings.LAST_VERSION_NAME_INSTALLED === '17.0') {
             debug('apply compatibility changes');
-            Settings.save_selected_layouts([]);
+            // if users enabled window border, they set it custom in the past, so enable the custom border
+            // keep using the custom border instead of using the accent color by default
+            Settings.WINDOW_USE_CUSTOM_BORDER_COLOR =
+                Settings.ENABLE_WINDOW_BORDER;
         }
+    }
 
-        // Setting used for compatibility changes if necessary
-        if (this.metadata['version-name']) {
-            Settings.LAST_VERSION_NAME_INSTALLED =
-                this.metadata['version-name'] || '0';
-        }
+    private _onInstall() {
+        const GNOME_VERSION_MAJOR = Number(
+            Config.PACKAGE_VERSION.split('.')[0],
+        );
+        // Force use of customer border color on GNOME < 47 since accent colors are not available
+        Settings.WINDOW_USE_CUSTOM_BORDER_COLOR = GNOME_VERSION_MAJOR < 47;
     }
 
     enable(): void {
@@ -102,6 +108,16 @@ export default class TilingShellExtension extends Extension {
         this._signals = new SignalHandling();
 
         Settings.initialize(this.getSettings());
+        if (Settings.LAST_VERSION_NAME_INSTALLED === '0') {
+            this._onInstall();
+
+            // Setting used for compatibility changes if necessary
+            if (this.metadata['version-name']) {
+                Settings.LAST_VERSION_NAME_INSTALLED =
+                    this.metadata['version-name'] || '0';
+            }
+        }
+
         this._validateSettings();
 
         // force initialization and tracking of windows

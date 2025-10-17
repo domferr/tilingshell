@@ -247,9 +247,16 @@ export default class KeyBindings extends GObject.Object {
             extensionSettings,
             Meta.KeyBindingFlags.NONE,
             Shell.ActionMode.NORMAL,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (display: Meta.Display, _, event: any) => {
-                this.emit('cycle-layouts', display, action, event.get_mask());
+            (
+                display: Meta.Display,
+                _,
+                event: Clutter.Event,
+                binding: Meta.KeyBinding,
+            ) => {
+                const mask = event.get_mask
+                    ? event.get_mask()
+                    : binding.get_mask();
+                this.emit('cycle-layouts', display, action, mask);
             },
         );
     }

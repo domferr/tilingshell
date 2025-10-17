@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-09-20 16:40+0200\n"
-"PO-Revision-Date: 2025-03-30 22:34+0200\n"
+"PO-Revision-Date: 2025-10-02 22:40+0200\n"
 "Last-Translator: Amerey <info@amerey.eu>\n"
 "Language-Team: \n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4.4\n"
+"X-Generator: Poedit 3.7\n"
 
 #: dist/prefs.js:805
 msgid "General"
@@ -234,13 +234,15 @@ msgstr ""
 
 #: dist/prefs.js:993
 msgid "Add tiled windows to ALT+TAB menu"
-msgstr ""
+msgstr "Přidat dlaždicová okna do nabídky ALT+TAB"
 
 #: dist/prefs.js:995
 msgid ""
 "Add the tiled windows to the ALT+TAB menu to open all the tiled windows at "
 "once"
 msgstr ""
+"Přidáním dlaždicových oken do nabídky ALT+TAB otevřete všechna dlaždicová "
+"okna najednou"
 
 #: dist/prefs.js:1000
 msgid "Screen Edges"
@@ -272,11 +274,11 @@ msgstr "Aktivační oblast pro spuštění dláždic (%% obrazovky)"
 
 #: dist/prefs.js:1043
 msgid "Edge tiling offset"
-msgstr ""
+msgstr "Odsazení dlaždic od okraje obrazovky"
 
 #: dist/prefs.js:1044
 msgid "Offset from the screen edge to trigger edge tiling (in pixels)"
-msgstr ""
+msgstr "Odsazení od okraje obrazovky pro spuštění dláždic (v pixelech)"
 
 #: dist/prefs.js:1061
 msgid "Windows suggestions"
@@ -522,13 +524,12 @@ msgid "Minimize all the other windows and show only the focused window"
 msgstr "Minimalizovat všechna ostatní okna a zobrazit pouze vybrané okno"
 
 #: dist/prefs.js:1388
-#, fuzzy
 msgid "Cycle layouts"
-msgstr "Resetovat rozvržení"
+msgstr "Procházet rozvržení"
 
 #: dist/prefs.js:1389
 msgid "Cycle through available workspace layouts"
-msgstr ""
+msgstr "Procházení dostupných rozvržení pracovního prostoru"
 
 #: dist/prefs.js:1416
 msgid "View and Customize all the Shortcuts"
@@ -548,11 +549,12 @@ msgstr "Při vybrání dalšího nebo předchozího okna zalomí okraje okna"
 
 #: dist/prefs.js:1475
 msgid "Restrict directional focus to tiled windows"
-msgstr ""
+msgstr "Omezení směrové navigace na okna s dlaždicemi"
 
 #: dist/prefs.js:1477
 msgid "When using directional focus navigation, only consider tiled windows"
 msgstr ""
+"Při použití směrové navigace bere v úvahu pouze dlaždicově uspořádaná okna"
 
 #: dist/prefs.js:1482
 msgid "Import, export and reset"

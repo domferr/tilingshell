@@ -79,6 +79,8 @@ export default class Settings {
     static KEY_LAST_VERSION_NAME_INSTALLED = 'last-version-name-installed';
     static KEY_OVERRIDDEN_SETTINGS = 'overridden-settings';
     static KEY_WINDOW_BORDER_COLOR = 'window-border-color';
+    static KEY_WINDOW_USE_CUSTOM_BORDER_COLOR =
+        'window-use-custom-border-color';
     static KEY_TILING_SYSTEM = 'enable-tiling-system';
     static KEY_SNAP_ASSIST = 'enable-snap-assist';
     static KEY_SHOW_INDICATOR = 'show-indicator';
@@ -393,6 +395,14 @@ export default class Settings {
 
     static set WINDOW_BORDER_COLOR(val: string) {
         set_string(Settings.KEY_WINDOW_BORDER_COLOR, val);
+    }
+
+    static get WINDOW_USE_CUSTOM_BORDER_COLOR(): boolean {
+        return get_boolean(Settings.KEY_WINDOW_USE_CUSTOM_BORDER_COLOR);
+    }
+
+    static set WINDOW_USE_CUSTOM_BORDER_COLOR(val: boolean) {
+        set_boolean(Settings.KEY_WINDOW_USE_CUSTOM_BORDER_COLOR, val);
     }
 
     static get WINDOW_BORDER_WIDTH(): number {
