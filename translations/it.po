@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Tiling Shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-09-20 16:40+0200\n"
-"PO-Revision-Date: 2025-09-27 21:39+0200\n"
+"PO-Revision-Date: 2025-10-09 20:11+0200\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <>\n"
 "Language: it\n"
@@ -562,7 +562,9 @@ msgstr "Limita la messa a fuoco direzionale alle finestre affiancate"
 
 #: dist/prefs.js:1477
 msgid "When using directional focus navigation, only consider tiled windows"
-msgstr "Quando si utilizza la navigazione con messa a fuoco direzionale, considerare solo le finestre affiancate"
+msgstr ""
+"Quando si utilizza la navigazione con messa a fuoco direzionale, considerare"
+"solo le finestre affiancate"
 
 #: dist/prefs.js:1482
 msgid "Import, export and reset"
