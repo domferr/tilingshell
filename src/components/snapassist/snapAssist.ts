@@ -3,6 +3,7 @@ import { GObject, St, Clutter, Mtk, Meta, Gio } from '@gi.ext';
 import SnapAssistTile from './snapAssistTile';
 import SnapAssistLayout from './snapAssistLayout';
 import Layout from '../layout/Layout';
+import LayoutUtils from '../layout/LayoutUtils';
 import Tile from '../layout/Tile';
 import Settings from '@settings/settings';
 import GlobalState from '@utils/globalState';
@@ -19,9 +20,9 @@ import { buildBlurEffect } from '@utils/gnomesupport';
 export const SNAP_ASSIST_SIGNAL = 'snap-assist';
 
 const GAPS = 4;
-// 16:9 ratio and then rounded to int
-const SNAP_ASSIST_LAYOUT_WIDTH = 120;
-const SNAP_ASSIST_LAYOUT_HEIGHT = 68;
+// The size of the smallest size of the monitor
+// Will result into a size of 120x68 if the monitor is 16:9
+const SNAP_ASSIST_LAYOUT_SIZE = 68;
 
 const debug = logger('SnapAssist');
 
@@ -209,7 +210,7 @@ class SnapAssistContent extends St.BoxLayout {
             ? Math.max(
                   0,
                   this._snapAssistantThreshold -
-                      this.height / 2 +
+                      46 * getMonitorScalingFactor(this._monitorIndex) +
                       this._padding,
               )
             : -this.height + this._padding;
@@ -237,12 +238,13 @@ class SnapAssistContent extends St.BoxLayout {
         this._snapAssistLayouts.forEach((lay) => lay.destroy());
         this.remove_all_children();
 
-        const [, scalingFactor] = getScalingFactorOf(this);
-
         const layoutGaps = buildMarginOf(GAPS);
+        const [width, height] = LayoutUtils.calc_size(
+            this,
+            this._monitorIndex,
+            SNAP_ASSIST_LAYOUT_SIZE,
+        );
 
-        const width = SNAP_ASSIST_LAYOUT_WIDTH * scalingFactor;
-        const height = SNAP_ASSIST_LAYOUT_HEIGHT * scalingFactor;
         // build the layouts inside the snap assistant. Place a spacer between each layout
         this._snapAssistLayouts = layouts.map((lay, ind) => {
             const saLay = new SnapAssistLayout(
