@@ -202,14 +202,14 @@ msgstr "Automatycznie układaj nowe okna do najlepszego kafelka"
 
 #: dist/prefs.js:969
 msgid "Enable auto-resize of the complementing tiled windows"
-msgstr "Włącz automatyczną zmianę rozmiaru sąsiednich ułożonych okien"
+msgstr "Włącz automatyczną zmianę rozmiaru sąsiednich kafelkowych okien"
 
 #: dist/prefs.js:971
 msgid ""
 "When a tiled window is resized, auto-resize the other tiled windows near it"
 msgstr ""
 "Gdy rozmiar ułożonego okna jest zmieniany, automatycznie zmień rozmiar "
-"sąsiednich ułożonych okien"
+"sąsiednich kafelkowych okien"
 
 #: dist/prefs.js:977
 msgid "Restore window size"
@@ -235,13 +235,13 @@ msgstr ""
 
 #: dist/prefs.js:993
 msgid "Add tiled windows to ALT+TAB menu"
-msgstr ""
+msgstr "Dodaj kafelkowe okna do menu ALT+TAB"
 
 #: dist/prefs.js:995
 msgid ""
 "Add the tiled windows to the ALT+TAB menu to open all the tiled windows at "
 "once"
-msgstr ""
+msgstr "Dodaje kafelkowe okna do menu ALT+TAB aby otworzyć wszystkie kafelkowe okna naraz" 
 
 #: dist/prefs.js:1000
 msgid "Screen Edges"
@@ -273,11 +273,11 @@ msgstr "Obszar aktywacji ćwiartkowego układania (%% ekranu)"
 
 #: dist/prefs.js:1043
 msgid "Edge tiling offset"
-msgstr ""
+msgstr "Odstęp układania krawędziowego"
 
 #: dist/prefs.js:1044
 msgid "Offset from the screen edge to trigger edge tiling (in pixels)"
-msgstr ""
+msgstr "Odstęp od krawędzi ekranu który wyzwoli układanie krawędziowe (w pikselach)"
 
 #: dist/prefs.js:1061
 msgid "Windows suggestions"
@@ -524,13 +524,12 @@ msgid "Minimize all the other windows and show only the focused window"
 msgstr "Zminimalizuj wszystkie inne okna i pokaż tylko aktywne okno"
 
 #: dist/prefs.js:1388
-#, fuzzy
 msgid "Cycle layouts"
-msgstr "Resetuj układy"
+msgstr "Rotuj układy"
 
 #: dist/prefs.js:1389
 msgid "Cycle through available workspace layouts"
-msgstr ""
+msgstr "Rotuj dostępne układy obszaru roboczego"
 
 #: dist/prefs.js:1416
 msgid "View and Customize all the Shortcuts"
@@ -552,11 +551,11 @@ msgstr ""
 
 #: dist/prefs.js:1475
 msgid "Restrict directional focus to tiled windows"
-msgstr ""
+msgstr "Ogranicz kierunkowy skupienie do kafelkowych okien"
 
 #: dist/prefs.js:1477
 msgid "When using directional focus navigation, only consider tiled windows"
-msgstr ""
+msgstr "Podczas używania nawigacji kierunkowego skupienia, rozważaj tylko kafelkowe okna"
 
 #: dist/prefs.js:1482
 msgid "Import, export and reset"
