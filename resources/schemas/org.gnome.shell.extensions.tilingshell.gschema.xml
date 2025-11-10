@@ -262,6 +262,14 @@
 			<default><![CDATA[['']]]></default>
 			<summary>Focus the window prior to the current focused window</summary>
 		</key>
+		<key type="as" name="shift-focus-window-next">
+			<default><![CDATA[['']]]></default>
+			<summary>Switch next window with focused window</summary>
+		</key>
+		<key type="as" name="shift-focus-window-prev">
+			<default><![CDATA[['']]]></default>
+			<summary>Switch previous window with focused window</summary>
+		</key>
 		<key type="as" name="highlight-current-window">
 			<default><![CDATA[['']]]></default>
 			<summary>Minimize all the other windows and show only the focused window</summary>

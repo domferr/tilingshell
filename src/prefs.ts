@@ -699,6 +699,20 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 false,
             ],
             [
+                Settings.SETTING_SHIFT_FOCUS_WINDOW_NEXT,
+                _('Switch next window with focused window'),
+                _('Flip the next window with focused window'),
+                false,
+                false,
+            ],
+            [
+                Settings.SETTING_SHIFT_FOCUS_WINDOW_PREV,
+                _('Switch previous window with focused window'),
+                _('Flip the previous window with focused window'),
+                false,
+                false,
+            ],
+            [
                 Settings.SETTING_HIGHLIGHT_CURRENT_WINDOW,
                 _('Highlight focused window'),
                 _(

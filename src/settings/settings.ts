@@ -141,6 +141,8 @@ export default class Settings {
     static SETTING_FOCUS_WINDOW_DOWN = 'focus-window-down';
     static SETTING_FOCUS_WINDOW_NEXT = 'focus-window-next';
     static SETTING_FOCUS_WINDOW_PREV = 'focus-window-prev';
+    static SETTING_SHIFT_FOCUS_WINDOW_NEXT = 'shift-focus-window-next';
+    static SETTING_SHIFT_FOCUS_WINDOW_PREV = 'shift-focus-window-prev';
     static SETTING_HIGHLIGHT_CURRENT_WINDOW = 'highlight-current-window';
     static SETTING_CYCLE_LAYOUTS = 'cycle-layouts';
 
