@@ -30,6 +30,7 @@ import { KeyBindingsDirection } from '../../keybindings';
 import TilingShellWindowManager from '../../components/windowManager/tilingShellWindowManager';
 import TilingLayoutWithSuggestions from '../windowsSuggestions/tilingLayoutWithSuggestions';
 import { maximizeWindow, unmaximizeWindow } from '../../utils/gnomesupport';
+import { CustomRulesManager } from '../customRulesManager';
 
 const MINIMUM_DISTANCE_TO_RESTORE_ORIGINAL_SIZE = 90;
 
@@ -78,12 +79,19 @@ export class TilingManager {
 
     private readonly _signals: SignalHandling;
     private readonly _debug: (..._content: unknown[]) => void;
+    private readonly _customRulesManager: CustomRulesManager;
 
     /**
      * Constructs a new TilingManager instance.
      * @param monitor The monitor to manage tiling for.
+     * @param enableScaling Whether to enable scaling for the monitor.
+     * @param customRulesManager The custom rules manager instance.
      */
-    constructor(monitor: Monitor, enableScaling: boolean) {
+    constructor(
+        monitor: Monitor,
+        enableScaling: boolean,
+        customRulesManager: CustomRulesManager,
+    ) {
         this._isGrabbingWindow = false;
         this._wasSpanMultipleTilesActivated = false;
         this._wasTilingSystemActivated = false;
@@ -91,6 +99,7 @@ export class TilingManager {
         this._enableScaling = enableScaling;
         this._monitor = monitor;
         this._signals = new SignalHandling();
+        this._customRulesManager = customRulesManager;
 
         this._debug = logger(`TilingManager ${monitor.index}`);
 
@@ -689,11 +698,14 @@ export class TilingManager {
                 ? false
                 : this._activationKeyStatus(modifier, deactivationKey);
         const allowSpanMultipleTiles =
-            Settings.SPAN_MULTIPLE_TILES && isSpanMultiTilesActivated;
+            Settings.SPAN_MULTIPLE_TILES &&
+            isSpanMultiTilesActivated &&
+            this._customRulesManager.isSpanMultipleTilesEnabled(window);
         const showTilingSystem =
             Settings.TILING_SYSTEM &&
             isTilingSystemActivated &&
-            !isTilingSystemDeactivated;
+            !isTilingSystemDeactivated &&
+            this._customRulesManager.isAutoTilingEnabled(window);
         // ensure we handle window movement only when needed
         // if the snap assistant activation key status is not changed and the mouse is on the same position as before
         // and the tiling system activation key status is not changed, we have nothing to do
@@ -847,12 +859,13 @@ export class TilingManager {
         this._edgeTilingManager.abortEdgeTiling();
 
         const canShowTilingSuggestions =
-            (wasSnapAssistingLayout &&
+            ((wasSnapAssistingLayout &&
                 Settings.ENABLE_SNAP_ASSISTANT_WINDOWS_SUGGESTIONS) ||
-            (wasEdgeTiling &&
-                Settings.ENABLE_SCREEN_EDGES_WINDOWS_SUGGESTIONS) ||
-            (isTilingSystemActivated &&
-                Settings.ENABLE_TILING_SYSTEM_WINDOWS_SUGGESTIONS);
+                (wasEdgeTiling &&
+                    Settings.ENABLE_SCREEN_EDGES_WINDOWS_SUGGESTIONS) ||
+                (isTilingSystemActivated &&
+                    Settings.ENABLE_TILING_SYSTEM_WINDOWS_SUGGESTIONS)) &&
+            this._customRulesManager.isWindowSuggestionsEnabled(window);
 
         // abort if the pointer is moving on another monitor: the user moved
         // the window to another monitor not handled by this tiling manager
@@ -1287,6 +1300,9 @@ export class TilingManager {
             window.maximizedVertically
         )
             return;
+
+        // check custom rules for this window
+        if (!this._customRulesManager.isAutoTilingEnabled(window)) return;
 
         (window as ExtendedWindow).assignedTile = undefined;
         const vacantTile = this._findEmptyTile(window);

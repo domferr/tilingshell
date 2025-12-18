@@ -138,6 +138,11 @@ export default class TilingShellExtension extends Extension {
             );
         }
 
+        // initialize CustomRulesManager before creating TilingManagers
+        if (this._customRulesManager) this._customRulesManager.destroy();
+        this._customRulesManager = new CustomRulesManager();
+        this._customRulesManager.enable();
+
         if (Main.layoutManager._startingUp) {
             this._signals.connect(
                 Main.layoutManager,
@@ -154,10 +159,6 @@ export default class TilingShellExtension extends Extension {
 
         this._resizingManager = new ResizingManager();
         this._resizingManager.enable();
-
-        if (this._customRulesManager) this._customRulesManager.destroy();
-        this._customRulesManager = new CustomRulesManager();
-        this._customRulesManager.enable();
 
         if (this._windowBorderManager) this._windowBorderManager.destroy();
         this._windowBorderManager = new WindowBorderManager(
@@ -187,7 +188,11 @@ export default class TilingShellExtension extends Extension {
         this._tilingManagers.forEach((tm) => tm.destroy());
         this._tilingManagers = getMonitors().map(
             (monitor) =>
-                new TilingManager(monitor, !this._fractionalScalingEnabled),
+                new TilingManager(
+                    monitor,
+                    !this._fractionalScalingEnabled,
+                    this._customRulesManager as CustomRulesManager,
+                ),
         );
         this._tilingManagers.forEach((tm) => tm.enable());
     }
@@ -233,7 +238,7 @@ export default class TilingShellExtension extends Extension {
                     this._windowBorderManager.destroy();
                 this._windowBorderManager = new WindowBorderManager(
                     this._fractionalScalingEnabled,
-                    this._customRulesManager!,
+                    this._customRulesManager as CustomRulesManager,
                 );
                 this._windowBorderManager.enable();
             },
