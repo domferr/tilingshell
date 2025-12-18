@@ -114,6 +114,7 @@ export default class Settings {
     static KEY_ENABLE_TILING_SYSTEM_WINDOWS_SUGGESTIONS = 'enable-tiling-system-windows-suggestions';
     static KEY_ENABLE_SNAP_ASSISTANT_WINDOWS_SUGGESTIONS = 'enable-snap-assistant-windows-suggestions';
     static KEY_ENABLE_SCREEN_EDGES_WINDOWS_SUGGESTIONS = 'enable-screen-edges-windows-suggestions';
+    static KEY_APPLICATION_BLACKLIST = 'application-blacklist';
 
     static SETTING_MOVE_WINDOW_RIGHT = 'move-window-right';
     static SETTING_MOVE_WINDOW_LEFT = 'move-window-left';
@@ -672,6 +673,37 @@ export default class Settings {
         this._settings?.set_value(
             Settings.KEY_SETTING_SELECTED_LAYOUTS,
             result,
+        );
+    }
+
+    static get_application_blacklist(): Array<{
+        name: string;
+        wmClass: string;
+        customBorder: boolean;
+        tiling: boolean;
+        snapToBorder: boolean;
+    }> {
+        try {
+            const json = get_string(Settings.KEY_APPLICATION_BLACKLIST);
+            return JSON.parse(json);
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (e) {
+            return [];
+        }
+    }
+
+    static save_application_blacklist(
+        blacklist: Array<{
+            name: string;
+            wmClass: string;
+            customBorder: boolean;
+            tiling: boolean;
+            snapToBorder: boolean;
+        }>,
+    ) {
+        set_string(
+            Settings.KEY_APPLICATION_BLACKLIST,
+            JSON.stringify(blacklist),
         );
     }
 

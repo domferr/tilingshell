@@ -192,6 +192,11 @@
             <summary>Enable window suggestions for screen edge snapping</summary>
             <description>Suggests windows to occupy empty tiles when snapping to screen edges.</description>
         </key>
+        <key name="application-blacklist" type="s">
+            <default>'[]'</default>
+            <summary>Application blacklist</summary>
+            <description>List of applications with custom feature settings (custom border, tiling, snap to border).</description>
+        </key>
 
         <!-- keybindings -->
 		<key type="as" name="move-window-right">

@@ -402,6 +402,190 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
 
         prefsPage.add(windowsSuggestionsGroup);
 
+        // Blacklist section
+        const blacklistGroup = new Adw.PreferencesGroup({
+            title: _('Application Blacklist'),
+            description: _(
+                'Configure which features are enabled for specific applications',
+            ),
+        });
+        prefsPage.add(blacklistGroup);
+
+        // Store WM classes to validate duplicates
+        const existingWmClasses = new Set<string>();
+        // Store all application rows for accordion behavior
+        const applicationRows: Array<{
+            row: Adw.ExpanderRow;
+            switches: {
+                customBorder: Gtk.Switch;
+                tiling: Gtk.Switch;
+                snapToBorder: Gtk.Switch;
+            };
+        }> = [];
+
+        // Helper function to save blacklist to settings
+        const saveBlacklist = () => {
+            const blacklist = applicationRows.map(({ row, switches }) => {
+                const wmClass = row.get_subtitle().replace('WM Class: ', '');
+                return {
+                    name: row.get_title(),
+                    wmClass,
+                    customBorder: switches.customBorder.get_active(),
+                    tiling: switches.tiling.get_active(),
+                    snapToBorder: switches.snapToBorder.get_active(),
+                };
+            });
+            Settings.save_application_blacklist(blacklist);
+        };
+
+        // Helper function to create application row
+        const createBlacklistApplicationRow = (
+            appName: string,
+            wmClass: string,
+            customBorder = true,
+            tiling = true,
+            snapToBorder = true,
+        ) => {
+            const appRow = new Adw.ExpanderRow({
+                title: appName,
+                subtitle: `WM Class: ${wmClass}`,
+            });
+
+            existingWmClasses.add(wmClass.toLowerCase());
+
+            // Custom border toggle
+            const customBorderSwitch = new Gtk.Switch({
+                vexpand: false,
+                valign: Gtk.Align.CENTER,
+                active: customBorder,
+            });
+            customBorderSwitch.connect('notify::active', () => saveBlacklist());
+            const customBorderRow = new Adw.ActionRow({
+                title: _('Custom border'),
+                subtitle: _('Show custom border for this application'),
+                activatableWidget: customBorderSwitch,
+            });
+            customBorderRow.add_suffix(customBorderSwitch);
+            appRow.add_row(customBorderRow);
+
+            // Tiling toggle
+            const tilingSwitch = new Gtk.Switch({
+                vexpand: false,
+                valign: Gtk.Align.CENTER,
+                active: tiling,
+            });
+            tilingSwitch.connect('notify::active', () => saveBlacklist());
+            const tilingRow = new Adw.ActionRow({
+                title: _('Tiling'),
+                subtitle: _('Enable tiling for this application'),
+                activatableWidget: tilingSwitch,
+            });
+            tilingRow.add_suffix(tilingSwitch);
+            appRow.add_row(tilingRow);
+
+            // Snap to border toggle
+            const snapToBorderSwitch = new Gtk.Switch({
+                vexpand: false,
+                valign: Gtk.Align.CENTER,
+                active: snapToBorder,
+            });
+            snapToBorderSwitch.connect('notify::active', () => saveBlacklist());
+            const snapToBorderRow = new Adw.ActionRow({
+                title: _('Snap to border'),
+                subtitle: _('Enable snap to border for this application'),
+                activatableWidget: snapToBorderSwitch,
+            });
+            snapToBorderRow.add_suffix(snapToBorderSwitch);
+            appRow.add_row(snapToBorderRow);
+
+            // Store row with switch references
+            const rowData = {
+                row: appRow,
+                switches: {
+                    customBorder: customBorderSwitch,
+                    tiling: tilingSwitch,
+                    snapToBorder: snapToBorderSwitch,
+                },
+            };
+            applicationRows.push(rowData);
+
+            // Implement accordion behavior: collapse others when this one expands
+            appRow.connect('notify::enable-expansion', () => {
+                if (appRow.get_enable_expansion()) {
+                    applicationRows.forEach(({ row }) => {
+                        if (row !== appRow) row.set_enable_expansion(false);
+                    });
+                }
+            });
+
+            // Delete button
+            const deleteButton = new Gtk.Button({
+                label: _('Delete'),
+                css_classes: ['destructive-action'],
+                halign: Gtk.Align.CENTER,
+                margin_top: 12,
+                margin_bottom: 6,
+            });
+            deleteButton.connect('clicked', () => {
+                existingWmClasses.delete(wmClass.toLowerCase());
+                // Remove from array
+                const index = applicationRows.findIndex(
+                    (item) => item.row === appRow,
+                );
+                if (index > -1) applicationRows.splice(index, 1);
+
+                blacklistGroup.remove(appRow);
+                saveBlacklist();
+            });
+            const deleteRow = new Adw.ActionRow({
+                activatable: false,
+            });
+            deleteRow.set_child(deleteButton);
+            appRow.add_row(deleteRow);
+
+            return appRow;
+        };
+
+        // Load blacklist from settings
+        const savedBlacklist = Settings.get_application_blacklist();
+        savedBlacklist.forEach((app) => {
+            const appRow = createBlacklistApplicationRow(
+                app.name,
+                app.wmClass,
+                app.customBorder,
+                app.tiling,
+                app.snapToBorder,
+            );
+            blacklistGroup.add(appRow);
+        });
+
+        // Add button to add new application to blacklist
+        const addAppBtn = this._buildButtonRow(
+            _('Add Application'),
+            _('Add application to blacklist'),
+            _('Configure features for a new application'),
+            () => {
+                this._showAddApplicationDialog(
+                    window,
+                    existingWmClasses,
+                    (appName, wmClass) => {
+                        debug(`Adding application: ${appName} (${wmClass})`);
+                        const newAppRow = createBlacklistApplicationRow(
+                            appName,
+                            wmClass,
+                        );
+                        // Insert before the "Add Application" button
+                        // Remove button, add new row, then re-add button to keep it at the bottom
+                        blacklistGroup.remove(addAppBtn);
+                        blacklistGroup.add(newAppRow);
+                        blacklistGroup.add(addAppBtn);
+                        saveBlacklist();
+                    },
+                );
+            },
+        );
+        blacklistGroup.add(addAppBtn);
+
         // Layouts section
         const layoutsGroup = new Adw.PreferencesGroup({
             title: _('Layouts'),
@@ -1210,6 +1394,152 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
 
             console.error(e);
         }
+    }
+
+    _showAddApplicationDialog(
+        parentWindow: Adw.PreferencesWindow,
+        existingWmClasses: Set<string>,
+        onAdd: (appName: string, wmClass: string) => void,
+    ) {
+        // Create dialog window
+        const dialog = new Adw.Window({
+            modal: true,
+            hide_on_close: true,
+            transient_for: parentWindow,
+            default_width: 400,
+            default_height: 300,
+        });
+
+        // Create header bar
+        const headerBar = new Adw.HeaderBar();
+        dialog.set_title(_('Add Application'));
+
+        // Create content
+        const toolbarView = new Adw.ToolbarView();
+        toolbarView.add_top_bar(headerBar);
+
+        const contentBox = new Gtk.Box({
+            orientation: Gtk.Orientation.VERTICAL,
+            margin_top: 24,
+            margin_bottom: 24,
+            margin_start: 24,
+            margin_end: 24,
+            spacing: 18,
+        });
+
+        // Application name entry
+        const nameEntry = new Gtk.Entry({
+            placeholder_text: _('Application Name (e.g., Firefox)'),
+            hexpand: true,
+        });
+        const nameRow = new Gtk.Box({
+            orientation: Gtk.Orientation.VERTICAL,
+            spacing: 6,
+        });
+        nameRow.append(
+            new Gtk.Label({
+                label: _('Application Name'),
+                halign: Gtk.Align.START,
+            }),
+        );
+        nameRow.append(nameEntry);
+
+        // WM Class entry
+        const wmClassEntry = new Gtk.Entry({
+            placeholder_text: _('WM Class (e.g., firefox, gnome-terminal)'),
+            hexpand: true,
+        });
+        const wmClassRow = new Gtk.Box({
+            orientation: Gtk.Orientation.VERTICAL,
+            spacing: 6,
+        });
+        wmClassRow.append(
+            new Gtk.Label({
+                label: _('WM Class'),
+                halign: Gtk.Align.START,
+            }),
+        );
+        wmClassRow.append(wmClassEntry);
+
+        // Error label for duplicate WM Class
+        const errorLabel = new Gtk.Label({
+            label: _('This WM Class already exists in the list'),
+            wrap: true,
+            halign: Gtk.Align.START,
+            css_classes: ['error', 'caption'],
+            visible: false,
+        });
+
+        // Help text
+        const helpLabel = new Gtk.Label({
+            label: _(
+                'Tip: You can find the WM Class by running "xprop WM_CLASS" in terminal and clicking the application window.',
+            ),
+            wrap: true,
+            halign: Gtk.Align.START,
+            css_classes: ['dim-label', 'caption'],
+        });
+
+        contentBox.append(nameRow);
+        contentBox.append(wmClassRow);
+        contentBox.append(errorLabel);
+        contentBox.append(helpLabel);
+
+        // Buttons
+        const buttonBox = new Gtk.Box({
+            orientation: Gtk.Orientation.HORIZONTAL,
+            spacing: 6,
+            halign: Gtk.Align.END,
+            margin_top: 12,
+        });
+
+        const cancelButton = new Gtk.Button({
+            label: _('Cancel'),
+        });
+        cancelButton.connect('clicked', () => {
+            dialog.close();
+        });
+
+        const addButton = new Gtk.Button({
+            label: _('Add'),
+            css_classes: ['suggested-action'],
+        });
+        addButton.connect('clicked', () => {
+            const appName = nameEntry.get_text().trim();
+            const wmClass = wmClassEntry.get_text().trim();
+
+            if (appName && wmClass) {
+                onAdd(appName, wmClass);
+                dialog.close();
+            }
+        });
+
+        // Enable/disable add button based on input and validation
+        const updateAddButton = () => {
+            const hasName = nameEntry.get_text().trim().length > 0;
+            const wmClass = wmClassEntry.get_text().trim();
+            const hasWmClass = wmClass.length > 0;
+            const isDuplicate =
+                hasWmClass && existingWmClasses.has(wmClass.toLowerCase());
+
+            // Show/hide error message
+            errorLabel.set_visible(isDuplicate);
+
+            // Enable button only if both fields have values and no duplicate
+            addButton.set_sensitive(hasName && hasWmClass && !isDuplicate);
+        };
+
+        nameEntry.connect('changed', updateAddButton);
+        wmClassEntry.connect('changed', updateAddButton);
+        updateAddButton(); // Initial state
+
+        buttonBox.append(cancelButton);
+        buttonBox.append(addButton);
+        contentBox.append(buttonBox);
+
+        toolbarView.set_content(contentBox);
+        dialog.set_content(toolbarView);
+        dialog.present();
     }
 
     _buildActivationKeysDropDown(
