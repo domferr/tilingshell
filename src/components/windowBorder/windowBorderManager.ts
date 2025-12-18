@@ -9,14 +9,16 @@ export class WindowBorderManager {
     private _border: WindowBorder | null;
     private _enableScaling: boolean;
     private _interfaceSettings: Gio.Settings;
+    private _blacklistManager: BlacklistManager;
 
-    constructor(enableScaling: boolean) {
+    constructor(enableScaling: boolean, blacklistManager: BlacklistManager) {
         this._signals = new SignalHandling();
         this._border = null;
         this._enableScaling = enableScaling;
         this._interfaceSettings = new Gio.Settings({
             schema_id: 'org.gnome.desktop.interface',
         });
+        this._blacklistManager = blacklistManager;
     }
 
     public enable(): void {
@@ -29,6 +31,15 @@ export class WindowBorderManager {
             () => {
                 if (Settings.ENABLE_WINDOW_BORDER) this._turnOn();
                 else this._turnOff();
+            },
+        );
+
+        // re-evaluate current window when blacklist changes
+        this._signals.connect(
+            this._blacklistManager,
+            'blacklist-changed',
+            () => {
+                this._onWindowFocused();
             },
         );
     }
@@ -70,11 +81,19 @@ export class WindowBorderManager {
     private _onWindowFocused(): void {
         // connect signals on the window and create the border
         const metaWindow = global.display.focus_window;
+
         if (
             !metaWindow ||
             metaWindow.get_wm_class() === null ||
             metaWindow.get_wm_class() === 'gjs'
         ) {
+            this._border?.destroy();
+            this._border = null;
+            return;
+        }
+
+        // Check if window is blacklisted for custom border
+        if (!this._blacklistManager.isCustomBorderEnabled(metaWindow)) {
             this._border?.destroy();
             this._border = null;
             return;

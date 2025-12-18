@@ -680,8 +680,11 @@ export default class Settings {
         name: string;
         wmClass: string;
         customBorder: boolean;
-        tiling: boolean;
-        snapToBorder: boolean;
+        autoTiling: boolean;
+        snapAssist: boolean;
+        windowSuggestions: boolean;
+        resizeComplementing: boolean;
+        spanMultipleTiles: boolean;
     }> {
         try {
             const json = get_string(Settings.KEY_APPLICATION_BLACKLIST);
@@ -697,8 +700,11 @@ export default class Settings {
             name: string;
             wmClass: string;
             customBorder: boolean;
-            tiling: boolean;
-            snapToBorder: boolean;
+            autoTiling: boolean;
+            snapAssist: boolean;
+            windowSuggestions: boolean;
+            resizeComplementing: boolean;
+            spanMultipleTiles: boolean;
         }>,
     ) {
         set_string(

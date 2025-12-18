@@ -418,8 +418,11 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             row: Adw.ExpanderRow;
             switches: {
                 customBorder: Gtk.Switch;
-                tiling: Gtk.Switch;
-                snapToBorder: Gtk.Switch;
+                autoTiling: Gtk.Switch;
+                snapAssist: Gtk.Switch;
+                windowSuggestions: Gtk.Switch;
+                resizeComplementing: Gtk.Switch;
+                spanMultipleTiles: Gtk.Switch;
             };
         }> = [];
 
@@ -431,8 +434,12 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                     name: row.get_title(),
                     wmClass,
                     customBorder: switches.customBorder.get_active(),
-                    tiling: switches.tiling.get_active(),
-                    snapToBorder: switches.snapToBorder.get_active(),
+                    autoTiling: switches.autoTiling.get_active(),
+                    snapAssist: switches.snapAssist.get_active(),
+                    windowSuggestions: switches.windowSuggestions.get_active(),
+                    resizeComplementing:
+                        switches.resizeComplementing.get_active(),
+                    spanMultipleTiles: switches.spanMultipleTiles.get_active(),
                 };
             });
             Settings.save_application_blacklist(blacklist);
@@ -443,8 +450,11 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             appName: string,
             wmClass: string,
             customBorder = true,
-            tiling = true,
-            snapToBorder = true,
+            autoTiling = true,
+            snapAssist = true,
+            windowSuggestions = true,
+            resizeComplementing = true,
+            spanMultipleTiles = true,
         ) => {
             const appRow = new Adw.ExpanderRow({
                 title: appName,
@@ -468,43 +478,103 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             customBorderRow.add_suffix(customBorderSwitch);
             appRow.add_row(customBorderRow);
 
-            // Tiling toggle
-            const tilingSwitch = new Gtk.Switch({
+            // Auto-tiling toggle
+            const autoTilingSwitch = new Gtk.Switch({
                 vexpand: false,
                 valign: Gtk.Align.CENTER,
-                active: tiling,
+                active: autoTiling,
             });
-            tilingSwitch.connect('notify::active', () => saveBlacklist());
-            const tilingRow = new Adw.ActionRow({
-                title: _('Tiling'),
-                subtitle: _('Enable tiling for this application'),
-                activatableWidget: tilingSwitch,
+            autoTilingSwitch.connect('notify::active', () => saveBlacklist());
+            const appAutoTilingRow = new Adw.ActionRow({
+                title: _('Auto-tiling'),
+                subtitle: _(
+                    'Automatically tile new windows for this application',
+                ),
+                activatableWidget: autoTilingSwitch,
             });
-            tilingRow.add_suffix(tilingSwitch);
-            appRow.add_row(tilingRow);
+            appAutoTilingRow.add_suffix(autoTilingSwitch);
+            appRow.add_row(appAutoTilingRow);
 
-            // Snap to border toggle
-            const snapToBorderSwitch = new Gtk.Switch({
+            // Snap assistant toggle
+            const snapAssistSwitch = new Gtk.Switch({
                 vexpand: false,
                 valign: Gtk.Align.CENTER,
-                active: snapToBorder,
+                active: snapAssist,
             });
-            snapToBorderSwitch.connect('notify::active', () => saveBlacklist());
-            const snapToBorderRow = new Adw.ActionRow({
-                title: _('Snap to border'),
-                subtitle: _('Enable snap to border for this application'),
-                activatableWidget: snapToBorderSwitch,
+            snapAssistSwitch.connect('notify::active', () => saveBlacklist());
+            const appSnapAssistRow = new Adw.ActionRow({
+                title: _('Snap assistant'),
+                subtitle: _('Enable snap assistant for this application'),
+                activatableWidget: snapAssistSwitch,
             });
-            snapToBorderRow.add_suffix(snapToBorderSwitch);
-            appRow.add_row(snapToBorderRow);
+            appSnapAssistRow.add_suffix(snapAssistSwitch);
+            appRow.add_row(appSnapAssistRow);
+
+            // Window suggestions toggle
+            const windowSuggestionsSwitch = new Gtk.Switch({
+                vexpand: false,
+                valign: Gtk.Align.CENTER,
+                active: windowSuggestions,
+            });
+            windowSuggestionsSwitch.connect('notify::active', () =>
+                saveBlacklist(),
+            );
+            const appWindowSuggestionsRow = new Adw.ActionRow({
+                title: _('Window suggestions'),
+                subtitle: _(
+                    "Suggest this application's windows to fill empty tiles",
+                ),
+                activatableWidget: windowSuggestionsSwitch,
+            });
+            appWindowSuggestionsRow.add_suffix(windowSuggestionsSwitch);
+            appRow.add_row(appWindowSuggestionsRow);
+
+            // Resize complementing windows toggle
+            const resizeComplementingSwitch = new Gtk.Switch({
+                vexpand: false,
+                valign: Gtk.Align.CENTER,
+                active: resizeComplementing,
+            });
+            resizeComplementingSwitch.connect('notify::active', () =>
+                saveBlacklist(),
+            );
+            const appResizeComplementingRow = new Adw.ActionRow({
+                title: _('Resize complementing windows'),
+                subtitle: _(
+                    'Auto-resize nearby windows when this window is resized',
+                ),
+                activatableWidget: resizeComplementingSwitch,
+            });
+            appResizeComplementingRow.add_suffix(resizeComplementingSwitch);
+            appRow.add_row(appResizeComplementingRow);
+
+            // Span multiple tiles toggle
+            const spanMultipleTilesSwitch = new Gtk.Switch({
+                vexpand: false,
+                valign: Gtk.Align.CENTER,
+                active: spanMultipleTiles,
+            });
+            spanMultipleTilesSwitch.connect('notify::active', () =>
+                saveBlacklist(),
+            );
+            const appSpanMultipleTilesRow = new Adw.ActionRow({
+                title: _('Span multiple tiles'),
+                subtitle: _('Allow this application to span multiple tiles'),
+                activatableWidget: spanMultipleTilesSwitch,
+            });
+            appSpanMultipleTilesRow.add_suffix(spanMultipleTilesSwitch);
+            appRow.add_row(appSpanMultipleTilesRow);
 
             // Store row with switch references
             const rowData = {
                 row: appRow,
                 switches: {
                     customBorder: customBorderSwitch,
-                    tiling: tilingSwitch,
-                    snapToBorder: snapToBorderSwitch,
+                    autoTiling: autoTilingSwitch,
+                    snapAssist: snapAssistSwitch,
+                    windowSuggestions: windowSuggestionsSwitch,
+                    resizeComplementing: resizeComplementingSwitch,
+                    spanMultipleTiles: spanMultipleTilesSwitch,
                 },
             };
             applicationRows.push(rowData);
@@ -553,8 +623,11 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 app.name,
                 app.wmClass,
                 app.customBorder,
-                app.tiling,
-                app.snapToBorder,
+                app.autoTiling,
+                app.snapAssist,
+                app.windowSuggestions,
+                app.resizeComplementing,
+                app.spanMultipleTiles,
             );
             blacklistGroup.add(appRow);
         });
