@@ -4,9 +4,9 @@ import { logger } from '@utils/logger';
 import { registerGObjectClass } from '@utils/gjs';
 import Settings from '@settings/settings';
 
-const debug = logger('BlacklistManager');
+const debug = logger('CustomRulesManager');
 
-export interface BlacklistApplication {
+export interface CustomRulesByApp {
     name: string;
     wmClass: string;
     customBorder: boolean;
@@ -18,59 +18,61 @@ export interface BlacklistApplication {
 }
 
 @registerGObjectClass
-export class BlacklistManager extends GObject.Object {
+export class CustomRulesManager extends GObject.Object {
     static metaInfo: GObject.MetaInfo<unknown, unknown, unknown> = {
-        GTypeName: 'BlacklistManager',
+        GTypeName: 'CustomRulesManager',
         Signals: {
-            'blacklist-changed': {},
+            'customRules-changed': {},
         },
     };
 
     private readonly _signals: SignalHandling;
-    private _blacklist: BlacklistApplication[];
+    private _customRules: CustomRulesByApp[];
 
     constructor() {
         super();
         this._signals = new SignalHandling();
-        this._blacklist = [];
+        this._customRules = [];
     }
 
     public enable(): void {
-        this._loadBlacklist();
+        this._loadCustomRules();
 
-        // reload blacklist when settings change
+        // reload customRules when settings change
         this._signals.connect(
             Settings,
-            Settings.KEY_APPLICATION_BLACKLIST,
+            Settings.KEY_APPLICATION_CUSTOMRULES,
             () => {
-                this._loadBlacklist();
+                this._loadCustomRules();
             },
         );
     }
 
     public destroy(): void {
         this._signals.disconnect();
-        this._blacklist = [];
+        this._customRules = [];
     }
 
-    private _loadBlacklist(): void {
-        this._blacklist = Settings.get_application_blacklist();
-        debug(`Loaded blacklist with ${this._blacklist.length} applications`);
-        this.emit('blacklist-changed');
+    private _loadCustomRules(): void {
+        this._customRules = Settings.get_application_custom_rules();
+        debug(
+            `Loaded customRules with ${this._customRules.length} applications`,
+        );
+        this.emit('customRules-changed');
     }
 
     /**
-     * Get the blacklist entry for a window by its WM class
+     * Get the customRules entry for a window by its WM class
      * @param window The window to check
-     * @returns The blacklist entry if found, undefined otherwise
+     * @returns The customRules entry if found, undefined otherwise
      */
-    private _getBlacklistEntry(
+    private _getCustomRulesEntry(
         window: Meta.Window,
-    ): BlacklistApplication | undefined {
+    ): CustomRulesByApp | undefined {
         const wmClass = window.get_wm_class();
         if (!wmClass) return undefined;
 
-        return this._blacklist.find(
+        return this._customRules.find(
             (entry) => entry.wmClass.toLowerCase() === wmClass.toLowerCase(),
         );
     }
@@ -81,7 +83,7 @@ export class BlacklistManager extends GObject.Object {
      * @returns true if custom border should be enabled, false otherwise
      */
     public isCustomBorderEnabled(window: Meta.Window): boolean {
-        const entry = this._getBlacklistEntry(window);
+        const entry = this._getCustomRulesEntry(window);
 
         if (!entry) return true;
         return entry.customBorder;
@@ -93,7 +95,7 @@ export class BlacklistManager extends GObject.Object {
      * @returns true if auto-tiling should be enabled, false otherwise
      */
     public isAutoTilingEnabled(window: Meta.Window): boolean {
-        const entry = this._getBlacklistEntry(window);
+        const entry = this._getCustomRulesEntry(window);
 
         if (!entry) return true;
         return entry.autoTiling;
@@ -105,7 +107,7 @@ export class BlacklistManager extends GObject.Object {
      * @returns true if snap assistant should be enabled, false otherwise
      */
     public isSnapAssistEnabled(window: Meta.Window): boolean {
-        const entry = this._getBlacklistEntry(window);
+        const entry = this._getCustomRulesEntry(window);
 
         if (!entry) return true;
         return entry.snapAssist;
@@ -117,7 +119,7 @@ export class BlacklistManager extends GObject.Object {
      * @returns true if window suggestions should be enabled, false otherwise
      */
     public isWindowSuggestionsEnabled(window: Meta.Window): boolean {
-        const entry = this._getBlacklistEntry(window);
+        const entry = this._getCustomRulesEntry(window);
 
         if (!entry) return true;
         return entry.windowSuggestions;
@@ -129,7 +131,7 @@ export class BlacklistManager extends GObject.Object {
      * @returns true if resize complementing should be enabled, false otherwise
      */
     public isResizeComplementingEnabled(window: Meta.Window): boolean {
-        const entry = this._getBlacklistEntry(window);
+        const entry = this._getCustomRulesEntry(window);
 
         if (!entry) return true;
         return entry.resizeComplementing;
@@ -141,26 +143,26 @@ export class BlacklistManager extends GObject.Object {
      * @returns true if span multiple tiles should be enabled, false otherwise
      */
     public isSpanMultipleTilesEnabled(window: Meta.Window): boolean {
-        const entry = this._getBlacklistEntry(window);
+        const entry = this._getCustomRulesEntry(window);
 
         if (!entry) return true;
         return entry.spanMultipleTiles;
     }
 
     /**
-     * Check if a window is blacklisted (any feature disabled)
+     * Check if a window is customRulesed (any feature disabled)
      * @param window The window to check
-     * @returns true if the window is in the blacklist, false otherwise
+     * @returns true if the window is in the customRules, false otherwise
      */
-    public isBlacklisted(window: Meta.Window): boolean {
-        return this._getBlacklistEntry(window) !== undefined;
+    public isCustomRulesed(window: Meta.Window): boolean {
+        return this._getCustomRulesEntry(window) !== undefined;
     }
 
     /**
-     * Get all blacklist entries
-     * @returns Array of blacklist applications
+     * Get all customRules entries
+     * @returns Array of customRules applications
      */
-    public getBlacklist(): BlacklistApplication[] {
-        return [...this._blacklist];
+    public getCustomRules(): CustomRulesByApp[] {
+        return [...this._customRules];
     }
 }

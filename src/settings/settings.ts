@@ -114,7 +114,8 @@ export default class Settings {
     static KEY_ENABLE_TILING_SYSTEM_WINDOWS_SUGGESTIONS = 'enable-tiling-system-windows-suggestions';
     static KEY_ENABLE_SNAP_ASSISTANT_WINDOWS_SUGGESTIONS = 'enable-snap-assistant-windows-suggestions';
     static KEY_ENABLE_SCREEN_EDGES_WINDOWS_SUGGESTIONS = 'enable-screen-edges-windows-suggestions';
-    static KEY_APPLICATION_BLACKLIST = 'application-blacklist';
+    
+    static KEY_APPLICATION_CUSTOMRULES = 'application-custom-rules';
 
     static SETTING_MOVE_WINDOW_RIGHT = 'move-window-right';
     static SETTING_MOVE_WINDOW_LEFT = 'move-window-left';
@@ -676,7 +677,7 @@ export default class Settings {
         );
     }
 
-    static get_application_blacklist(): Array<{
+    static get_application_custom_rules(): Array<{
         name: string;
         wmClass: string;
         customBorder: boolean;
@@ -687,7 +688,7 @@ export default class Settings {
         spanMultipleTiles: boolean;
     }> {
         try {
-            const json = get_string(Settings.KEY_APPLICATION_BLACKLIST);
+            const json = get_string(Settings.KEY_APPLICATION_CUSTOMRULES);
             return JSON.parse(json);
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (e) {
@@ -695,8 +696,8 @@ export default class Settings {
         }
     }
 
-    static save_application_blacklist(
-        blacklist: Array<{
+    static save_application_custom_rules(
+        customRules: Array<{
             name: string;
             wmClass: string;
             customBorder: boolean;
@@ -708,8 +709,8 @@ export default class Settings {
         }>,
     ) {
         set_string(
-            Settings.KEY_APPLICATION_BLACKLIST,
-            JSON.stringify(blacklist),
+            Settings.KEY_APPLICATION_CUSTOMRULES,
+            JSON.stringify(customRules),
         );
     }
 

@@ -50,7 +50,7 @@ import OverriddenAltTab from './components/altTab/overriddenAltTab';
 import { LayoutSwitcherPopup } from './components/layoutSwitcher/layoutSwitcher';
 import { unmaximizeWindow } from './utils/gnomesupport';
 import * as Config from 'resource:///org/gnome/shell/misc/config.js';
-import { BlacklistManager } from '@components/blacklistManager';
+import { CustomRulesManager } from '@components/customRulesManager';
 
 const debug = logger('extension');
 
@@ -63,7 +63,7 @@ export default class TilingShellExtension extends Extension {
     private _keybindings: KeyBindings | null;
     private _resizingManager: ResizingManager | null;
     private _windowBorderManager: WindowBorderManager | null;
-    private _blacklistManager: BlacklistManager | null;
+    private _customRulesManager: CustomRulesManager | null;
 
     constructor(metadata: ExtensionMetadata) {
         super(metadata);
@@ -75,7 +75,7 @@ export default class TilingShellExtension extends Extension {
         this._keybindings = null;
         this._resizingManager = null;
         this._windowBorderManager = null;
-        this._blacklistManager = null;
+        this._customRulesManager = null;
     }
 
     createIndicator() {
@@ -155,14 +155,14 @@ export default class TilingShellExtension extends Extension {
         this._resizingManager = new ResizingManager();
         this._resizingManager.enable();
 
-        if (this._blacklistManager) this._blacklistManager.destroy();
-        this._blacklistManager = new BlacklistManager();
-        this._blacklistManager.enable();
+        if (this._customRulesManager) this._customRulesManager.destroy();
+        this._customRulesManager = new CustomRulesManager();
+        this._customRulesManager.enable();
 
         if (this._windowBorderManager) this._windowBorderManager.destroy();
         this._windowBorderManager = new WindowBorderManager(
             !this._fractionalScalingEnabled,
-            this._blacklistManager,
+            this._customRulesManager,
         );
         this._windowBorderManager.enable();
 
@@ -233,7 +233,7 @@ export default class TilingShellExtension extends Extension {
                     this._windowBorderManager.destroy();
                 this._windowBorderManager = new WindowBorderManager(
                     this._fractionalScalingEnabled,
-                    this._blacklistManager!,
+                    this._customRulesManager!,
                 );
                 this._windowBorderManager.enable();
             },
@@ -776,8 +776,8 @@ export default class TilingShellExtension extends Extension {
         this._windowBorderManager?.destroy();
         this._windowBorderManager = null;
 
-        this._blacklistManager?.destroy();
-        this._blacklistManager = null;
+        this._customRulesManager?.destroy();
+        this._customRulesManager = null;
 
         // disable dbus
         this._dbus?.disable();

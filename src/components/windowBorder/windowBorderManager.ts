@@ -2,6 +2,7 @@ import { Gio } from '../../gi/ext';
 import WindowBorder from './windowBorder';
 import SignalHandling from '../../utils/signalHandling';
 import Settings from '../../settings/settings';
+import { CustomRulesManager } from '../customRulesManager';
 
 export class WindowBorderManager {
     private readonly _signals: SignalHandling;
@@ -9,16 +10,19 @@ export class WindowBorderManager {
     private _border: WindowBorder | null;
     private _enableScaling: boolean;
     private _interfaceSettings: Gio.Settings;
-    private _blacklistManager: BlacklistManager;
+    private _customRulesManager: CustomRulesManager;
 
-    constructor(enableScaling: boolean, blacklistManager: BlacklistManager) {
+    constructor(
+        enableScaling: boolean,
+        customRulesManager: CustomRulesManager,
+    ) {
         this._signals = new SignalHandling();
         this._border = null;
         this._enableScaling = enableScaling;
         this._interfaceSettings = new Gio.Settings({
             schema_id: 'org.gnome.desktop.interface',
         });
-        this._blacklistManager = blacklistManager;
+        this._customRulesManager = customRulesManager;
     }
 
     public enable(): void {
@@ -34,10 +38,10 @@ export class WindowBorderManager {
             },
         );
 
-        // re-evaluate current window when blacklist changes
+        // re-evaluate current window when customRules changes
         this._signals.connect(
-            this._blacklistManager,
-            'blacklist-changed',
+            this._customRulesManager,
+            'customRules-changed',
             () => {
                 this._onWindowFocused();
             },
@@ -92,8 +96,8 @@ export class WindowBorderManager {
             return;
         }
 
-        // Check if window is blacklisted for custom border
-        if (!this._blacklistManager.isCustomBorderEnabled(metaWindow)) {
+        // Check if window is customRulesed for custom border
+        if (!this._customRulesManager.isCustomBorderEnabled(metaWindow)) {
             this._border?.destroy();
             this._border = null;
             return;

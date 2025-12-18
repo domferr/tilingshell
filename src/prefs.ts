@@ -402,14 +402,14 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
 
         prefsPage.add(windowsSuggestionsGroup);
 
-        // Blacklist section
-        const blacklistGroup = new Adw.PreferencesGroup({
-            title: _('Application Blacklist'),
+        // Custom Rules section
+        const customRulesGroup = new Adw.PreferencesGroup({
+            title: _('Application Custom Rules'),
             description: _(
                 'Configure which features are enabled for specific applications',
             ),
         });
-        prefsPage.add(blacklistGroup);
+        prefsPage.add(customRulesGroup);
 
         // Store WM classes to validate duplicates
         const existingWmClasses = new Set<string>();
@@ -426,9 +426,9 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             };
         }> = [];
 
-        // Helper function to save blacklist to settings
-        const saveBlacklist = () => {
-            const blacklist = applicationRows.map(({ row, switches }) => {
+        // Helper function to save customRules to settings
+        const saveCustomRules = () => {
+            const customRules = applicationRows.map(({ row, switches }) => {
                 const wmClass = row.get_subtitle().replace('WM Class: ', '');
                 return {
                     name: row.get_title(),
@@ -442,11 +442,11 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                     spanMultipleTiles: switches.spanMultipleTiles.get_active(),
                 };
             });
-            Settings.save_application_blacklist(blacklist);
+            Settings.save_application_custom_rules(customRules);
         };
 
         // Helper function to create application row
-        const createBlacklistApplicationRow = (
+        const createCustomRulesApplicationRow = (
             appName: string,
             wmClass: string,
             customBorder = true,
@@ -469,7 +469,9 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 valign: Gtk.Align.CENTER,
                 active: customBorder,
             });
-            customBorderSwitch.connect('notify::active', () => saveBlacklist());
+            customBorderSwitch.connect('notify::active', () =>
+                saveCustomRules(),
+            );
             const customBorderRow = new Adw.ActionRow({
                 title: _('Custom border'),
                 subtitle: _('Show custom border for this application'),
@@ -484,7 +486,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 valign: Gtk.Align.CENTER,
                 active: autoTiling,
             });
-            autoTilingSwitch.connect('notify::active', () => saveBlacklist());
+            autoTilingSwitch.connect('notify::active', () => saveCustomRules());
             const appAutoTilingRow = new Adw.ActionRow({
                 title: _('Auto-tiling'),
                 subtitle: _(
@@ -501,7 +503,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 valign: Gtk.Align.CENTER,
                 active: snapAssist,
             });
-            snapAssistSwitch.connect('notify::active', () => saveBlacklist());
+            snapAssistSwitch.connect('notify::active', () => saveCustomRules());
             const appSnapAssistRow = new Adw.ActionRow({
                 title: _('Snap assistant'),
                 subtitle: _('Enable snap assistant for this application'),
@@ -517,7 +519,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 active: windowSuggestions,
             });
             windowSuggestionsSwitch.connect('notify::active', () =>
-                saveBlacklist(),
+                saveCustomRules(),
             );
             const appWindowSuggestionsRow = new Adw.ActionRow({
                 title: _('Window suggestions'),
@@ -536,7 +538,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 active: resizeComplementing,
             });
             resizeComplementingSwitch.connect('notify::active', () =>
-                saveBlacklist(),
+                saveCustomRules(),
             );
             const appResizeComplementingRow = new Adw.ActionRow({
                 title: _('Resize complementing windows'),
@@ -555,7 +557,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 active: spanMultipleTiles,
             });
             spanMultipleTilesSwitch.connect('notify::active', () =>
-                saveBlacklist(),
+                saveCustomRules(),
             );
             const appSpanMultipleTilesRow = new Adw.ActionRow({
                 title: _('Span multiple tiles'),
@@ -604,8 +606,8 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 );
                 if (index > -1) applicationRows.splice(index, 1);
 
-                blacklistGroup.remove(appRow);
-                saveBlacklist();
+                customRulesGroup.remove(appRow);
+                saveCustomRules();
             });
             const deleteRow = new Adw.ActionRow({
                 activatable: false,
@@ -616,10 +618,10 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             return appRow;
         };
 
-        // Load blacklist from settings
-        const savedBlacklist = Settings.get_application_blacklist();
-        savedBlacklist.forEach((app) => {
-            const appRow = createBlacklistApplicationRow(
+        // Load customRules from settings
+        const savedCustomRules = Settings.get_application_custom_rules();
+        savedCustomRules.forEach((app) => {
+            const appRow = createCustomRulesApplicationRow(
                 app.name,
                 app.wmClass,
                 app.customBorder,
@@ -629,13 +631,13 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 app.resizeComplementing,
                 app.spanMultipleTiles,
             );
-            blacklistGroup.add(appRow);
+            customRulesGroup.add(appRow);
         });
 
-        // Add button to add new application to blacklist
+        // Add button to add new application to customRules
         const addAppBtn = this._buildButtonRow(
             _('Add Application'),
-            _('Add application to blacklist'),
+            _('Add application to customRules'),
             _('Configure features for a new application'),
             () => {
                 this._showAddApplicationDialog(
@@ -643,21 +645,21 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                     existingWmClasses,
                     (appName, wmClass) => {
                         debug(`Adding application: ${appName} (${wmClass})`);
-                        const newAppRow = createBlacklistApplicationRow(
+                        const newAppRow = createCustomRulesApplicationRow(
                             appName,
                             wmClass,
                         );
                         // Insert before the "Add Application" button
                         // Remove button, add new row, then re-add button to keep it at the bottom
-                        blacklistGroup.remove(addAppBtn);
-                        blacklistGroup.add(newAppRow);
-                        blacklistGroup.add(addAppBtn);
-                        saveBlacklist();
+                        customRulesGroup.remove(addAppBtn);
+                        customRulesGroup.add(newAppRow);
+                        customRulesGroup.add(addAppBtn);
+                        saveCustomRules();
                     },
                 );
             },
         );
-        blacklistGroup.add(addAppBtn);
+        customRulesGroup.add(addAppBtn);
 
         // Layouts section
         const layoutsGroup = new Adw.PreferencesGroup({
