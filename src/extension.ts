@@ -157,7 +157,7 @@ export default class TilingShellExtension extends Extension {
             this._setupSignals();
         }
 
-        this._resizingManager = new ResizingManager();
+        this._resizingManager = new ResizingManager(this._customRulesManager);
         this._resizingManager.enable();
 
         if (this._windowBorderManager) this._windowBorderManager.destroy();

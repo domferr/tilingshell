@@ -680,12 +680,12 @@ export default class Settings {
     static get_application_custom_rules(): Array<{
         name: string;
         wmClass: string;
-        customBorder: boolean; // ✅
-        autoTiling: boolean; // ✅
+        customBorder: boolean;
+        autoTiling: boolean;
         snapAssist: boolean;
         windowSuggestions: boolean;
         resizeComplementing: boolean;
-        spanMultipleTiles: boolean; // ✅
+        spanMultipleTiles: boolean;
     }> {
         try {
             const json = get_string(Settings.KEY_APPLICATION_CUSTOMRULES);

@@ -751,7 +751,10 @@ export class TilingManager {
                     this._edgeTilingManager.abortEdgeTiling();
                 }
 
-                if (Settings.SNAP_ASSIST) {
+                if (
+                    Settings.SNAP_ASSIST &&
+                    this._customRulesManager.isSnapAssistEnabled(window)
+                ) {
                     this._snapAssist.onMovingWindow(
                         window,
                         currPointerPos,
@@ -962,7 +965,10 @@ export class TilingManager {
                 (extWin as ExtendedWindow).assignedTile
             )
                 tiledWindows.push(extWin as ExtendedWindow);
-            else nontiledWindows.push(extWin);
+            else if (
+                this._customRulesManager.isWindowSuggestionsEnabled(extWin)
+            )
+                nontiledWindows.push(extWin);
         });
 
         if (nontiledWindows.length === 0) return;
@@ -1321,7 +1327,8 @@ export class TilingManager {
                     !window.maximizedHorizontally &&
                     !window.maximizedVertically &&
                     window.get_transient_for() === null &&
-                    !window.is_attached_dialog()
+                    !window.is_attached_dialog() &&
+                    this._customRulesManager.isAutoTilingEnabled(window)
                 )
                     this._easeWindowRectFromTile(vacantTile, window, true);
 
