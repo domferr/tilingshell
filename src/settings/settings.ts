@@ -1,7 +1,7 @@
 import { Gio, GObject, GLib } from '../gi/shared';
 import Layout from '../components/layout/Layout';
 import Tile from '../components/layout/Tile';
-import { CustomRulesApplicationConfig } from '@components/customRulesManager';
+import { ConfigRules } from '@components/customRulesManager';
 
 export enum ActivationKey {
     NONE = -1,
@@ -681,7 +681,7 @@ export default class Settings {
     static get_application_custom_rules(): Array<{
         name: string;
         wmClass: string;
-        ruleConfig?: CustomRulesApplicationConfig;
+        ruleConfig?: ConfigRules;
     }> {
         try {
             const json = get_string(Settings.KEY_APPLICATION_CUSTOMRULES);
@@ -696,7 +696,7 @@ export default class Settings {
         customRules: Array<{
             name: string;
             wmClass: string;
-            ruleConfig?: CustomRulesApplicationConfig;
+            ruleConfig?: ConfigRules;
         }>,
     ) {
         set_string(

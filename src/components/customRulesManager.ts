@@ -6,7 +6,7 @@ import Settings from '@settings/settings';
 
 const debug = logger('CustomRulesManager');
 
-export type CustomRulesApplicationConfig = {
+export type ConfigRules = {
     customBorder: boolean;
     autoTiling: boolean;
     snapAssist: boolean;
@@ -15,10 +15,10 @@ export type CustomRulesApplicationConfig = {
     spanMultipleTiles: boolean;
 };
 
-export interface CustomRulesByApp {
+export interface CustomApplicationRules {
     name: string;
     wmClass: string;
-    ruleConfig?: CustomRulesApplicationConfig;
+    ruleConfig?: ConfigRules;
 }
 
 @registerGObjectClass
@@ -31,7 +31,7 @@ export class CustomRulesManager extends GObject.Object {
     };
 
     private readonly _signals: SignalHandling;
-    private _customRules: CustomRulesByApp[];
+    private _customRules: CustomApplicationRules[];
 
     constructor() {
         super();
@@ -69,7 +69,7 @@ export class CustomRulesManager extends GObject.Object {
      * Get the default rule for fullscreen applications
      * @returns The default rule with all features disabled
      */
-    private _getFullscreenDefaultRule(): CustomRulesByApp {
+    private _getFullscreenDefaultRule(): CustomApplicationRules {
         return (
             this._customRules.find(
                 (entry) => entry.wmClass.toLowerCase() === 'fullscreen',
@@ -95,7 +95,7 @@ export class CustomRulesManager extends GObject.Object {
      */
     private _getCustomRulesEntry(
         window: Meta.Window,
-    ): CustomRulesByApp | undefined {
+    ): CustomApplicationRules | undefined {
         // Check if the window is fullscreen first - apply default rule
         if (window.is_fullscreen()) return this._getFullscreenDefaultRule();
 
@@ -192,7 +192,7 @@ export class CustomRulesManager extends GObject.Object {
      * Get all customRules entries
      * @returns Array of customRules applications
      */
-    public getCustomRules(): CustomRulesByApp[] {
+    public getCustomRules(): CustomApplicationRules[] {
         return [...this._customRules];
     }
 }

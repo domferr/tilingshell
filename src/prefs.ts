@@ -29,7 +29,7 @@ import SettingsExport from './settings/settingsExport';
 import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 // @ts-expect-error "Module exists"
 import * as Config from 'resource:///org/gnome/Shell/Extensions/js/misc/config.js';
-import { CustomRulesApplicationConfig } from '@components/customRulesManager';
+import { ConfigRules } from '@components/customRulesManager';
 
 const debug = logger('prefs');
 const RESOURCES_PREFIX = "/org/gnome/Shell/Extensions/tilingshell"; // must match the prefix in resources.gresources.xml
@@ -454,7 +454,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         const createCustomRulesApplicationRow = (
             appName: string,
             wmClass: string,
-            config: CustomRulesApplicationConfig = {
+            config: ConfigRules = {
                 customBorder: true,
                 autoTiling: true,
                 snapAssist: true,
