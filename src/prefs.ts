@@ -627,15 +627,6 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 applicationRows.push(rowData);
             }
 
-            // Implement accordion behavior: collapse others when this one expands
-            appRow.connect('notify::enable-expansion', () => {
-                if (appRow.get_enable_expansion()) {
-                    applicationRows.forEach(({ row }) => {
-                        if (row !== appRow) row.set_enable_expansion(false);
-                    });
-                }
-            });
-
             // Delete button or info row
             if (isDefault) {
                 const infoRow = new Adw.ActionRow({
