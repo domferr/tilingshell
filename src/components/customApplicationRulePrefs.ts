@@ -7,15 +7,9 @@ import { ConfigRules } from './customRulesManager';
 const debug = logger('customApplicationRulePrefs');
 
 interface ApplicationRowData {
-    row: Adw.ExpanderRow;
-    switches: {
-        customBorder: Gtk.Switch;
-        autoTiling: Gtk.Switch;
-        snapAssist: Gtk.Switch;
-        windowSuggestions: Gtk.Switch;
-        resizeComplementing: Gtk.Switch;
-        spanMultipleTiles: Gtk.Switch;
-    };
+    row: Adw.ActionRow;
+    wmClass: string;
+    config: ConfigRules;
 }
 
 export class CustomApplicationRulePrefs {
@@ -96,22 +90,15 @@ export class CustomApplicationRulePrefs {
      * Save custom rules to settings
      */
     private saveCustomRules(): void {
-        const customRules = this.applicationRows.map(({ row, switches }) => {
-            const wmClass = row.get_subtitle().replace('WM Class: ', '');
-            return {
-                name: row.get_title(),
-                wmClass,
-                ruleConfig: {
-                    customBorder: switches.customBorder.get_active(),
-                    autoTiling: switches.autoTiling.get_active(),
-                    snapAssist: switches.snapAssist.get_active(),
-                    windowSuggestions: switches.windowSuggestions.get_active(),
-                    resizeComplementing:
-                        switches.resizeComplementing.get_active(),
-                    spanMultipleTiles: switches.spanMultipleTiles.get_active(),
-                },
-            };
-        });
+        const customRules = this.applicationRows.map(
+            ({ row, wmClass, config }) => {
+                return {
+                    name: row.get_title(),
+                    wmClass,
+                    ruleConfig: config,
+                };
+            },
+        );
         Settings.save_application_custom_rules(customRules);
     }
 
@@ -130,7 +117,7 @@ export class CustomApplicationRulePrefs {
             spanMultipleTiles: true,
         },
         isDefault = false,
-    ): Adw.ExpanderRow {
+    ): Adw.ActionRow {
         const ruleConfig = Object.assign(
             {
                 customBorder: true,
@@ -143,26 +130,113 @@ export class CustomApplicationRulePrefs {
             config,
         );
 
-        const appRow = new Adw.ExpanderRow({
+        const appRow = new Adw.ActionRow({
             title: appName,
             subtitle: isDefault
                 ? _('Default rule (cannot be deleted)')
                 : `WM Class: ${wmClass}`,
+            activatable: true,
         });
+
+        // Add chevron icon to indicate it opens a window
+        appRow.add_suffix(
+            new Gtk.Image({
+                icon_name: 'go-next-symbolic',
+                valign: Gtk.Align.CENTER,
+            }),
+        );
 
         if (!isDefault) this.existingWmClasses.add(wmClass.toLowerCase());
 
-        // Custom border toggle
+        // Store row with config (only for custom rules)
+        if (!isDefault) {
+            const rowData: ApplicationRowData = {
+                row: appRow,
+                wmClass,
+                config: ruleConfig,
+            };
+            this.applicationRows.push(rowData);
+        }
+
+        // Open rules window when row is clicked
+        appRow.connect('activated', () => {
+            this.showRulesWindow(appName, wmClass, ruleConfig, isDefault);
+        });
+
+        return appRow;
+    }
+
+    /**
+     * Show window with grouped rules for an application
+     */
+    private showRulesWindow(
+        appName: string,
+        wmClass: string,
+        config: ConfigRules,
+        isDefault: boolean,
+    ): void {
+        // Create dialog window
+        const rulesWindow = new Adw.Window({
+            modal: true,
+            hide_on_close: true,
+            default_width: 500,
+            default_height: 600,
+        });
+
+        // Create header bar
+        const headerBar = new Adw.HeaderBar();
+        rulesWindow.set_title(appName);
+
+        // Create toolbar view
+        const toolbarView = new Adw.ToolbarView();
+        toolbarView.add_top_bar(headerBar);
+
+        // Create scrollable content
+        const scrolledWindow = new Gtk.ScrolledWindow({
+            vexpand: true,
+            hexpand: true,
+        });
+
+        const preferencesPage = new Adw.PreferencesPage();
+        scrolledWindow.set_child(preferencesPage);
+
+        // Application info group
+        const infoGroup = new Adw.PreferencesGroup({
+            title: _('Application Information'),
+        });
+
+        const nameRow = new Adw.ActionRow({
+            title: _('Name'),
+            subtitle: appName,
+            activatable: false,
+        });
+        infoGroup.add(nameRow);
+
+        const wmClassRow = new Adw.ActionRow({
+            title: _('WM Class'),
+            subtitle: isDefault ? _('N/A (default rule)') : wmClass,
+            activatable: false,
+        });
+        infoGroup.add(wmClassRow);
+        preferencesPage.add(infoGroup);
+
+        // Visual Features group
+        const visualGroup = new Adw.PreferencesGroup({
+            title: _('Visual Features'),
+            description: _('Appearance and visual effects'),
+        });
+
         const customBorderSwitch = new Gtk.Switch({
             vexpand: false,
             valign: Gtk.Align.CENTER,
-            active: ruleConfig.customBorder,
+            active: config.customBorder,
             sensitive: !isDefault,
         });
         if (!isDefault) {
-            customBorderSwitch.connect('notify::active', () =>
-                this.saveCustomRules(),
-            );
+            customBorderSwitch.connect('notify::active', () => {
+                config.customBorder = customBorderSwitch.get_active();
+                this.saveCustomRules();
+            });
         }
         const customBorderRow = new Adw.ActionRow({
             title: _('Custom border'),
@@ -170,134 +244,169 @@ export class CustomApplicationRulePrefs {
             activatableWidget: customBorderSwitch,
         });
         customBorderRow.add_suffix(customBorderSwitch);
-        appRow.add_row(customBorderRow);
+        visualGroup.add(customBorderRow);
+        preferencesPage.add(visualGroup);
 
-        // Auto-tiling toggle
+        // Window Management group
+        const managementGroup = new Adw.PreferencesGroup({
+            title: _('Window Management'),
+            description: _('Automatic tiling and window behavior'),
+        });
+
         const autoTilingSwitch = new Gtk.Switch({
             vexpand: false,
             valign: Gtk.Align.CENTER,
-            active: ruleConfig.autoTiling,
+            active: config.autoTiling,
             sensitive: !isDefault,
         });
         if (!isDefault) {
-            autoTilingSwitch.connect('notify::active', () =>
-                this.saveCustomRules(),
-            );
+            autoTilingSwitch.connect('notify::active', () => {
+                config.autoTiling = autoTilingSwitch.get_active();
+                this.saveCustomRules();
+            });
         }
-        const appAutoTilingRow = new Adw.ActionRow({
+        const autoTilingRow = new Adw.ActionRow({
             title: _('Auto-tiling'),
             subtitle: _('Automatically tile new windows for this application'),
             activatableWidget: autoTilingSwitch,
         });
-        appAutoTilingRow.add_suffix(autoTilingSwitch);
-        appRow.add_row(appAutoTilingRow);
+        autoTilingRow.add_suffix(autoTilingSwitch);
+        managementGroup.add(autoTilingRow);
 
-        // Snap assistant toggle
-        const snapAssistSwitch = new Gtk.Switch({
+        const spanMultipleTilesSwitch = new Gtk.Switch({
             vexpand: false,
             valign: Gtk.Align.CENTER,
-            active: ruleConfig.snapAssist,
+            active: config.spanMultipleTiles,
             sensitive: !isDefault,
         });
         if (!isDefault) {
-            snapAssistSwitch.connect('notify::active', () =>
-                this.saveCustomRules(),
-            );
+            spanMultipleTilesSwitch.connect('notify::active', () => {
+                config.spanMultipleTiles = spanMultipleTilesSwitch.get_active();
+                this.saveCustomRules();
+            });
         }
-        const appSnapAssistRow = new Adw.ActionRow({
-            title: _('Snap assistant'),
-            subtitle: _('Enable snap assistant for this application'),
-            activatableWidget: snapAssistSwitch,
+        const spanMultipleTilesRow = new Adw.ActionRow({
+            title: _('Span multiple tiles'),
+            subtitle: _('Allow this application to span multiple tiles'),
+            activatableWidget: spanMultipleTilesSwitch,
         });
-        appSnapAssistRow.add_suffix(snapAssistSwitch);
-        appRow.add_row(appSnapAssistRow);
+        spanMultipleTilesRow.add_suffix(spanMultipleTilesSwitch);
+        managementGroup.add(spanMultipleTilesRow);
 
-        // Window suggestions toggle
-        const windowSuggestionsSwitch = new Gtk.Switch({
-            vexpand: false,
-            valign: Gtk.Align.CENTER,
-            active: ruleConfig.windowSuggestions,
-            sensitive: !isDefault,
-        });
-        if (!isDefault) {
-            windowSuggestionsSwitch.connect('notify::active', () =>
-                this.saveCustomRules(),
-            );
-        }
-        const appWindowSuggestionsRow = new Adw.ActionRow({
-            title: _('Window suggestions'),
-            subtitle: _(
-                "Suggest this application's windows to fill empty tiles",
-            ),
-            activatableWidget: windowSuggestionsSwitch,
-        });
-        appWindowSuggestionsRow.add_suffix(windowSuggestionsSwitch);
-        appRow.add_row(appWindowSuggestionsRow);
-
-        // Resize complementing windows toggle
         const resizeComplementingSwitch = new Gtk.Switch({
             vexpand: false,
             valign: Gtk.Align.CENTER,
-            active: ruleConfig.resizeComplementing,
+            active: config.resizeComplementing,
             sensitive: !isDefault,
         });
         if (!isDefault) {
-            resizeComplementingSwitch.connect('notify::active', () =>
-                this.saveCustomRules(),
-            );
+            resizeComplementingSwitch.connect('notify::active', () => {
+                config.resizeComplementing =
+                    resizeComplementingSwitch.get_active();
+                this.saveCustomRules();
+            });
         }
-        const appResizeComplementingRow = new Adw.ActionRow({
+        const resizeComplementingRow = new Adw.ActionRow({
             title: _('Resize complementing windows'),
             subtitle: _(
                 'Auto-resize nearby windows when this window is resized',
             ),
             activatableWidget: resizeComplementingSwitch,
         });
-        appResizeComplementingRow.add_suffix(resizeComplementingSwitch);
-        appRow.add_row(appResizeComplementingRow);
+        resizeComplementingRow.add_suffix(resizeComplementingSwitch);
+        managementGroup.add(resizeComplementingRow);
+        preferencesPage.add(managementGroup);
 
-        // Span multiple tiles toggle
-        const spanMultipleTilesSwitch = new Gtk.Switch({
+        // Assistants group
+        const assistantsGroup = new Adw.PreferencesGroup({
+            title: _('Assistants'),
+            description: _('Helper features and suggestions'),
+        });
+
+        const snapAssistSwitch = new Gtk.Switch({
             vexpand: false,
             valign: Gtk.Align.CENTER,
-            active: ruleConfig.spanMultipleTiles,
+            active: config.snapAssist,
             sensitive: !isDefault,
         });
         if (!isDefault) {
-            spanMultipleTilesSwitch.connect('notify::active', () =>
-                this.saveCustomRules(),
-            );
+            snapAssistSwitch.connect('notify::active', () => {
+                config.snapAssist = snapAssistSwitch.get_active();
+                this.saveCustomRules();
+            });
         }
-        const appSpanMultipleTilesRow = new Adw.ActionRow({
-            title: _('Span multiple tiles'),
-            subtitle: _('Allow this application to span multiple tiles'),
-            activatableWidget: spanMultipleTilesSwitch,
+        const snapAssistRow = new Adw.ActionRow({
+            title: _('Snap assistant'),
+            subtitle: _('Enable snap assistant for this application'),
+            activatableWidget: snapAssistSwitch,
         });
-        appSpanMultipleTilesRow.add_suffix(spanMultipleTilesSwitch);
-        appRow.add_row(appSpanMultipleTilesRow);
+        snapAssistRow.add_suffix(snapAssistSwitch);
+        assistantsGroup.add(snapAssistRow);
 
-        // Store row with switch references (only for custom rules)
+        const windowSuggestionsSwitch = new Gtk.Switch({
+            vexpand: false,
+            valign: Gtk.Align.CENTER,
+            active: config.windowSuggestions,
+            sensitive: !isDefault,
+        });
         if (!isDefault) {
-            const rowData: ApplicationRowData = {
-                row: appRow,
-                switches: {
-                    customBorder: customBorderSwitch,
-                    autoTiling: autoTilingSwitch,
-                    snapAssist: snapAssistSwitch,
-                    windowSuggestions: windowSuggestionsSwitch,
-                    resizeComplementing: resizeComplementingSwitch,
-                    spanMultipleTiles: spanMultipleTilesSwitch,
-                },
-            };
-            this.applicationRows.push(rowData);
+            windowSuggestionsSwitch.connect('notify::active', () => {
+                config.windowSuggestions = windowSuggestionsSwitch.get_active();
+                this.saveCustomRules();
+            });
         }
+        const windowSuggestionsRow = new Adw.ActionRow({
+            title: _('Window suggestions'),
+            subtitle: _(
+                "Suggest this application's windows to fill empty tiles",
+            ),
+            activatableWidget: windowSuggestionsSwitch,
+        });
+        windowSuggestionsRow.add_suffix(windowSuggestionsSwitch);
+        assistantsGroup.add(windowSuggestionsRow);
+        preferencesPage.add(assistantsGroup);
 
-        // Delete button or info row
-        if (isDefault) {
+        // Delete button for custom rules
+        if (!isDefault) {
+            const deleteGroup = new Adw.PreferencesGroup({
+                title: _('Delete Rule'),
+            });
+
+            const deleteButton = new Gtk.Button({
+                label: _('Delete Application Rule'),
+                css_classes: ['destructive-action'],
+                halign: Gtk.Align.CENTER,
+                margin_top: 12,
+                margin_bottom: 12,
+            });
+            deleteButton.connect('clicked', () => {
+                this.existingWmClasses.delete(wmClass.toLowerCase());
+                // Find and remove from array
+                const index = this.applicationRows.findIndex(
+                    (item) => item.wmClass === wmClass,
+                );
+                if (index > -1) {
+                    const rowToRemove = this.applicationRows[index].row;
+                    this.applicationRows.splice(index, 1);
+                    this.customRulesGroup.remove(rowToRemove);
+                }
+                this.saveCustomRules();
+                rulesWindow.close();
+            });
+
+            const deleteRow = new Adw.ActionRow({
+                activatable: false,
+            });
+            deleteRow.set_child(deleteButton);
+            deleteGroup.add(deleteRow);
+            preferencesPage.add(deleteGroup);
+        } else {
+            // Info for default rule
+            const subInfoGroup = new Adw.PreferencesGroup();
             const infoRow = new Adw.ActionRow({
                 title: _('This is a default rule'),
                 subtitle: _(
-                    `All features are disabled for ${appName} by default`,
+                    'All features are disabled for fullscreen applications by default',
                 ),
                 activatable: false,
             });
@@ -307,34 +416,13 @@ export class CustomApplicationRulePrefs {
                     valign: Gtk.Align.CENTER,
                 }),
             );
-            appRow.add_row(infoRow);
-        } else {
-            const deleteButton = new Gtk.Button({
-                label: _('Delete'),
-                css_classes: ['destructive-action'],
-                halign: Gtk.Align.CENTER,
-                margin_top: 12,
-                margin_bottom: 6,
-            });
-            deleteButton.connect('clicked', () => {
-                this.existingWmClasses.delete(wmClass.toLowerCase());
-                // Remove from array
-                const index = this.applicationRows.findIndex(
-                    (item) => item.row === appRow,
-                );
-                if (index > -1) this.applicationRows.splice(index, 1);
-
-                this.customRulesGroup.remove(appRow);
-                this.saveCustomRules();
-            });
-            const deleteRow = new Adw.ActionRow({
-                activatable: false,
-            });
-            deleteRow.set_child(deleteButton);
-            appRow.add_row(deleteRow);
+            subInfoGroup.add(infoRow);
+            preferencesPage.add(subInfoGroup);
         }
 
-        return appRow;
+        toolbarView.set_content(scrolledWindow);
+        rulesWindow.set_content(toolbarView);
+        rulesWindow.present();
     }
 
     /**
