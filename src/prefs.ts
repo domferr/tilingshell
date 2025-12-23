@@ -29,6 +29,7 @@ import SettingsExport from './settings/settingsExport';
 import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 // @ts-expect-error "Module exists"
 import * as Config from 'resource:///org/gnome/Shell/Extensions/js/misc/config.js';
+import { CustomRulesApplicationConfig } from '@components/customRulesManager';
 
 const debug = logger('prefs');
 const RESOURCES_PREFIX = "/org/gnome/Shell/Extensions/tilingshell"; // must match the prefix in resources.gresources.xml
@@ -433,13 +434,17 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 return {
                     name: row.get_title(),
                     wmClass,
-                    customBorder: switches.customBorder.get_active(),
-                    autoTiling: switches.autoTiling.get_active(),
-                    snapAssist: switches.snapAssist.get_active(),
-                    windowSuggestions: switches.windowSuggestions.get_active(),
-                    resizeComplementing:
-                        switches.resizeComplementing.get_active(),
-                    spanMultipleTiles: switches.spanMultipleTiles.get_active(),
+                    ruleConfig: {
+                        customBorder: switches.customBorder.get_active(),
+                        autoTiling: switches.autoTiling.get_active(),
+                        snapAssist: switches.snapAssist.get_active(),
+                        windowSuggestions:
+                            switches.windowSuggestions.get_active(),
+                        resizeComplementing:
+                            switches.resizeComplementing.get_active(),
+                        spanMultipleTiles:
+                            switches.spanMultipleTiles.get_active(),
+                    },
                 };
             });
             Settings.save_application_custom_rules(customRules);
@@ -449,29 +454,49 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         const createCustomRulesApplicationRow = (
             appName: string,
             wmClass: string,
-            customBorder = true,
-            autoTiling = true,
-            snapAssist = true,
-            windowSuggestions = true,
-            resizeComplementing = true,
-            spanMultipleTiles = true,
+            config: CustomRulesApplicationConfig = {
+                customBorder: true,
+                autoTiling: true,
+                snapAssist: true,
+                windowSuggestions: true,
+                resizeComplementing: true,
+                spanMultipleTiles: true,
+            },
+            isDefault = false,
         ) => {
+            const ruleConfig = Object.assign(
+                {
+                    customBorder: true,
+                    autoTiling: true,
+                    snapAssist: true,
+                    windowSuggestions: true,
+                    resizeComplementing: true,
+                    spanMultipleTiles: true,
+                },
+                config,
+            );
+
             const appRow = new Adw.ExpanderRow({
                 title: appName,
-                subtitle: `WM Class: ${wmClass}`,
+                subtitle: isDefault
+                    ? _('Default rule (cannot be deleted)')
+                    : `WM Class: ${wmClass}`,
             });
 
-            existingWmClasses.add(wmClass.toLowerCase());
+            if (!isDefault) existingWmClasses.add(wmClass.toLowerCase());
 
             // Custom border toggle
             const customBorderSwitch = new Gtk.Switch({
                 vexpand: false,
                 valign: Gtk.Align.CENTER,
-                active: customBorder,
+                active: ruleConfig.customBorder,
+                sensitive: !isDefault,
             });
-            customBorderSwitch.connect('notify::active', () =>
-                saveCustomRules(),
-            );
+            if (!isDefault) {
+                customBorderSwitch.connect('notify::active', () =>
+                    saveCustomRules(),
+                );
+            }
             const customBorderRow = new Adw.ActionRow({
                 title: _('Custom border'),
                 subtitle: _('Show custom border for this application'),
@@ -484,9 +509,14 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             const autoTilingSwitch = new Gtk.Switch({
                 vexpand: false,
                 valign: Gtk.Align.CENTER,
-                active: autoTiling,
+                active: ruleConfig.autoTiling,
+                sensitive: !isDefault,
             });
-            autoTilingSwitch.connect('notify::active', () => saveCustomRules());
+            if (!isDefault) {
+                autoTilingSwitch.connect('notify::active', () =>
+                    saveCustomRules(),
+                );
+            }
             const appAutoTilingRow = new Adw.ActionRow({
                 title: _('Auto-tiling'),
                 subtitle: _(
@@ -501,9 +531,14 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             const snapAssistSwitch = new Gtk.Switch({
                 vexpand: false,
                 valign: Gtk.Align.CENTER,
-                active: snapAssist,
+                active: ruleConfig.snapAssist,
+                sensitive: !isDefault,
             });
-            snapAssistSwitch.connect('notify::active', () => saveCustomRules());
+            if (!isDefault) {
+                snapAssistSwitch.connect('notify::active', () =>
+                    saveCustomRules(),
+                );
+            }
             const appSnapAssistRow = new Adw.ActionRow({
                 title: _('Snap assistant'),
                 subtitle: _('Enable snap assistant for this application'),
@@ -516,11 +551,14 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             const windowSuggestionsSwitch = new Gtk.Switch({
                 vexpand: false,
                 valign: Gtk.Align.CENTER,
-                active: windowSuggestions,
+                active: ruleConfig.windowSuggestions,
+                sensitive: !isDefault,
             });
-            windowSuggestionsSwitch.connect('notify::active', () =>
-                saveCustomRules(),
-            );
+            if (!isDefault) {
+                windowSuggestionsSwitch.connect('notify::active', () =>
+                    saveCustomRules(),
+                );
+            }
             const appWindowSuggestionsRow = new Adw.ActionRow({
                 title: _('Window suggestions'),
                 subtitle: _(
@@ -535,11 +573,14 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             const resizeComplementingSwitch = new Gtk.Switch({
                 vexpand: false,
                 valign: Gtk.Align.CENTER,
-                active: resizeComplementing,
+                active: ruleConfig.resizeComplementing,
+                sensitive: !isDefault,
             });
-            resizeComplementingSwitch.connect('notify::active', () =>
-                saveCustomRules(),
-            );
+            if (!isDefault) {
+                resizeComplementingSwitch.connect('notify::active', () =>
+                    saveCustomRules(),
+                );
+            }
             const appResizeComplementingRow = new Adw.ActionRow({
                 title: _('Resize complementing windows'),
                 subtitle: _(
@@ -554,11 +595,14 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             const spanMultipleTilesSwitch = new Gtk.Switch({
                 vexpand: false,
                 valign: Gtk.Align.CENTER,
-                active: spanMultipleTiles,
+                active: ruleConfig.spanMultipleTiles,
+                sensitive: !isDefault,
             });
-            spanMultipleTilesSwitch.connect('notify::active', () =>
-                saveCustomRules(),
-            );
+            if (!isDefault) {
+                spanMultipleTilesSwitch.connect('notify::active', () =>
+                    saveCustomRules(),
+                );
+            }
             const appSpanMultipleTilesRow = new Adw.ActionRow({
                 title: _('Span multiple tiles'),
                 subtitle: _('Allow this application to span multiple tiles'),
@@ -567,19 +611,21 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             appSpanMultipleTilesRow.add_suffix(spanMultipleTilesSwitch);
             appRow.add_row(appSpanMultipleTilesRow);
 
-            // Store row with switch references
-            const rowData = {
-                row: appRow,
-                switches: {
-                    customBorder: customBorderSwitch,
-                    autoTiling: autoTilingSwitch,
-                    snapAssist: snapAssistSwitch,
-                    windowSuggestions: windowSuggestionsSwitch,
-                    resizeComplementing: resizeComplementingSwitch,
-                    spanMultipleTiles: spanMultipleTilesSwitch,
-                },
-            };
-            applicationRows.push(rowData);
+            // Store row with switch references (only for custom rules)
+            if (!isDefault) {
+                const rowData = {
+                    row: appRow,
+                    switches: {
+                        customBorder: customBorderSwitch,
+                        autoTiling: autoTilingSwitch,
+                        snapAssist: snapAssistSwitch,
+                        windowSuggestions: windowSuggestionsSwitch,
+                        resizeComplementing: resizeComplementingSwitch,
+                        spanMultipleTiles: spanMultipleTilesSwitch,
+                    },
+                };
+                applicationRows.push(rowData);
+            }
 
             // Implement accordion behavior: collapse others when this one expands
             appRow.connect('notify::enable-expansion', () => {
@@ -590,33 +636,66 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 }
             });
 
-            // Delete button
-            const deleteButton = new Gtk.Button({
-                label: _('Delete'),
-                css_classes: ['destructive-action'],
-                halign: Gtk.Align.CENTER,
-                margin_top: 12,
-                margin_bottom: 6,
-            });
-            deleteButton.connect('clicked', () => {
-                existingWmClasses.delete(wmClass.toLowerCase());
-                // Remove from array
-                const index = applicationRows.findIndex(
-                    (item) => item.row === appRow,
+            // Delete button or info row
+            if (isDefault) {
+                const infoRow = new Adw.ActionRow({
+                    title: _('This is a default rule'),
+                    subtitle: _(
+                        `All features are disabled for ${appName} by default`,
+                    ),
+                    activatable: false,
+                });
+                infoRow.add_prefix(
+                    new Gtk.Image({
+                        icon_name: 'dialog-information-symbolic',
+                        valign: Gtk.Align.CENTER,
+                    }),
                 );
-                if (index > -1) applicationRows.splice(index, 1);
+                appRow.add_row(infoRow);
+            } else {
+                const deleteButton = new Gtk.Button({
+                    label: _('Delete'),
+                    css_classes: ['destructive-action'],
+                    halign: Gtk.Align.CENTER,
+                    margin_top: 12,
+                    margin_bottom: 6,
+                });
+                deleteButton.connect('clicked', () => {
+                    existingWmClasses.delete(wmClass.toLowerCase());
+                    // Remove from array
+                    const index = applicationRows.findIndex(
+                        (item) => item.row === appRow,
+                    );
+                    if (index > -1) applicationRows.splice(index, 1);
 
-                customRulesGroup.remove(appRow);
-                saveCustomRules();
-            });
-            const deleteRow = new Adw.ActionRow({
-                activatable: false,
-            });
-            deleteRow.set_child(deleteButton);
-            appRow.add_row(deleteRow);
+                    customRulesGroup.remove(appRow);
+                    saveCustomRules();
+                });
+                const deleteRow = new Adw.ActionRow({
+                    activatable: false,
+                });
+                deleteRow.set_child(deleteButton);
+                appRow.add_row(deleteRow);
+            }
 
             return appRow;
         };
+
+        // Add fullscreen default rule first (non-deletable)
+        const fullscreenDefaultRow = createCustomRulesApplicationRow(
+            _('Fullscreen Applications'),
+            'fullscreen',
+            {
+                customBorder: false,
+                autoTiling: false,
+                snapAssist: false,
+                windowSuggestions: false,
+                resizeComplementing: false,
+                spanMultipleTiles: false,
+            },
+            true, // isDefault
+        );
+        customRulesGroup.add(fullscreenDefaultRow);
 
         // Load customRules from settings
         const savedCustomRules = Settings.get_application_custom_rules();
@@ -624,12 +703,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             const appRow = createCustomRulesApplicationRow(
                 app.name,
                 app.wmClass,
-                app.customBorder,
-                app.autoTiling,
-                app.snapAssist,
-                app.windowSuggestions,
-                app.resizeComplementing,
-                app.spanMultipleTiles,
+                app.ruleConfig,
             );
             customRulesGroup.add(appRow);
         });

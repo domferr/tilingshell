@@ -1,6 +1,7 @@
 import { Gio, GObject, GLib } from '../gi/shared';
 import Layout from '../components/layout/Layout';
 import Tile from '../components/layout/Tile';
+import { CustomRulesApplicationConfig } from '@components/customRulesManager';
 
 export enum ActivationKey {
     NONE = -1,
@@ -680,12 +681,7 @@ export default class Settings {
     static get_application_custom_rules(): Array<{
         name: string;
         wmClass: string;
-        customBorder: boolean;
-        autoTiling: boolean;
-        snapAssist: boolean;
-        windowSuggestions: boolean;
-        resizeComplementing: boolean;
-        spanMultipleTiles: boolean;
+        ruleConfig?: CustomRulesApplicationConfig;
     }> {
         try {
             const json = get_string(Settings.KEY_APPLICATION_CUSTOMRULES);
@@ -700,12 +696,7 @@ export default class Settings {
         customRules: Array<{
             name: string;
             wmClass: string;
-            customBorder: boolean;
-            autoTiling: boolean;
-            snapAssist: boolean;
-            windowSuggestions: boolean;
-            resizeComplementing: boolean;
-            spanMultipleTiles: boolean;
+            ruleConfig?: CustomRulesApplicationConfig;
         }>,
     ) {
         set_string(

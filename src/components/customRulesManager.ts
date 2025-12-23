@@ -6,15 +6,19 @@ import Settings from '@settings/settings';
 
 const debug = logger('CustomRulesManager');
 
-export interface CustomRulesByApp {
-    name: string;
-    wmClass: string;
+export type CustomRulesApplicationConfig = {
     customBorder: boolean;
     autoTiling: boolean;
     snapAssist: boolean;
     windowSuggestions: boolean;
     resizeComplementing: boolean;
     spanMultipleTiles: boolean;
+};
+
+export interface CustomRulesByApp {
+    name: string;
+    wmClass: string;
+    ruleConfig?: CustomRulesApplicationConfig;
 }
 
 @registerGObjectClass
@@ -62,6 +66,29 @@ export class CustomRulesManager extends GObject.Object {
     }
 
     /**
+     * Get the default rule for fullscreen applications
+     * @returns The default rule with all features disabled
+     */
+    private _getFullscreenDefaultRule(): CustomRulesByApp {
+        return (
+            this._customRules.find(
+                (entry) => entry.wmClass.toLowerCase() === 'fullscreen',
+            ) || {
+                name: 'Fullscreen Applications',
+                wmClass: 'fullscreen',
+                ruleConfig: {
+                    customBorder: false,
+                    autoTiling: false,
+                    snapAssist: false,
+                    windowSuggestions: false,
+                    resizeComplementing: false,
+                    spanMultipleTiles: false,
+                },
+            }
+        );
+    }
+
+    /**
      * Get the customRules entry for a window by its WM class
      * @param window The window to check
      * @returns The customRules entry if found, undefined otherwise
@@ -69,6 +96,9 @@ export class CustomRulesManager extends GObject.Object {
     private _getCustomRulesEntry(
         window: Meta.Window,
     ): CustomRulesByApp | undefined {
+        // Check if the window is fullscreen first - apply default rule
+        if (window.is_fullscreen()) return this._getFullscreenDefaultRule();
+
         const wmClass = window.get_wm_class();
         if (!wmClass) return undefined;
 
@@ -86,7 +116,7 @@ export class CustomRulesManager extends GObject.Object {
         const entry = this._getCustomRulesEntry(window);
 
         if (!entry) return true;
-        return entry.customBorder;
+        return entry.ruleConfig?.customBorder ?? true;
     }
 
     /**
@@ -98,7 +128,7 @@ export class CustomRulesManager extends GObject.Object {
         const entry = this._getCustomRulesEntry(window);
 
         if (!entry) return true;
-        return entry.autoTiling;
+        return entry.ruleConfig?.autoTiling ?? true;
     }
 
     /**
@@ -110,7 +140,7 @@ export class CustomRulesManager extends GObject.Object {
         const entry = this._getCustomRulesEntry(window);
 
         if (!entry) return true;
-        return entry.snapAssist;
+        return entry.ruleConfig?.snapAssist ?? true;
     }
 
     /**
@@ -122,7 +152,7 @@ export class CustomRulesManager extends GObject.Object {
         const entry = this._getCustomRulesEntry(window);
 
         if (!entry) return true;
-        return entry.windowSuggestions;
+        return entry.ruleConfig?.windowSuggestions ?? true;
     }
 
     /**
@@ -134,7 +164,7 @@ export class CustomRulesManager extends GObject.Object {
         const entry = this._getCustomRulesEntry(window);
 
         if (!entry) return true;
-        return entry.resizeComplementing;
+        return entry.ruleConfig?.resizeComplementing ?? true;
     }
 
     /**
@@ -146,7 +176,7 @@ export class CustomRulesManager extends GObject.Object {
         const entry = this._getCustomRulesEntry(window);
 
         if (!entry) return true;
-        return entry.spanMultipleTiles;
+        return entry.ruleConfig?.spanMultipleTiles ?? true;
     }
 
     /**
