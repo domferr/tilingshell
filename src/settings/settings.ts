@@ -1,7 +1,7 @@
 import { Gio, GObject, GLib } from '../gi/shared';
 import Layout from '../components/layout/Layout';
 import Tile from '../components/layout/Tile';
-import { ConfigRules } from '@components/customRulesManager';
+import { CustomApplicationRules } from '@components/customRulesManager';
 
 export enum ActivationKey {
     NONE = -1,
@@ -678,14 +678,26 @@ export default class Settings {
         );
     }
 
-    static get_application_custom_rules(): Array<{
-        name: string;
-        wmClass: string;
-        ruleConfig?: ConfigRules;
-    }> {
+    static get_application_custom_rules(): Array<CustomApplicationRules> {
         try {
             const json = get_string(Settings.KEY_APPLICATION_CUSTOMRULES);
-            return JSON.parse(json);
+            const rules = JSON.parse(json) as Array<CustomApplicationRules>;
+
+            // Validate all rules - if any rule is invalid, clear all custom rules
+            const hasInvalidRule = rules.some(
+                (rule) => !rule.appId || !rule.name,
+            );
+
+            if (hasInvalidRule) {
+                console.warn(
+                    'TilingShell: Invalid or corrupted custom rules detected, clearing all custom rules',
+                );
+                // Clear the invalid data
+                this.save_application_custom_rules([]);
+                return [];
+            }
+
+            return rules;
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (e) {
             return [];
@@ -693,11 +705,7 @@ export default class Settings {
     }
 
     static save_application_custom_rules(
-        customRules: Array<{
-            name: string;
-            wmClass: string;
-            ruleConfig?: ConfigRules;
-        }>,
+        customRules: Array<CustomApplicationRules>,
     ) {
         set_string(
             Settings.KEY_APPLICATION_CUSTOMRULES,

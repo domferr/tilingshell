@@ -3,17 +3,18 @@ import Settings from '@settings/settings';
 import { logger } from '@utils/logger';
 import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 import { ConfigRules } from './customRulesManager';
+import { ApplicationPicker } from './applicationPicker';
 
 const debug = logger('customApplicationRulePrefs');
 
 interface ApplicationRowData {
     row: Adw.ActionRow;
-    wmClass: string;
+    appId: string;
     config: ConfigRules;
 }
 
 export class CustomApplicationRulePrefs {
-    private existingWmClasses: Set<string> = new Set<string>();
+    private existingAppsId: Set<string> = new Set<string>();
     private applicationRows: ApplicationRowData[] = [];
     private customRulesGroup!: Adw.PreferencesGroup;
 
@@ -51,7 +52,7 @@ export class CustomApplicationRulePrefs {
         savedCustomRules.forEach((app) => {
             const appRow = this.createCustomRulesApplicationRow(
                 app.name,
-                app.wmClass,
+                app.appId,
                 app.ruleConfig,
             );
             this.customRulesGroup.add(appRow);
@@ -63,13 +64,14 @@ export class CustomApplicationRulePrefs {
             _('Add application to customRules'),
             _('Configure features for a new application'),
             () => {
-                this.showAddApplicationDialog(
+                ApplicationPicker.showPicker(
                     parentWindow,
-                    (appName, wmClass) => {
-                        debug(`Adding application: ${appName} (${wmClass})`);
+                    this.existingAppsId,
+                    (appName, appId) => {
+                        debug(`Adding application: ${appName} (${appId})`);
                         const newAppRow = this.createCustomRulesApplicationRow(
                             appName,
-                            wmClass,
+                            appId,
                         );
                         // Insert before the "Add Application" button
                         // Remove button, add new row, then re-add button to keep it at the bottom
@@ -91,10 +93,10 @@ export class CustomApplicationRulePrefs {
      */
     private saveCustomRules(): void {
         const customRules = this.applicationRows.map(
-            ({ row, wmClass, config }) => {
+            ({ row, appId, config }) => {
                 return {
                     name: row.get_title(),
-                    wmClass,
+                    appId,
                     ruleConfig: config,
                 };
             },
@@ -107,7 +109,7 @@ export class CustomApplicationRulePrefs {
      */
     private createCustomRulesApplicationRow(
         appName: string,
-        wmClass: string,
+        appId: string,
         config: ConfigRules = {
             customBorder: true,
             autoTiling: true,
@@ -134,7 +136,7 @@ export class CustomApplicationRulePrefs {
             title: appName,
             subtitle: isDefault
                 ? _('Default rule (cannot be deleted)')
-                : `WM Class: ${wmClass}`,
+                : `App ID: ${appId}`,
             activatable: true,
         });
 
@@ -146,13 +148,13 @@ export class CustomApplicationRulePrefs {
             }),
         );
 
-        if (!isDefault) this.existingWmClasses.add(wmClass.toLowerCase());
+        if (!isDefault && appId) this.existingAppsId.add(appId.toLowerCase());
 
         // Store row with config (only for custom rules)
         if (!isDefault) {
             const rowData: ApplicationRowData = {
                 row: appRow,
-                wmClass,
+                appId,
                 config: ruleConfig,
             };
             this.applicationRows.push(rowData);
@@ -160,7 +162,7 @@ export class CustomApplicationRulePrefs {
 
         // Open rules window when row is clicked
         appRow.connect('activated', () => {
-            this.showRulesWindow(appName, wmClass, ruleConfig, isDefault);
+            this.showRulesWindow(appName, appId, ruleConfig, isDefault);
         });
 
         return appRow;
@@ -171,7 +173,7 @@ export class CustomApplicationRulePrefs {
      */
     private showRulesWindow(
         appName: string,
-        wmClass: string,
+        appId: string,
         config: ConfigRules,
         isDefault: boolean,
     ): void {
@@ -212,18 +214,18 @@ export class CustomApplicationRulePrefs {
         });
         infoGroup.add(nameRow);
 
-        const wmClassRow = new Adw.ActionRow({
-            title: _('WM Class'),
-            subtitle: isDefault ? _('N/A (default rule)') : wmClass,
+        const appIdRow = new Adw.ActionRow({
+            title: _('Application ID'),
+            subtitle: isDefault ? _('N/A (default rule)') : appId,
             activatable: false,
         });
-        infoGroup.add(wmClassRow);
+        infoGroup.add(appIdRow);
         preferencesPage.add(infoGroup);
 
-        // Visual Features group
-        const visualGroup = new Adw.PreferencesGroup({
-            title: _('Visual Features'),
-            description: _('Appearance and visual effects'),
+        // Appearance Section
+        const appearenceGroup = new Adw.PreferencesGroup({
+            title: _('Appearance'),
+            description: _('Configure the appearance of Tiling Shell'),
         });
 
         const customBorderSwitch = new Gtk.Switch({
@@ -244,13 +246,13 @@ export class CustomApplicationRulePrefs {
             activatableWidget: customBorderSwitch,
         });
         customBorderRow.add_suffix(customBorderSwitch);
-        visualGroup.add(customBorderRow);
-        preferencesPage.add(visualGroup);
+        appearenceGroup.add(customBorderRow);
+        preferencesPage.add(appearenceGroup);
 
-        // Window Management group
-        const managementGroup = new Adw.PreferencesGroup({
-            title: _('Window Management'),
-            description: _('Automatic tiling and window behavior'),
+        // Behavior section
+        const behaviourGroup = new Adw.PreferencesGroup({
+            title: _('Behaviour'),
+            description: _('Configure the behaviour of Tiling Shell'),
         });
 
         const autoTilingSwitch = new Gtk.Switch({
@@ -271,7 +273,7 @@ export class CustomApplicationRulePrefs {
             activatableWidget: autoTilingSwitch,
         });
         autoTilingRow.add_suffix(autoTilingSwitch);
-        managementGroup.add(autoTilingRow);
+        behaviourGroup.add(autoTilingRow);
 
         const spanMultipleTilesSwitch = new Gtk.Switch({
             vexpand: false,
@@ -291,7 +293,7 @@ export class CustomApplicationRulePrefs {
             activatableWidget: spanMultipleTilesSwitch,
         });
         spanMultipleTilesRow.add_suffix(spanMultipleTilesSwitch);
-        managementGroup.add(spanMultipleTilesRow);
+        behaviourGroup.add(spanMultipleTilesRow);
 
         const resizeComplementingSwitch = new Gtk.Switch({
             vexpand: false,
@@ -314,8 +316,8 @@ export class CustomApplicationRulePrefs {
             activatableWidget: resizeComplementingSwitch,
         });
         resizeComplementingRow.add_suffix(resizeComplementingSwitch);
-        managementGroup.add(resizeComplementingRow);
-        preferencesPage.add(managementGroup);
+        behaviourGroup.add(resizeComplementingRow);
+        preferencesPage.add(behaviourGroup);
 
         // Assistants group
         const assistantsGroup = new Adw.PreferencesGroup({
@@ -380,10 +382,10 @@ export class CustomApplicationRulePrefs {
                 margin_bottom: 12,
             });
             deleteButton.connect('clicked', () => {
-                this.existingWmClasses.delete(wmClass.toLowerCase());
+                this.existingAppsId.delete(appId.toLowerCase());
                 // Find and remove from array
                 const index = this.applicationRows.findIndex(
-                    (item) => item.wmClass === wmClass,
+                    (item) => item.appId === appId,
                 );
                 if (index > -1) {
                     const rowToRemove = this.applicationRows[index].row;
@@ -423,154 +425,6 @@ export class CustomApplicationRulePrefs {
         toolbarView.set_content(scrolledWindow);
         rulesWindow.set_content(toolbarView);
         rulesWindow.present();
-    }
-
-    /**
-     * Show dialog for adding a new application
-     */
-    private showAddApplicationDialog(
-        parentWindow: Adw.PreferencesWindow,
-        onAdd: (appName: string, wmClass: string) => void,
-    ): void {
-        // Create dialog window
-        const dialog = new Adw.Window({
-            modal: true,
-            hide_on_close: true,
-            transient_for: parentWindow,
-            default_width: 400,
-            default_height: 300,
-        });
-
-        // Create header bar
-        const headerBar = new Adw.HeaderBar();
-        dialog.set_title(_('Add Application'));
-
-        // Create content
-        const toolbarView = new Adw.ToolbarView();
-        toolbarView.add_top_bar(headerBar);
-
-        const contentBox = new Gtk.Box({
-            orientation: Gtk.Orientation.VERTICAL,
-            margin_top: 24,
-            margin_bottom: 24,
-            margin_start: 24,
-            margin_end: 24,
-            spacing: 18,
-        });
-
-        // Application name entry
-        const nameEntry = new Gtk.Entry({
-            placeholder_text: _('Application Name (e.g., Firefox)'),
-            hexpand: true,
-        });
-        const nameRow = new Gtk.Box({
-            orientation: Gtk.Orientation.VERTICAL,
-            spacing: 6,
-        });
-        nameRow.append(
-            new Gtk.Label({
-                label: _('Application Name'),
-                halign: Gtk.Align.START,
-            }),
-        );
-        nameRow.append(nameEntry);
-
-        // WM Class entry
-        const wmClassEntry = new Gtk.Entry({
-            placeholder_text: _('WM Class (e.g., firefox, gnome-terminal)'),
-            hexpand: true,
-        });
-        const wmClassRow = new Gtk.Box({
-            orientation: Gtk.Orientation.VERTICAL,
-            spacing: 6,
-        });
-        wmClassRow.append(
-            new Gtk.Label({
-                label: _('WM Class'),
-                halign: Gtk.Align.START,
-            }),
-        );
-        wmClassRow.append(wmClassEntry);
-
-        // Error label for duplicate WM Class
-        const errorLabel = new Gtk.Label({
-            label: _('This WM Class already exists in the list'),
-            wrap: true,
-            halign: Gtk.Align.START,
-            css_classes: ['error', 'caption'],
-            visible: false,
-        });
-
-        // Help text
-        const helpLabel = new Gtk.Label({
-            label: _(
-                'Tip: You can find the WM Class by running "xprop WM_CLASS" in terminal and clicking the application window.',
-            ),
-            wrap: true,
-            halign: Gtk.Align.START,
-            css_classes: ['dim-label', 'caption'],
-        });
-
-        contentBox.append(nameRow);
-        contentBox.append(wmClassRow);
-        contentBox.append(errorLabel);
-        contentBox.append(helpLabel);
-
-        // Buttons
-        const buttonBox = new Gtk.Box({
-            orientation: Gtk.Orientation.HORIZONTAL,
-            spacing: 6,
-            halign: Gtk.Align.END,
-            margin_top: 12,
-        });
-
-        const cancelButton = new Gtk.Button({
-            label: _('Cancel'),
-        });
-        cancelButton.connect('clicked', () => {
-            dialog.close();
-        });
-
-        const addButton = new Gtk.Button({
-            label: _('Add'),
-            css_classes: ['suggested-action'],
-        });
-        addButton.connect('clicked', () => {
-            const appName = nameEntry.get_text().trim();
-            const wmClass = wmClassEntry.get_text().trim();
-
-            if (appName && wmClass) {
-                onAdd(appName, wmClass);
-                dialog.close();
-            }
-        });
-
-        // Enable/disable add button based on input and validation
-        const updateAddButton = () => {
-            const hasName = nameEntry.get_text().trim().length > 0;
-            const wmClass = wmClassEntry.get_text().trim();
-            const hasWmClass = wmClass.length > 0;
-            const isDuplicate =
-                hasWmClass && this.existingWmClasses.has(wmClass.toLowerCase());
-
-            // Show/hide error message
-            errorLabel.set_visible(isDuplicate);
-
-            // Enable button only if both fields have values and no duplicate
-            addButton.set_sensitive(hasName && hasWmClass && !isDuplicate);
-        };
-
-        nameEntry.connect('changed', updateAddButton);
-        wmClassEntry.connect('changed', updateAddButton);
-        updateAddButton(); // Initial state
-
-        buttonBox.append(cancelButton);
-        buttonBox.append(addButton);
-        contentBox.append(buttonBox);
-
-        toolbarView.set_content(contentBox);
-        dialog.set_content(toolbarView);
-        dialog.present();
     }
 
     /**

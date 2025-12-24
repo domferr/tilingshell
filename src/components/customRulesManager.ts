@@ -1,4 +1,4 @@
-import { GObject, Meta } from '@gi.ext';
+import { GObject, Meta, Shell, Gio } from '@gi.ext';
 import SignalHandling from '@utils/signalHandling';
 import { logger } from '@utils/logger';
 import { registerGObjectClass } from '@utils/gjs';
@@ -17,7 +17,7 @@ export type ConfigRules = {
 
 export interface CustomApplicationRules {
     name: string;
-    wmClass: string;
+    appId: string;
     ruleConfig?: ConfigRules;
 }
 
@@ -72,10 +72,10 @@ export class CustomRulesManager extends GObject.Object {
     private _getFullscreenDefaultRule(): CustomApplicationRules {
         return (
             this._customRules.find(
-                (entry) => entry.wmClass.toLowerCase() === 'fullscreen',
+                (entry) => entry.appId.toLowerCase() === 'fullscreen',
             ) || {
                 name: 'Fullscreen Applications',
-                wmClass: 'fullscreen',
+                appId: 'fullscreen',
                 ruleConfig: {
                     customBorder: false,
                     autoTiling: false,
@@ -89,7 +89,7 @@ export class CustomRulesManager extends GObject.Object {
     }
 
     /**
-     * Get the customRules entry for a window by its WM class
+     * Get the customRules entry for a window by its application ID
      * @param window The window to check
      * @returns The customRules entry if found, undefined otherwise
      */
@@ -99,11 +99,23 @@ export class CustomRulesManager extends GObject.Object {
         // Check if the window is fullscreen first - apply default rule
         if (window.is_fullscreen()) return this._getFullscreenDefaultRule();
 
-        const wmClass = window.get_wm_class();
-        if (!wmClass) return undefined;
+        // Get the app using WindowTracker - this properly handles all window types
+        const tracker = Shell.WindowTracker.get_default();
+        const app = tracker.get_window_app(window);
+        if (!app) return undefined;
+
+        // Get the desktop app info to retrieve the desktop file ID
+        const desktopApp = app.get_app_info() as Gio.DesktopAppInfo;
+        if (!desktopApp) return undefined;
+
+        const desktopId = desktopApp.get_id();
+        if (!desktopId) return undefined;
+
+        // Remove .desktop extension and convert to lowercase to match stored format
+        const appId = desktopId.replace(/\.desktop$/, '').toLowerCase();
 
         return this._customRules.find(
-            (entry) => entry.wmClass.toLowerCase() === wmClass.toLowerCase(),
+            (entry) => entry.appId.toLowerCase() === appId.toLowerCase(),
         );
     }
 
@@ -186,6 +198,19 @@ export class CustomRulesManager extends GObject.Object {
      */
     public isCustomRulesed(window: Meta.Window): boolean {
         return this._getCustomRulesEntry(window) !== undefined;
+    }
+
+    /**
+     * Check if an application ID is managed by customRules
+     * @param appId The application ID to check
+     * @returns true if the application ID is in the customRules, false otherwise
+     */
+    public isApplicationManagedByCustomRules(appId: string): boolean {
+        return (
+            this._customRules.find(
+                (entry) => entry.appId.toLowerCase() === appId.toLowerCase(),
+            ) !== undefined
+        );
     }
 
     /**
