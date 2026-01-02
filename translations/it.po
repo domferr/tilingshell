@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Tiling Shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-11-09 11:35+0100\n"
-"PO-Revision-Date: 2025-10-09 20:11+0200\n"
+"PO-Revision-Date: 2026-01-02 21:11+0200\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <>\n"
 "Language: it\n"
@@ -632,11 +632,11 @@ msgstr "Apri una nuova issue su"
 
 #: dist/prefs.js:1814
 msgid "Choose custom color"
-msgstr ""
+msgstr "Scegli colore personalizzato"
 
 #: dist/prefs.js:1815
 msgid "Use system accent color"
-msgstr ""
+msgstr "Usa il colore predefinito del sistema"
 
 #: dist/prefs.js:1866 dist/prefs.js:1889
 msgid "New accelerator…"
