@@ -20,8 +20,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Gtk, Adw, Gio, GLib, Gdk, GObject } from '@gi.prefs';
-import Settings, { ActivationKey } from './settings/settings';
+import { Gtk, Adw, Gio, GLib, Gdk, GObject } from './gi/prefs';
+import Settings from './settings/settings';
+import { EdgeSnapMode, ActivationKey } from './settings/settings';
 import { logger } from './utils/logger';
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 import Layout from './components/layout/Layout';
@@ -29,8 +30,6 @@ import SettingsExport from './settings/settingsExport';
 import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 // @ts-expect-error "Module exists"
 import * as Config from 'resource:///org/gnome/Shell/Extensions/js/misc/config.js';
-
-import { EdgeSnapMode } from '@settings/settings';
 
 const debug = logger('prefs');
 const RESOURCES_PREFIX = "/org/gnome/Shell/Extensions/tilingshell"; // must match the prefix in resources.gresources.xml
