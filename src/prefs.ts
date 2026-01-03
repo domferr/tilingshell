@@ -364,56 +364,16 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         activeScreenEdgesGroup.add(edgeTilingOffset);
 
         // Create dropdown for edge snap mode
-        const edgeSnapModeRow = new Adw.ActionRow({
-            title: _('Edge snap behavior'),
-            subtitle: _('Choose how windows snap to screen edges'),
-        });
+        const edgeTilingBehaviourRow = this._buildEdgeTilingBehaviourRow(
+            Settings.EDGE_SNAP_MODE,
+            (newMode: EdgeSnapMode) => Settings.EDGE_SNAP_MODE = newMode,
+        );
 
         const edgeSnapModeModel = new Gtk.StringList();
         edgeSnapModeModel.append(_('Default - snap to quarters and halves'));
         edgeSnapModeModel.append(_('Adaptive - snap to corners and edges'));
         edgeSnapModeModel.append(_('Granular - snap to exact tile'));
-
-        const edgeSnapModeDropdown = new Gtk.DropDown({
-            model: edgeSnapModeModel,
-            valign: Gtk.Align.CENTER,
-        });
-
-        // Convert the current setting value to dropdown index
-        const currentMode = Settings.EDGE_SNAP_MODE;
-        let initialIndex = 0;
-
-        if (currentMode === EdgeSnapMode.ADAPTIVE) initialIndex = 1;
-        else if (currentMode === EdgeSnapMode.GRANULAR) initialIndex = 2;
-
-        edgeSnapModeDropdown.set_selected(initialIndex);
-
-        // Connect the signal to update settings when selection changes
-        edgeSnapModeDropdown.connect('notify::selected', () => {
-            const selected = edgeSnapModeDropdown.get_selected();
-            let newMode: EdgeSnapMode;
-
-            switch (selected) {
-                case 1:
-                    newMode = EdgeSnapMode.ADAPTIVE;
-                    break;
-                case 2:
-                    newMode = EdgeSnapMode.GRANULAR;
-                    break;
-                default:
-                    newMode = EdgeSnapMode.DEFAULT;
-            }
-
-            Settings.EDGE_SNAP_MODE = newMode;
-        });
-
-        edgeSnapModeRow.add_suffix(edgeSnapModeDropdown);
-        Settings.bind(
-            Settings.KEY_ACTIVE_SCREEN_EDGES,
-            edgeSnapModeRow,
-            'sensitive',
-        );
-        activeScreenEdgesGroup.add(edgeSnapModeRow);
+        activeScreenEdgesGroup.add(edgeTilingBehaviourRow);
 
         prefsPage.add(activeScreenEdgesGroup);
 
@@ -1108,11 +1068,10 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         return button;
     }
 
-    _buildEdgeTilingBehaviourRow() {
+    _buildEdgeTilingBehaviourRow(currentMode: EdgeSnapMode, onModeChange: (newMode: EdgeSnapMode) => void) {
         const row = new Adw.ActionRow({
             activatable: false,
-            title: _("Behaviour"),
-            subtitle: _("Choose how windows snap to screen edges"),
+            title: _("Choose how windows snap to screen edges"),
             cssClasses: ['edge-tiling-behaviour']
         });
         (row.get_child() as Gtk.Box).set_orientation(Gtk.Orientation.VERTICAL);
@@ -1123,24 +1082,27 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             valign: Gtk.Align.FILL,
             homogeneous: true, // all children same size
             spacing: 2,
-            cssClasses: ['content']
-            //margin_top: 6,
+            cssClasses: ['content'],
+            margin_bottom: 6,
         });
         const defaultBtn = this._createEdgeTilingBehaviourOption(
             _('Default'),
             _('Snap to quarters and halves'),
             'edge-default-symbolic'
         );
+        defaultBtn.connect("toggled", () => onModeChange(EdgeSnapMode.DEFAULT));
         const adaptiveBtn = this._createEdgeTilingBehaviourOption(
             _('Adaptive'),
             _('Snap to corners and columns'),
             'edge-adaptive-symbolic'
         );
+        adaptiveBtn.connect("toggled", () => onModeChange(EdgeSnapMode.ADAPTIVE));
         const granularBtn = this._createEdgeTilingBehaviourOption(
             _('Granular'),
-            _('Snap window to layout tiles'),
+            _('Snap to layout tiles'),
             'edge-granular-symbolic'
         );
+        granularBtn.connect("toggled", () => onModeChange(EdgeSnapMode.GRANULAR));
         content.append(defaultBtn);
         content.append(adaptiveBtn);
         content.append(granularBtn);
@@ -1148,7 +1110,9 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         defaultBtn.set_group(adaptiveBtn);
         granularBtn.set_group(adaptiveBtn);
         // set the currently activated one
-        defaultBtn.set_active(true);
+        if (currentMode === EdgeSnapMode.ADAPTIVE) adaptiveBtn.set_active(true);
+        else if (currentMode === EdgeSnapMode.GRANULAR) granularBtn.set_active(true);
+        else defaultBtn.set_active(true);
         (row.get_child() as Gtk.Box).append(content);
 
         return row;
