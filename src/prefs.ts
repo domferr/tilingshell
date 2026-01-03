@@ -368,11 +368,6 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             Settings.EDGE_SNAP_MODE,
             (newMode: EdgeSnapMode) => Settings.EDGE_SNAP_MODE = newMode,
         );
-
-        const edgeSnapModeModel = new Gtk.StringList();
-        edgeSnapModeModel.append(_('Default - snap to quarters and halves'));
-        edgeSnapModeModel.append(_('Adaptive - snap to corners and edges'));
-        edgeSnapModeModel.append(_('Granular - snap to exact tile'));
         activeScreenEdgesGroup.add(edgeTilingBehaviourRow);
 
         prefsPage.add(activeScreenEdgesGroup);
@@ -1087,19 +1082,19 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         });
         const defaultBtn = this._createEdgeTilingBehaviourOption(
             _('Default'),
-            _('Snap to quarters and halves'),
+            _('Follow quarters or screen halves'),
             'edge-default-symbolic'
         );
         defaultBtn.connect("toggled", () => onModeChange(EdgeSnapMode.DEFAULT));
         const adaptiveBtn = this._createEdgeTilingBehaviourOption(
             _('Adaptive'),
-            _('Snap to corners and columns'),
+            _('Follow corners of selected layout or screen halves'),
             'edge-adaptive-symbolic'
         );
         adaptiveBtn.connect("toggled", () => onModeChange(EdgeSnapMode.ADAPTIVE));
         const granularBtn = this._createEdgeTilingBehaviourOption(
             _('Granular'),
-            _('Snap to layout tiles'),
+            _('Follow currently selected layout'),
             'edge-granular-symbolic'
         );
         granularBtn.connect("toggled", () => onModeChange(EdgeSnapMode.GRANULAR));

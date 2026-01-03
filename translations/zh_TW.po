@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-09 11:35+0100\n"
+"POT-Creation-Date: 2026-01-03 22:57+0100\n"
 "PO-Revision-Date: 2025-12-01 01:58+0800\n"
 "Last-Translator: taijuin\n"
 "Language-Team: \n"
@@ -18,206 +18,207 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.8\n"
 
-#: dist/prefs.js:793
+#: dist/prefs.js:59
 msgid "General"
 msgstr "一般"
 
-#: dist/prefs.js:798
+#: dist/prefs.js:64
 msgid "Appearance"
 msgstr "外觀"
 
-#: dist/prefs.js:799
+#: dist/prefs.js:65
 msgid "Configure the appearance of Tiling Shell"
 msgstr "設定 Tiling Shell 的外觀"
 
-#: dist/prefs.js:804
+#: dist/prefs.js:70
 msgid "Show Indicator"
 msgstr "顯示指示器"
 
-#: dist/prefs.js:805
+#: dist/prefs.js:71
 msgid "Whether to show the panel indicator"
 msgstr "是否顯示面板指示器"
 
-#: dist/prefs.js:810
+#: dist/prefs.js:76
 msgid "Inner gaps"
 msgstr "內部間距"
 
-#: dist/prefs.js:811
+#: dist/prefs.js:77
 msgid "Gaps between windows"
 msgstr "視窗之間的間距"
 
-#: dist/prefs.js:816
+#: dist/prefs.js:82
 msgid "Outer gaps"
 msgstr "外部間距"
 
-#: dist/prefs.js:817
+#: dist/prefs.js:83
 msgid "Gaps between a window and the monitor borders"
 msgstr "視窗與顯示器邊框之間的間距"
 
-#: dist/prefs.js:821
+#: dist/prefs.js:87
 msgid "Blur (experimental feature)"
 msgstr "模糊（實驗性功能）"
 
-#: dist/prefs.js:823
+#: dist/prefs.js:89
 msgid "Apply blur effect to Snap Assistant and tile previews"
 msgstr "將模糊效果套用至「貼齊小幫手」與區塊預覽"
 
-#: dist/prefs.js:829
+#: dist/prefs.js:95
 msgid "Snap Assistant threshold"
 msgstr "貼齊小幫手的靈敏度"
 
-#: dist/prefs.js:831
+#: dist/prefs.js:97
 msgid "Minimum distance from the Snap Assistant to the pointer to open it"
 msgstr "貼齊小幫手感知拖曳視窗之游標靠近的距離"
 
-#: dist/prefs.js:840
+#: dist/prefs.js:106
 msgid "Snap Assistant"
 msgstr "貼齊小幫手"
 
-#: dist/prefs.js:841
+#: dist/prefs.js:107
 msgid "Apply blur effect to Snap Assistant"
 msgstr "將模糊效果套用至貼齊小幫手"
 
-#: dist/prefs.js:847
+#: dist/prefs.js:113
 msgid "Selected tile preview"
 msgstr "所選區塊預覽"
 
-#: dist/prefs.js:848
+#: dist/prefs.js:114
 msgid "Apply blur effect to selected tile preview"
 msgstr "將模糊效果套用至所選區塊預覽"
 
-#: dist/prefs.js:852
+#: dist/prefs.js:118
 msgid "Window border"
 msgstr "視窗邊框"
 
-#: dist/prefs.js:853 dist/prefs.js:860
+#: dist/prefs.js:119 dist/prefs.js:126
 msgid "Show a border around focused window"
 msgstr "在焦點視窗周圍顯示邊框"
 
-#: dist/prefs.js:859
+#: dist/prefs.js:125
 msgid "Enable"
 msgstr "啟用"
 
-#: dist/prefs.js:866
+#: dist/prefs.js:132
 msgid "Smart border radius"
 msgstr "智慧型邊框半徑"
 
-#: dist/prefs.js:867
-msgid "Dynamically adapt to the window’s actual border radius"
+#: dist/prefs.js:133
+#, fuzzy
+msgid "Dynamically adapt to the window's actual border radius"
 msgstr "動態適應視窗的實際邊框半徑"
 
-#: dist/prefs.js:873
+#: dist/prefs.js:139
 msgid "Width"
 msgstr "寬度"
 
-#: dist/prefs.js:874
+#: dist/prefs.js:140
 msgid "The size of the border"
 msgstr "邊框的大小"
 
-#: dist/prefs.js:883
+#: dist/prefs.js:149
 msgid "Border color"
 msgstr "邊框顏色"
 
-#: dist/prefs.js:884
+#: dist/prefs.js:150
 msgid "Choose the color of the border"
 msgstr "選擇邊框的顏色"
 
-#: dist/prefs.js:900
+#: dist/prefs.js:166
 msgid "Animations"
 msgstr "動畫"
 
-#: dist/prefs.js:901
+#: dist/prefs.js:167
 msgid "Customize animations"
 msgstr "自訂動畫"
 
-#: dist/prefs.js:907
+#: dist/prefs.js:173
 msgid "Snap assistant animation time"
 msgstr "貼齊小幫手動畫時間"
 
-#: dist/prefs.js:908
+#: dist/prefs.js:174
 msgid "The snap assistant animation time in milliseconds"
 msgstr "貼齊小幫手到達定位所需時間（以毫秒為單位）"
 
-#: dist/prefs.js:916
+#: dist/prefs.js:182
 msgid "Tiles animation time"
 msgstr "區塊動畫時間"
 
-#: dist/prefs.js:917
+#: dist/prefs.js:183
 msgid "The tiles animation time in milliseconds"
 msgstr "切換所選區塊時，切換其預覽所需時間（以毫秒為單位）"
 
-#: dist/prefs.js:923
+#: dist/prefs.js:189
 msgid "Behaviour"
 msgstr "行為"
 
-#: dist/prefs.js:924
+#: dist/prefs.js:190
 msgid "Configure the behaviour of Tiling Shell"
 msgstr "設定 Tiling Shell 的行為"
 
-#: dist/prefs.js:929
+#: dist/prefs.js:195
 msgid "Enable Snap Assistant"
 msgstr "啟用「貼齊小幫手」"
 
-#: dist/prefs.js:930
+#: dist/prefs.js:196
 msgid "Move the window on top of the screen to snap assist it"
 msgstr "將視窗移到螢幕中間頂端以輔助它貼齊"
 
-#: dist/prefs.js:935
+#: dist/prefs.js:201
 msgid "Enable Tiling System"
 msgstr "啟用平鋪系統"
 
-#: dist/prefs.js:936
+#: dist/prefs.js:202
 msgid "Hold the activation key while moving a window to tile it"
 msgstr "移動視窗時按住啟動鍵以平鋪視窗"
 
-#: dist/prefs.js:944
+#: dist/prefs.js:210
 msgid "Tiling System deactivation key"
 msgstr "平鋪系統停用鍵"
 
-#: dist/prefs.js:946
+#: dist/prefs.js:212
 msgid ""
 "Hold the deactivation key while moving a window to deactivate the tiling "
 "system"
 msgstr "移動視窗時按住停用鍵，可停用平鋪系統"
 
-#: dist/prefs.js:954
+#: dist/prefs.js:220
 msgid "Span multiple tiles"
 msgstr "橫跨多個區塊"
 
-#: dist/prefs.js:955
+#: dist/prefs.js:221
 msgid "Hold the activation key to span multiple tiles"
 msgstr "按住啟動鍵可跨越多個區塊"
 
-#: dist/prefs.js:964
+#: dist/prefs.js:230
 msgid "Enable Auto Tiling"
 msgstr "啟用自動平鋪"
 
-#: dist/prefs.js:965
+#: dist/prefs.js:231
 msgid "Automatically tile new windows to the best tile"
 msgstr "自動將新視窗平鋪到最佳區塊位置"
 
-#: dist/prefs.js:970
+#: dist/prefs.js:236
 msgid "Enable auto-resize of the complementing tiled windows"
 msgstr "啟用自動調整互補平鋪視窗的大小"
 
-#: dist/prefs.js:972
+#: dist/prefs.js:238
 msgid ""
 "When a tiled window is resized, auto-resize the other tiled windows near it"
 msgstr "調整平鋪視窗的大小時，自動調整其附近其他平鋪視窗的大小"
 
-#: dist/prefs.js:978
+#: dist/prefs.js:244
 msgid "Restore window size"
 msgstr "還原視窗大小"
 
-#: dist/prefs.js:980
+#: dist/prefs.js:246
 msgid "Whether to restore the windows to their original size when untiled"
 msgstr "是否將視窗還原為未平鋪時的原始大小"
 
-#: dist/prefs.js:986
+#: dist/prefs.js:252
 msgid "Add snap assistant and auto-tile buttons to window menu"
 msgstr "在視窗選單中加入「貼齊小幫手」和自動平鋪按鈕"
 
-#: dist/prefs.js:988
+#: dist/prefs.js:254
 msgid ""
 "Add snap assistant and auto-tile buttons in the menu that shows up when you "
 "right click on a window title"
@@ -225,420 +226,442 @@ msgstr ""
 "當您在視窗標題上按一下滑鼠右鍵時，在顯示的功能表中加入「貼齊小幫手」和自動平"
 "鋪按鈕"
 
-#: dist/prefs.js:994
+#: dist/prefs.js:260
 msgid "Add tiled windows to ALT+TAB menu"
 msgstr "在 ALT+TAB 選單中新增平鋪的視窗"
 
-#: dist/prefs.js:996
+#: dist/prefs.js:262
 msgid ""
 "Add the tiled windows to the ALT+TAB menu to open all the tiled windows at "
 "once"
 msgstr "將平鋪的視窗新增至 ALT+TAB 選單，即可同時開啟所有平鋪的視窗"
 
-#: dist/prefs.js:1001
+#: dist/prefs.js:267
 msgid "Screen Edges"
 msgstr "螢幕邊緣"
 
-#: dist/prefs.js:1003
+#: dist/prefs.js:269
 msgid ""
 "Drag windows against the top, left and right screen edges to resize them"
 msgstr "將視窗拖曳到螢幕頂端、左邊和右邊以調整視窗大小"
 
-#: dist/prefs.js:1017
+#: dist/prefs.js:283
 msgid "Drag against top edge to maximize window"
 msgstr "拖曳頂端邊緣以最大化視窗"
 
-#: dist/prefs.js:1018
+#: dist/prefs.js:284
 msgid "Drag windows against the top edge to maximize them"
 msgstr "將視窗拖曳到頂端邊緣，使其最大化"
 
-#: dist/prefs.js:1027
+#: dist/prefs.js:293
 msgid "Quarter tiling activation area"
 msgstr "四分之一平鋪啟動區"
 
-#: dist/prefs.js:1028
+#: dist/prefs.js:294
 #, javascript-format
 msgid "Activation area to trigger quarter tiling (%% of the screen)"
 msgstr "觸發四分之一平鋪的啟動區域（佔螢幕百分比）"
 
-#: dist/prefs.js:1044
+#: dist/prefs.js:310
 msgid "Edge tiling offset"
 msgstr "邊緣平鋪偏移量"
 
-#: dist/prefs.js:1045
+#: dist/prefs.js:311
 msgid "Offset from the screen edge to trigger edge tiling (in pixels)"
 msgstr "從螢幕邊緣到觸發邊緣的偏移量（以像素為單位）"
 
-#: dist/prefs.js:1062
+#: dist/prefs.js:333
 msgid "Windows suggestions"
 msgstr "視窗建議"
 
-#: dist/prefs.js:1063
+#: dist/prefs.js:334
 msgid "Enable and disable windows suggestions"
 msgstr "啟用和停用視窗建議"
 
-#: dist/prefs.js:1068
+#: dist/prefs.js:339
 msgid "Enable window suggestions for the tiling system"
 msgstr "啟用平鋪系統的視窗建議"
 
-#: dist/prefs.js:1070
+#: dist/prefs.js:341
 msgid ""
 "Provides smart suggestions to fill empty tiles when using the tiling system"
 msgstr "使用平鋪系統時，提供填滿空白區塊的智慧型建議"
 
-#: dist/prefs.js:1076
+#: dist/prefs.js:347
 msgid "Enable window suggestions for the snap assistant"
 msgstr "啟用「貼齊小幫手」的視窗建議"
 
-#: dist/prefs.js:1078
+#: dist/prefs.js:349
 msgid ""
 "Offers suggestions to populate empty tiles when using the snap assistant"
 msgstr "使用「貼齊小幫手」時，提供填入空白區塊的建議"
 
-#: dist/prefs.js:1084
+#: dist/prefs.js:355
 msgid "Enable window suggestions for screen edge snapping"
 msgstr "啟用螢幕邊緣貼齊的視窗建議"
 
-#: dist/prefs.js:1086
+#: dist/prefs.js:357
 msgid "Suggests windows to occupy empty tiles when snapping to screen edges"
 msgstr "當貼齊至螢幕邊緣時，會建議視窗佔用空白區塊"
 
-#: dist/prefs.js:1092
+#: dist/prefs.js:363
 msgid "Layouts"
 msgstr "版面配置"
 
-#: dist/prefs.js:1093
+#: dist/prefs.js:364
 msgid "Configure the layouts of Tiling Shell"
 msgstr "設定 Tiling Shell 的版面配置"
 
-#: dist/prefs.js:1097 dist/prefs.js:1098
+#: dist/prefs.js:368 dist/prefs.js:369
 msgid "Edit layouts"
 msgstr "編輯版面配置"
 
-#: dist/prefs.js:1099
+#: dist/prefs.js:370
 msgid "Open the layouts editor"
 msgstr "開啟版面配置編輯器"
 
-#: dist/prefs.js:1104 dist/prefs.js:1105 dist/prefs.js:1109
+#: dist/prefs.js:375 dist/prefs.js:376 dist/prefs.js:380
 msgid "Export layouts"
 msgstr "匯出版面配置"
 
-#: dist/prefs.js:1106
+#: dist/prefs.js:377
 msgid "Export layouts to a file"
 msgstr "將版面配置匯出到檔案"
 
-#: dist/prefs.js:1112 dist/prefs.js:1496
+#: dist/prefs.js:383 dist/prefs.js:767
 msgid "Save"
 msgstr "儲存"
 
-#: dist/prefs.js:1113 dist/prefs.js:1167 dist/prefs.js:1497 dist/prefs.js:1552
+#: dist/prefs.js:384 dist/prefs.js:438 dist/prefs.js:768 dist/prefs.js:823
 msgid "Cancel"
 msgstr "取消"
 
-#: dist/prefs.js:1158 dist/prefs.js:1159
+#: dist/prefs.js:429 dist/prefs.js:430
 msgid "Import layouts"
 msgstr "匯入版面配置"
 
-#: dist/prefs.js:1160
+#: dist/prefs.js:431
 msgid "Import layouts from a file"
 msgstr "從檔案匯入版面配置"
 
-#: dist/prefs.js:1163
+#: dist/prefs.js:434
 msgid "Select layouts file"
 msgstr "選取版面配置檔"
 
-#: dist/prefs.js:1166 dist/prefs.js:1551
+#: dist/prefs.js:437 dist/prefs.js:822
 msgid "Open"
 msgstr "開啟"
 
-#: dist/prefs.js:1214 dist/prefs.js:1215
+#: dist/prefs.js:485 dist/prefs.js:486
 msgid "Reset layouts"
 msgstr "重設版面配置"
 
-#: dist/prefs.js:1216
+#: dist/prefs.js:487
 msgid "Bring back the default layouts"
 msgstr "恢復預設版面配置"
 
-#: dist/prefs.js:1229
+#: dist/prefs.js:500
 msgid "Keybindings"
 msgstr "按鍵綁定"
 
-#: dist/prefs.js:1231
+#: dist/prefs.js:502
 msgid "Use hotkeys to perform actions on the focused window"
 msgstr "使用熱鍵對焦點視窗執行動作"
 
-#: dist/prefs.js:1249
+#: dist/prefs.js:520
 msgid "Move window to right tile"
 msgstr "將視窗移到右側區塊"
 
-#: dist/prefs.js:1251
+#: dist/prefs.js:522
 msgid "Move the focused window to the tile on its right"
 msgstr "將聚焦的視窗移至其右側的區塊"
 
-#: dist/prefs.js:1260
+#: dist/prefs.js:531
 msgid "Move window to left tile"
 msgstr "將視窗移到左側區塊"
 
-#: dist/prefs.js:1261
+#: dist/prefs.js:532
 msgid "Move the focused window to the tile on its left"
 msgstr "將對焦的視窗移至其左側的區塊"
 
-#: dist/prefs.js:1267
+#: dist/prefs.js:538
 msgid "Move window to tile above"
 msgstr "將視窗移到上方區塊"
 
-#: dist/prefs.js:1268
+#: dist/prefs.js:539
 msgid "Move the focused window to the tile above"
 msgstr "將聚焦的視窗移至其上方的區塊"
 
-#: dist/prefs.js:1274
+#: dist/prefs.js:545
 msgid "Move window to tile below"
 msgstr "將視窗移到下方區塊"
 
-#: dist/prefs.js:1275
+#: dist/prefs.js:546
 msgid "Move the focused window to the tile below"
 msgstr "將聚焦的視窗移至其下方的區塊"
 
-#: dist/prefs.js:1281
+#: dist/prefs.js:552
 msgid "Span window to right tile"
 msgstr "跨越視窗到右側區塊"
 
-#: dist/prefs.js:1282
+#: dist/prefs.js:553
 msgid "Span the focused window to the tile on its right"
 msgstr "將聚焦的視窗跨越至右側的區塊"
 
-#: dist/prefs.js:1288
+#: dist/prefs.js:559
 msgid "Span window to left tile"
 msgstr "跨越視窗到左側區塊"
 
-#: dist/prefs.js:1289
+#: dist/prefs.js:560
 msgid "Span the focused window to the tile on its left"
 msgstr "將聚焦的視窗跨越至左側的區塊"
 
-#: dist/prefs.js:1295
+#: dist/prefs.js:566
 msgid "Span window above"
 msgstr "向上橫跨視窗"
 
-#: dist/prefs.js:1296
+#: dist/prefs.js:567
 msgid "Span the focused window to the tile above"
 msgstr "將聚焦的視窗跨越至上方的區塊"
 
-#: dist/prefs.js:1302
+#: dist/prefs.js:573
 msgid "Span window down"
 msgstr "向下橫跨視窗"
 
-#: dist/prefs.js:1303
+#: dist/prefs.js:574
 msgid "Span the focused window to the tile below"
 msgstr "將聚焦的視窗跨越至下方的區塊"
 
-#: dist/prefs.js:1309
+#: dist/prefs.js:580
 msgid "Span window to all tiles"
 msgstr "跨越視窗至所有區塊"
 
-#: dist/prefs.js:1310
+#: dist/prefs.js:581
 msgid "Span the focused window to all the tiles"
 msgstr "將聚焦的視窗跨越至所有區塊"
 
-#: dist/prefs.js:1316
+#: dist/prefs.js:587
 msgid "Untile focused window"
 msgstr "未平鋪焦點的視窗"
 
-#: dist/prefs.js:1324
+#: dist/prefs.js:595
 msgid "Move window to the center"
 msgstr "將視窗移到中央"
 
-#: dist/prefs.js:1326
+#: dist/prefs.js:597
 msgid "Move the focused window to the center of the screen"
 msgstr "將聚焦的視窗移至螢幕中央"
 
-#: dist/prefs.js:1335
+#: dist/prefs.js:606
 msgid "Focus window to the right"
 msgstr "焦點視窗向右"
 
-#: dist/prefs.js:1337
+#: dist/prefs.js:608
 msgid "Focus the window to the right of the current focused window"
 msgstr "將視窗對焦到目前對焦視窗右邊的視窗"
 
-#: dist/prefs.js:1344
+#: dist/prefs.js:615
 msgid "Focus window to the left"
 msgstr "焦點視窗向左移動"
 
-#: dist/prefs.js:1345
+#: dist/prefs.js:616
 msgid "Focus the window to the left of the current focused window"
 msgstr "對焦目前對焦視窗左側的視窗"
 
-#: dist/prefs.js:1351
+#: dist/prefs.js:622
 msgid "Focus window above"
 msgstr "上方的對焦視窗"
 
-#: dist/prefs.js:1352
+#: dist/prefs.js:623
 msgid "Focus the window above the current focused window"
 msgstr "將視窗對焦於目前對焦的視窗上方"
 
-#: dist/prefs.js:1358
+#: dist/prefs.js:629
 msgid "Focus window below"
 msgstr "對焦視窗下方"
 
-#: dist/prefs.js:1359
+#: dist/prefs.js:630
 msgid "Focus the window below the current focused window"
 msgstr "對焦目前對焦視窗下方的視窗"
 
-#: dist/prefs.js:1365
+#: dist/prefs.js:636
 msgid "Focus next window"
 msgstr "聚焦下一個視窗"
 
-#: dist/prefs.js:1366
+#: dist/prefs.js:637
 msgid "Focus the window next to the current focused window"
 msgstr "對焦目前對焦視窗旁邊的視窗"
 
-#: dist/prefs.js:1372
+#: dist/prefs.js:643
 msgid "Focus previous window"
 msgstr "對焦上一個視窗"
 
-#: dist/prefs.js:1373
+#: dist/prefs.js:644
 msgid "Focus the window prior to the current focused window"
 msgstr "對焦目前對焦視窗之前的視窗"
 
-#: dist/prefs.js:1379
+#: dist/prefs.js:650
 msgid "Highlight focused window"
 msgstr "高亮顯示焦點視窗"
 
-#: dist/prefs.js:1381
+#: dist/prefs.js:652
 msgid "Minimize all the other windows and show only the focused window"
 msgstr "最小化所有其他視窗，只顯示焦點視窗"
 
-#: dist/prefs.js:1388
+#: dist/prefs.js:659
 msgid "Cycle layouts"
 msgstr "循環版面配置"
 
-#: dist/prefs.js:1389
+#: dist/prefs.js:660
 msgid "Cycle through available workspace layouts"
 msgstr "循環切換可用工作區版面配置"
 
-#: dist/prefs.js:1415
+#: dist/prefs.js:686
 msgid "View and Customize all the Shortcuts"
 msgstr "檢視並自訂所有快捷鍵"
 
-#: dist/prefs.js:1443 dist/prefs.js:1444
+#: dist/prefs.js:714 dist/prefs.js:715
 msgid "View and Customize Shortcuts"
 msgstr "檢視和自訂快捷鍵"
 
-#: dist/prefs.js:1466
+#: dist/prefs.js:737
 msgid "Enable next/previous window focus to wrap around"
 msgstr "啟用下一個/上一個視窗焦點環繞"
 
-#: dist/prefs.js:1468
+#: dist/prefs.js:739
 msgid "When focusing next or previous window, wrap around at the window edge"
 msgstr "對焦下一個或上一個視窗時，環繞視窗邊緣"
 
-#: dist/prefs.js:1474
+#: dist/prefs.js:745
 msgid "Restrict directional focus to tiled windows"
 msgstr "將方向性聚焦限制於平鋪的視窗"
 
-#: dist/prefs.js:1476
+#: dist/prefs.js:747
 msgid "When using directional focus navigation, only consider tiled windows"
 msgstr "使用方向性焦點導航時，僅考慮平鋪的視窗"
 
-#: dist/prefs.js:1481
+#: dist/prefs.js:752
 msgid "Import, export and reset"
 msgstr "匯入、匯出及重設"
 
-#: dist/prefs.js:1483
+#: dist/prefs.js:754
 msgid "Import, export and reset the settings of Tiling Shell"
 msgstr "匯入、匯出及重設 Tiling Shell 的設定"
 
-#: dist/prefs.js:1488 dist/prefs.js:1489
+#: dist/prefs.js:759 dist/prefs.js:760
 msgid "Export settings"
 msgstr "匯出設定"
 
-#: dist/prefs.js:1490
+#: dist/prefs.js:761
 msgid "Export settings to a file"
 msgstr "將設定匯出至檔案"
 
-#: dist/prefs.js:1493
+#: dist/prefs.js:764
 msgid "Export settings to a text file"
 msgstr "將設定匯出到文字檔"
 
-#: dist/prefs.js:1500
+#: dist/prefs.js:771
 msgid "Text file"
 msgstr "文字檔"
 
-#: dist/prefs.js:1543 dist/prefs.js:1544
+#: dist/prefs.js:814 dist/prefs.js:815
 msgid "Import settings"
 msgstr "匯入設定"
 
-#: dist/prefs.js:1545
+#: dist/prefs.js:816
 msgid "Import settings from a file"
 msgstr "從檔案匯入設定"
 
-#: dist/prefs.js:1548
+#: dist/prefs.js:819
 msgid "Select a text file to import from"
 msgstr "選擇要匯入的文字檔"
 
-#: dist/prefs.js:1590 dist/prefs.js:1591
+#: dist/prefs.js:861 dist/prefs.js:862
 msgid "Reset settings"
 msgstr "重設設定"
 
-#: dist/prefs.js:1592
+#: dist/prefs.js:863
 msgid "Bring back the default settings"
 msgstr "恢復預設設定"
 
-#: dist/prefs.js:1607
+#: dist/prefs.js:878
 msgid "Donate on ko-fi"
 msgstr "在 ko-fi 上捐款"
 
-#: dist/prefs.js:1613
+#: dist/prefs.js:884
 msgid "Report a bug"
 msgstr "回報錯誤"
 
-#: dist/prefs.js:1619
+#: dist/prefs.js:890
 msgid "Request a feature"
 msgstr "要求功能"
 
-#: dist/prefs.js:1627
+#: dist/prefs.js:898
 msgid "Have issues, you want to suggest a new feature or contribute?"
 msgstr "有問題、想建議新功能或貢獻心力？"
 
-#: dist/prefs.js:1634
+#: dist/prefs.js:905
 msgid "Open a new issue on"
 msgstr "開啟一個新的議題"
 
-#: dist/prefs.js:1814
+#: dist/prefs.js:970
+msgid "Choose how windows snap to screen edges"
+msgstr ""
+
+#: dist/prefs.js:985
+msgid "Default"
+msgstr ""
+
+#: dist/prefs.js:986
+msgid "Follow quarters or screen halves"
+msgstr ""
+
+#: dist/prefs.js:991
+msgid "Adaptive"
+msgstr ""
+
+#: dist/prefs.js:992
+msgid "Follow corners of selected layout or screen halves"
+msgstr ""
+
+#: dist/prefs.js:997
+msgid "Granular"
+msgstr ""
+
+#: dist/prefs.js:998
+msgid "Follow currently selected layout"
+msgstr ""
+
+#: dist/prefs.js:1187
 msgid "Choose custom color"
 msgstr "選擇自訂顏色"
 
-#: dist/prefs.js:1815
+#: dist/prefs.js:1188
 msgid "Use system accent color"
 msgstr "使用系統強調色"
 
-#: dist/prefs.js:1866 dist/prefs.js:1889
+#: dist/prefs.js:1241 dist/prefs.js:1267
 msgid "New accelerator…"
 msgstr "新增快捷鍵…"
 
-#: dist/prefs.js:1892
+#: dist/prefs.js:1270
 msgid "Use Backspace to clear"
 msgstr "使用 Backspace 清除"
 
-#: dist/extension.js:5809
-msgid "Edit Layouts"
-msgstr "編輯版面配置"
+#~ msgid "Edit Layouts"
+#~ msgstr "編輯版面配置"
 
-#: dist/extension.js:5819
-msgid "New Layout"
-msgstr "新增版面配置"
+#~ msgid "New Layout"
+#~ msgstr "新增版面配置"
 
-#: dist/extension.js:6004
-msgid "to split a tile"
-msgstr "分割區塊"
+#~ msgid "to split a tile"
+#~ msgstr "分割區塊"
 
-#: dist/extension.js:6043
-msgid "to split a tile vertically"
-msgstr "垂直分割區塊"
+#~ msgid "to split a tile vertically"
+#~ msgstr "垂直分割區塊"
 
-#: dist/extension.js:6063
-msgid "to delete a tile"
-msgstr "刪除區塊"
+#~ msgid "to delete a tile"
+#~ msgstr "刪除區塊"
 
-#: dist/extension.js:6087
-msgid "use the indicator button to save or cancel"
-msgstr "使用指示器按鈕儲存或取消"
+#~ msgid "use the indicator button to save or cancel"
+#~ msgstr "使用指示器按鈕儲存或取消"

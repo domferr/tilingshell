@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tiling Shell\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-09 11:35+0100\n"
+"POT-Creation-Date: 2026-01-03 22:57+0100\n"
 "PO-Revision-Date: 2025-03-23 14:33+0100\n"
 "Last-Translator: Nicolas Bénard <nico5b@msn.com>\n"
 "Language-Team: French\n"
@@ -19,167 +19,168 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Gtranslator 47.1\n"
 
-#: dist/prefs.js:793
+#: dist/prefs.js:59
 msgid "General"
 msgstr "Général"
 
-#: dist/prefs.js:798
+#: dist/prefs.js:64
 msgid "Appearance"
 msgstr "Apparence"
 
-#: dist/prefs.js:799
+#: dist/prefs.js:65
 msgid "Configure the appearance of Tiling Shell"
 msgstr "Configurer l'apparence de Tiling Shell"
 
-#: dist/prefs.js:804
+#: dist/prefs.js:70
 msgid "Show Indicator"
 msgstr "Afficher l'indicateur"
 
-#: dist/prefs.js:805
+#: dist/prefs.js:71
 msgid "Whether to show the panel indicator"
 msgstr "Afficher ou non l'indicateur dans le panneau"
 
-#: dist/prefs.js:810
+#: dist/prefs.js:76
 msgid "Inner gaps"
 msgstr "Espaces internes"
 
-#: dist/prefs.js:811
+#: dist/prefs.js:77
 msgid "Gaps between windows"
 msgstr "Espaces entre les fenêtres"
 
-#: dist/prefs.js:816
+#: dist/prefs.js:82
 msgid "Outer gaps"
 msgstr "Espaces externes"
 
-#: dist/prefs.js:817
+#: dist/prefs.js:83
 msgid "Gaps between a window and the monitor borders"
 msgstr "Espaces entre une fenêtre et les bords de l'écran"
 
-#: dist/prefs.js:821
+#: dist/prefs.js:87
 msgid "Blur (experimental feature)"
 msgstr "Flou (fonctionnalité expérimentale)"
 
-#: dist/prefs.js:823
+#: dist/prefs.js:89
 msgid "Apply blur effect to Snap Assistant and tile previews"
 msgstr ""
 "Appliquer un effet de flou à l'assistant d'ancrage et aux aperçus des tuiles"
 
-#: dist/prefs.js:829
+#: dist/prefs.js:95
 msgid "Snap Assistant threshold"
 msgstr "Seuil de l'assistant d'ancrage"
 
-#: dist/prefs.js:831
+#: dist/prefs.js:97
 msgid "Minimum distance from the Snap Assistant to the pointer to open it"
 msgstr ""
 "Distance minimale entre l'assistant d'ancrage et le pointeur pour l'ouvrir"
 
-#: dist/prefs.js:840
+#: dist/prefs.js:106
 msgid "Snap Assistant"
 msgstr "Assistant d'ancrage"
 
-#: dist/prefs.js:841
+#: dist/prefs.js:107
 msgid "Apply blur effect to Snap Assistant"
 msgstr "Appliquer un effet de flou à l'assistant d'ancrage"
 
-#: dist/prefs.js:847
+#: dist/prefs.js:113
 msgid "Selected tile preview"
 msgstr "Aperçu de la tuile sélectionnée"
 
-#: dist/prefs.js:848
+#: dist/prefs.js:114
 msgid "Apply blur effect to selected tile preview"
 msgstr "Appliquer un effet de flou à l'aperçu de la tuile sélectionnée"
 
-#: dist/prefs.js:852
+#: dist/prefs.js:118
 msgid "Window border"
 msgstr "Bordure de fenêtre"
 
-#: dist/prefs.js:853 dist/prefs.js:860
+#: dist/prefs.js:119 dist/prefs.js:126
 msgid "Show a border around focused window"
 msgstr "Afficher une bordure autour de la fenêtre active"
 
-#: dist/prefs.js:859
+#: dist/prefs.js:125
 msgid "Enable"
 msgstr "Activer"
 
-#: dist/prefs.js:866
+#: dist/prefs.js:132
 msgid "Smart border radius"
 msgstr "Rayon de bordure intelligent"
 
-#: dist/prefs.js:867
-msgid "Dynamically adapt to the window’s actual border radius"
+#: dist/prefs.js:133
+#, fuzzy
+msgid "Dynamically adapt to the window's actual border radius"
 msgstr "S'adapte dynamiquement au rayon de bordure réel de la fenêtre"
 
-#: dist/prefs.js:873
+#: dist/prefs.js:139
 msgid "Width"
 msgstr "Largeur"
 
-#: dist/prefs.js:874
+#: dist/prefs.js:140
 msgid "The size of the border"
 msgstr "Taille de la bordure"
 
-#: dist/prefs.js:883
+#: dist/prefs.js:149
 msgid "Border color"
 msgstr "Couleur de la bordure"
 
-#: dist/prefs.js:884
+#: dist/prefs.js:150
 msgid "Choose the color of the border"
 msgstr "Choisir la couleur de la bordure"
 
-#: dist/prefs.js:900
+#: dist/prefs.js:166
 msgid "Animations"
 msgstr "Animations"
 
-#: dist/prefs.js:901
+#: dist/prefs.js:167
 msgid "Customize animations"
 msgstr "Personnaliser les animations"
 
-#: dist/prefs.js:907
+#: dist/prefs.js:173
 msgid "Snap assistant animation time"
 msgstr "Durée de l'animation de l'assistant d'ancrage"
 
-#: dist/prefs.js:908
+#: dist/prefs.js:174
 msgid "The snap assistant animation time in milliseconds"
 msgstr "Durée de l'animation de l'assistant d'ancrage en millisecondes"
 
-#: dist/prefs.js:916
+#: dist/prefs.js:182
 msgid "Tiles animation time"
 msgstr "Durée de l'animation des tuiles"
 
-#: dist/prefs.js:917
+#: dist/prefs.js:183
 msgid "The tiles animation time in milliseconds"
 msgstr "Durée de l'animation des tuiles en millisecondes"
 
-#: dist/prefs.js:923
+#: dist/prefs.js:189
 msgid "Behaviour"
 msgstr "Comportement"
 
-#: dist/prefs.js:924
+#: dist/prefs.js:190
 msgid "Configure the behaviour of Tiling Shell"
 msgstr "Configurer le comportement de Tiling Shell"
 
-#: dist/prefs.js:929
+#: dist/prefs.js:195
 msgid "Enable Snap Assistant"
 msgstr "Activer l'assistant d'ancrage"
 
-#: dist/prefs.js:930
+#: dist/prefs.js:196
 msgid "Move the window on top of the screen to snap assist it"
 msgstr ""
 "Déplacer la fenêtre en haut de l'écran pour activer l'assistant d'ancrage"
 
-#: dist/prefs.js:935
+#: dist/prefs.js:201
 msgid "Enable Tiling System"
 msgstr "Activer le système de tuiles"
 
-#: dist/prefs.js:936
+#: dist/prefs.js:202
 msgid "Hold the activation key while moving a window to tile it"
 msgstr ""
 "Maintenir la touche d'activation en déplaçant une fenêtre pour l'ancrer"
 
-#: dist/prefs.js:944
+#: dist/prefs.js:210
 msgid "Tiling System deactivation key"
 msgstr "Touche de désactivation du système de tuilage"
 
-#: dist/prefs.js:946
+#: dist/prefs.js:212
 msgid ""
 "Hold the deactivation key while moving a window to deactivate the tiling "
 "system"
@@ -187,50 +188,50 @@ msgstr ""
 "Maintenez la touche de désactivation tout en déplaçant une fenêtre pour "
 "désactiver le système de tuilage"
 
-#: dist/prefs.js:954
+#: dist/prefs.js:220
 msgid "Span multiple tiles"
 msgstr "Étendre sur plusieurs tuiles"
 
-#: dist/prefs.js:955
+#: dist/prefs.js:221
 msgid "Hold the activation key to span multiple tiles"
 msgstr "Maintenir la touche d'activation pour étendre sur plusieurs tuiles"
 
-#: dist/prefs.js:964
+#: dist/prefs.js:230
 msgid "Enable Auto Tiling"
 msgstr "Activer le tuilage automatique"
 
-#: dist/prefs.js:965
+#: dist/prefs.js:231
 msgid "Automatically tile new windows to the best tile"
 msgstr "Carrelez automatiquement les nouvelles fenêtres sur la meilleure tuile"
 
-#: dist/prefs.js:970
+#: dist/prefs.js:236
 msgid "Enable auto-resize of the complementing tiled windows"
 msgstr "Activer le redimensionnement automatique des fenêtres adjacentes"
 
-#: dist/prefs.js:972
+#: dist/prefs.js:238
 msgid ""
 "When a tiled window is resized, auto-resize the other tiled windows near it"
 msgstr ""
 "Lorsque qu'une fenêtre ancrée est redimensionnée, ajuster automatiquement "
 "les autres fenêtres adjacentes"
 
-#: dist/prefs.js:978
+#: dist/prefs.js:244
 msgid "Restore window size"
 msgstr "Restaurer la taille de la fenêtre"
 
-#: dist/prefs.js:980
+#: dist/prefs.js:246
 msgid "Whether to restore the windows to their original size when untiled"
 msgstr ""
 "Restaurer ou non la taille d'origine des fenêtres lorsqu'elles sont "
 "désancrées"
 
-#: dist/prefs.js:986
+#: dist/prefs.js:252
 msgid "Add snap assistant and auto-tile buttons to window menu"
 msgstr ""
 "Ajouter des boutons pour l'assistant d'ancrage et l'ancrage automatique au "
 "menu de la fenêtre"
 
-#: dist/prefs.js:988
+#: dist/prefs.js:254
 msgid ""
 "Add snap assistant and auto-tile buttons in the menu that shows up when you "
 "right click on a window title"
@@ -238,444 +239,467 @@ msgstr ""
 "Ajouter des boutons pour l'assistant d'ancrage et l'ancrage automatique dans "
 "le menu contextuel du titre de la fenêtre"
 
-#: dist/prefs.js:994
+#: dist/prefs.js:260
 msgid "Add tiled windows to ALT+TAB menu"
 msgstr ""
 
-#: dist/prefs.js:996
+#: dist/prefs.js:262
 msgid ""
 "Add the tiled windows to the ALT+TAB menu to open all the tiled windows at "
 "once"
 msgstr ""
 
-#: dist/prefs.js:1001
+#: dist/prefs.js:267
 msgid "Screen Edges"
 msgstr "Bords de l'écran"
 
-#: dist/prefs.js:1003
+#: dist/prefs.js:269
 msgid ""
 "Drag windows against the top, left and right screen edges to resize them"
 msgstr ""
 "Faites glisser les fenêtres contre les bords supérieur, gauche et droit de "
 "l'écran pour les redimensionner"
 
-#: dist/prefs.js:1017
+#: dist/prefs.js:283
 msgid "Drag against top edge to maximize window"
 msgstr "Faites glisser contre le bord supérieur pour maximiser la fenêtre"
 
-#: dist/prefs.js:1018
+#: dist/prefs.js:284
 msgid "Drag windows against the top edge to maximize them"
 msgstr ""
 "Faites glisser les fenêtres contre le bord supérieur pour les maximiser"
 
-#: dist/prefs.js:1027
+#: dist/prefs.js:293
 msgid "Quarter tiling activation area"
 msgstr "Zone d'activation du quadrillage"
 
-#: dist/prefs.js:1028
+#: dist/prefs.js:294
 #, fuzzy, javascript-format
 msgid "Activation area to trigger quarter tiling (%% of the screen)"
 msgstr "Zone d'activation pour déclencher le quadrillage (en % de l'écran)"
 
-#: dist/prefs.js:1044
+#: dist/prefs.js:310
 msgid "Edge tiling offset"
 msgstr ""
 
-#: dist/prefs.js:1045
+#: dist/prefs.js:311
 msgid "Offset from the screen edge to trigger edge tiling (in pixels)"
 msgstr ""
 
-#: dist/prefs.js:1062
+#: dist/prefs.js:333
 msgid "Windows suggestions"
 msgstr "Suggestions de fenêtres"
 
-#: dist/prefs.js:1063
+#: dist/prefs.js:334
 msgid "Enable and disable windows suggestions"
 msgstr "Activer et désactiver les suggestions de fenêtres"
 
-#: dist/prefs.js:1068
+#: dist/prefs.js:339
 msgid "Enable window suggestions for the tiling system"
 msgstr "Activer les suggestions de fenêtres pour le système de tuilage"
 
-#: dist/prefs.js:1070
+#: dist/prefs.js:341
 msgid ""
 "Provides smart suggestions to fill empty tiles when using the tiling system"
 msgstr ""
 "Fournit des suggestions intelligentes pour remplir les tuiles vides lors de "
 "l'utilisation du système de tuilage"
 
-#: dist/prefs.js:1076
+#: dist/prefs.js:347
 msgid "Enable window suggestions for the snap assistant"
 msgstr "Activer les suggestions de fenêtres pour l'assistant de fixation"
 
-#: dist/prefs.js:1078
+#: dist/prefs.js:349
 msgid ""
 "Offers suggestions to populate empty tiles when using the snap assistant"
 msgstr ""
 "Propose des suggestions pour remplir les tuiles vides lors de l'utilisation "
 "de l'assistant de fixation"
 
-#: dist/prefs.js:1084
+#: dist/prefs.js:355
 msgid "Enable window suggestions for screen edge snapping"
 msgstr ""
 "Activer les suggestions de fenêtres pour l'ancrage aux bords de l'écran"
 
-#: dist/prefs.js:1086
+#: dist/prefs.js:357
 msgid "Suggests windows to occupy empty tiles when snapping to screen edges"
 msgstr ""
 "Propose des fenêtres pour occuper les tuiles vides lorsqu'elles sont ancrées "
 "aux bords de l'écran"
 
-#: dist/prefs.js:1092
+#: dist/prefs.js:363
 msgid "Layouts"
 msgstr "Dispositions"
 
-#: dist/prefs.js:1093
+#: dist/prefs.js:364
 msgid "Configure the layouts of Tiling Shell"
 msgstr "Configurer les dispositions de Tiling Shell"
 
-#: dist/prefs.js:1097 dist/prefs.js:1098
+#: dist/prefs.js:368 dist/prefs.js:369
 msgid "Edit layouts"
 msgstr "Modifier les dispositions"
 
-#: dist/prefs.js:1099
+#: dist/prefs.js:370
 msgid "Open the layouts editor"
 msgstr "Ouvrir l'éditeur de dispositions"
 
-#: dist/prefs.js:1104 dist/prefs.js:1105 dist/prefs.js:1109
+#: dist/prefs.js:375 dist/prefs.js:376 dist/prefs.js:380
 msgid "Export layouts"
 msgstr "Exporter les dispositions"
 
-#: dist/prefs.js:1106
+#: dist/prefs.js:377
 msgid "Export layouts to a file"
 msgstr "Exporter les dispositions dans un fichier"
 
-#: dist/prefs.js:1112 dist/prefs.js:1496
+#: dist/prefs.js:383 dist/prefs.js:767
 msgid "Save"
 msgstr "Enregistrer"
 
-#: dist/prefs.js:1113 dist/prefs.js:1167 dist/prefs.js:1497 dist/prefs.js:1552
+#: dist/prefs.js:384 dist/prefs.js:438 dist/prefs.js:768 dist/prefs.js:823
 msgid "Cancel"
 msgstr "Annuler"
 
-#: dist/prefs.js:1158 dist/prefs.js:1159
+#: dist/prefs.js:429 dist/prefs.js:430
 msgid "Import layouts"
 msgstr "Importer des dispositions"
 
-#: dist/prefs.js:1160
+#: dist/prefs.js:431
 msgid "Import layouts from a file"
 msgstr "Importer des dispositions depuis un fichier"
 
-#: dist/prefs.js:1163
+#: dist/prefs.js:434
 msgid "Select layouts file"
 msgstr "Sélectionner un fichier de dispositions"
 
-#: dist/prefs.js:1166 dist/prefs.js:1551
+#: dist/prefs.js:437 dist/prefs.js:822
 msgid "Open"
 msgstr "Ouvrir"
 
-#: dist/prefs.js:1214 dist/prefs.js:1215
+#: dist/prefs.js:485 dist/prefs.js:486
 msgid "Reset layouts"
 msgstr "Réinitialiser les dispositions"
 
-#: dist/prefs.js:1216
+#: dist/prefs.js:487
 msgid "Bring back the default layouts"
 msgstr "Restaurer les dispositions par défaut"
 
-#: dist/prefs.js:1229
+#: dist/prefs.js:500
 msgid "Keybindings"
 msgstr "Raccourcis clavier"
 
-#: dist/prefs.js:1231
+#: dist/prefs.js:502
 msgid "Use hotkeys to perform actions on the focused window"
 msgstr ""
 "Utiliser des raccourcis pour effectuer des actions sur la fenêtre active"
 
-#: dist/prefs.js:1249
+#: dist/prefs.js:520
 msgid "Move window to right tile"
 msgstr "Déplacer la fenêtre vers la tuile de droite"
 
-#: dist/prefs.js:1251
+#: dist/prefs.js:522
 msgid "Move the focused window to the tile on its right"
 msgstr "Déplacer la fenêtre active vers la tuile à sa droite"
 
-#: dist/prefs.js:1260
+#: dist/prefs.js:531
 msgid "Move window to left tile"
 msgstr "Déplacer la fenêtre vers la tuile de gauche"
 
-#: dist/prefs.js:1261
+#: dist/prefs.js:532
 msgid "Move the focused window to the tile on its left"
 msgstr "Déplacer la fenêtre active vers la tuile à sa gauche"
 
-#: dist/prefs.js:1267
+#: dist/prefs.js:538
 msgid "Move window to tile above"
 msgstr "Déplacer la fenêtre vers la tuile au-dessus"
 
-#: dist/prefs.js:1268
+#: dist/prefs.js:539
 msgid "Move the focused window to the tile above"
 msgstr "Déplacer la fenêtre active vers la tuile au-dessus"
 
-#: dist/prefs.js:1274
+#: dist/prefs.js:545
 msgid "Move window to tile below"
 msgstr "Déplacer la fenêtre vers la tuile en dessous"
 
-#: dist/prefs.js:1275
+#: dist/prefs.js:546
 msgid "Move the focused window to the tile below"
 msgstr "Déplacer la fenêtre active vers la tuile en dessous"
 
-#: dist/prefs.js:1281
+#: dist/prefs.js:552
 msgid "Span window to right tile"
 msgstr "Étendre la fenêtre vers la tuile de droite"
 
-#: dist/prefs.js:1282
+#: dist/prefs.js:553
 msgid "Span the focused window to the tile on its right"
 msgstr "Étendre la fenêtre active vers la tuile à sa droite"
 
-#: dist/prefs.js:1288
+#: dist/prefs.js:559
 msgid "Span window to left tile"
 msgstr "Étendre la fenêtre vers la tuile de gauche"
 
-#: dist/prefs.js:1289
+#: dist/prefs.js:560
 msgid "Span the focused window to the tile on its left"
 msgstr "Étendre la fenêtre active vers la tuile à sa gauche"
 
-#: dist/prefs.js:1295
+#: dist/prefs.js:566
 msgid "Span window above"
 msgstr "Étendre la fenêtre vers la tuile au-dessus"
 
-#: dist/prefs.js:1296
+#: dist/prefs.js:567
 msgid "Span the focused window to the tile above"
 msgstr "Étendre la fenêtre active vers la tuile au-dessus"
 
-#: dist/prefs.js:1302
+#: dist/prefs.js:573
 msgid "Span window down"
 msgstr "Étendre la fenêtre vers la tuile en dessous"
 
-#: dist/prefs.js:1303
+#: dist/prefs.js:574
 msgid "Span the focused window to the tile below"
 msgstr "Étendre la fenêtre active vers la tuile en dessous"
 
-#: dist/prefs.js:1309
+#: dist/prefs.js:580
 msgid "Span window to all tiles"
 msgstr "Étendre la fenêtre à toutes les tuiles"
 
-#: dist/prefs.js:1310
+#: dist/prefs.js:581
 msgid "Span the focused window to all the tiles"
 msgstr "Étendre la fenêtre active à toutes les tuiles"
 
-#: dist/prefs.js:1316
+#: dist/prefs.js:587
 msgid "Untile focused window"
 msgstr "Détacher la fenêtre active"
 
-#: dist/prefs.js:1324
+#: dist/prefs.js:595
 msgid "Move window to the center"
 msgstr "Déplacer la fenêtre au centre"
 
-#: dist/prefs.js:1326
+#: dist/prefs.js:597
 msgid "Move the focused window to the center of the screen"
 msgstr "Déplacer la fenêtre active au centre de l'écran"
 
-#: dist/prefs.js:1335
+#: dist/prefs.js:606
 msgid "Focus window to the right"
 msgstr "Focus sur la fenêtre à droite"
 
-#: dist/prefs.js:1337
+#: dist/prefs.js:608
 msgid "Focus the window to the right of the current focused window"
 msgstr "Mettre le focus sur la fenêtre à droite de la fenêtre active"
 
-#: dist/prefs.js:1344
+#: dist/prefs.js:615
 msgid "Focus window to the left"
 msgstr "Focus sur la fenêtre à gauche"
 
-#: dist/prefs.js:1345
+#: dist/prefs.js:616
 msgid "Focus the window to the left of the current focused window"
 msgstr "Mettre le focus sur la fenêtre à gauche de la fenêtre active"
 
-#: dist/prefs.js:1351
+#: dist/prefs.js:622
 msgid "Focus window above"
 msgstr "Focus sur la fenêtre au-dessus"
 
-#: dist/prefs.js:1352
+#: dist/prefs.js:623
 msgid "Focus the window above the current focused window"
 msgstr "Mettre le focus sur la fenêtre au-dessus de la fenêtre active"
 
-#: dist/prefs.js:1358
+#: dist/prefs.js:629
 msgid "Focus window below"
 msgstr "Focus sur la fenêtre en dessous"
 
-#: dist/prefs.js:1359
+#: dist/prefs.js:630
 msgid "Focus the window below the current focused window"
 msgstr "Mettre le focus sur la fenêtre en dessous de la fenêtre active"
 
-#: dist/prefs.js:1365
+#: dist/prefs.js:636
 msgid "Focus next window"
 msgstr "Focus sur la fenêtre suivante"
 
-#: dist/prefs.js:1366
+#: dist/prefs.js:637
 msgid "Focus the window next to the current focused window"
 msgstr ""
 "Mettre le focus sur la fenêtre suivante à la fenêtre actuellement active"
 
-#: dist/prefs.js:1372
+#: dist/prefs.js:643
 msgid "Focus previous window"
 msgstr "Focus sur la fenêtre précédente"
 
-#: dist/prefs.js:1373
+#: dist/prefs.js:644
 msgid "Focus the window prior to the current focused window"
 msgstr ""
 "Mettre le focus sur la fenêtre précédente à la fenêtre actuellement active"
 
-#: dist/prefs.js:1379
+#: dist/prefs.js:650
 #, fuzzy
 msgid "Highlight focused window"
 msgstr "Détacher la fenêtre active"
 
-#: dist/prefs.js:1381
+#: dist/prefs.js:652
 #, fuzzy
 msgid "Minimize all the other windows and show only the focused window"
 msgstr ""
 "Utiliser des raccourcis pour effectuer des actions sur la fenêtre active"
 
-#: dist/prefs.js:1388
+#: dist/prefs.js:659
 #, fuzzy
 msgid "Cycle layouts"
 msgstr "Réinitialiser les dispositions"
 
-#: dist/prefs.js:1389
+#: dist/prefs.js:660
 msgid "Cycle through available workspace layouts"
 msgstr ""
 
-#: dist/prefs.js:1415
+#: dist/prefs.js:686
 msgid "View and Customize all the Shortcuts"
 msgstr "Afficher et personnaliser tous les raccourcis"
 
-#: dist/prefs.js:1443 dist/prefs.js:1444
+#: dist/prefs.js:714 dist/prefs.js:715
 msgid "View and Customize Shortcuts"
 msgstr "Afficher et personnaliser les raccourcis"
 
-#: dist/prefs.js:1466
+#: dist/prefs.js:737
 msgid "Enable next/previous window focus to wrap around"
 msgstr "Activer le focus suivant/précédent de la fenêtre pour revenir au début"
 
-#: dist/prefs.js:1468
+#: dist/prefs.js:739
 msgid "When focusing next or previous window, wrap around at the window edge"
 msgstr ""
 "Lorsque vous vous concentrez sur la fenêtre suivante ou précédente, faites-"
 "le rebondir sur le bord de la fenêtre"
 
-#: dist/prefs.js:1474
+#: dist/prefs.js:745
 msgid "Restrict directional focus to tiled windows"
 msgstr ""
 
-#: dist/prefs.js:1476
+#: dist/prefs.js:747
 msgid "When using directional focus navigation, only consider tiled windows"
 msgstr ""
 
-#: dist/prefs.js:1481
+#: dist/prefs.js:752
 msgid "Import, export and reset"
 msgstr "Importer, exporter et réinitialiser"
 
-#: dist/prefs.js:1483
+#: dist/prefs.js:754
 msgid "Import, export and reset the settings of Tiling Shell"
 msgstr "Importer, exporter et réinitialiser les paramètres de Tiling Shell"
 
-#: dist/prefs.js:1488 dist/prefs.js:1489
+#: dist/prefs.js:759 dist/prefs.js:760
 msgid "Export settings"
 msgstr "Exporter les paramètres"
 
-#: dist/prefs.js:1490
+#: dist/prefs.js:761
 msgid "Export settings to a file"
 msgstr "Exporter les paramètres vers un fichier"
 
-#: dist/prefs.js:1493
+#: dist/prefs.js:764
 msgid "Export settings to a text file"
 msgstr "Exporter les paramètres vers un fichier texte"
 
-#: dist/prefs.js:1500
+#: dist/prefs.js:771
 msgid "Text file"
 msgstr "Fichier texte"
 
-#: dist/prefs.js:1543 dist/prefs.js:1544
+#: dist/prefs.js:814 dist/prefs.js:815
 msgid "Import settings"
 msgstr "Importer les paramètres"
 
-#: dist/prefs.js:1545
+#: dist/prefs.js:816
 msgid "Import settings from a file"
 msgstr "Importer les paramètres à partir d'un fichier"
 
-#: dist/prefs.js:1548
+#: dist/prefs.js:819
 msgid "Select a text file to import from"
 msgstr "Sélectionner un fichier texte à importer"
 
-#: dist/prefs.js:1590 dist/prefs.js:1591
+#: dist/prefs.js:861 dist/prefs.js:862
 msgid "Reset settings"
 msgstr "Réinitialiser les paramètres"
 
-#: dist/prefs.js:1592
+#: dist/prefs.js:863
 msgid "Bring back the default settings"
 msgstr "Rétablir les paramètres par défaut"
 
-#: dist/prefs.js:1607
+#: dist/prefs.js:878
 msgid "Donate on ko-fi"
 msgstr "Faire un don sur ko-fi"
 
-#: dist/prefs.js:1613
+#: dist/prefs.js:884
 msgid "Report a bug"
 msgstr "Signaler un bug"
 
-#: dist/prefs.js:1619
+#: dist/prefs.js:890
 msgid "Request a feature"
 msgstr "Demander une fonctionnalité"
 
-#: dist/prefs.js:1627
+#: dist/prefs.js:898
 msgid "Have issues, you want to suggest a new feature or contribute?"
 msgstr ""
 "Vous avez des problèmes, vous souhaitez suggérer une nouvelle fonctionnalité "
 "ou contribuer ?"
 
-#: dist/prefs.js:1634
+#: dist/prefs.js:905
 msgid "Open a new issue on"
 msgstr "Ouvrir un nouveau problème sur"
 
-#: dist/prefs.js:1814
+#: dist/prefs.js:970
+msgid "Choose how windows snap to screen edges"
+msgstr ""
+
+#: dist/prefs.js:985
+msgid "Default"
+msgstr ""
+
+#: dist/prefs.js:986
+#, fuzzy
+msgid "Follow quarters or screen halves"
+msgstr "Déplacer vers la meilleure tuile"
+
+#: dist/prefs.js:991
+msgid "Adaptive"
+msgstr ""
+
+#: dist/prefs.js:992
+msgid "Follow corners of selected layout or screen halves"
+msgstr ""
+
+#: dist/prefs.js:997
+msgid "Granular"
+msgstr ""
+
+#: dist/prefs.js:998
+msgid "Follow currently selected layout"
+msgstr ""
+
+#: dist/prefs.js:1187
 msgid "Choose custom color"
 msgstr ""
 
-#: dist/prefs.js:1815
+#: dist/prefs.js:1188
 msgid "Use system accent color"
 msgstr ""
 
-#: dist/prefs.js:1866 dist/prefs.js:1889
+#: dist/prefs.js:1241 dist/prefs.js:1267
 msgid "New accelerator…"
 msgstr "Nouveau raccourci…"
 
-#: dist/prefs.js:1892
+#: dist/prefs.js:1270
 msgid "Use Backspace to clear"
 msgstr "Utilisez Backspace pour effacer"
 
-#: dist/extension.js:5809
-msgid "Edit Layouts"
-msgstr "Modifier les dispositions"
+#~ msgid "Edit Layouts"
+#~ msgstr "Modifier les dispositions"
 
-#: dist/extension.js:5819
-msgid "New Layout"
-msgstr "Nouvelle disposition"
+#~ msgid "New Layout"
+#~ msgstr "Nouvelle disposition"
 
-#: dist/extension.js:6004
-msgid "to split a tile"
-msgstr "pour diviser une tuile"
+#~ msgid "to split a tile"
+#~ msgstr "pour diviser une tuile"
 
-#: dist/extension.js:6043
-msgid "to split a tile vertically"
-msgstr "pour diviser une tuile verticalement"
+#~ msgid "to split a tile vertically"
+#~ msgstr "pour diviser une tuile verticalement"
 
-#: dist/extension.js:6063
-msgid "to delete a tile"
-msgstr "pour supprimer une tuile"
+#~ msgid "to delete a tile"
+#~ msgstr "pour supprimer une tuile"
 
-#: dist/extension.js:6087
-msgid "use the indicator button to save or cancel"
-msgstr "utilisez le bouton d'indicateur pour enregistrer ou annuler"
+#~ msgid "use the indicator button to save or cancel"
+#~ msgstr "utilisez le bouton d'indicateur pour enregistrer ou annuler"
 
 #~ msgid "Menu"
 #~ msgstr "Menu"
@@ -694,9 +718,6 @@ msgstr "utilisez le bouton d'indicateur pour enregistrer ou annuler"
 
 #~ msgid "Start editing"
 #~ msgstr "Commencer à modifier"
-
-#~ msgid "Move to best tile"
-#~ msgstr "Déplacer vers la meilleure tuile"
 
 #~ msgid "Move to leftmost tile"
 #~ msgstr "Déplacer vers la tuile la plus à gauche"
