@@ -52,10 +52,6 @@ export class ApplicationPicker {
         const appId = desktopId.replace(/\.desktop$/, '').toLowerCase();
 
         return appId;
-
-        // Remove organization prefixes (e.g., org.gnome.Nautilus -> nautilus)
-        const parts = appId.split('.');
-        return parts[parts.length - 1];
     }
 
     /**
