@@ -89,11 +89,11 @@ async function preprocess(files) {
         // drop lines tagged with "// @esbuild-drop-next-line"
         text = text.replace(/\/\/\s*@esbuild-drop-next-line\s*\n.*?;/gs, '');
 
-        // Ensure every import has ".js" at end end, excluding GJS imports
+        // Ensure every import has ".js" at end end, excluding GJS imports (but include @ aliases)
         text = text.replace(
             /import\s+([\s\S]*?)\s+from\s+['"]([^'"]+)['"]/g,
             (_match, imports, importPath) => {
-                if (!importPath.endsWith('.js') && !importPath.startsWith('gi://')) {
+                if (!importPath.endsWith('.js') && !importPath.startsWith('gi://') && !importPath.startsWith('resource://')) {
                     importPath += '.js';
                 }
                 return `import ${imports} from "${importPath}"`;
@@ -199,6 +199,29 @@ function convertImports(text, currentFilePath, rootDirName) {
     // replace import of Config
     text = text.replaceAll('import * as Config from "resource:///org/gnome/Shell/Extensions/js/misc/config.js";', "const Config = imports.misc.config;");
 
+    // handle @ path aliases (convert to relative imports)
+    text = text.replace(
+        /import\s+(?:\{([^}]+)\}|([^\s]+))\s+from\s+"@([^"]+)";/gm,
+        (match, destructured, single, aliasPath) => {
+            // Remove .js extension if present
+            aliasPath = aliasPath.replace(/\.js$/, '');
+            
+            // Convert @ alias to Me.imports path
+            const modulePath = aliasPath.replace(/\//g, '.');
+            
+            if (destructured) {
+                return destructured
+                    .split(',')
+                    .map(i => i.trim())
+                    .filter(Boolean)
+                    .map(v => `const ${v} = Me.imports.${modulePath}.${v};`)
+                    .join('\n');
+            } else {
+                return `const ${single} = Me.imports.${modulePath}.${single};`;
+            }
+        }
+    );
+
     // handle relative imports
     const relativeCurrent = currentFilePath.replace(
         new RegExp(`^${rootDirName}[\\\\/]`), ''
@@ -279,8 +302,9 @@ function printError(text) {
 
 async function processLegacyFiles(files) {
     await Promise.all(files.map(async (filePath) => {
-        const jsFileContent = await fs.readFile(filePath, 'utf-8');
-        const convertedContent = convertImports(jsFileContent, filePath, distLegacyDir);
+        try {
+            const jsFileContent = await fs.readFile(filePath, 'utf-8');
+            const convertedContent = convertImports(jsFileContent, filePath, distLegacyDir);
 
         // append banners
         let finalContent;
@@ -297,6 +321,11 @@ async function processLegacyFiles(files) {
         }
 
         await fs.writeFile(filePath, finalContent, 'utf-8');
+        } catch (error) {
+            console.error(`\x1b[31mError processing file: ${filePath}\x1b[0m`);
+            console.error(error);
+            throw error;
+        }
     }));
 }
 
