@@ -62,6 +62,11 @@
             <summary>Selected layouts</summary>
             <description>Each monitor's active layout used by the monitor tiling manager.</description>
         </key>
+        <key name="selected-layouts-by-monitor" type="s">
+            <default>'{}'</default>
+            <summary>Selected layouts by monitor</summary>
+            <description>Monitor identity to workspace layout mapping, used to restore layouts when monitors change.</description>
+        </key>
         <key name="restore-window-original-size" type="b">
             <default>true</default>
             <summary>Restore window size</summary>
