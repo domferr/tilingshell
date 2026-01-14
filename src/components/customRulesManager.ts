@@ -21,14 +21,21 @@ export interface CustomApplicationRules {
     ruleConfig?: ConfigRules;
 }
 
-@registerGObjectClass
 export class CustomRulesManager extends GObject.Object {
-    static metaInfo: GObject.MetaInfo<unknown, unknown, unknown> = {
+    static { registerGObjectClass(this, {
         GTypeName: 'CustomRulesManager',
         Signals: {
-            'customRules-changed': {},
+            'customRules-changed': {
+                param_types: [],
+            },
         },
-    };
+    })};
+
+    // Add emit method to satisfy TypeScript
+    emit(signal: string, ...args: unknown[]): void {
+        // @ts-ignore
+        super.emit(signal, ...args);
+    }
 
     private readonly _signals: SignalHandling;
     private _customRules: CustomApplicationRules[];
