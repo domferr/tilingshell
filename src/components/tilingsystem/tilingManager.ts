@@ -494,6 +494,22 @@ export class TilingManager {
         );
         this._snapAssist.workArea = this._workArea;
         this._edgeTilingManager.workarea = this._workArea;
+
+        // resize each tiled window
+        this._workspaceTilingLayout.forEach((_, workspace) => {
+            workspace
+                .list_windows()
+                .filter((win) =>
+                    win.get_monitor() === this._monitor.index &&
+                        (win as ExtendedWindow).assignedTile !== undefined
+                )
+                .forEach((win) => {
+                    this._easeWindowRectFromTile(
+                        (win as ExtendedWindow).assignedTile!,
+                        win,
+                    );
+                });
+        });
     }
 
     private _onWindowGrabBegin(window: Meta.Window, grabOp: number) {
