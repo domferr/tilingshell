@@ -9,6 +9,10 @@ import types from '@babel/types';
 import traverseBabel from '@babel/traverse';
 import generatorBabel from '@babel/generator';
 import { ESLint } from "eslint";
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const traverse = traverseBabel.default;
 const generator = generatorBabel.default;
@@ -89,7 +93,31 @@ async function preprocess(files) {
         // drop lines tagged with "// @esbuild-drop-next-line"
         text = text.replace(/\/\/\s*@esbuild-drop-next-line\s*\n.*?;/gs, '');
 
-        // Ensure every import has ".js" at end end, excluding GJS imports (but include @ aliases)
+        // Convert @ path aliases to relative imports
+        text = text.replace(
+            /import\s+([\s\S]*?)\s+from\s+['"]@([^'"]+)['"]/g,
+            (_match, imports, aliasPath) => {
+                // Remove .js extension if present for resolution
+                aliasPath = aliasPath.replace(/\.js$/, '');
+                
+                // Replace dots with slashes to handle paths like @gi.prefs -> gi/prefs
+                aliasPath = aliasPath.replace(/\./g, '/');
+                
+                // Calculate relative path from current file to src/<aliasPath>
+                const currentFileDir = path.dirname(filename);
+                const targetPath = path.resolve(__dirname, distDir, aliasPath);
+                let relativePath = path.relative(currentFileDir, targetPath).replace(/\\/g, '/');
+                
+                // Ensure relative path starts with ./ or ../
+                if (!relativePath.startsWith('.')) {
+                    relativePath = './' + relativePath;
+                }
+                
+                return `import ${imports} from "${relativePath}.js"`;
+            }
+        );
+
+        // Ensure every import has ".js" at end end, excluding GJS imports
         text = text.replace(
             /import\s+([\s\S]*?)\s+from\s+['"]([^'"]+)['"]/g,
             (_match, imports, importPath) => {
@@ -228,7 +256,7 @@ function convertImports(text, currentFilePath, rootDirName) {
     );
 
     text = text.replace(
-        /import\s+(?:\{([\s\S]+?)\}|([^\s]+))\s+from\s+"([\.]{1,2}\/[^"]+)";/gm,
+        /import\s+(?:\{([^}]+)\}|([^\s]+))\s+from\s+"(\.{1,2}\/[^"]+)";/gm,
         (_, destructured, single, importPath) => {
             const currentAbs = path.resolve(rootDirName, relativeCurrent);
             const fullPath = path.resolve(path.dirname(currentAbs), importPath).replace(/\.(js|ts)$/, '');
