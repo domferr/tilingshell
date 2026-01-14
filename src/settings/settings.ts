@@ -107,6 +107,7 @@ export default class Settings {
     static KEY_TILE_PREVIEW_ANIMATION_TIME = 'tile-preview-animation-time';
     static KEY_SETTING_LAYOUTS_JSON = 'layouts-json';
     static KEY_SETTING_SELECTED_LAYOUTS = 'selected-layouts';
+    static KEY_SETTING_SELECTED_LAYOUTS_BY_MONITOR = 'selected-layouts-by-monitor';
     static KEY_WINDOW_BORDER_WIDTH = 'window-border-width';
     static KEY_ENABLE_SMART_WINDOW_BORDER_RADIUS = 'enable-smart-window-border-radius';
     static KEY_QUARTER_TILING_THRESHOLD = 'quarter-tiling-threshold';
@@ -544,6 +545,17 @@ export default class Settings {
         return result;
     }
 
+    static get_selected_layouts_by_monitor(): Record<string, string[]> {
+        try {
+            return JSON.parse(
+                get_string(Settings.KEY_SETTING_SELECTED_LAYOUTS_BY_MONITOR) ||
+                    '{}',
+            ) as Record<string, string[]>;
+        } catch (_unused) {
+            return {};
+        }
+    }
+
     static reset_layouts_json() {
         this.save_layouts_json([
             new Layout(
@@ -672,6 +684,15 @@ export default class Settings {
         this._settings?.set_value(
             Settings.KEY_SETTING_SELECTED_LAYOUTS,
             result,
+        );
+    }
+
+    static save_selected_layouts_by_monitor(
+        layoutsByMonitor: Record<string, string[]>,
+    ) {
+        set_string(
+            Settings.KEY_SETTING_SELECTED_LAYOUTS_BY_MONITOR,
+            JSON.stringify(layoutsByMonitor),
         );
     }
 
