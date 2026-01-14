@@ -4,6 +4,7 @@ import Settings from '../settings/settings';
 import SignalHandling from './signalHandling';
 import { GObject, Meta, Gio } from '../gi/ext';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as ExtensionUtils from 'resource:///org/gnome/shell/misc/extensionUtils.js';
 import { logger } from './logger';
 import { getWindows } from './ui';
 import ExtendedWindow from '../components/tilingsystem/extendedWindow';
@@ -38,6 +39,7 @@ export default class GlobalState extends GObject.Object {
     private _signals: SignalHandling;
     private _layouts: Layout[];
     private _tilePreviewAnimationTime: number;
+    private _monitorIdentities: string[];
     // if workspaces are reordered, we use this map to know which layouts where selected
     // to each workspace and we save the new ordering in the settings
     private _selected_layouts: Map<Meta.Workspace, string[]>; // used to handle reordering of workspaces
@@ -62,7 +64,9 @@ export default class GlobalState extends GObject.Object {
         this._signals = new SignalHandling();
         this._layouts = Settings.get_layouts_json();
         this._tilePreviewAnimationTime = 100;
+        this._monitorIdentities = [];
         this._selected_layouts = new Map();
+        this._refreshMonitorIdentities();
         this.validate_selected_layouts();
 
         Settings.bind(
@@ -84,7 +88,7 @@ export default class GlobalState extends GObject.Object {
             Settings,
             Settings.KEY_SETTING_SELECTED_LAYOUTS,
             () => {
-                const selected_layouts = Settings.get_selected_layouts();
+                const selected_layouts = this._get_selected_layouts_from_settings();
                 if (selected_layouts.length === 0) {
                     this.validate_selected_layouts();
                     return;
@@ -104,13 +108,18 @@ export default class GlobalState extends GObject.Object {
                             : [defaultLayout.id];
                     while (monitors_layouts.length < n_monitors)
                         monitors_layouts.push(defaultLayout.id);
-                    while (monitors_layouts.length > n_monitors)
-                        monitors_layouts.pop();
+                    // do not truncate layouts when monitors are disconnected
+                    // so we can restore selections when monitors return
 
                     this._selected_layouts.set(ws, monitors_layouts);
                 }
+                this._save_selected_layouts_by_monitor(selected_layouts);
             },
         );
+
+        this._signals.connect(Main.layoutManager, 'monitors-changed', () => {
+            this._refreshMonitorIdentities();
+        });
 
         this._signals.connect(
             global.workspaceManager,
@@ -158,6 +167,7 @@ export default class GlobalState extends GObject.Object {
                 }
 
                 Settings.save_selected_layouts(to_be_saved);
+                this._save_selected_layouts_by_monitor(to_be_saved);
             },
         );
 
@@ -180,6 +190,7 @@ export default class GlobalState extends GObject.Object {
                     to_be_saved.push(monitors_layouts);
                 }
                 Settings.save_selected_layouts(to_be_saved);
+                this._save_selected_layouts_by_monitor(to_be_saved);
 
                 this._selected_layouts.clear();
                 this._selected_layouts = newMap;
@@ -199,7 +210,7 @@ export default class GlobalState extends GObject.Object {
 
     public validate_selected_layouts() {
         const n_monitors = Main.layoutManager.monitors.length;
-        const old_selected_layouts = Settings.get_selected_layouts();
+        const old_selected_layouts = this._get_selected_layouts_from_settings();
         for (let i = 0; i < global.workspaceManager.get_n_workspaces(); i++) {
             const ws = global.workspaceManager.get_workspace_by_index(i);
             if (!ws) continue;
@@ -208,7 +219,8 @@ export default class GlobalState extends GObject.Object {
                 i < old_selected_layouts.length ? old_selected_layouts[i] : [];
             while (monitors_layouts.length < n_monitors)
                 monitors_layouts.push(this._layouts[0].id);
-            while (monitors_layouts.length > n_monitors) monitors_layouts.pop();
+            // do not truncate layouts when monitors are disconnected
+            // so we can restore selections when monitors return
 
             monitors_layouts.forEach((_, ind) => {
                 if (
@@ -237,6 +249,7 @@ export default class GlobalState extends GObject.Object {
         }
 
         Settings.save_selected_layouts(to_be_saved);
+        this._save_selected_layouts_by_monitor(to_be_saved);
     }
 
     get layouts(): Layout[] {
@@ -293,7 +306,7 @@ export default class GlobalState extends GObject.Object {
         monitorIndex: number,
         workspaceIndex: number,
     ): Layout {
-        const selectedLayouts = Settings.get_selected_layouts();
+        const selectedLayouts = this._get_selected_layouts_from_settings();
         if (workspaceIndex < 0 || workspaceIndex >= selectedLayouts.length)
             workspaceIndex = 0;
 
@@ -324,7 +337,7 @@ export default class GlobalState extends GObject.Object {
         monitorIndex: number,
     ) {
         // get the currently selected layouts
-        const selected = Settings.get_selected_layouts();
+        const selected = this._get_selected_layouts_from_settings();
         // select the layout for the given monitor
         selected[global.workspaceManager.get_active_workspace_index()][
             monitorIndex
@@ -358,5 +371,113 @@ export default class GlobalState extends GObject.Object {
         }
 
         Settings.save_selected_layouts(selected);
+        this._save_selected_layouts_by_monitor(selected);
+    }
+
+    private _get_selected_layouts_from_settings(): string[][] {
+        const byMonitor = Settings.get_selected_layouts_by_monitor();
+        const fallback = Settings.get_selected_layouts();
+        if (Object.keys(byMonitor).length === 0) return fallback;
+
+        const monitorIds = this._getMonitorIdentities();
+        const defaultLayout = this._layouts[0]?.id ?? '';
+        const n_workspaces = global.workspaceManager.get_n_workspaces();
+        const selectedLayouts: string[][] = [];
+        for (let wsIndex = 0; wsIndex < n_workspaces; wsIndex++) {
+            const monitors_layouts = monitorIds.map((monitorId, index) => {
+                return (
+                    byMonitor[monitorId]?.[wsIndex] ||
+                    fallback[wsIndex]?.[index] ||
+                    defaultLayout
+                );
+            });
+            selectedLayouts.push(monitors_layouts);
+        }
+
+        return selectedLayouts;
+    }
+
+    private _save_selected_layouts_by_monitor(selectedLayouts: string[][]) {
+        const monitorIds = this._getMonitorIdentities();
+        const defaultLayout = this._layouts[0]?.id ?? '';
+        const layoutsByMonitor: Record<string, string[]> = {};
+        monitorIds.forEach((monitorId, monitorIndex) => {
+            const layoutsForWorkspaces: string[] = [];
+            for (
+                let wsIndex = 0;
+                wsIndex < global.workspaceManager.get_n_workspaces();
+                wsIndex++
+            ) {
+                layoutsForWorkspaces.push(
+                    selectedLayouts[wsIndex]?.[monitorIndex] || defaultLayout,
+                );
+            }
+            layoutsByMonitor[monitorId] = layoutsForWorkspaces;
+        });
+
+        Settings.save_selected_layouts_by_monitor(layoutsByMonitor);
+    }
+
+    private _getMonitorIdentities(): string[] {
+        if (this._monitorIdentities.length > 0) return this._monitorIdentities;
+        return this._computeMonitorIdentities();
+    }
+
+    private _refreshMonitorIdentities() {
+        this._monitorIdentities = this._computeMonitorIdentities();
+    }
+
+    private _computeMonitorIdentities(): string[] {
+        const monitors = Main.layoutManager.monitors;
+        const fallback = monitors.map(
+            (monitor, index) => `monitor-${monitor.index ?? index}`,
+        );
+
+        try {
+            const extension = ExtensionUtils.getCurrentExtension();
+            const proc = Gio.Subprocess.new(
+                ['gjs', '-m', `${extension.path}/monitorDescription.js`],
+                Gio.SubprocessFlags.STDOUT_PIPE |
+                    Gio.SubprocessFlags.STDERR_PIPE,
+            );
+            const [, stdout, stderr] = proc.communicate_utf8(null, null);
+            if (!proc.get_successful()) {
+                debug(stderr);
+                return fallback;
+            }
+
+            const details = JSON.parse(stdout) as Array<{
+                name?: string;
+                x: number;
+                y: number;
+                width: number;
+                height: number;
+            }>;
+            const names = monitors.map((monitor, index) => {
+                const detail = details.find(
+                    (item) =>
+                        item.x === monitor.x &&
+                        item.y === monitor.y &&
+                        item.width === monitor.width &&
+                        item.height === monitor.height,
+                );
+                const name = detail?.name?.trim();
+                return name && name.length > 0 ? name : fallback[index];
+            });
+
+            return this._dedupeMonitorNames(names);
+        } catch (error) {
+            debug(error);
+            return fallback;
+        }
+    }
+
+    private _dedupeMonitorNames(names: string[]): string[] {
+        const counts = new Map<string, number>();
+        return names.map((name) => {
+            const count = (counts.get(name) ?? 0) + 1;
+            counts.set(name, count);
+            return count > 1 ? `${name} #${count}` : name;
+        });
     }
 }
