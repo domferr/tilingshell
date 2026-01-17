@@ -50,7 +50,8 @@ import OverriddenAltTab from './components/altTab/overriddenAltTab';
 import { LayoutSwitcherPopup } from './components/layoutSwitcher/layoutSwitcher';
 import { unmaximizeWindow } from './utils/gnomesupport';
 import * as Config from 'resource:///org/gnome/shell/misc/config.js';
-import { CustomRulesManager } from '@components/customRulesManager';
+import { CustomRulesManager } from './components/customRulesManager';
+import { RaiseTogetherManager } from './components/raiseTogether/raiseTogetherManager';
 
 const debug = logger('extension');
 
@@ -64,6 +65,7 @@ export default class TilingShellExtension extends Extension {
     private _resizingManager: ResizingManager | null;
     private _windowBorderManager: WindowBorderManager | null;
     private _customRulesManager: CustomRulesManager | null;
+    private _raiseTogetherManager: RaiseTogetherManager | null;
 
     constructor(metadata: ExtensionMetadata) {
         super(metadata);
@@ -76,6 +78,7 @@ export default class TilingShellExtension extends Extension {
         this._resizingManager = null;
         this._windowBorderManager = null;
         this._customRulesManager = null;
+        this._raiseTogetherManager = null;
     }
 
     createIndicator() {
@@ -166,6 +169,9 @@ export default class TilingShellExtension extends Extension {
             this._customRulesManager,
         );
         this._windowBorderManager.enable();
+
+        this._raiseTogetherManager = new RaiseTogetherManager();
+        this._raiseTogetherManager.enable();
 
         this.createIndicator();
 
@@ -783,6 +789,9 @@ export default class TilingShellExtension extends Extension {
 
         this._customRulesManager?.destroy();
         this._customRulesManager = null;
+      
+        this._raiseTogetherManager?.destroy();
+        this._raiseTogetherManager = null;
 
         // disable dbus
         this._dbus?.disable();

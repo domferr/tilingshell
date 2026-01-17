@@ -107,6 +107,11 @@
             <summary>Enable auto tiling</summary>
             <description>Automatically tile a new window to the best tile according to the current layout.</description>
         </key>
+        <key name="raise-together" type="b">
+            <default>false</default>
+            <summary>Raise tiled windows together</summary>
+            <description>When one tiled window is raised, raise all tiled windows into the foreground together.</description>
+        </key>
         <key name="overridden-settings" type="s">
             <default>'{}'</default>
             <summary>Overridden settings</summary>

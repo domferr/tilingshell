@@ -103,6 +103,7 @@ export default class Settings {
     static KEY_ENABLE_BLUR_SELECTED_TILEPREVIEW = 'enable-blur-selected-tilepreview';
     static KEY_ENABLE_MOVE_KEYBINDINGS = 'enable-move-keybindings';
     static KEY_ENABLE_AUTO_TILING = 'enable-autotiling';
+    static KEY_RAISE_TOGETHER = 'raise-together';
     static KEY_ACTIVE_SCREEN_EDGES = 'active-screen-edges';
     static KEY_TOP_EDGE_MAXIMIZE = 'top-edge-maximize';
     static KEY_OVERRIDE_WINDOW_MENU = 'override-window-menu';
@@ -339,6 +340,14 @@ export default class Settings {
 
     static set ENABLE_AUTO_TILING(val: boolean) {
         set_boolean(Settings.KEY_ENABLE_AUTO_TILING, val);
+    }
+
+    static get RAISE_TOGETHER(): boolean {
+        return get_boolean(Settings.KEY_RAISE_TOGETHER);
+    }
+
+    static set RAISE_TOGETHER(val: boolean) {
+        set_boolean(Settings.KEY_RAISE_TOGETHER, val);
     }
 
     static get ACTIVE_SCREEN_EDGES(): boolean {

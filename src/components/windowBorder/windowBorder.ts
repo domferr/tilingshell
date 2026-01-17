@@ -132,9 +132,6 @@ export default class WindowBorder extends St.DrawingArea {
 
         this._signals.connect(global.display, 'restacked', () => {
             this.queue_repaint(); // a transient window might have been opened
-        });
-
-        this._signals.connect(global.display, 'restacked', () => {
             global.windowGroup.set_child_above_sibling(this, null);
         });
 

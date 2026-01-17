@@ -1,4 +1,3 @@
-// eslint-disable-next-line spaced-comment
 /*!
  * Tiling Shell: advanced and modern window management for GNOME
  *
@@ -312,6 +311,15 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             ),
         );
         behaviourGroup.add(overrideAltTabRow);
+
+        const raiseTogetherRow = this._buildSwitchRow(
+            Settings.KEY_RAISE_TOGETHER,
+            _('Raise tiled windows together'),
+            _(
+                'When one tiled window is raised, raise all tiled windows into the foreground together',
+            ),
+        );
+        behaviourGroup.add(raiseTogetherRow);
 
         // Screen Edges section
         const activeScreenEdgesGroup = new Adw.PreferencesGroup({

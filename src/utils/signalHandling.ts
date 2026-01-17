@@ -19,6 +19,8 @@ export default class SignalHandling {
     ) {
         const signalId = obj.connect(key, fun);
         this._signalsIds[key] = { id: signalId, obj };
+
+        return signalId;
     }
 
     public disconnect(): boolean;
