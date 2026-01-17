@@ -27,6 +27,11 @@
             <summary>Enable snap assist</summary>
             <description>Move the window on top of the screen to snap assist it.</description>
         </key>
+        <key name="snap-assist-sync-layout" type="b">
+            <default>false</default>
+            <summary>Sync layout when tiling with Snap Assistant</summary>
+            <description>Change the desktop layout to match the layout used when tiling a window with Snap Assistant.</description>
+        </key>
         <key name="show-indicator" type="b">
             <default>true</default>
             <summary>Shows indicator</summary>
@@ -196,6 +201,10 @@
             <default>'[]'</default>
             <summary>Application custom rules</summary>
             <description>List of applications with custom feature settings (custom border, tiling, snap to border).</description>
+        <key name="edge-snap-mode" type="s">
+            <default>'default'</default>
+            <summary>Edge snap behavior</summary>
+            <description>Controls how windows snap to screen edges:\n'default' (corners snap to quarters, edges to halves),\n'adaptive' (snap to layout tiles by column),\n'granular' (snap to exact tile under cursor).</description>
         </key>
 
         <!-- keybindings -->

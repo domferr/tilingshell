@@ -57,7 +57,6 @@ export default class WindowBorder extends St.DrawingArea {
         this.close();
         global.windowGroup.add_child(this);
         this.trackWindow(win, true);
-
         this.connect('destroy', () => {
             this._bindings.forEach((b) => b.unbind());
             this._bindings = [];
@@ -133,6 +132,10 @@ export default class WindowBorder extends St.DrawingArea {
 
         this._signals.connect(global.display, 'restacked', () => {
             this.queue_repaint(); // a transient window might have been opened
+        });
+
+        this._signals.connect(global.display, 'restacked', () => {
+            global.windowGroup.set_child_above_sibling(this, null);
         });
 
         this._signals.connect(this._window, 'position-changed', () => {

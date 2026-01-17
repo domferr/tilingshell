@@ -111,6 +111,7 @@ export class TilingManager {
             `Work area for monitor ${this._monitor.index}: ${this._workArea.x} ${this._workArea.y} ${this._workArea.width}x${this._workArea.height}`,
         );
         this._edgeTilingManager = new EdgeTilingManager(this._workArea);
+        this._edgeTilingManager.monitorIndex = this._monitor.index;
 
         // handle scale factor of the monitor
         const monitorScalingFactor = this._enableScaling
@@ -605,6 +606,8 @@ export class TilingManager {
         const tilingLayout = this._workspaceTilingLayout.get(currentWs);
         if (!tilingLayout) return GLib.SOURCE_REMOVE;
 
+        this._edgeTilingManager.workspaceIndex = currentWs.index();
+
         // if the window was moved into another monitor and it is still grabbed
         if (
             !window.allows_resize() ||
@@ -888,47 +891,22 @@ export class TilingManager {
         });
         this._easeWindowRect(window, desiredWindowRect);
 
+        // Sync the desktop layout to match the snap-assisted layout if enabled
+        if (wasSnapAssistingLayout && Settings.SNAP_ASSIST_SYNC_LAYOUT) {
+            GlobalState.get().setSelectedLayoutOfMonitor(
+                wasSnapAssistingLayout.id,
+                this._monitor.index,
+            );
+        }
+
         if (!tilingLayout || !canShowTilingSuggestions) return;
 
         // retrieve the current layout for the monitor and workspace
         // were the window was tiled
         const layout = wasEdgeTiling
-            ? new Layout(
-                  [
-                      // top-left
-                      new Tile({
-                          x: 0,
-                          y: 0,
-                          width: 0.5,
-                          height: 0.5,
-                          groups: [],
-                      }),
-                      // top-right
-                      new Tile({
-                          x: 0.5,
-                          y: 0,
-                          width: 0.5,
-                          height: 0.5,
-                          groups: [],
-                      }),
-                      // bottom-left
-                      new Tile({
-                          x: 0,
-                          y: 0.5,
-                          width: 0.5,
-                          height: 0.5,
-                          groups: [],
-                      }),
-                      // bottom-right
-                      new Tile({
-                          x: 0.5,
-                          y: 0.5,
-                          width: 0.5,
-                          height: 0.5,
-                          groups: [],
-                      }),
-                  ],
-                  'edge-tiling-layout',
+            ? GlobalState.get().getSelectedLayoutOfMonitor(
+                  this._monitor.index,
+                  window.get_workspace().index(),
               )
             : wasSnapAssistingLayout
               ? wasSnapAssistingLayout
