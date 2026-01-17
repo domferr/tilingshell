@@ -88,6 +88,7 @@ export default class Settings {
     static KEY_WINDOW_USE_CUSTOM_BORDER_COLOR = 'window-use-custom-border-color';
     static KEY_TILING_SYSTEM = 'enable-tiling-system';
     static KEY_SNAP_ASSIST = 'enable-snap-assist';
+    static KEY_SNAP_ASSIST_SYNC_LAYOUT = 'snap-assist-sync-layout';
     static KEY_SHOW_INDICATOR = 'show-indicator';
     static KEY_TILING_SYSTEM_ACTIVATION_KEY = 'tiling-system-activation-key';
     static KEY_TILING_SYSTEM_DEACTIVATION_KEY = 'tiling-system-deactivation-key';
@@ -199,6 +200,14 @@ export default class Settings {
 
     static set SNAP_ASSIST(val: boolean) {
         set_boolean(Settings.KEY_SNAP_ASSIST, val);
+    }
+
+    static get SNAP_ASSIST_SYNC_LAYOUT(): boolean {
+        return get_boolean(Settings.KEY_SNAP_ASSIST_SYNC_LAYOUT);
+    }
+
+    static set SNAP_ASSIST_SYNC_LAYOUT(val: boolean) {
+        set_boolean(Settings.KEY_SNAP_ASSIST_SYNC_LAYOUT, val);
     }
 
     static get SHOW_INDICATOR(): boolean {

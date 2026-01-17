@@ -283,6 +283,14 @@ export default class GlobalState extends GObject.Object {
         this.layouts = this._layouts;
     }
 
+    public swapLayouts(first: number, second: number) {
+        const tmp = this._layouts[first];
+        this._layouts[first] = this._layouts[second];
+        this._layouts[second] = tmp;
+        // easy way to trigger save and signal emission
+        this.layouts = this._layouts;
+    }
+
     set layouts(layouts: Layout[]) {
         this._layouts = layouts;
         Settings.save_layouts_json(layouts);

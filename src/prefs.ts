@@ -220,6 +220,20 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         behaviourGroup.add(snapAssistRow);
 
+        const snapAssistSyncLayoutRow = this._buildSwitchRow(
+            Settings.KEY_SNAP_ASSIST_SYNC_LAYOUT,
+            _('Sync layout when tiling with Snap Assistant'),
+            _(
+                'Change the desktop layout to match the layout used when tiling a window with Snap Assistant',
+            ),
+        );
+        Settings.bind(
+            Settings.KEY_SNAP_ASSIST,
+            snapAssistSyncLayoutRow,
+            'sensitive',
+        );
+        behaviourGroup.add(snapAssistSyncLayoutRow);
+
         const enableTilingSystemRow = this._buildSwitchRow(
             Settings.KEY_TILING_SYSTEM,
             _('Enable Tiling System'),

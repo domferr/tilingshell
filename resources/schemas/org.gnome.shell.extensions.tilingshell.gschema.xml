@@ -27,6 +27,11 @@
             <summary>Enable snap assist</summary>
             <description>Move the window on top of the screen to snap assist it.</description>
         </key>
+        <key name="snap-assist-sync-layout" type="b">
+            <default>false</default>
+            <summary>Sync layout when tiling with Snap Assistant</summary>
+            <description>Change the desktop layout to match the layout used when tiling a window with Snap Assistant.</description>
+        </key>
         <key name="show-indicator" type="b">
             <default>true</default>
             <summary>Shows indicator</summary>

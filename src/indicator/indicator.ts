@@ -21,7 +21,7 @@ enum IndicatorState {
 
 export default class Indicator extends PanelMenu.Button {
     static { registerGObjectClass(this) }
-    
+
     private _layoutEditor: LayoutEditor | null;
     private _editorDialog: EditorDialog | null;
     private _currentMenu: CurrentMenu | null;
@@ -161,6 +161,9 @@ export default class Indicator extends PanelMenu.Button {
             onClose: () => {
                 this._editorDialog?.destroy();
                 this._editorDialog = null;
+            },
+            onReorderLayout: (fromIndex: number, toIndex: number) => {
+                GlobalState.get().swapLayouts(fromIndex, toIndex);
             },
             path: this._path,
             legend: showLegend,

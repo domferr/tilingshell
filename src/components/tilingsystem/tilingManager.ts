@@ -508,6 +508,32 @@ export class TilingManager {
                 TouchPointer.get().onTouchEvent(x, y);
             },
         );
+        // Add Wacom tablet support, listen to tablet events
+        this._signals.connect(
+            global.stage,
+            'captured-event',
+            (_source, event: Clutter.Event) => {
+                const device = event.get_source_device();
+                if (!device) return;
+
+                const deviceType = device.get_device_type();
+
+                // Check for tablet device types
+                if (deviceType === Clutter.InputDeviceType.TABLET_DEVICE ||
+                    deviceType === Clutter.InputDeviceType.PEN_DEVICE) {
+
+                    const eventType = event.type();
+                    // Capture motion events from tablet
+                    if (eventType === Clutter.EventType.MOTION) {
+                        const [x, y] = event.get_coords();
+                        TouchPointer.get().onTouchEvent(x, y);
+                        // Move the actual mouse cursor to match tablet position
+                        const seat = Clutter.get_default_backend().get_default_seat();
+                        seat.warp_pointer(x, y);
+                    }
+                }
+            },
+        );
 
         // workaround for gnome-shell bug https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/2857
         if (
@@ -848,6 +874,14 @@ export class TilingManager {
             ...TileUtils.build_tile(selectedTilesRect, this._workArea),
         });
         this._easeWindowRect(window, desiredWindowRect);
+
+        // Sync the desktop layout to match the snap-assisted layout if enabled
+        if (wasSnapAssistingLayout && Settings.SNAP_ASSIST_SYNC_LAYOUT) {
+            GlobalState.get().setSelectedLayoutOfMonitor(
+                wasSnapAssistingLayout.id,
+                this._monitor.index,
+            );
+        }
 
         if (!tilingLayout || !canShowTilingSuggestions) return;
 
