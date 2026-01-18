@@ -21,7 +21,7 @@
 
 import { Gtk, Adw, Gio, GLib, Gdk, GObject } from './gi/prefs';
 import Settings from './settings/settings';
-import { EdgeSnapMode, ActivationKey } from './settings/settings';
+import { EdgeTilingMode, ActivationKey } from './settings/settings';
 import { logger } from './utils/logger';
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 import Layout from './components/layout/Layout';
@@ -386,10 +386,10 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         activeScreenEdgesGroup.add(edgeTilingOffset);
 
-        // Create dropdown for edge snap mode
+        // Create dropdown for edge tiling mode
         const edgeTilingBehaviourRow = this._buildEdgeTilingBehaviourRow(
-            Settings.EDGE_SNAP_MODE,
-            (newMode: EdgeSnapMode) => Settings.EDGE_SNAP_MODE = newMode,
+            Settings.EDGE_TILING_MODE,
+            (newMode: EdgeTilingMode) => Settings.EDGE_TILING_MODE = newMode,
         );
         activeScreenEdgesGroup.add(edgeTilingBehaviourRow);
 
@@ -422,9 +422,9 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
 
         const screenEdgesWindowSuggestionRow = this._buildSwitchRow(
             Settings.KEY_ENABLE_SCREEN_EDGES_WINDOWS_SUGGESTIONS,
-            _('Enable window suggestions for screen edge snapping'),
+            _('Enable window suggestions for screen edge tiling'),
             _(
-                'Suggests windows to occupy empty tiles when snapping to screen edges',
+                'Suggests windows to occupy empty tiles when tiling to screen edges',
             ),
         );
         windowsSuggestionsGroup.add(screenEdgesWindowSuggestionRow);
@@ -1091,7 +1091,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         return button;
     }
 
-    _buildEdgeTilingBehaviourRow(currentMode: EdgeSnapMode, onModeChange: (newMode: EdgeSnapMode) => void) {
+    _buildEdgeTilingBehaviourRow(currentMode: EdgeTilingMode, onModeChange: (newMode: EdgeTilingMode) => void) {
         const row = new Adw.ActionRow({
             activatable: false,
             title: _("Choose how windows snap to screen edges"),
@@ -1113,19 +1113,19 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             _('Follow quarters or screen halves'),
             'edge-default-symbolic'
         );
-        defaultBtn.connect("toggled", () => onModeChange(EdgeSnapMode.DEFAULT));
+        defaultBtn.connect("toggled", () => onModeChange(EdgeTilingMode.DEFAULT));
         const adaptiveBtn = this._createEdgeTilingBehaviourOption(
             _('Adaptive'),
             _('Follow corners of selected layout or screen halves'),
             'edge-adaptive-symbolic'
         );
-        adaptiveBtn.connect("toggled", () => onModeChange(EdgeSnapMode.ADAPTIVE));
+        adaptiveBtn.connect("toggled", () => onModeChange(EdgeTilingMode.ADAPTIVE));
         const granularBtn = this._createEdgeTilingBehaviourOption(
             _('Granular'),
             _('Follow currently selected layout'),
             'edge-granular-symbolic'
         );
-        granularBtn.connect("toggled", () => onModeChange(EdgeSnapMode.GRANULAR));
+        granularBtn.connect("toggled", () => onModeChange(EdgeTilingMode.GRANULAR));
         content.append(defaultBtn);
         content.append(adaptiveBtn);
         content.append(granularBtn);
@@ -1133,8 +1133,8 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         defaultBtn.set_group(adaptiveBtn);
         granularBtn.set_group(adaptiveBtn);
         // set the currently activated one
-        if (currentMode === EdgeSnapMode.ADAPTIVE) adaptiveBtn.set_active(true);
-        else if (currentMode === EdgeSnapMode.GRANULAR) granularBtn.set_active(true);
+        if (currentMode === EdgeTilingMode.ADAPTIVE) adaptiveBtn.set_active(true);
+        else if (currentMode === EdgeTilingMode.GRANULAR) granularBtn.set_active(true);
         else defaultBtn.set_active(true);
         (row.get_child() as Gtk.Box).append(content);
 

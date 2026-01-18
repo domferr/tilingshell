@@ -293,7 +293,7 @@ msgid ""
 msgstr ""
 
 #: dist/prefs.js:355
-msgid "Enable window suggestions for screen edge snapping"
+msgid "Enable window suggestions for screen edge tiling"
 msgstr ""
 
 #: dist/prefs.js:357

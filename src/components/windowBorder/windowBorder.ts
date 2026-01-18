@@ -33,7 +33,7 @@ export default class WindowBorder extends St.DrawingArea {
     private _borderRadiusValue: [number, number, number, number];
     private _timeout: GLib.Source | undefined;
     private _delayedSmartBorderRadius: boolean;
-    private _borderWidth: number;
+    private _scaledBorderWidth: number;
 
     constructor(win: Meta.Window, enableScaling: boolean) {
         super({
@@ -41,7 +41,7 @@ export default class WindowBorder extends St.DrawingArea {
         });
         this._signals = new SignalHandling();
         this._bindings = [];
-        this._borderWidth = 1;
+        this._scaledBorderWidth = 1;
         this._window = win;
         this._windowMonitor = win.get_monitor();
         this._enableScaling = enableScaling;
@@ -92,16 +92,6 @@ export default class WindowBorder extends St.DrawingArea {
             ),
         );
 
-        const winRect = this._window.get_frame_rect();
-        this.set_position(
-            winRect.x - this._borderWidth,
-            winRect.y - this._borderWidth,
-        );
-        this.set_size(
-            winRect.width + 2 * this._borderWidth,
-            winRect.height + 2 * this._borderWidth,
-        );
-
         if (Settings.ENABLE_SMART_WINDOW_BORDER_RADIUS) {
             const cached_radius = (this._window as WindowWithCachedRadius)
                 .__ts_cached_radius;
@@ -117,6 +107,15 @@ export default class WindowBorder extends St.DrawingArea {
             }
         }
         this.updateStyle();
+        const winRect = this._window.get_frame_rect();
+        this.set_position(
+            winRect.x - this._scaledBorderWidth,
+            winRect.y - this._scaledBorderWidth,
+        );
+        this.set_size(
+            winRect.width + (2 * this._scaledBorderWidth),
+            winRect.height + (2 * this._scaledBorderWidth),
+        );
 
         const isMaximized =
             this._window.maximizedVertically &&
@@ -157,8 +156,8 @@ export default class WindowBorder extends St.DrawingArea {
 
             const rect = this._window.get_frame_rect();
             this.set_position(
-                rect.x - this._borderWidth,
-                rect.y - this._borderWidth,
+                rect.x - this._scaledBorderWidth,
+                rect.y - this._scaledBorderWidth,
             );
             // if the window changes monitor, we may have a different scaling factor
             if (this._windowMonitor !== win.get_monitor()) {
@@ -190,8 +189,8 @@ export default class WindowBorder extends St.DrawingArea {
 
             const rect = this._window.get_frame_rect();
             this.set_size(
-                rect.width + 2 * this._borderWidth,
-                rect.height + 2 * this._borderWidth,
+                rect.width + (2 * this._scaledBorderWidth),
+                rect.height + (2 * this._scaledBorderWidth),
             );
             // if the window changes monitor, we may have a different scaling factor
             if (this._windowMonitor !== win.get_monitor()) {
@@ -332,11 +331,12 @@ export default class WindowBorder extends St.DrawingArea {
             (alreadyScaled ? 1 : scalingFactor) *
             (Settings.WINDOW_BORDER_WIDTH /
                 (alreadyScaled ? scalingFactor : 1));
+        this._scaledBorderWidth = scalingFactor * Settings.WINDOW_BORDER_WIDTH;
         const borderColor = Settings.WINDOW_USE_CUSTOM_BORDER_COLOR
             ? Settings.WINDOW_BORDER_COLOR
             : '-st-accent-color';
         const radius = this._borderRadiusValue.map((val) => {
-            const valWithBorder = val === 0 ? val : val + borderWidth;
+            const valWithBorder = val === 0 ? val : (val + borderWidth);
             return (
                 (alreadyScaled ? 1 : scalingFactor) *
                 (valWithBorder / (alreadyScaled ? scalingFactor : 1))
@@ -346,20 +346,10 @@ export default class WindowBorder extends St.DrawingArea {
         const scalingFactorSupportString = monitorScalingFactor
             ? `${getScalingFactorSupportString(monitorScalingFactor)};`
             : '';
-
-        if (this._borderWidth !== borderWidth) {
-            const diff = this._borderWidth - borderWidth;
-            this._borderWidth = borderWidth;
-            this.set_size(
-                this.get_width() - 2 * diff,
-                this.get_height() - 2 * diff,
-            );
-            this.set_position(this.get_x() + diff, this.get_y() + diff);
-        }
         this.set_style(
             `border-color: ${borderColor}; border-radius: ${radius[St.Corner.TOPLEFT]}px ${radius[St.Corner.TOPRIGHT]}px ${radius[St.Corner.BOTTOMRIGHT]}px ${radius[St.Corner.BOTTOMLEFT]}px; ${scalingFactorSupportString}`,
         );
-        // not setting border-width: ${borderWidth}px since we will use this._borderWidth in vfunc_repaint
+        // not setting border-width: ${borderWidth}px since we will draw the border manually in vfunc_repaint
     }
 
     vfunc_repaint() {
@@ -368,7 +358,7 @@ export default class WindowBorder extends St.DrawingArea {
         const [width, height] = this.get_surface_size();
         if (!width || !height) return;
 
-        const borderWidth = this._borderWidth;
+        const borderWidth = this._scaledBorderWidth;
         const borderColor = themeNode.get_border_color(null);
         const radius = [0, 0, 0, 0];
         radius[St.Corner.TOPLEFT] = themeNode.get_border_radius(St.Corner.TOPLEFT);

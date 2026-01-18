@@ -199,16 +199,16 @@
         </key>
         <key name="enable-screen-edges-windows-suggestions" type="b">
             <default>false</default>
-            <summary>Enable window suggestions for screen edge snapping</summary>
-            <description>Suggests windows to occupy empty tiles when snapping to screen edges.</description>
+            <summary>Enable window suggestions for screen edge tiling</summary>
+            <description>Suggests windows to occupy empty tiles when tiling to screen edges.</description>
         </key>
         <key name="application-custom-rules" type="s">
             <default>'[]'</default>
             <summary>Application custom rules</summary>
             <description>List of applications with custom feature settings (custom border, tiling, snap to border).</description>
-        <key name="edge-snap-mode" type="s">
+        <key name="edge-tiling-mode" type="s">
             <default>'default'</default>
-            <summary>Edge snap behavior</summary>
+            <summary>Edge tiling behavior</summary>
             <description>Controls how windows snap to screen edges:\n'default' (corners snap to quarters, edges to halves),\n'adaptive' (snap to layout tiles by column),\n'granular' (snap to exact tile under cursor).</description>
         </key>
 

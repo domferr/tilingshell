@@ -3,9 +3,9 @@ import {
     isPointInsideRect,
     clampPointInsideRect,
 } from '../../utils/ui';
-import { GObject, Mtk, St } from '../../gi/ext';
+import { GObject, Mtk } from '../../gi/ext';
 import Settings from '../../settings/settings';
-import { EdgeSnapMode } from '../../settings/settings';
+import { EdgeTilingMode } from '../../settings/settings';
 import { registerGObjectClass } from '../../utils/gjs';
 import { logger } from '../../utils/logger';
 import Layout from '../layout/Layout';
@@ -14,7 +14,6 @@ import Tile from '../../components/layout/Tile';
 
 const TOP_EDGE_TILING_OFFSET = 8;
 const QUARTER_PERCENTAGE = 0.5;
-const __DEBUG_MODE__ = false;
 
 export default class EdgeTilingManager extends GObject.Object {
     static { registerGObjectClass(this, {
@@ -209,8 +208,8 @@ export default class EdgeTilingManager extends GObject.Object {
 
         if (!this._activeEdgeTile) this._activeEdgeTile = buildRectangle();
 
-        // Get the current edge snap mode
-        const edgeSnapMode = Settings.EDGE_SNAP_MODE;
+        // Get the current edge tiling mode
+        const edgeSnapMode = Settings.EDGE_TILING_MODE;
 
         // Default behavior - initialize with quarter tiling
         previewRect.width = this._workArea.width * QUARTER_PERCENTAGE;
@@ -220,21 +219,21 @@ export default class EdgeTilingManager extends GObject.Object {
 
         // Handle different snapping modes
         switch (edgeSnapMode) {
-            case EdgeSnapMode.DEFAULT:
+            case EdgeTilingMode.DEFAULT:
                 // Default behavior - quarters for corners, halves for edges
-                return this._handleDefaultEdgeSnap(x, y, previewRect);
-            case EdgeSnapMode.ADAPTIVE:
+                return this._handleDefaultEdgeTiling(x, y, previewRect);
+            case EdgeTilingMode.ADAPTIVE:
                 // Adaptive behavior - snap to layout tiles by column
-                return this._handleAdaptiveEdgeSnap(x, y, previewRect);
-            case EdgeSnapMode.GRANULAR:
+                return this._handleAdaptiveEdgeTiling(x, y, previewRect);
+            case EdgeTilingMode.GRANULAR:
                 // Granular behavior - snap to exact tile under cursor
-                return this._handleGranularEdgeSnap(x, y, previewRect);
+                return this._handleGranularEdgeTiling(x, y, previewRect);
             default:
-                return this._handleDefaultEdgeSnap(x, y, previewRect);
+                return this._handleDefaultEdgeTiling(x, y, previewRect);
         }
     }
 
-    private _handleDefaultEdgeSnap(
+    private _handleDefaultEdgeTiling(
         x: number,
         y: number,
         previewRect: Mtk.Rectangle,
@@ -293,25 +292,23 @@ export default class EdgeTilingManager extends GObject.Object {
             }
         }
 
-        // Debug visualization
-        if (__DEBUG_MODE__) {
-            // Clean up any existing debug widget
-            global.windowGroup
-                .get_children()
-                .filter((c) => c.get_name() === 'debug')[0]
-                ?.destroy();
+        // Uncomment to show visual debug
+        // Clean up any existing debug widget
+        // global.windowGroup
+        //     .get_children()
+        //     .filter((c) => c.get_name() === 'debug')[0]
+        //     ?.destroy();
 
-            // Create a new debug widget
-            const debug = new St.Widget({
-                x: this._activeEdgeTile.x,
-                y: this._activeEdgeTile.y,
-                height: this._activeEdgeTile.height,
-                width: this._activeEdgeTile.width,
-                style: 'border: 2px solid red',
-                name: 'debug',
-            });
-            global.windowGroup.add_child(debug);
-        }
+        // // Create a new debug widget
+        // const debug = new St.Widget({
+        //     x: this._activeEdgeTile.x,
+        //     y: this._activeEdgeTile.y,
+        //     height: this._activeEdgeTile.height,
+        //     width: this._activeEdgeTile.width,
+        //     style: 'border: 2px solid red',
+        //     name: 'debug',
+        // });
+        // global.windowGroup.add_child(debug);
 
         return {
             changed: true,
@@ -319,7 +316,7 @@ export default class EdgeTilingManager extends GObject.Object {
         };
     }
 
-    private _handleAdaptiveEdgeSnap(
+    private _handleAdaptiveEdgeTiling(
         x: number,
         y: number,
         previewRect: Mtk.Rectangle,
@@ -329,7 +326,7 @@ export default class EdgeTilingManager extends GObject.Object {
         // - edges snap to entire column of tiles
 
         if (!this._currentLayout)
-            return this._handleDefaultEdgeSnap(x, y, previewRect);
+            return this._handleDefaultEdgeTiling(x, y, previewRect);
 
         if (isPointInsideRect({ x, y }, this._topCenter)) {
             previewRect.width = this._workArea.width;
@@ -467,25 +464,23 @@ export default class EdgeTilingManager extends GObject.Object {
             };
         }
 
-        // Debug visualization
-        if (__DEBUG_MODE__) {
-            // Clean up any existing debug widget
-            global.windowGroup
-                .get_children()
-                .filter((c) => c.get_name() === 'debug')[0]
-                ?.destroy();
+        // Uncomment to show visual debug
+        // // Clean up any existing debug widget
+        // global.windowGroup
+        //     .get_children()
+        //     .filter((c) => c.get_name() === 'debug')[0]
+        //     ?.destroy();
 
-            // Create a new debug widget
-            const debug = new St.Widget({
-                x: this._activeEdgeTile.x,
-                y: this._activeEdgeTile.y,
-                height: this._activeEdgeTile.height,
-                width: this._activeEdgeTile.width,
-                style: 'border: 2px solid red',
-                name: 'debug',
-            });
-            global.windowGroup.add_child(debug);
-        }
+        // // Create a new debug widget
+        // const debug = new St.Widget({
+        //     x: this._activeEdgeTile.x,
+        //     y: this._activeEdgeTile.y,
+        //     height: this._activeEdgeTile.height,
+        //     width: this._activeEdgeTile.width,
+        //     style: 'border: 2px solid red',
+        //     name: 'debug',
+        // });
+        // global.windowGroup.add_child(debug);
 
         return {
             changed: true,
@@ -493,7 +488,7 @@ export default class EdgeTilingManager extends GObject.Object {
         };
     }
 
-    private _handleGranularEdgeSnap(
+    private _handleGranularEdgeTiling(
         x: number,
         y: number,
         previewRect: Mtk.Rectangle,
@@ -503,7 +498,7 @@ export default class EdgeTilingManager extends GObject.Object {
         // - edges snap to the exact tile the cursor is over
 
         if (!this._currentLayout)
-            return this._handleDefaultEdgeSnap(x, y, previewRect);
+            return this._handleDefaultEdgeTiling(x, y, previewRect);
 
         if (isPointInsideRect({ x, y }, this._topCenter)) {
             previewRect.width = this._workArea.width;
@@ -613,36 +608,28 @@ export default class EdgeTilingManager extends GObject.Object {
             };
         }
 
-        // Debug visualization
-        if (__DEBUG_MODE__) {
-            // Clean up any existing debug widget
-            global.windowGroup
-                .get_children()
-                .filter((c) => c.get_name() === 'debug')[0]
-                ?.destroy();
+        // Uncomment to show visual debug
+        // // Clean up any existing debug widget
+        // global.windowGroup
+        //     .get_children()
+        //     .filter((c) => c.get_name() === 'debug')[0]
+        //     ?.destroy();
 
-            // Create a new debug widget
-            const debug = new St.Widget({
-                x: this._activeEdgeTile.x,
-                y: this._activeEdgeTile.y,
-                height: this._activeEdgeTile.height,
-                width: this._activeEdgeTile.width,
-                style: 'border: 2px solid red',
-                name: 'debug',
-            });
-            global.windowGroup.add_child(debug);
-        }
+        // // Create a new debug widget
+        // const debug = new St.Widget({
+        //     x: this._activeEdgeTile.x,
+        //     y: this._activeEdgeTile.y,
+        //     height: this._activeEdgeTile.height,
+        //     width: this._activeEdgeTile.width,
+        //     style: 'border: 2px solid red',
+        //     name: 'debug',
+        // });
+        // global.windowGroup.add_child(debug);
 
         return {
             changed: true,
             rect: previewRect,
         };
-    }
-
-    // Helper methods for intelligent edge snap
-    private _shouldUseEdgeSnap(): boolean {
-        if (!this._currentLayout) return false;
-        return true;
     }
 
     private _getLeftColumnTiles() {
@@ -656,13 +643,6 @@ export default class EdgeTilingManager extends GObject.Object {
         if (!this._currentLayout) return [];
         return this._currentLayout.tiles.filter(
             (tile) => Math.abs(tile.x + tile.width - 1) < 0.01, // Tiles ending at x=1
-        );
-    }
-
-    private _findAllTilesInColumn(x: number, tolerance: number = 0.01) {
-        if (!this._currentLayout) return [];
-        return this._currentLayout.tiles.filter(
-            (tile) => Math.abs(tile.x - x) < tolerance,
         );
     }
 

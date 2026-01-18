@@ -15,7 +15,7 @@ import {
 import TilingLayout from '../../components/tilingsystem/tilingLayout';
 import SnapAssist from '../snapassist/snapAssist';
 import SelectionTilePreview from '../tilepreview/selectionTilePreview';
-import { ActivationKey } from '../../settings/settings';
+import { ActivationKey, EdgeTilingMode } from '../../settings/settings';
 import Settings from '../../settings/settings';
 import SignalHandling from '../../utils/signalHandling';
 import Layout from '../layout/Layout';
@@ -580,19 +580,19 @@ export class TilingManager {
     ): boolean {
         if (key === ActivationKey.NONE) return true;
 
-        let val = 2;
+        let mask = Clutter.ModifierType.CONTROL_MASK;
         switch (key) {
             case ActivationKey.CTRL:
-                val = 2; // Clutter.ModifierType.CONTROL_MASK
+                mask = Clutter.ModifierType.CONTROL_MASK;
                 break;
             case ActivationKey.ALT:
-                val = 3; // Clutter.ModifierType.MOD1_MASK
+                mask = Clutter.ModifierType.MOD1_MASK;
                 break;
             case ActivationKey.SUPER:
-                val = 6; // Clutter.ModifierType.SUPER_MASK
+                mask = Clutter.ModifierType.SUPER_MASK;
                 break;
         }
-        return (modifier & (1 << val)) !== 0;
+        return (modifier & mask) === mask;
     }
 
     private _onMovingWindow(window: Meta.Window, grabOp: number) {
@@ -904,16 +904,23 @@ export class TilingManager {
         // retrieve the current layout for the monitor and workspace
         // were the window was tiled
         const layout = wasEdgeTiling
-            ? GlobalState.get().getSelectedLayoutOfMonitor(
+            ? (Settings.EDGE_TILING_MODE === EdgeTilingMode.DEFAULT
+                ? new Layout([
+                    new Tile({ x: 0, y: 0, height: 0.5, width: 0.5, groups: []}),
+                    new Tile({ x: 0.5, y: 0, height: 0.5, width: 0.5, groups: []}),
+                    new Tile({ x: 0, y: 0.5, height: 0.5, width: 0.5, groups: []}),
+                    new Tile({ x: 0.5, y: 0.5, height: 0.5, width: 0.5, groups: []})],
+                    "quarters"
+                )
+                : GlobalState.get().getSelectedLayoutOfMonitor(
                   this._monitor.index,
-                  window.get_workspace().index(),
-              )
-            : wasSnapAssistingLayout
+                  window.get_workspace().index())
+            ): (wasSnapAssistingLayout
               ? wasSnapAssistingLayout
               : GlobalState.get().getSelectedLayoutOfMonitor(
                     this._monitor.index,
                     window.get_workspace().index(),
-                );
+                ));
         this._openWindowsSuggestions(
             window,
             desiredWindowRect,
@@ -994,7 +1001,7 @@ export class TilingManager {
 
         // apply animations when tiling the window
         windowActor.remove_all_transitions();
-        // @ts-expect-error "Main.wm has the private function _prepareAnimationInfo"
+        // @ts-expect-error "Main.wm has the "private" function _prepareAnimationInfo"
         Main.wm._prepareAnimationInfo(
             global.windowManager,
             windowActor,
