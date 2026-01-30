@@ -107,6 +107,8 @@ export default class Settings {
     static KEY_SETTING_LAYOUTS_JSON = 'layouts-json';
     static KEY_SETTING_SELECTED_LAYOUTS = 'selected-layouts';
     static KEY_SETTING_SELECTED_LAYOUTS_MONITORS = 'selected-layouts-monitors';
+    static KEY_SETTING_SELECTED_LAYOUTS_BY_TOPOLOGY =
+        'selected-layouts-by-topology';
     static KEY_WINDOW_BORDER_WIDTH = 'window-border-width';
     static KEY_ENABLE_SMART_WINDOW_BORDER_RADIUS = 'enable-smart-window-border-radius';
     static KEY_QUARTER_TILING_THRESHOLD = 'quarter-tiling-threshold';
@@ -550,6 +552,20 @@ export default class Settings {
         ) ?? [];
     }
 
+    static get_selected_layouts_by_topology(): Record<string, string[][]> {
+        try {
+            const raw = this._settings?.get_string(
+                Settings.KEY_SETTING_SELECTED_LAYOUTS_BY_TOPOLOGY,
+            );
+            if (!raw) return {};
+            const parsed = JSON.parse(raw) as Record<string, string[][]>;
+            return parsed ?? {};
+        } catch (_unused) {
+            this.save_selected_layouts_by_topology({});
+            return {};
+        }
+    }
+
     static reset_layouts_json() {
         this.save_layouts_json([
             {
@@ -691,6 +707,15 @@ export default class Settings {
         this._settings?.set_strv(
             Settings.KEY_SETTING_SELECTED_LAYOUTS_MONITORS,
             signatures,
+        );
+    }
+
+    static save_selected_layouts_by_topology(
+        layoutsByTopology: Record<string, string[][]>,
+    ) {
+        set_string(
+            Settings.KEY_SETTING_SELECTED_LAYOUTS_BY_TOPOLOGY,
+            JSON.stringify(layoutsByTopology),
         );
     }
 

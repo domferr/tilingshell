@@ -407,10 +407,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                     window,
                     _('Save'),
                     _('Cancel'),
-                    new Gtk.FileFilter({
-                        suffixes: ['json'],
-                        name: 'JSON',
-                    }),
+                    this._buildFileFilter(['json'], 'JSON'),
                     (_source: Gtk.FileChooserNative, response_id: number) => {
                         try {
                             if (response_id === Gtk.ResponseType.ACCEPT) {
@@ -464,10 +461,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                     window,
                     _('Open'),
                     _('Cancel'),
-                    new Gtk.FileFilter({
-                        suffixes: ['json'],
-                        name: 'JSON',
-                    }),
+                    this._buildFileFilter(['json'], 'JSON'),
                     (_source: Gtk.FileChooserNative, response_id: number) => {
                         try {
                             if (response_id === Gtk.ResponseType.ACCEPT) {
@@ -815,10 +809,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                     window,
                     _('Save'),
                     _('Cancel'),
-                    new Gtk.FileFilter({
-                        suffixes: ['txt'],
-                        name: _('Text file'),
-                    }),
+                    this._buildFileFilter(['txt'], _('Text file')),
                     (_source: Gtk.FileChooserNative, response_id: number) => {
                         try {
                             if (response_id === Gtk.ResponseType.ACCEPT) {
@@ -874,10 +865,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                     window,
                     _('Open'),
                     _('Cancel'),
-                    new Gtk.FileFilter({
-                        suffixes: ['txt'],
-                        name: 'Text file',
-                    }),
+                    this._buildFileFilter(['txt'], _('Text file')),
                     (_source: Gtk.FileChooserNative, response_id: number) => {
                         try {
                             if (response_id === Gtk.ResponseType.ACCEPT) {
@@ -1256,13 +1244,23 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         window.connect('map', () => {
             fc.set_transient_for(window);
         });
-        // due to a bug, file chooser doesn't open on GNOME 42 when a filter is set
-        // filter is then enabled for GNOME 43+
-        if (this.GNOME_VERSION_MAJOR >= 43) fc.set_filter(filter);
+        try {
+            fc.set_filter(filter);
+        } catch (error: unknown) {
+            debug(error);
+        }
         fc.set_current_folder(Gio.File.new_for_path(GLib.get_home_dir()));
         fc.connect('response', onResponse);
 
         return fc;
+    }
+
+    _buildFileFilter(suffixes: string[], name: string): Gtk.FileFilter {
+        const filter = new Gtk.FileFilter({ name });
+        suffixes.forEach((suffix) => {
+            filter.add_pattern(`*.${suffix}`);
+        });
+        return filter;
     }
 }
 

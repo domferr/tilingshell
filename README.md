@@ -201,7 +201,7 @@ Download the latest [release](https://github.com/domferr/tilingshell/releases). 
 
 ### Install via Source
 
-Clone the repo then run ```npm i``` to install dependencies and then run ```npm run build``` to build the extension. To finally install the extension run
+Clone the repo then run ```npm install --legacy-peer-deps``` to install dependencies and then run ```npm run build``` to build the extension. To finally install the extension run
 ```bash
 npm run install:extension
 ```
