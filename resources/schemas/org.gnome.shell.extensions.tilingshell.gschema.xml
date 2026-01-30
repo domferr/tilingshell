@@ -67,6 +67,11 @@
             <summary>Selected layouts monitor signatures</summary>
             <description>Monitor signatures used to remap selected layouts when monitor ordering changes.</description>
         </key>
+        <key name="selected-layouts-by-topology" type="s">
+            <default>'{}'</default>
+            <summary>Selected layouts by monitor topology</summary>
+            <description>Serialized mapping between monitor topology signatures and selected layouts.</description>
+        </key>
         <key name="restore-window-original-size" type="b">
             <default>true</default>
             <summary>Restore window size</summary>
