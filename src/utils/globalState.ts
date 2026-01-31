@@ -176,17 +176,37 @@ export default class GlobalState extends GObject.Object {
         }
 
         Settings.save_selected_layouts(to_be_saved);
-        Settings.save_selected_layouts_monitors(
-            this._getMonitorSignatures(),
-        );
+        const currentSignatures = this._getMonitorSignatures();
+        Settings.save_selected_layouts_monitors(currentSignatures);
+        const layoutsByTopology = Settings.get_selected_layouts_by_topology();
+        layoutsByTopology[this._getMonitorTopologyKey(currentSignatures)] =
+            to_be_saved;
+        Settings.save_selected_layouts_by_topology(layoutsByTopology);
     }
 
     private _syncSelectedLayoutsFromSettings(saveIfChanged: boolean) {
         const n_workspaces = global.workspaceManager.get_n_workspaces();
         const defaultLayoutId = this._layouts[0]?.id;
-        const savedLayouts = Settings.get_selected_layouts();
-        const savedSignatures = Settings.get_selected_layouts_monitors();
         const currentSignatures = this._getMonitorSignatures();
+        const layoutsByTopology = Settings.get_selected_layouts_by_topology();
+        const topologyKey = this._getMonitorTopologyKey(currentSignatures);
+        const settingsLayouts = Settings.get_selected_layouts();
+        let topologyLayouts = layoutsByTopology[topologyKey];
+        if (
+            topologyLayouts &&
+            !this._areNestedStringArraysEqual(
+                topologyLayouts,
+                settingsLayouts,
+            )
+        ) {
+            layoutsByTopology[topologyKey] = settingsLayouts;
+            Settings.save_selected_layouts_by_topology(layoutsByTopology);
+            topologyLayouts = settingsLayouts;
+        }
+        const savedLayouts = topologyLayouts ?? settingsLayouts;
+        const savedSignatures = topologyLayouts
+            ? currentSignatures
+            : Settings.get_selected_layouts_monitors();
         const changedSignatures =
             !this._areStringArraysEqual(savedSignatures, currentSignatures);
         let didRemap = false;
@@ -235,14 +255,30 @@ export default class GlobalState extends GObject.Object {
 
     private _getMonitorSignatures(): string[] {
         return Main.layoutManager.monitors.map(
-            (monitor) =>
-                `${monitor.x},${monitor.y},${monitor.width},${monitor.height},${monitor.geometryScale}`,
+            (monitor) => {
+                const geometryScale = monitor.geometryScale ?? 1;
+                return `${monitor.x},${monitor.y},${monitor.width},${monitor.height},${geometryScale}`;
+            },
         );
+    }
+
+    private _getMonitorTopologyKey(signatures: string[]): string {
+        return signatures.join('||');
     }
 
     private _areStringArraysEqual(a: string[], b: string[]): boolean {
         if (a.length !== b.length) return false;
         return a.every((value, index) => value === b[index]);
+    }
+
+    private _areNestedStringArraysEqual(
+        a: string[][],
+        b: string[][],
+    ): boolean {
+        if (a.length !== b.length) return false;
+        return a.every((value, index) =>
+            this._areStringArraysEqual(value, b[index] ?? []),
+        );
     }
 
     get layouts(): Layout[] {
@@ -372,7 +408,12 @@ export default class GlobalState extends GObject.Object {
         }
 
         Settings.save_selected_layouts(selected);
-        Settings.save_selected_layouts_monitors(this._getMonitorSignatures());
+        const currentSignatures = this._getMonitorSignatures();
+        Settings.save_selected_layouts_monitors(currentSignatures);
+        const layoutsByTopology = Settings.get_selected_layouts_by_topology();
+        layoutsByTopology[this._getMonitorTopologyKey(currentSignatures)] =
+            selected;
+        Settings.save_selected_layouts_by_topology(layoutsByTopology);
     }
 
     private _getMonitorIndexInSettings(monitorIndex: number): number {
