@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Tiling Shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-25 18:00+0100\n"
-"PO-Revision-Date: 2026-01-02 21:11+0200\n"
+"PO-Revision-Date: 2026-01-31 12:11+0200\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 
 #: dist/components/altTab/MultipleWindowsIcon.js:42
 msgid "Tiled windows"
-msgstr ""
+msgstr "Finestre affiancate"
 
 #: dist/components/editor/editorDialog.js:36
 msgid "Select the layout to edit"
@@ -410,11 +410,11 @@ msgstr ""
 
 #: dist/prefs.js:376
 msgid "Enable window suggestions for screen edge tiling"
-msgstr ""
+msgstr "Abilita i suggerimenti delle finestre per l'affiancamento ai bordi dello schermo"
 
 #: dist/prefs.js:378
 msgid "Suggests windows to occupy empty tiles when tiling to screen edges"
-msgstr ""
+msgstr "Suggerisce finestre da posizionare negli spazi vuoti quando si affiancano ai bordi dello schermo"
 
 #: dist/prefs.js:384
 msgid "Layouts"
