@@ -206,13 +206,16 @@ export default class TilingShellExtension extends Extension {
 
         this._signals.connect(global.display, 'workareas-changed', () => {
             const allMonitors = getMonitors();
-            if (this._tilingManagers.length !== allMonitors.length) {
-                // a monitor was disconnected or a new one was connected
+            if (
+                this._tilingManagers.length !== allMonitors.length ||
+                GlobalState.get().hasMonitorTopologyChanged()
+            ) {
+                // Restore layouts when monitor count, geometry, scale or order changes.
                 GlobalState.get().validate_selected_layouts();
                 // finally build a tiling manager for each monitor
                 this._createTilingManagers();
             } else {
-                // the number of monitors is the same, so update the workarea
+                // The topology is unchanged; only update the workarea.
                 this._tilingManagers.forEach((tm, index) => {
                     tm.workArea =
                         Main.layoutManager.getWorkAreaForMonitor(index);
