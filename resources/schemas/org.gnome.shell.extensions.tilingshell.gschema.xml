@@ -202,6 +202,10 @@
             <summary>Enable window suggestions for screen edge tiling</summary>
             <description>Suggests windows to occupy empty tiles when tiling to screen edges.</description>
         </key>
+        <key name="application-custom-rules" type="s">
+            <default>'[]'</default>
+            <summary>Application custom rules</summary>
+            <description>List of applications with custom feature settings (custom border, tiling, snap to border).</description>
         <key name="edge-tiling-mode" type="s">
             <default>'default'</default>
             <summary>Edge tiling behavior</summary>

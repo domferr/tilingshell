@@ -1,6 +1,7 @@
 import { Gio, GObject, GLib } from '../gi/shared';
 import Layout from '../components/layout/Layout';
 import Tile from '../components/layout/Tile';
+import { CustomApplicationRules } from '@components/customRulesManager';
 
 export enum ActivationKey {
     NONE = -1,
@@ -121,7 +122,8 @@ export default class Settings {
     static KEY_EDGE_TILING_OFFSET = 'edge-tiling-offset';
     static KEY_ENABLE_TILING_SYSTEM_WINDOWS_SUGGESTIONS = 'enable-tiling-system-windows-suggestions';
     static KEY_ENABLE_SNAP_ASSISTANT_WINDOWS_SUGGESTIONS = 'enable-snap-assistant-windows-suggestions';
-    static KEY_ENABLE_SCREEN_EDGES_WINDOWS_SUGGESTIONS = 'enable-screen-edges-windows-suggestions';
+    static KEY_ENABLE_SCREEN_EDGES_WINDOWS_SUGGESTIONS = 'enable-screen-edges-windows-suggestions';    
+    static KEY_APPLICATION_CUSTOMRULES = 'application-custom-rules';
     static KEY_EDGE_TILING_MODE = 'edge-tiling-mode';
 
     static SETTING_MOVE_WINDOW_RIGHT = 'move-window-right';
@@ -710,6 +712,41 @@ export default class Settings {
         this._settings?.set_value(
             Settings.KEY_SETTING_SELECTED_LAYOUTS,
             result,
+        );
+    }
+
+    static get_application_custom_rules(): Array<CustomApplicationRules> {
+        try {
+            const json = get_string(Settings.KEY_APPLICATION_CUSTOMRULES);
+            const rules = JSON.parse(json) as Array<CustomApplicationRules>;
+
+            // Validate all rules - if any rule is invalid, clear all custom rules
+            const hasInvalidRule = rules.some(
+                (rule) => !rule.appId || !rule.name,
+            );
+
+            if (hasInvalidRule) {
+                console.warn(
+                    'TilingShell: Invalid or corrupted custom rules detected, clearing all custom rules',
+                );
+                // Clear the invalid data
+                this.save_application_custom_rules([]);
+                return [];
+            }
+
+            return rules;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (e) {
+            return [];
+        }
+    }
+
+    static save_application_custom_rules(
+        customRules: Array<CustomApplicationRules>,
+    ) {
+        set_string(
+            Settings.KEY_APPLICATION_CUSTOMRULES,
+            JSON.stringify(customRules),
         );
     }
 

@@ -29,6 +29,7 @@ import SettingsExport from './settings/settingsExport';
 import { gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 // @ts-expect-error "Module exists"
 import * as Config from 'resource:///org/gnome/Shell/Extensions/js/misc/config.js';
+import { CustomApplicationRulePrefs } from '@components/customApplicationRulePrefs';
 
 const debug = logger('prefs');
 const RESOURCES_PREFIX = "/org/gnome/Shell/Extensions/tilingshell"; // must match the prefix in resources.gresources.xml
@@ -429,6 +430,11 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         windowsSuggestionsGroup.add(screenEdgesWindowSuggestionRow);
 
         prefsPage.add(windowsSuggestionsGroup);
+
+        // Custom Rules section
+        const customRulesPrefs = new CustomApplicationRulePrefs();
+        const customRulesGroup = customRulesPrefs.buildCustomRulesGroup(window);
+        prefsPage.add(customRulesGroup);
 
         // Layouts section
         const layoutsGroup = new Adw.PreferencesGroup({

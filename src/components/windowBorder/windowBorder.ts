@@ -9,6 +9,8 @@ import {
     getScalingFactorOf,
     getScalingFactorSupportString,
 } from '../../utils/ui';
+import { CustomRulesManager } from './customRulesManager';
+import { BlacklistManager } from './blacklistManager';
 
 Gio._promisify(Shell.Screenshot, 'composite_to_stream');
 

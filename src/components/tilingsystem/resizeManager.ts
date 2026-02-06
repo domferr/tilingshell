@@ -3,12 +3,15 @@ import SignalHandling from '../../utils/signalHandling';
 import Settings from '../../settings/settings';
 import ExtendedWindow from './extendedWindow';
 import { getWindows } from '../../utils/ui';
+import { CustomRulesManager } from '@components/customRulesManager';
 
 export class ResizingManager {
     private _signals: SignalHandling | null;
+    private readonly _customRulesManager: CustomRulesManager;
 
-    constructor() {
+    constructor(customRulesManager: CustomRulesManager) {
         this._signals = null;
+        this._customRulesManager = customRulesManager;
     }
 
     public enable() {
@@ -27,6 +30,12 @@ export class ResizingManager {
                     grabOp === Meta.GrabOp.KEYBOARD_MOVING ||
                     grabOp === Meta.GrabOp.MOVING;
                 if (moving || !Settings.RESIZE_COMPLEMENTING_WINDOWS) return;
+                if (
+                    !this._customRulesManager.isResizeComplementingEnabled(
+                        window,
+                    )
+                )
+                    return;
 
                 this._onWindowResizingBegin(window, grabOp & ~1024);
             },
