@@ -580,10 +580,12 @@ export class TilingManager {
                 mask = Clutter.ModifierType.MOD1_MASK;
                 break;
             case ActivationKey.SUPER:
-                mask = Clutter.ModifierType.SUPER_MASK;
+                // global.get_pointer() returns MOD4_MASK for the Super key,
+                // not SUPER_MASK (which has a different bit position).
+                mask = Clutter.ModifierType.MOD4_MASK;
                 break;
         }
-        return (modifier & mask) === mask;
+        return (modifier & mask) !== 0;
     }
 
     private _onMovingWindow(window: Meta.Window, grabOp: number) {
