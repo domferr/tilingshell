@@ -1264,12 +1264,19 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             ActivationKey.CTRL,
             ActivationKey.ALT,
             ActivationKey.SUPER,
+            ActivationKey.RIGHT_CLICK,
         ];
-        activationKeys.forEach((k) => options.append(ActivationKey[k]));
-        options.append('(None)');
+        const labels = {
+            [ActivationKey.CTRL]: 'CTRL',
+            [ActivationKey.ALT]: 'ALT',
+            [ActivationKey.SUPER]: 'SUPER',
+            [ActivationKey.RIGHT_CLICK]: _('Right Mouse Button'),
+        };
+        activationKeys.forEach((k) => options.append(labels[k]));
+        options.append(_('(None)'));
         const dropdown = new Gtk.DropDown({
             model: options,
-            selected: initialValue,
+            selected: initialValue === ActivationKey.NONE ? activationKeys.length : activationKeys.indexOf(initialValue),
         });
         dropdown.connect('notify::selected-item', (dd: Gtk.DropDown) => {
             const index = dd.get_selected();

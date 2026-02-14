@@ -1,4 +1,4 @@
-import { Clutter, Mtk, Meta, GLib } from '../../gi/ext';
+import { Clutter, Mtk, Meta, GLib, St } from '../../gi/ext';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { logger } from '../../utils/logger';
 import {
@@ -70,13 +70,20 @@ export class TilingManager {
     private _movingWindowTimerDuration: number = 15;
     private _lastCursorPos: { x: number; y: number } | null = null;
     private _grabStartPosition: { x: number; y: number } | null = null;
+    private _grabOffset: { x: number; y: number } | null = null;
     private _wasSpanMultipleTilesActivated: boolean;
     private _wasTilingSystemActivated: boolean;
+    private _isRightButtonPressed: boolean = false;
+    private _isRMBInterrupted: boolean = false;
+    private _isManualSnap: boolean = false;
     private _snapAssistingInfo: SnapAssistingInfo;
 
     private _movingWindowTimerId: number | null = null;
+    private _rightClickPollingId: number | null = null;
+    private _eventCaptureActor: Clutter.Actor | null = null;
 
     private readonly _signals: SignalHandling;
+    private readonly _grabSignals: SignalHandling;
     private readonly _debug: (..._content: unknown[]) => void;
 
     /**
@@ -91,6 +98,7 @@ export class TilingManager {
         this._enableScaling = enableScaling;
         this._monitor = monitor;
         this._signals = new SignalHandling();
+        this._grabSignals = new SignalHandling();
 
         this._debug = logger(`TilingManager ${monitor.index}`);
 
@@ -222,7 +230,7 @@ export class TilingManager {
             global.display,
             'grab-op-end',
             (_display: Meta.Display, window: Meta.Window) => {
-                if (!this._isGrabbingWindow) return;
+                if (!this._isGrabbingWindow && !this._isRMBInterrupted) return;
 
                 this._onWindowGrabEnd(window);
             },
@@ -468,8 +476,13 @@ export class TilingManager {
             GLib.Source.remove(this._movingWindowTimerId);
             this._movingWindowTimerId = null;
         }
+        this._stopRightClickPolling();
+        this._removeEventCaptureActor();
         this._signals.disconnect();
+        this._grabSignals.disconnect();
         this._isGrabbingWindow = false;
+        this._isRMBInterrupted = false;
+        this._isManualSnap = false;
         this._snapAssistingInfo.update(undefined);
         this._edgeTilingManager.abortEdgeTiling();
         this._workspaceTilingLayout.forEach((tl) => tl.destroy());
@@ -497,41 +510,81 @@ export class TilingManager {
     }
 
     private _onWindowGrabBegin(window: Meta.Window, grabOp: number) {
-        if (this._isGrabbingWindow) return;
+        if (this._isGrabbingWindow) {
+            this._debug(`[GRAB] updating grab op:${grabOp}`);
+            return;
+        }
+        this._debug(`[GRAB] begin window:${window.get_title()} op:${grabOp}`);
 
-        TouchPointer.get().updateWindowPosition(window.get_frame_rect());
-        this._signals.connect(
+        const [x, y] = global.get_pointer();
+        const windowRect = window.get_frame_rect();
+        this._grabOffset = { x: x - windowRect.x, y: y - windowRect.y };
+
+        TouchPointer.get().updateWindowPosition(windowRect);
+        this._grabSignals.connect(
             global.stage,
             'touch-event',
             (_source, event: Clutter.Event) => {
-                const [x, y] = event.get_coords();
-                TouchPointer.get().onTouchEvent(x, y);
+                const [ex, ey] = event.get_coords();
+                TouchPointer.get().onTouchEvent(ex, ey);
             },
         );
+
+        this._isGrabbingWindow = true;
+        this._isRightButtonPressed = false;
+        this._isRMBInterrupted = false;
+        this._isManualSnap = false;
+
+        // Add capture layer for Right-Click activation
+        if (Settings.TILING_SYSTEM_ACTIVATION_KEY === ActivationKey.RIGHT_CLICK) {
+            this._addEventCaptureActor(window, grabOp);
+        }
+
         // Add Wacom tablet support, listen to tablet events
-        this._signals.connect(
+        this._grabSignals.connect(
             global.stage,
             'captured-event',
             (_source, event: Clutter.Event) => {
-                const device = event.get_source_device();
-                if (!device) return;
+                const eventType = event.type();
+                
+                if (eventType === Clutter.EventType.BUTTON_PRESS || 
+                    eventType === Clutter.EventType.BUTTON_RELEASE) {
+                    const button = event.get_button();
+                    
+                    if (button === 2 || button === 3) {
+                        const isPress = eventType === Clutter.EventType.BUTTON_PRESS;
+                        if (this._isRightButtonPressed !== isPress) {
+                            this._debug(`[EVENT] button:${button} ${isPress ? 'PRESS' : 'RELEASE'}`);
+                            this._isRightButtonPressed = isPress;
+                            if (this._isRightButtonPressed && Settings.TILING_SYSTEM_ACTIVATION_KEY === ActivationKey.RIGHT_CLICK) {
+                                this._onMovingWindow(window, grabOp);
+                            }
+                        }
+                        // Stop propagation ONLY if it's our activation key to prevent context menu
+                        if (Settings.TILING_SYSTEM_ACTIVATION_KEY === ActivationKey.RIGHT_CLICK)
+                            return Clutter.EVENT_STOP;
+                    }
+                }
 
+                const device = event.get_source_device();
+                if (!device) return Clutter.EVENT_PROPAGATE;
                 const deviceType = device.get_device_type();
 
                 // Check for tablet device types
                 if (deviceType === Clutter.InputDeviceType.TABLET_DEVICE ||
                     deviceType === Clutter.InputDeviceType.PEN_DEVICE) {
 
-                    const eventType = event.type();
                     // Capture motion events from tablet
                     if (eventType === Clutter.EventType.MOTION) {
-                        const [x, y] = event.get_coords();
-                        TouchPointer.get().onTouchEvent(x, y);
+                        const [ex, ey] = event.get_coords();
+                        TouchPointer.get().onTouchEvent(ex, ey);
                         // Move the actual mouse cursor to match tablet position
                         const seat = Clutter.get_default_backend().get_default_seat();
-                        seat.warp_pointer(x, y);
+                        seat.warp_pointer(ex, ey);
                     }
                 }
+
+                return Clutter.EVENT_PROPAGATE;
             },
         );
 
@@ -540,7 +593,7 @@ export class TilingManager {
             Settings.ENABLE_BLUR_SNAP_ASSISTANT ||
             Settings.ENABLE_BLUR_SELECTED_TILEPREVIEW
         ) {
-            this._signals.connect(window, 'position-changed', () => {
+            this._grabSignals.connect(window, 'position-changed', () => {
                 if (Settings.ENABLE_BLUR_SELECTED_TILEPREVIEW) {
                     this._selectedTilesPreview
                         .get_effect('blur')
@@ -555,14 +608,130 @@ export class TilingManager {
             });
         }
 
-        this._isGrabbingWindow = true;
         this._movingWindowTimerId = GLib.timeout_add(
             GLib.PRIORITY_DEFAULT_IDLE,
             this._movingWindowTimerDuration,
             this._onMovingWindow.bind(this, window, grabOp),
         );
 
+        this._startRightClickPolling(window, grabOp);
+
         this._onMovingWindow(window, grabOp);
+    }
+
+    private _addEventCaptureActor(window: Meta.Window, grabOp: number) {
+        if (this._eventCaptureActor) return;
+
+        this._eventCaptureActor = new St.Widget({
+            name: 'TilingShellEventCapture',
+            reactive: true,
+            visible: true,
+            x: 0,
+            y: 0,
+            width: global.stage.width,
+            height: global.stage.height,
+        });
+
+        Main.uiGroup.add_child(this._eventCaptureActor);
+        Main.uiGroup.set_child_above_sibling(this._eventCaptureActor, null);
+
+        this._eventCaptureActor.connect('button-press-event', (_actor, event) => {
+            const button = event.get_button();
+            if (button === 2 || button === 3) {
+                this._isRightButtonPressed = true;
+                this._onMovingWindow(window, grabOp);
+                return Clutter.EVENT_STOP;
+            }
+            return Clutter.EVENT_PROPAGATE;
+        });
+
+        this._eventCaptureActor.connect('button-release-event', (_actor, event) => {
+            const button = event.get_button();
+            if (button === 2 || button === 3) {
+                this._isRightButtonPressed = false;
+                this._onMovingWindow(window, grabOp);
+                return Clutter.EVENT_STOP;
+            }
+            return Clutter.EVENT_PROPAGATE;
+        });
+        
+        this._debug(`[CAPTURE ACTOR] Added`);
+    }
+
+    private _removeEventCaptureActor() {
+        if (this._eventCaptureActor) {
+            this._eventCaptureActor.destroy();
+            this._eventCaptureActor = null;
+            this._debug(`[CAPTURE ACTOR] Removed`);
+        }
+    }
+
+    private _getModifierState(): number {
+        // @ts-expect-error "Method might exist in runtime"
+        if (global.display.get_modifier_state) return global.display.get_modifier_state();
+        // @ts-expect-error "Property might exist in runtime"
+        if (global.display.modifier_state) return global.display.modifier_state;
+        return 0;
+    }
+
+    private _getPointerDevice(): Clutter.InputDevice | null {
+        const seat = Clutter.get_default_backend().get_default_seat();
+        // GNOME 45+
+        // @ts-expect-error "Method might exist in runtime"
+        if (seat.get_pointer_device) return seat.get_pointer_device();
+        // Older versions
+        // @ts-expect-error "Method might exist in runtime"
+        if (seat.get_core_pointer_device) return seat.get_core_pointer_device();
+        
+        return null;
+    }
+
+    private _checkRightClickState(): boolean {
+        const seat = Clutter.get_default_backend().get_default_seat();
+        const device = this._getPointerDevice();
+        
+        const [,, maskGlobal] = global.get_pointer();
+        const maskDisplay = this._getModifierState();
+        
+        let maskSeat = 0;
+        if (device && seat.query_state) {
+            [,, maskSeat] = seat.query_state(device, null);
+        }
+        
+        const secondaryMask = Clutter.ModifierType.BUTTON2_MASK | Clutter.ModifierType.BUTTON3_MASK;
+        
+        const isRightClick = 
+            (maskGlobal & secondaryMask) !== 0 ||
+            (maskDisplay & secondaryMask) !== 0 ||
+            (maskSeat & secondaryMask) !== 0;
+        
+        return isRightClick;
+    }
+
+    private _startRightClickPolling(window: Meta.Window, grabOp: number) {
+        if (this._rightClickPollingId) return;
+        const activationKey = Settings.TILING_SYSTEM_ACTIVATION_KEY;
+        this._debug(`[POLLING] start key:${activationKey}`);
+        
+        if (activationKey !== ActivationKey.RIGHT_CLICK) return;
+
+        this._rightClickPollingId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 10, () => {
+            const isRightClick = this._checkRightClickState();
+            
+            if (isRightClick !== this._isRightButtonPressed) {
+                this._debug(`[POLLING] RightClick changed to:${isRightClick}`);
+                this._isRightButtonPressed = isRightClick;
+                this._onMovingWindow(window, grabOp);
+            }
+            return GLib.SOURCE_CONTINUE;
+        });
+    }
+
+    private _stopRightClickPolling() {
+        if (this._rightClickPollingId) {
+            GLib.Source.remove(this._rightClickPollingId);
+            this._rightClickPollingId = null;
+        }
     }
 
     private _activationKeyStatus(
@@ -570,27 +739,55 @@ export class TilingManager {
         key: ActivationKey,
     ): boolean {
         if (key === ActivationKey.NONE) return true;
-
-        let mask = Clutter.ModifierType.CONTROL_MASK;
-        switch (key) {
-            case ActivationKey.CTRL:
-                mask = Clutter.ModifierType.CONTROL_MASK;
-                break;
-            case ActivationKey.ALT:
-                mask = Clutter.ModifierType.MOD1_MASK;
-                break;
-            case ActivationKey.SUPER:
-                mask = Clutter.ModifierType.SUPER_MASK;
-                break;
+        
+        if (key === ActivationKey.RIGHT_CLICK) {
+            const secondaryMask = Clutter.ModifierType.BUTTON2_MASK | Clutter.ModifierType.BUTTON3_MASK;
+            return this._isRightButtonPressed || 
+                   this._checkRightClickState() ||
+                   (modifier & secondaryMask) !== 0;
+        } else {
+            let clutterMask = Clutter.ModifierType.CONTROL_MASK;
+            switch (key) {
+                case ActivationKey.CTRL:
+                    clutterMask = Clutter.ModifierType.CONTROL_MASK;
+                    break;
+                case ActivationKey.ALT:
+                    clutterMask = Clutter.ModifierType.MOD1_MASK;
+                    break;
+                case ActivationKey.SUPER:
+                    clutterMask = Clutter.ModifierType.SUPER_MASK;
+                    break;
+            }
+            return (modifier & clutterMask) !== 0;
         }
-        return (modifier & mask) === mask;
     }
 
     private _onMovingWindow(window: Meta.Window, grabOp: number) {
-        // if the window is no longer grabbed, disable handler
-        if (!this._isGrabbingWindow) {
+        const [x, y, modifier] = TouchPointer.get().isTouchDeviceActive()
+            ? TouchPointer.get().get_pointer(window)
+            : global.get_pointer();
+        
+        const isLMBDown = (modifier & Clutter.ModifierType.BUTTON1_MASK) !== 0;
+
+        // If we are in interrupted state and LMB is released, finalize snap
+        if (this._isRMBInterrupted && !isLMBDown) {
+            this._debug(`[MOVE] LMB released during interrupted state, finalizing manual snap`);
+            this._isManualSnap = true;
+            this._isRMBInterrupted = false;
+            this._isGrabbingWindow = false;
+            this._onWindowGrabEnd(window);
+            return GLib.SOURCE_REMOVE;
+        }
+
+        // if the window is no longer grabbed and not in interrupted state, disable handler
+        if (!this._isGrabbingWindow && !this._isRMBInterrupted) {
             this._movingWindowTimerId = null;
             return GLib.SOURCE_REMOVE;
+        }
+
+        // Manual window movement during interrupted state
+        if (this._isRMBInterrupted && this._grabOffset) {
+            window.move_frame(true, x - this._grabOffset.x, y - this._grabOffset.y);
         }
 
         const currentWs = window.get_workspace();
@@ -614,9 +811,6 @@ export class TilingManager {
             return GLib.SOURCE_CONTINUE;
         }
 
-        const [x, y, modifier] = TouchPointer.get().isTouchDeviceActive()
-            ? TouchPointer.get().get_pointer(window)
-            : global.get_pointer();
         const extWin = window as ExtendedWindow;
         extWin.assignedTile = undefined;
         const currPointerPos = { x, y };
@@ -644,24 +838,21 @@ export class TilingManager {
                 });
 
                 // restart grab for GNOME 42
-                const restartGrab =
-                    // @ts-expect-error "grab is available on GNOME 42"
-                    global.display.end_grab_op && global.display.begin_grab_op;
+                const display = global.display as any;
+                const restartGrab = display.end_grab_op && display.begin_grab_op;
                 if (restartGrab) {
-                    // @ts-expect-error "grab is available on GNOME 42"
-                    global.display.end_grab_op(global.get_current_time());
+                    display.end_grab_op(global.get_current_time());
                 }
                 // if we restarted the grab, we need to force window movement and to
                 // perform user operation
-                this._easeWindowRect(window, newSize, restartGrab, restartGrab);
+                this._easeWindowRect(window, newSize, !!restartGrab, !!restartGrab);
                 TouchPointer.get().updateWindowPosition(newSize);
 
                 if (restartGrab) {
                     // must be done now, before begin_grab_op, because begin_grab_op will trigger
                     // _onMovingWindow again, so we will go into infinite loop on restoring the window size
                     extWin.originalSize = undefined;
-                    // @ts-expect-error "grab is available on GNOME 42"
-                    global.display.begin_grab_op(
+                    display.begin_grab_op(
                         window,
                         grabOp,
                         true, // pointer already grabbed
@@ -756,7 +947,7 @@ export class TilingManager {
 
         // we know that the layout must be shown, snap assistant must be closed
         if (!tilingLayout.showing) {
-            // this._debug("open layout below grabbed window");
+            this._debug('open layout below grabbed window');
             tilingLayout.openAbove(window);
             this._snapAssist.close(true);
             // close selection tile if we were performing edge-tiling
@@ -782,7 +973,12 @@ export class TilingManager {
             currPointerPos,
             changedSpanMultipleTiles && !allowSpanMultipleTiles,
         );
-        if (!selectionRect) return GLib.SOURCE_CONTINUE;
+        
+        if (!selectionRect) {
+            tilingLayout.unhoverAllTiles();
+            this._selectedTilesPreview.close(true);
+            return GLib.SOURCE_CONTINUE;
+        }
 
         selectionRect = selectionRect.copy();
         if (allowSpanMultipleTiles && this._selectedTilesPreview.showing) {
@@ -798,30 +994,108 @@ export class TilingManager {
     }
 
     private _onWindowGrabEnd(window: Meta.Window) {
-        this._isGrabbingWindow = false;
-        this._grabStartPosition = null;
+        const [x, y, mask] = global.get_pointer();
+        const isRMB = (mask & (Clutter.ModifierType.BUTTON2_MASK | Clutter.ModifierType.BUTTON3_MASK)) !== 0 || this._isRightButtonPressed;
+        const isLMB = (mask & Clutter.ModifierType.BUTTON1_MASK) !== 0;
+        
+        this._debug(`[GRAB END] window:${window.get_title()} L:${isLMB} R:${isRMB} manualSnap:${this._isManualSnap}`);
 
+        // Handle RMB Interruption (Wayland specific)
+        if (!this._isRMBInterrupted && !this._isManualSnap && isLMB && isRMB && Settings.TILING_SYSTEM_ACTIVATION_KEY === ActivationKey.RIGHT_CLICK) {
+            this._debug(`[GRAB END] RMB Interrupted grab, switching to manual tracking`);
+            
+            this._isRMBInterrupted = true;
+            
+            const display = global.display as any;
+            if (display.begin_grab_op) {
+                try {
+                    const success = display.begin_grab_op(
+                        window,
+                        Meta.GrabOp.MOVING,
+                        true, // pointer_already_grabbed
+                        true, // frame_action
+                        -1,   // button
+                        mask,
+                        global.get_current_time(),
+                        x,
+                        y
+                    );
+                    if (success) {
+                        this._debug(`[GRAB END] Restarted grab successfully`);
+                        this._isRMBInterrupted = false;
+                        return;
+                    }
+                } catch (e) {
+                    this._debug(`[GRAB END] begin_grab_op failed: ${e}`);
+                }
+            }
+            
+            this._debug(`[GRAB END] Continuing in interrupted state`);
+            return;
+        }
+
+        this._isGrabbingWindow = false;
+        this._isRMBInterrupted = false;
+        const wasManualSnap = this._isManualSnap;
+        this._isManualSnap = false;
+        this._grabStartPosition = null;
+        this._grabOffset = null;
+
+        this._stopRightClickPolling();
+        this._removeEventCaptureActor();
         this._signals.disconnect(window);
+        this._grabSignals.disconnect();
         TouchPointer.get().reset();
 
         const currentWs = window.get_workspace();
         const tilingLayout = this._workspaceTilingLayout.get(currentWs);
         if (tilingLayout) tilingLayout.close();
-        const desiredWindowRect = buildRectangle({
+
+        let desiredWindowRect = buildRectangle({
             x: this._selectedTilesPreview.innerX,
             y: this._selectedTilesPreview.innerY,
             width: this._selectedTilesPreview.innerWidth,
             height: this._selectedTilesPreview.innerHeight,
         });
-        const selectedTilesRect = this._selectedTilesPreview.rect.copy();
+        
+        let selectedTilesRect = this._selectedTilesPreview.rect.copy();
+
+        // Fallback snap if RMB was used and preview is invalid
+        if ((isRMB || wasManualSnap) && Settings.TILING_SYSTEM_ACTIVATION_KEY === ActivationKey.RIGHT_CLICK && tilingLayout) {
+            if (desiredWindowRect.width <= 0 || desiredWindowRect.height <= 0) {
+                const rectUnderCursor = tilingLayout.getTileBelow({ x, y }, false);
+                if (rectUnderCursor) {
+                    selectedTilesRect = rectUnderCursor.copy();
+                    const gaps = buildTileGaps(
+                        selectedTilesRect,
+                        tilingLayout.innerGaps,
+                        tilingLayout.outerGaps,
+                        this._workArea,
+                        tilingLayout.scalingFactor,
+                    ).gaps;
+                    desiredWindowRect = buildRectangle({
+                        x: selectedTilesRect.x + gaps.left,
+                        y: selectedTilesRect.y + gaps.top,
+                        width: selectedTilesRect.width - gaps.left - gaps.right,
+                        height: selectedTilesRect.height - gaps.top - gaps.bottom,
+                    });
+                    this._debug(`[GRAB END] Forced snap fallback: ${desiredWindowRect.width}x${desiredWindowRect.height}`);
+                }
+            }
+        }
+
         this._selectedTilesPreview.close(true);
         this._snapAssist.close(true);
         this._lastCursorPos = null;
 
-        const isTilingSystemActivated = this._activationKeyStatus(
-            global.get_pointer()[2],
+        // Force activation status for manual snap
+        const isTilingSystemActivated = wasManualSnap || this._activationKeyStatus(
+            mask,
             Settings.TILING_SYSTEM_ACTIVATION_KEY,
         );
+        
+        this._isRightButtonPressed = false;
+
         if (
             !isTilingSystemActivated &&
             !this._snapAssistingInfo.isSnapAssisting &&
@@ -835,7 +1109,6 @@ export class TilingManager {
               )
             : undefined;
 
-        // disable snap assistance
         this._snapAssistingInfo.update(undefined);
 
         if (
@@ -845,7 +1118,6 @@ export class TilingManager {
         )
             maximizeWindow(window);
 
-        // disable edge-tiling
         const wasEdgeTiling = this._edgeTilingManager.isPerformingEdgeTiling();
         this._edgeTilingManager.abortEdgeTiling();
 
@@ -857,15 +1129,16 @@ export class TilingManager {
             (isTilingSystemActivated &&
                 Settings.ENABLE_TILING_SYSTEM_WINDOWS_SUGGESTIONS);
 
-        // abort if the pointer is moving on another monitor: the user moved
-        // the window to another monitor not handled by this tiling manager
         if (!this._isPointerInsideThisMonitor(window)) return;
 
-        // abort if there is an invalid selection
         if (desiredWindowRect.width <= 0 || desiredWindowRect.height <= 0)
             return;
 
-        if (window.maximizedHorizontally || window.maximizedVertically) return;
+        // Ensure window is unmaximized before final snap easing
+        const isMaximized = window.maximizedHorizontally || window.maximizedVertically;
+        if (isMaximized) {
+            unmaximizeWindow(window);
+        }
 
         (window as ExtendedWindow).originalSize = window
             .get_frame_rect()
@@ -873,9 +1146,10 @@ export class TilingManager {
         (window as ExtendedWindow).assignedTile = new Tile({
             ...TileUtils.build_tile(selectedTilesRect, this._workArea),
         });
-        this._easeWindowRect(window, desiredWindowRect);
+        
+        this._debug(`[GRAB END] Snap to: ${desiredWindowRect.width}x${desiredWindowRect.height}`);
+        this._easeWindowRect(window, desiredWindowRect, true);
 
-        // Sync the desktop layout to match the snap-assisted layout if enabled
         if (wasSnapAssistingLayout && Settings.SNAP_ASSIST_SYNC_LAYOUT) {
             GlobalState.get().setSelectedLayoutOfMonitor(
                 wasSnapAssistingLayout.id,
@@ -885,8 +1159,6 @@ export class TilingManager {
 
         if (!tilingLayout || !canShowTilingSuggestions) return;
 
-        // retrieve the current layout for the monitor and workspace
-        // were the window was tiled
         const layout = wasEdgeTiling
             ? (Settings.EDGE_TILING_MODE === EdgeTilingMode.DEFAULT
                 ? new Layout([
@@ -947,12 +1219,6 @@ export class TilingManager {
             scalingFactor,
         );
         this._tilingSuggestionsLayout.relayout({ layout });
-        /* this._tilingSuggestionsLayout.relayout({
-            containerRect: this._workArea,
-            innerGaps,
-            outerGaps,
-            layout,
-        });*/
         this._tilingSuggestionsLayout.open(
             tiledWindows,
             nontiledWindows,
@@ -971,7 +1237,6 @@ export class TilingManager {
         const windowActor = window.get_compositor_private() as Clutter.Actor;
 
         const beforeRect = window.get_frame_rect();
-        // do not animate the window if it will not move or scale
         if (
             destRect.x === beforeRect.x &&
             destRect.y === beforeRect.y &&
@@ -980,7 +1245,6 @@ export class TilingManager {
         )
             return;
 
-        // apply animations when tiling the window
         windowActor.remove_all_transitions();
         // @ts-expect-error "Main.wm has the "private" function _prepareAnimationInfo"
         Main.wm._prepareAnimationInfo(
@@ -990,7 +1254,6 @@ export class TilingManager {
             Meta.SizeChange.UNMAXIMIZE,
         );
 
-        // move and resize the window to the current selection
         window.move_to_monitor(this._monitor.index);
         if (force) window.move_frame(user_op, destRect.x, destRect.y);
         window.move_resize_frame(
@@ -1003,16 +1266,13 @@ export class TilingManager {
     }
 
     private _onSnapAssist(_: SnapAssist, tile: Tile, layoutId: string) {
-        // if there isn't a tile hovered, then close selection
         if (tile.width === 0 || tile.height === 0) {
             this._selectedTilesPreview.close(true);
             this._snapAssistingInfo.update(undefined);
             return;
         }
 
-        // We apply the proportions to get tile size and position relative to the work area
         const scaledRect = TileUtils.apply_props(tile, this._workArea);
-        // ensure the rect doesn't go horizontally beyond the workarea
         if (
             scaledRect.x + scaledRect.width >
             this._workArea.x + this._workArea.width
@@ -1023,7 +1283,6 @@ export class TilingManager {
                 this._workArea.x -
                 this._workArea.width;
         }
-        // ensure the rect doesn't go vertically beyond the workarea
         if (
             scaledRect.y + scaledRect.height >
             this._workArea.y + this._workArea.height
@@ -1106,14 +1365,14 @@ export class TilingManager {
      * @returns true if the pointer is inside the current monitor, false otherwise
      */
     private _isPointerInsideThisMonitor(window: Meta.Window): boolean {
-        const [x, y] = TouchPointer.get().isTouchDeviceActive()
+        const [ex, ey] = TouchPointer.get().isTouchDeviceActive()
             ? TouchPointer.get().get_pointer(window)
             : global.get_pointer();
 
         const pointerMonitorIndex = global.display.get_monitor_index_for_rect(
             buildRectangle({
-                x,
-                y,
+                x: ex,
+                y: ey,
                 width: 1,
                 height: 1,
             }),
@@ -1164,9 +1423,7 @@ export class TilingManager {
         const tilingLayout = this._workspaceTilingLayout.get(currentWs);
         if (!tilingLayout) return;
 
-        // We apply the proportions to get tile size and position relative to the work area
         const scaledRect = TileUtils.apply_props(tile, this._workArea);
-        // ensure the rect doesn't go horizontally beyond the workarea
         if (
             scaledRect.x + scaledRect.width >
             this._workArea.x + this._workArea.width
@@ -1177,7 +1434,6 @@ export class TilingManager {
                 this._workArea.x -
                 this._workArea.width;
         }
-        // ensure the rect doesn't go vertically beyond the workarea
         if (
             scaledRect.y + scaledRect.height >
             this._workArea.y + this._workArea.height
@@ -1206,7 +1462,6 @@ export class TilingManager {
             height: scaledRect.height - gaps.top - gaps.bottom,
         });
 
-        // abort if there is an invalid selection
         if (destinationRect.width <= 0 || destinationRect.height <= 0) return;
 
         const isMaximized =
@@ -1259,7 +1514,6 @@ export class TilingManager {
     }
 
     private _autoTile(window: Meta.Window, windowCreated: boolean) {
-        // do not handle windows in monitors not managed by this manager
         if (window.get_monitor() !== this._monitor.index) return;
 
         if (
@@ -1281,10 +1535,6 @@ export class TilingManager {
             const windowActor =
                 window.get_compositor_private() as Meta.WindowActor;
             const id = windowActor.connect('first-frame', () => {
-                // while we restore the opacity, making the window visible
-                // again, we perform easing of movement too
-                // if the window is no longer a good candidate for
-                // autotiling, immediately restore its opacity
                 if (
                     !window.minimized &&
                     !window.maximizedHorizontally &&
@@ -1329,7 +1579,6 @@ export class TilingManager {
 
         if (vacantTiles.length === 0) return undefined;
 
-        // finally find the nearest tile to the center of the screen
         vacantTiles.sort((a, b) => a.x - b.x);
 
         let bestTileIndex = 0;
