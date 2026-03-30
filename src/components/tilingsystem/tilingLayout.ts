@@ -198,10 +198,23 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
 
     public hoverTilesInRect(rect: Mtk.Rectangle, reset: boolean) {
         const newPreviewsArray: DynamicTilePreview[] = [];
+        const sourcePreviews = reset
+            ? this._previews.filter((preview) => {
+                if (preview.canRestore) return true;
 
-        this._previews.forEach((preview) => {
+                this.remove_child(preview);
+                preview.destroy();
+                return false;
+            })
+            : this._previews;
+
+        sourcePreviews.forEach((preview) => {
+            const sourceRect =
+                reset && preview.canRestore
+                    ? preview.originalRect
+                    : preview.rect;
             const [hasIntersection, rectangles] = this._subtractRectangles(
-                preview.rect,
+                sourceRect,
                 rect,
             );
             if (hasIntersection) {
@@ -237,26 +250,23 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
                         this.set_child_above_sibling(innerPreview, preview);
                         newPreviewsArray.push(innerPreview);
                     }
-                    preview.open(
-                        rectangles[maxIndex].union(
-                            preview.rect.intersect(rect)[1],
-                        ),
-                        false
-                    );
+                    if (!reset) {
+                        preview.open(
+                            rectangles[maxIndex].union(
+                                preview.rect.intersect(rect)[1],
+                            ),
+                            false
+                        );
+                    }
                     preview.open(rectangles[maxIndex], true);
                     newPreviewsArray.push(preview);
                 } else {
                     preview.close();
                     newPreviewsArray.push(preview);
                 }
-            } else if (reset /* && !preview.originalRect.intersect(rect)[0]*/) {
-                if (preview.restore(true)) {
-                    preview.open(undefined, true);
-                    newPreviewsArray.push(preview);
-                } else {
-                    this.remove_child(preview);
-                    preview.destroy();
-                }
+            } else if (reset) {
+                preview.open(preview.originalRect.copy(), true);
+                newPreviewsArray.push(preview);
             } else {
                 preview.open(undefined, true);
                 newPreviewsArray.push(preview);
