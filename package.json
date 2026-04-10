@@ -54,5 +54,18 @@
   },
   "dependencies": {
     "@girs/gnome-shell": "^49.1.0"
+  },
+  "overrides": {
+    "@girs/adw-1": "1.9.0-4.0.0-beta.38",
+    "@girs/gio-2.0": "2.86.0-4.0.0-beta.38",
+    "@girs/glib-2.0": "2.86.0-4.0.0-beta.38",
+    "@girs/gjs": "4.0.0-beta.38",
+    "@girs/gmodule-2.0": "2.0.0-4.0.0-beta.38",
+    "@girs/gobject-2.0": "2.86.0-4.0.0-beta.38",
+    "@girs/mtk-17": "17.0.0-4.0.0-rc.1",
+    "@girs/pango-1.0": "1.57.1-4.0.0-rc.1",
+    "@girs/pangocairo-1.0": "1.0.0-4.0.0-rc.1",
+    "@girs/xfixes-4.0": "4.0.0-4.0.0-rc.1",
+    "@girs/xlib-2.0": "2.0.0-4.0.0-rc.1"
   }
 }

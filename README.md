@@ -2,13 +2,13 @@
 
 [![release](https://img.shields.io/badge/Release_v16-blue?style=for-the-badge)]([https://ko-fi.com/domferr](https://github.com/domferr/tilingshell/releases))
 ![](https://img.shields.io/github/license/domferr/tilingshell?style=for-the-badge)
-![](https://img.shields.io/badge/GNOME-42--49-e04196?style=for-the-badge&logo=gnome&logoColor=white)
+![](https://img.shields.io/badge/GNOME-42--50-e04196?style=for-the-badge&logo=gnome&logoColor=white)
 [![kofi](https://img.shields.io/badge/Donate_on_Ko--fi-purple?logo=ko-fi&style=for-the-badge)](https://ko-fi.com/domferr)
 [![patreon](https://img.shields.io/badge/Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white)](https://patreon.com/domferr)
 
 # Tiling Shell #
 
-This is a Gnome Shell extension implementing modern windows tiling system by extending GNOME's default 2 columns to any layout you want! Can be installed on Gnome Shells from **42 to 49** on X11 and Wayland: the most recent GNOME Shell is supported, and older releases will include all the features and bug fixes!
+This is a Gnome Shell extension implementing modern windows tiling system by extending GNOME's default 2 columns to any layout you want! Can be installed on Gnome Shells from **42 to 50** on Wayland, and on X11 for **42 to 49** (GNOME Shell 50 and later use a Wayland-only session on standard upstream GNOME).
 
 - 🤩 First and only extension that provides Windows 11's **snap assistant**
 - 🖥️🖥️ **multiple monitors support**, even with different scaling factors!
@@ -201,11 +201,11 @@ Download the latest [release](https://github.com/domferr/tilingshell/releases). 
 
 ### Install via Source
 
-Clone the repo then run ```npm i``` to install dependencies and then run ```npm run build``` to build the extension. To finally install the extension run
+Clone the repo then run ```npm i``` (if npm reports peer dependency conflicts, use ```npm i --legacy-peer-deps```) to install dependencies and then run ```npm run build``` to build the extension. To finally install the extension run
 ```bash
 npm run install:extension
 ```
-You can restart your GNOME shell e.g. logout then login, or restart in place with an `alt-F2` and entering `r` (X11 only) and enable the extension. Enjoy it!
+After installing or updating, restart GNOME Shell so the extension loads cleanly: log out and back in (works on any session), or on **X11 with GNOME Shell 49 and older** you can use <kbd>Alt</kbd>+<kbd>F2</kbd>, type <kbd>r</kbd>, then <kbd>Enter</kbd> to restart Shell in place. On **GNOME Shell 50+** (Wayland-only session), use log out/in or your environment’s equivalent. Then enable the extension. Enjoy it!
 To enable via the command line you can run 
 ```bash
 /usr/bin/gnome-extensions enable tilingshell@ferrarodomenico.com
