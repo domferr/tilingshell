@@ -41,7 +41,7 @@
     "@babel/generator": "^7.28.3",
     "@babel/parser": "^7.28.4",
     "@babel/traverse": "^7.28.4",
-    "esbuild": "^0.25.10",
+    "esbuild": "^0.27.3",
     "esbuild-sass-plugin": "^3.3.1",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
