@@ -107,6 +107,11 @@
             <summary>Enable auto tiling</summary>
             <description>Automatically tile a new window to the best tile according to the current layout.</description>
         </key>
+        <key name="always-maximize-with-up" type="b">
+            <default>true</default>
+            <summary>Always maximize with move up</summary>
+            <description>When using the Move Window Up shortcut, always maximize on the current monitor instead of moving to the monitor above.</description>
+        </key>
         <key name="raise-together" type="b">
             <default>false</default>
             <summary>Raise tiled windows together</summary>

@@ -362,7 +362,8 @@ export class TilingManager {
         if (
             direction === KeyBindingsDirection.UP &&
             extWin.assignedTile &&
-            extWin.assignedTile?.y === 0
+            extWin.assignedTile?.y === 0 &&
+            (Settings.ALWAYS_MAXIMIZE_WITH_UP || clamp)
         ) {
             maximizeWindow(window);
             return true;
@@ -428,7 +429,8 @@ export class TilingManager {
             // handle maximize of window
             if (
                 direction === KeyBindingsDirection.UP &&
-                window.can_maximize()
+                window.can_maximize() &&
+                (Settings.ALWAYS_MAXIMIZE_WITH_UP || clamp)
             ) {
                 maximizeWindow(window);
                 return true;
