@@ -36,22 +36,34 @@ const RESOURCES_PREFIX = "/org/gnome/Shell/Extensions/tilingshell"; // must matc
 export default class TilingShellExtensionPreferences extends ExtensionPreferences {
     private GNOME_VERSION_MAJOR = Number(Config.PACKAGE_VERSION.split('.')[0]);
 
+    /** Loaded once per prefs process: re-registering the same bundle breaks the second open (GLib duplicate resource). */
+    private static _prefsGresource: Gio.Resource | null = null;
+    private static _prefsCssLoadedForPath: string | null = null;
+
     loadCssAndResources() {
-        const resource = Gio.Resource.load(`${this.path}/resources.gresource`);
-        Gio.resources_register(resource);
+        if (!TilingShellExtensionPreferences._prefsGresource) {
+            TilingShellExtensionPreferences._prefsGresource = Gio.Resource.load(
+                `${this.path}/resources.gresource`,
+            );
+            Gio.resources_register(TilingShellExtensionPreferences._prefsGresource);
+        }
 
-        const provider = new Gtk.CssProvider();
-        provider.load_from_path(`${this.path}/prefs.css`);
-
-        Gtk.StyleContext.add_provider_for_display(
-            Gdk.Display.get_default(),
-            provider,
-            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-        );
-
-        Gtk.IconTheme
-            .get_for_display(Gdk.Display.get_default())
-            .add_resource_path(`${RESOURCES_PREFIX}/icons/scalable/actions`);
+        if (TilingShellExtensionPreferences._prefsCssLoadedForPath !== this.path) {
+            const display = Gdk.Display.get_default();
+            if (display) {
+                const provider = new Gtk.CssProvider();
+                provider.load_from_path(`${this.path}/prefs.css`);
+                Gtk.StyleContext.add_provider_for_display(
+                    display,
+                    provider,
+                    Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
+                );
+                Gtk.IconTheme.get_for_display(display).add_resource_path(
+                    `${RESOURCES_PREFIX}/icons/scalable/actions`,
+                );
+                TilingShellExtensionPreferences._prefsCssLoadedForPath = this.path;
+            }
+        }
     }
 
     /**
