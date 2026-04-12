@@ -580,7 +580,7 @@ export class TilingManager {
                 mask = Clutter.ModifierType.MOD1_MASK;
                 break;
             case ActivationKey.SUPER:
-                mask = Clutter.ModifierType.SUPER_MASK;
+                mask = Clutter.ModifierType.MOD4_MASK;
                 break;
         }
         return (modifier & mask) === mask;
