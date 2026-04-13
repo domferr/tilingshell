@@ -207,6 +207,11 @@
             <summary>Edge tiling behavior</summary>
             <description>Controls how windows snap to screen edges:\n'default' (corners snap to quarters, edges to halves),\n'adaptive' (snap to layout tiles by column),\n'granular' (snap to exact tile under cursor).</description>
         </key>
+        <key name="enable-multi-tile-window-suggestions" type="b">
+            <default>false</default>
+            <summary>Enable multi-tile window suggestions</summary>
+            <description>Displays window suggestions in all available tiles after a snap.</description>
+        </key>
 
         <!-- keybindings -->
 		<key type="as" name="move-window-right">

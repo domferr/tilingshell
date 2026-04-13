@@ -179,7 +179,9 @@ https://github.com/user-attachments/assets/fbf68458-199d-490b-90cf-3e976d5b511b
 
 _Can I choose to opt in or out?_
 
-Yes. From the extension's preferences you find a section called Windows Suggestions. You can enable and disable windows suggestions for tiling system, snap assistant and screen edges. You can choose which of the three to keep enabled, or all of them, to personalize for your needs and preferences.
+Yes. From the extension's preferences you find a section called Windows Suggestions. You can enable and disable windows suggestions for tiling system, snap assistant and screen edges. You can choose which of the three to keep enabled, or all of them, to personalize for your needs and preferences. You can also enable multi-tile window suggestions, allowing window-previews to be displayed in all available tiles after snapping.
+
+[Screencast from multi-tile_suggestion.mp4](https://github.com/domferr/tilingshell/blob/main/doc/multi-tile_suggestion.mp4)
 
 <p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
 

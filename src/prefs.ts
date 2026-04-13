@@ -428,6 +428,15 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         windowsSuggestionsGroup.add(screenEdgesWindowSuggestionRow);
 
+        const multiTileWindowSuggestionRow = this._buildSwitchRow(
+            Settings.KEY_ENABLE_MULTI_TILE_WINDOW_SUGGESTIONS,
+            _('Enable multi-tile window suggestions'),
+            _(
+                'Displays window suggestions in all available tiles after a snap',
+            ),
+        );
+        windowsSuggestionsGroup.add(multiTileWindowSuggestionRow);
+
         prefsPage.add(windowsSuggestionsGroup);
 
         // Layouts section
