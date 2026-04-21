@@ -36,6 +36,7 @@ class LayoutsRow extends St.BoxLayout {
 
     private _layoutsBox: St.BoxLayout;
     private _layoutsButtons: LayoutButton[];
+    private _layouts: Layout[];
     private _label: St.Label;
     private _monitor: Monitor;
 
@@ -61,6 +62,7 @@ class LayoutsRow extends St.BoxLayout {
             yExpand: true,
             styleClass: 'layouts-box-layout',
         });
+        this._layouts = layouts;
         this._monitor = monitor;
         this._label = new St.Label({
             text: `Monitor ${this._monitor.index + 1}`,
@@ -96,8 +98,11 @@ class LayoutsRow extends St.BoxLayout {
     }
 
     public selectLayout(selectedId: string) {
-        const selectedIndex = GlobalState.get().layouts.findIndex(
-            (lay) => lay.id === selectedId,
+        const selectedIndex = this._layoutsButtons.findIndex(
+            (_, ind) => {
+                const lay = this._layouts[ind];
+                return lay && lay.id === selectedId;
+            },
         );
         this._layoutsButtons.forEach((btn, ind) =>
             btn.set_checked(ind === selectedIndex),
@@ -200,6 +205,13 @@ export default class DefaultMenu implements CurrentMenu {
         this._signals.connect(Settings, Settings.KEY_INNER_GAPS, () => {
             this._drawLayouts();
         });
+        this._signals.connect(
+            Settings,
+            Settings.KEY_MINIMUM_TILE_WIDTH_THRESHOLD,
+            () => {
+                this._drawLayouts();
+            },
+        );
 
         // if the selected layout was changed externaly, update the selected button
         this._signals.connect(
@@ -415,7 +427,6 @@ export default class DefaultMenu implements CurrentMenu {
     }
 
     private _drawLayouts() {
-        const layouts = GlobalState.get().layouts;
         this._container.destroy_all_children();
         this._layoutsRows = [];
 
@@ -423,6 +434,8 @@ export default class DefaultMenu implements CurrentMenu {
         const ws_index = global.workspaceManager.get_active_workspace_index();
         const monitors = getMonitors();
         this._layoutsRows = monitors.map((monitor) => {
+            const layouts =
+                GlobalState.get().getLayoutsForMonitor(monitor.index);
             const ws_selected_layouts =
                 ws_index < selected_layouts.length
                     ? selected_layouts[ws_index]
@@ -430,7 +443,7 @@ export default class DefaultMenu implements CurrentMenu {
             const selectedId =
                 monitor.index < ws_selected_layouts.length
                     ? ws_selected_layouts[monitor.index]
-                    : GlobalState.get().layouts[0].id;
+                    : layouts[0].id;
             const row = new LayoutsRow(
                 this._container,
                 layouts,

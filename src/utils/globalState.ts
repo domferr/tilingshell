@@ -7,6 +7,7 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { logger } from './logger';
 import { getWindows } from './ui';
 import ExtendedWindow from '../components/tilingsystem/extendedWindow';
+import { getLayoutsForMonitor } from './layoutFiltering';
 
 const debug = logger('GlobalState');
 
@@ -76,6 +77,15 @@ export default class GlobalState extends GObject.Object {
             Settings.KEY_SETTING_LAYOUTS_JSON,
             () => {
                 this._layouts = Settings.get_layouts_json();
+                this.emit(GlobalState.SIGNAL_LAYOUTS_CHANGED);
+            },
+        );
+
+        this._signals.connect(
+            Settings,
+            Settings.KEY_MINIMUM_TILE_WIDTH_THRESHOLD,
+            () => {
+                this.validate_selected_layouts();
                 this.emit(GlobalState.SIGNAL_LAYOUTS_CHANGED);
             },
         );
@@ -210,13 +220,24 @@ export default class GlobalState extends GObject.Object {
                 monitors_layouts.push(this._layouts[0].id);
             while (monitors_layouts.length > n_monitors) monitors_layouts.pop();
 
-            monitors_layouts.forEach((_, ind) => {
+            monitors_layouts.forEach((_, monitorIndex) => {
                 if (
                     this._layouts.findIndex(
-                        (lay) => lay.id === monitors_layouts[ind],
+                        (lay) => lay.id === monitors_layouts[monitorIndex],
                     ) === -1
                 )
-                    monitors_layouts[ind] = monitors_layouts[0];
+                    monitors_layouts[monitorIndex] = monitors_layouts[0];
+
+                const suitableLayouts =
+                    this.getLayoutsForMonitor(monitorIndex);
+                if (
+                    !suitableLayouts.find(
+                        (lay) =>
+                            lay.id === monitors_layouts[monitorIndex],
+                    )
+                ) {
+                    monitors_layouts[monitorIndex] = suitableLayouts[0].id;
+                }
             });
 
             this._selected_layouts.set(ws, monitors_layouts);
@@ -241,6 +262,16 @@ export default class GlobalState extends GObject.Object {
 
     get layouts(): Layout[] {
         return this._layouts;
+    }
+
+    public getLayoutsForMonitor(monitorIndex: number): Layout[] {
+        const workArea =
+            Main.layoutManager.getWorkAreaForMonitor(monitorIndex);
+        return getLayoutsForMonitor(
+            this._layouts,
+            workArea.width,
+            workArea.height,
+        );
     }
 
     public addLayout(newLay: Layout) {
@@ -312,11 +343,16 @@ export default class GlobalState extends GObject.Object {
         if (monitorIndex < 0 || monitorIndex >= monitors_selected.length)
             monitorIndex = 0;
 
-        return (
+        const selectedLayout =
             this._layouts.find(
                 (lay) => lay.id === monitors_selected[monitorIndex],
-            ) || this._layouts[0]
-        );
+            ) || this._layouts[0];
+
+        const suitableLayouts = this.getLayoutsForMonitor(monitorIndex);
+        if (suitableLayouts.find((lay) => lay.id === selectedLayout.id)) {
+            return selectedLayout;
+        }
+        return suitableLayouts[0];
     }
 
     public get tilePreviewAnimationTime(): number {

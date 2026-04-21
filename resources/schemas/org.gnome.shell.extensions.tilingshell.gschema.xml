@@ -207,6 +207,11 @@
             <summary>Edge tiling behavior</summary>
             <description>Controls how windows snap to screen edges:\n'default' (corners snap to quarters, edges to halves),\n'adaptive' (snap to layout tiles by column),\n'granular' (snap to exact tile under cursor).</description>
         </key>
+        <key name="minimum-tile-width-threshold" type="u">
+            <default>300</default>
+            <summary>Minimum tile width threshold</summary>
+            <description>Minimum width in pixels each tile must have for a layout to be usable on a monitor.</description>
+        </key>
 
         <!-- keybindings -->
 		<key type="as" name="move-window-right">

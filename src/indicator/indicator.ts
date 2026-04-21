@@ -142,6 +142,9 @@ export default class Indicator extends PanelMenu.Button {
                             }),
                     ),
                     lay.id,
+                    lay.minimumMonitorResolution
+                        ? { ...lay.minimumMonitorResolution }
+                        : undefined,
                 );
 
                 if (this._layoutEditor) {
