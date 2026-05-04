@@ -123,6 +123,7 @@ export default class Settings {
     static KEY_ENABLE_SNAP_ASSISTANT_WINDOWS_SUGGESTIONS = 'enable-snap-assistant-windows-suggestions';
     static KEY_ENABLE_SCREEN_EDGES_WINDOWS_SUGGESTIONS = 'enable-screen-edges-windows-suggestions';
     static KEY_EDGE_TILING_MODE = 'edge-tiling-mode';
+    static KEY_SYNC_LAYOUT_ACROSS_WORKSPACES = 'sync-layout-across-workspaces';
 
     static SETTING_MOVE_WINDOW_RIGHT = 'move-window-right';
     static SETTING_MOVE_WINDOW_LEFT = 'move-window-left';
@@ -504,6 +505,14 @@ export default class Settings {
 
     static set EDGE_TILING_MODE(val: EdgeTilingMode) {
         set_string(Settings.KEY_EDGE_TILING_MODE, val);
+    }
+
+    static get SYNC_LAYOUT_ACROSS_WORKSPACES(): boolean {
+        return get_boolean(Settings.KEY_SYNC_LAYOUT_ACROSS_WORKSPACES);
+    }
+
+    static set SYNC_LAYOUT_ACROSS_WORKSPACES(val: boolean) {
+        set_boolean(Settings.KEY_SYNC_LAYOUT_ACROSS_WORKSPACES, val);
     }
 
     static get_inner_gaps(scaleFactor: number = 1): {

@@ -208,6 +208,12 @@
             <description>Controls how windows snap to screen edges:\n'default' (corners snap to quarters, edges to halves),\n'adaptive' (snap to layout tiles by column),\n'granular' (snap to exact tile under cursor).</description>
         </key>
 
+        <key name="sync-layout-across-workspaces" type="b">
+            <default>false</default>
+            <summary>Sync layout across workspaces</summary>
+            <description>When a layout is selected, apply it to all workspaces instead of just the active one.</description>
+        </key>
+
         <!-- keybindings -->
 		<key type="as" name="move-window-right">
 			<default><![CDATA[['<Super>Right']]]></default>

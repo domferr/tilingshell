@@ -320,6 +320,15 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         behaviourGroup.add(raiseTogetherRow);
 
+        const syncLayoutRow = this._buildSwitchRow(
+            Settings.KEY_SYNC_LAYOUT_ACROSS_WORKSPACES,
+            _('Sync layout across workspaces'),
+            _(
+                'When a layout is selected, apply it to all workspaces instead of just the active one',
+            ),
+        );
+        behaviourGroup.add(syncLayoutRow);
+
         // Screen Edges section
         const activeScreenEdgesGroup = new Adw.PreferencesGroup({
             title: _('Screen Edges'),
