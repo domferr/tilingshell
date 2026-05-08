@@ -762,21 +762,17 @@ export default class TilingShellExtension extends Extension {
     }
 
     disable(): void {
-        // bring back overridden keybindings
+        // disconnect signals
+        this._signals?.disconnect();
+        this._signals = null;
+
+       // bring back overridden keybindings
         this._keybindings?.destroy();
         this._keybindings = null;
 
         // destroy indicator
         this._indicator?.destroy();
         this._indicator = null;
-
-        // destroy tiling managers
-        this._tilingManagers.forEach((tm) => tm.destroy());
-        this._tilingManagers = [];
-
-        // disconnect signals
-        this._signals?.disconnect();
-        this._signals = null;
 
         this._resizingManager?.destroy();
         this._resizingManager = null;
