@@ -472,6 +472,7 @@ export class TilingManager {
         }
         this._signals.disconnect();
         this._isGrabbingWindow = false;
+        this._removeRmbFilterIfInstalled();
         this._snapAssistingInfo.update(undefined);
         this._edgeTilingManager.abortEdgeTiling();
         this._workspaceTilingLayout.forEach((tl) => tl.destroy());
@@ -558,6 +559,7 @@ export class TilingManager {
         }
 
         this._isGrabbingWindow = true;
+        this._installRmbFilterIfNeeded();
         this._movingWindowTimerId = GLib.timeout_add(
             GLib.PRIORITY_DEFAULT_IDLE,
             this._movingWindowTimerDuration,
@@ -883,6 +885,7 @@ export class TilingManager {
 
     private _onWindowGrabEnd(window: Meta.Window) {
         this._isGrabbingWindow = false;
+        this._removeRmbFilterIfInstalled();
         this._grabStartPosition = null;
 
         this._signals.disconnect(window);
