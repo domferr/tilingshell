@@ -7,6 +7,7 @@ export enum ActivationKey {
     CTRL = 0,
     ALT,
     SUPER,
+    RIGHT_BUTTON,
 }
 
 export enum EdgeTilingMode {
