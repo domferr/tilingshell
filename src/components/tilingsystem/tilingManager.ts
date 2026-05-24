@@ -582,6 +582,12 @@ export class TilingManager {
             case ActivationKey.SUPER:
                 mask = Clutter.ModifierType.SUPER_MASK;
                 break;
+            case ActivationKey.RIGHT_BUTTON:
+                // Clutter's native backend maps clutter_button=3 (RMB) to
+                // BUTTON2_MASK (see mutter src/backends/native/meta-seat-impl.c
+                // maskmap). BUTTON3_MASK is the middle button — do not use it.
+                mask = Clutter.ModifierType.BUTTON2_MASK;
+                break;
         }
         return (modifier & mask) === mask;
     }
