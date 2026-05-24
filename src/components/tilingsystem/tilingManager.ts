@@ -67,6 +67,8 @@ export class TilingManager {
     private _enableScaling: boolean;
 
     private _isGrabbingWindow: boolean;
+    private _rmbFilterId: number = 0;
+    private _rmbFilterInstalled: boolean = false;
     private _movingWindowTimerDuration: number = 15;
     private _lastCursorPos: { x: number; y: number } | null = null;
     private _grabStartPosition: { x: number; y: number } | null = null;
@@ -563,6 +565,82 @@ export class TilingManager {
         );
 
         this._onMovingWindow(window, grabOp);
+    }
+
+    private _anyActivationKeyIsRmb(): boolean {
+        return (
+            Settings.TILING_SYSTEM_ACTIVATION_KEY === ActivationKey.RIGHT_BUTTON ||
+            Settings.TILING_SYSTEM_DEACTIVATION_KEY === ActivationKey.RIGHT_BUTTON ||
+            Settings.SPAN_MULTIPLE_TILES_ACTIVATION_KEY === ActivationKey.RIGHT_BUTTON
+        );
+    }
+
+    private _rmbEventFilter(event: Clutter.Event, _actor: Clutter.Actor): boolean {
+        // Fast path: only act on button press/release.
+        const t = event.type();
+        if (
+            t !== Clutter.EventType.BUTTON_PRESS &&
+            t !== Clutter.EventType.BUTTON_RELEASE
+        ) {
+            return Clutter.EVENT_PROPAGATE;
+        }
+        // Swallow RMB press/release so Mutter's MOVING grab doesn't see them.
+        // CLUTTER_BUTTON_SECONDARY === 3.
+        if (event.get_button() === Clutter.BUTTON_SECONDARY) {
+            return Clutter.EVENT_STOP;
+        }
+        return Clutter.EVENT_PROPAGATE;
+    }
+
+    private _installRmbFilterIfNeeded(): void {
+        if (this._rmbFilterInstalled) return;
+        if (!this._anyActivationKeyIsRmb()) return;
+        // `Clutter.event_add_filter` / `event_remove_filter` are not always
+        // present in @girs/clutter type stubs. Cast to `any` to access them
+        // and runtime-check for availability below.
+        const addFilter = (Clutter as any).event_add_filter;
+        if (typeof addFilter !== 'function') {
+            console.error(
+                'tilingshell: Clutter.event_add_filter unavailable; ' +
+                'RIGHT_BUTTON activation key will not work on this version.',
+            );
+            return;
+        }
+        try {
+            this._rmbFilterId = addFilter(
+                global.stage,
+                this._rmbEventFilter.bind(this),
+            );
+            this._rmbFilterInstalled = this._rmbFilterId !== 0;
+            if (!this._rmbFilterInstalled) {
+                console.error(
+                    'tilingshell: Clutter.event_add_filter returned 0; ' +
+                    'RIGHT_BUTTON activation key will not work this drag.',
+                );
+            }
+        } catch (e) {
+            console.error('tilingshell: failed to install RMB filter: ' + e);
+            this._rmbFilterInstalled = false;
+            this._rmbFilterId = 0;
+        }
+    }
+
+    private _removeRmbFilterIfInstalled(): void {
+        if (!this._rmbFilterInstalled || this._rmbFilterId === 0) return;
+        const removeFilter = (Clutter as any).event_remove_filter;
+        if (typeof removeFilter !== 'function') {
+            // Defensive: should not happen if install succeeded.
+            this._rmbFilterInstalled = false;
+            this._rmbFilterId = 0;
+            return;
+        }
+        try {
+            removeFilter(this._rmbFilterId);
+        } catch (e) {
+            console.error('tilingshell: failed to remove RMB filter: ' + e);
+        }
+        this._rmbFilterInstalled = false;
+        this._rmbFilterId = 0;
     }
 
     private _activationKeyStatus(
