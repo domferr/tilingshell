@@ -325,6 +325,16 @@ msgid ""
 "together"
 msgstr ""
 
+#: dist/prefs.js
+msgid "Limit to current display"
+msgstr ""
+
+#: dist/prefs.js
+msgid ""
+"When raising tiled windows together, only raise tiled windows on the same "
+"display as the window being raised"
+msgstr ""
+
 #: dist/prefs.js:288
 msgid "Screen Edges"
 msgstr ""
