@@ -275,6 +275,15 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         behaviourGroup.add(autoTilingRow);
 
+        const alwaysMaximizeWithUpRow = this._buildSwitchRow(
+            Settings.KEY_ALWAYS_MAXIMIZE_WITH_UP,
+            _('Always maximize with Move Up'),
+            _(
+                'When enabled, Move Up always maximizes on the current monitor instead of moving to the monitor above',
+            ),
+        );
+        behaviourGroup.add(alwaysMaximizeWithUpRow);
+
         const resizeComplementingRow = this._buildSwitchRow(
             Settings.KEY_RESIZE_COMPLEMENTING_WINDOWS,
             _('Enable auto-resize of the complementing tiled windows'),
