@@ -581,6 +581,17 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         layoutsGroup.add(resetBtn);
 
+        const minTileWidthRow = this._buildSpinButtonRow(
+            Settings.KEY_MINIMUM_TILE_WIDTH_THRESHOLD,
+            _('Minimum tile width'),
+            _(
+                'Minimum tile pixel width for a layout to be shown on a monitor (0 to disable filtering)',
+            ),
+            0,
+            800,
+        );
+        layoutsGroup.add(minTileWidthRow);
+
         // Keybindings section
         const keybindingsGroup = new Adw.PreferencesGroup({
             title: _('Keybindings'),

@@ -55,5 +55,12 @@
   },
   "dependencies": {
     "@girs/gnome-shell": "^49.1.0"
+  },
+  "overrides": {
+    "@girs/mtk-17": "17.0.0-4.0.0-rc.3",
+    "@girs/st-17": "17.0.0-4.0.0-rc.3",
+    "@girs/meta-17": "17.0.0-4.0.0-rc.3",
+    "@girs/clutter-17": "17.0.0-4.0.0-rc.3",
+    "@girs/shell-17": "17.0.0-4.0.0-rc.3"
   }
 }

@@ -94,14 +94,15 @@ export class LayoutSwitcherPopup extends SwitcherPopup.SwitcherPopup {
     private _backwardAction: number;
 
     constructor(action: number, backwardAction: number, enableScaling: boolean) {
+        const monitorIndex =
+            LayoutSwitcherPopup._getMonitorIndex();
         // @ts-expect-error "Parent can take a list"
-        super(GlobalState.get().layouts);
+        super(GlobalState.get().getLayoutsForMonitor(monitorIndex));
 
         this._action = action;
         this._backwardAction = backwardAction;
-        // handle scale factor of the monitor
         const monitorScalingFactor = enableScaling
-            ? getMonitorScalingFactor(this._getCurrentMonitorIndex())
+            ? getMonitorScalingFactor(monitorIndex)
             : undefined;
         this._switcherList = new LayoutSwitcherList(
             this._items,
@@ -115,7 +116,7 @@ export class LayoutSwitcherPopup extends SwitcherPopup.SwitcherPopup {
             this._getCurrentMonitorIndex(),
             global.workspaceManager.get_active_workspace_index(),
         );
-        this._selectedIndex = GlobalState.get().layouts.findIndex(
+        this._selectedIndex = this._items.findIndex(
             (lay) => lay.id === selectedLay.id,
         );
         // backward is the one passed to show function
@@ -147,10 +148,14 @@ export class LayoutSwitcherPopup extends SwitcherPopup.SwitcherPopup {
         );
     }
 
-    private _getCurrentMonitorIndex(): number {
+    private static _getMonitorIndex(): number {
         const focusWindow = global.display.focus_window;
         if (focusWindow) return focusWindow.get_monitor();
 
         return Main.layoutManager.primaryIndex;
+    }
+
+    private _getCurrentMonitorIndex(): number {
+        return LayoutSwitcherPopup._getMonitorIndex();
     }
 }

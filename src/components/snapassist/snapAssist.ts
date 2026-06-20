@@ -117,12 +117,18 @@ class SnapAssistContent extends St.BoxLayout {
             },
         );
 
-        this._setLayouts(GlobalState.get().layouts);
+        this._setLayouts(
+            GlobalState.get().getLayoutsForMonitor(this._monitorIndex),
+        );
         this._signals.connect(
             GlobalState.get(),
             GlobalState.SIGNAL_LAYOUTS_CHANGED,
             () => {
-                this._setLayouts(GlobalState.get().layouts);
+                this._setLayouts(
+                    GlobalState.get().getLayoutsForMonitor(
+                        this._monitorIndex,
+                    ),
+                );
             },
         );
 
