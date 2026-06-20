@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: Tiling Shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-25 18:00+0100\n"
-"PO-Revision-Date: 2025-11-22 16:08+0100\n"
+"PO-Revision-Date: 2026-01-31 15:45+0100\n"
 "Last-Translator: Christian Lauinger <christian@lauinger-clan.de>\n"
 "Language-Team: German\n"
 "Language: de\n"
@@ -56,7 +56,7 @@ msgstr "Editieren starten"
 
 #: dist/components/window_menu/overriddenWindowMenu.js:117
 msgid "Move to best tile"
-msgstr ""
+msgstr "Fenster zur besten Kachel verschieben"
 
 #: dist/components/window_menu/overriddenWindowMenu.js:137
 msgid "Move to leftmost tile"
@@ -179,6 +179,7 @@ msgstr "Intelligenter Rahmenradius"
 #: dist/prefs.js:133
 msgid "Dynamically adapt to the window's actual border radius"
 msgstr ""
+"Rahmenradius dynamisch an den tatsächlichen Fensterrahmenradius anpassen."
 
 #: dist/prefs.js:139
 msgid "Width"
@@ -240,13 +241,15 @@ msgstr ""
 
 #: dist/prefs.js:201
 msgid "Sync layout when tiling with Snap Assistant"
-msgstr ""
+msgstr "Layout beim Kacheln mit Snap Assistant synchronisieren"
 
 #: dist/prefs.js:203
 msgid ""
 "Change the active layout to match the layout used when tiling a window with "
 "Snap Assistant"
 msgstr ""
+"Ändern Sie das aktive Layout so, dass es dem Layout entspricht, das beim "
+"Kacheln eines Fensters mit dem Snap Assistant verwendet wird."
 
 #: dist/prefs.js:214
 msgid "Enable Tiling System"
@@ -334,13 +337,15 @@ msgstr ""
 
 #: dist/prefs.js:281
 msgid "Raise tiled windows together"
-msgstr ""
+msgstr "Kachelfenster gemeinsam anheben"
 
 #: dist/prefs.js:283
 msgid ""
 "When one tiled window is raised, raise all tiled windows into the foreground "
 "together"
 msgstr ""
+"Wenn ein gekacheltes Fenster in den Vordergrund gebracht wird, werden alle "
+"gekachelten Fenster gemeinsam in den Vordergrund gebracht."
 
 #: dist/prefs.js:288
 msgid "Screen Edges"
@@ -411,11 +416,13 @@ msgstr ""
 
 #: dist/prefs.js:376
 msgid "Enable window suggestions for screen edge tiling"
-msgstr ""
+msgstr "Fenster-Vorschläge für Bildschirmrand-Kacheln aktivieren"
 
 #: dist/prefs.js:378
 msgid "Suggests windows to occupy empty tiles when tiling to screen edges"
 msgstr ""
+"Schlägt Fenster vor, um leere Kacheln zu belegen, wenn an Bildschirmrändern "
+"gekachelt wird"
 
 #: dist/prefs.js:384
 msgid "Layouts"
@@ -724,30 +731,31 @@ msgstr "Neuen Issue öffnen auf"
 #: dist/prefs.js:999
 msgid "Choose how windows snap to screen edges"
 msgstr ""
+"Wählen Sie aus, wie Fenster an Bildschirmrändern ausgerichtet werden sollen."
 
 #: dist/prefs.js:1014
 msgid "Default"
-msgstr ""
+msgstr "Standard"
 
 #: dist/prefs.js:1015
 msgid "Follow quarters or screen halves"
-msgstr ""
+msgstr "Viertel oder Hälften des Spielfelds verfolgen"
 
 #: dist/prefs.js:1020
 msgid "Adaptive"
-msgstr ""
+msgstr "Adaptiv"
 
 #: dist/prefs.js:1021
 msgid "Follow corners of selected layout or screen halves"
-msgstr ""
+msgstr "Ecken des ausgewählten Layouts oder der Bildschirmhälften verfolgen"
 
 #: dist/prefs.js:1026
 msgid "Granular"
-msgstr ""
+msgstr "Granular"
 
 #: dist/prefs.js:1027
 msgid "Follow currently selected layout"
-msgstr ""
+msgstr "Aktuell ausgewähltes Layout übernehmen"
 
 #: dist/prefs.js:1216
 msgid "Choose custom color"

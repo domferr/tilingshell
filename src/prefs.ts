@@ -322,7 +322,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
 
         const raiseTogetherCurrentMonitorRow = this._buildSwitchRow(
             Settings.KEY_RAISE_TOGETHER_CURRENT_MONITOR_ONLY,
-            _('Limit to current display'),
+            _('Raise tiled windows together: limit to current display'),
             _(
                 'When raising tiled windows together, only raise tiled windows on the same display as the window being raised',
             ),
@@ -333,6 +333,15 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             'sensitive',
         );
         behaviourGroup.add(raiseTogetherCurrentMonitorRow);
+
+        const syncLayoutRow = this._buildSwitchRow(
+            Settings.KEY_SYNC_LAYOUT_ACROSS_WORKSPACES,
+            _('Sync layout across workspaces'),
+            _(
+                'When a layout is selected, apply it to all workspaces instead of just the active one',
+            ),
+        );
+        behaviourGroup.add(syncLayoutRow);
 
         // Screen Edges section
         const activeScreenEdgesGroup = new Adw.PreferencesGroup({
@@ -687,6 +696,13 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             [
                 Settings.SETTING_UNTILE_WINDOW,
                 _('Untile focused window'),
+                undefined,
+                false,
+                false,
+            ],
+            [
+                Settings.SETTING_UNTILE_ALL_WINDOWS,
+                _('Untile all windows from current workspace'),
                 undefined,
                 false,
                 false,
