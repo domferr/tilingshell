@@ -678,6 +678,13 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 false,
             ],
             [
+                Settings.SETTING_UNTILE_ALL_WINDOWS,
+                _('Untile all windows from current workspace'),
+                undefined,
+                false,
+                false,
+            ],
+            [
                 Settings.SETTING_MOVE_WINDOW_CENTER, // settings key
                 _('Move window to the center'), // title
                 _('Move the focused window to the center of the screen'), // subtitle

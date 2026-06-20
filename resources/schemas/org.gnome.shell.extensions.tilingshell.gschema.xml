@@ -249,6 +249,10 @@
 			<default><![CDATA[['']]]></default>
 			<summary>Untile the focused window</summary>
 		</key>
+		<key type="as" name="untile-all-windows">
+			<default><![CDATA[['']]]></default>
+			<summary>Untile all windows from current workspace</summary>
+		</key>
 		<key type="as" name="move-window-center">
 			<default><![CDATA[['']]]></default>
 			<summary>Move the focused window to the center of the screen</summary>

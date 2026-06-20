@@ -134,6 +134,7 @@ export default class Settings {
     static SETTING_SPAN_WINDOW_DOWN = 'span-window-down';
     static SETTING_SPAN_WINDOW_ALL_TILES = 'span-window-all-tiles';
     static SETTING_UNTILE_WINDOW = 'untile-window';
+    static SETTING_UNTILE_ALL_WINDOWS = 'untile-all-windows';
     static SETTING_MOVE_WINDOW_CENTER = 'move-window-center';
     static SETTING_FOCUS_WINDOW_RIGHT = 'focus-window-right';
     static SETTING_FOCUS_WINDOW_LEFT = 'focus-window-left';

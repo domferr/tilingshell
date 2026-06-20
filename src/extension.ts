@@ -82,6 +82,7 @@ export default class TilingShellExtension extends Extension {
         this._indicator = new Indicator(this.path, this.uuid);
         this._indicator.enableScaling = !this._fractionalScalingEnabled;
         this._indicator.enable();
+        this._signals?.connect(this._indicator, 'open-preferences', () => this.openPreferences());
     }
 
     private _validateSettings() {
@@ -282,6 +283,11 @@ export default class TilingShellExtension extends Extension {
                 this._keybindings,
                 'untile-window',
                 this._onKeyboardUntileWindow.bind(this),
+            );
+            this._signals.connect(
+                this._keybindings,
+                'untile-all-windows',
+                this._onKeyboardUntileAllWindows.bind(this),
             );
             this._signals.connect(
                 this._keybindings,
@@ -745,6 +751,30 @@ export default class TilingShellExtension extends Extension {
         if (!monitorTilingManager) return;
 
         monitorTilingManager.onUntileWindow(focus_window, true);
+    }
+    
+    private _onKeyboardUntileAllWindows(kb: KeyBindings, display: Meta.Display) {
+        getWindows().forEach((extWin) => {
+            if (extWin && !extWin.minimized && (extWin as ExtendedWindow).assignedTile) {
+                if (
+                    extWin.windowType !== Meta.WindowType.NORMAL ||
+                    (extWin.get_wm_class() &&
+                        extWin.get_wm_class() === 'gjs')
+                )
+                    return;
+                // if the window is maximized, unmaximize it
+                if (
+                    extWin.maximizedHorizontally ||
+                    extWin.maximizedVertically
+                )
+                    unmaximizeWindow(extWin);
+                const monitorTilingManager =
+                    this._tilingManagers[extWin.get_monitor()];
+                if (!monitorTilingManager) return;
+
+                monitorTilingManager.onUntileWindow(extWin, true);      
+            }
+        });
     }
 
     private _isFractionalScalingEnabled(
