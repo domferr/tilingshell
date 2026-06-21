@@ -82,6 +82,7 @@ export default class TilingShellExtension extends Extension {
         this._indicator = new Indicator(this.path, this.uuid);
         this._indicator.enableScaling = !this._fractionalScalingEnabled;
         this._indicator.enable();
+        this._signals?.connect(this._indicator, 'open-preferences', () => this.openPreferences());
     }
 
     private _validateSettings() {

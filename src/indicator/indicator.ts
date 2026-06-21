@@ -20,7 +20,14 @@ enum IndicatorState {
 }
 
 export default class Indicator extends PanelMenu.Button {
-    static { registerGObjectClass(this) }
+    static { registerGObjectClass(this, {
+        Signals: {
+            'open-preferences': {
+                param_types: [],
+            },
+        },
+        GTypeName: 'Indicator',
+    }) }
 
     private _layoutEditor: LayoutEditor | null;
     private _editorDialog: EditorDialog | null;
@@ -71,13 +78,13 @@ export default class Indicator extends PanelMenu.Button {
 
         if (this._currentMenu && this._state === IndicatorState.DEFAULT) {
             this._currentMenu.destroy();
-            this._currentMenu = new DefaultMenu(this, this._enableScaling);
+            this._currentMenu = new DefaultMenu(this, this._enableScaling, this._openPreferences.bind(this));
         }
     }
 
     public enable() {
         (this.menu as PopupMenu.PopupMenu).removeAll();
-        this._currentMenu = new DefaultMenu(this, this._enableScaling);
+        this._currentMenu = new DefaultMenu(this, this._enableScaling, this._openPreferences.bind(this));
     }
 
     public selectLayoutOnClick(monitorIndex: number, layoutToSelectId: string) {
@@ -210,13 +217,17 @@ export default class Indicator extends PanelMenu.Button {
         this._setState(IndicatorState.DEFAULT);
     }
 
+    private _openPreferences() {
+        this.emit('open-preferences');
+    };
+
     private _setState(newState: IndicatorState) {
         if (this._state === newState) return;
         this._state = newState;
         this._currentMenu?.destroy();
         switch (newState) {
             case IndicatorState.DEFAULT:
-                this._currentMenu = new DefaultMenu(this, this._enableScaling);
+                this._currentMenu = new DefaultMenu(this, this._enableScaling, this._openPreferences.bind(this));
                 if (!Settings.SHOW_INDICATOR) this.hide();
                 if (this._keyPressEvent) {
                     global.stage.disconnect(this._keyPressEvent);
