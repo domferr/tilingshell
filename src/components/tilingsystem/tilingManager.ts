@@ -70,6 +70,8 @@ export class TilingManager {
     private _movingWindowTimerDuration: number = 15;
     private _lastCursorPos: { x: number; y: number } | null = null;
     private _grabStartPosition: { x: number; y: number } | null = null;
+    private _spanMultipleTilesAnchorRect: Mtk.Rectangle | null = null;
+    private _lastSpanMultipleTilesHoveredRect: Mtk.Rectangle | null = null;
     private _wasSpanMultipleTilesActivated: boolean;
     private _wasTilingSystemActivated: boolean;
     private _snapAssistingInfo: SnapAssistingInfo;
@@ -496,6 +498,11 @@ export class TilingManager {
         this._edgeTilingManager.workarea = this._workArea;
     }
 
+    private _resetSpanSelectionState() {
+        this._spanMultipleTilesAnchorRect = null;
+        this._lastSpanMultipleTilesHoveredRect = null;
+    }
+
     private _onWindowGrabBegin(window: Meta.Window, grabOp: number) {
         if (this._isGrabbingWindow) return;
 
@@ -556,6 +563,7 @@ export class TilingManager {
         }
 
         this._isGrabbingWindow = true;
+        this._resetSpanSelectionState();
         this._movingWindowTimerId = GLib.timeout_add(
             GLib.PRIORITY_DEFAULT_IDLE,
             this._movingWindowTimerDuration,
@@ -607,6 +615,7 @@ export class TilingManager {
         ) {
             tilingLayout.close();
             this._selectedTilesPreview.close(true);
+            this._resetSpanSelectionState();
             this._snapAssist.close(true);
             this._snapAssistingInfo.update(undefined);
             this._edgeTilingManager.abortEdgeTiling();
@@ -724,6 +733,7 @@ export class TilingManager {
             if (tilingLayout.showing) {
                 tilingLayout.close();
                 this._selectedTilesPreview.close(true);
+                this._resetSpanSelectionState();
             }
 
             if (
@@ -739,6 +749,7 @@ export class TilingManager {
             } else {
                 if (this._edgeTilingManager.isPerformingEdgeTiling()) {
                     this._selectedTilesPreview.close(true);
+                    this._resetSpanSelectionState();
                     this._edgeTilingManager.abortEdgeTiling();
                 }
 
@@ -762,35 +773,52 @@ export class TilingManager {
             // close selection tile if we were performing edge-tiling
             if (this._edgeTilingManager.isPerformingEdgeTiling()) {
                 this._selectedTilesPreview.close(true);
+                this._resetSpanSelectionState();
                 this._edgeTilingManager.abortEdgeTiling();
             }
         }
         // if it was snap assisting then close the selection tile preview. We may reopen it if that's the case
         if (this._snapAssistingInfo.isSnapAssisting) {
             this._selectedTilesPreview.close(true);
+            this._resetSpanSelectionState();
             this._snapAssistingInfo.update(undefined);
         }
 
         // if the pointer is inside the current selection and ALT key status is not changed, then there is nothing to do
         if (
+            !allowSpanMultipleTiles &&
             !changedSpanMultipleTiles &&
             isPointInsideRect(currPointerPos, this._selectedTilesPreview.rect)
         )
             return GLib.SOURCE_CONTINUE;
 
-        let selectionRect = tilingLayout.getTileBelow(
+        let hoveredTileRect = tilingLayout.getTileBelow(
             currPointerPos,
             changedSpanMultipleTiles && !allowSpanMultipleTiles,
         );
-        if (!selectionRect) return GLib.SOURCE_CONTINUE;
+        if (!hoveredTileRect) return GLib.SOURCE_CONTINUE;
 
-        selectionRect = selectionRect.copy();
-        if (allowSpanMultipleTiles && this._selectedTilesPreview.showing) {
-            selectionRect = selectionRect.union(
-                this._selectedTilesPreview.rect,
+        let selectionRect = hoveredTileRect.copy();
+        if (allowSpanMultipleTiles) {
+            if (
+                !changedSpanMultipleTiles &&
+                this._lastSpanMultipleTilesHoveredRect?.equal(hoveredTileRect)
+            )
+                return GLib.SOURCE_CONTINUE;
+            if (
+                changedSpanMultipleTiles ||
+                !this._spanMultipleTilesAnchorRect
+            ) {
+                this._spanMultipleTilesAnchorRect = hoveredTileRect.copy();
+            }
+            selectionRect = this._spanMultipleTilesAnchorRect.union(
+                selectionRect,
             );
+            this._lastSpanMultipleTilesHoveredRect = hoveredTileRect.copy();
+        } else {
+            this._resetSpanSelectionState();
         }
-        tilingLayout.hoverTilesInRect(selectionRect, !allowSpanMultipleTiles);
+        tilingLayout.hoverTilesInRect(selectionRect, true);
 
         this.openSelectionTilePreview(selectionRect, true, true, window);
 
@@ -800,6 +828,7 @@ export class TilingManager {
     private _onWindowGrabEnd(window: Meta.Window) {
         this._isGrabbingWindow = false;
         this._grabStartPosition = null;
+        this._resetSpanSelectionState();
 
         this._signals.disconnect(window);
         TouchPointer.get().reset();
@@ -1006,6 +1035,7 @@ export class TilingManager {
         // if there isn't a tile hovered, then close selection
         if (tile.width === 0 || tile.height === 0) {
             this._selectedTilesPreview.close(true);
+            this._resetSpanSelectionState();
             this._snapAssistingInfo.update(undefined);
             return;
         }
