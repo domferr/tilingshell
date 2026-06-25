@@ -38,7 +38,7 @@ Have issues, you want to suggest a new feature or contribute? Please open a new 
 |:---|:---|:---|:---|
 | [⬇️](#layout-editor) **Layout editor** | [⬇️](#smart-resize) **Smart resize** | [⬇️](#tile-with-keyboard) **Tile with Keyboard** | [⬇️](#edge-tiling) **Edge Tiling** |
 | [⬇️](#tiling-buttons) **Tiling Buttons** | [⬇️](#per-workspace-layout) **Per-workspace layout** | [⬇️](#auto-tiling) **Auto-tiling** | [⬇️](#tiling-context-menu) **Tiling context menu** |
-| [⬇️](#smart-border-radius) **Smart border radius** | [⬇️](#windows-suggestions) **Windows Suggestions** 
+| [⬇️](#smart-border-radius) **Smart border radius** | [⬇️](#windows-suggestions) **Windows Suggestions** | [⬇️](#spatial-focus-switching) **Spatial Focus Switching** | 
 
 ## 🎉🎉 Tiling Shell's AWESOME Supporters!
 Thank you to the :star2: **amazing** <a href="https://patreon.com/domferr"><img src="https://img.shields.io/badge/Patreons-F96854?logo=patreon&logoColor=white)" height="14px"/><a/> and **everyone** who donated on <a href="https://ko-fi.com/domferr"><img src="https://img.shields.io/badge/_Ko--fi-794bc4?logo=ko-fi&logoColor=white" height="14px"/><a/>! :medal_sports:Sean, Markus Huggler, Kostja Palović, Mike Empey, Miguel and Jesse Dhillon on Patreon:medal_sports: and Zorin OS, Nick, thy-fi, iatanas0v, Chris, wbezs, DaneshManoharan, Tamas, Ivan Banha and many more on Ko-fi! You are on a mission to **make Linux window management better for everyone**!
@@ -105,6 +105,34 @@ Move window through the tiles using keyboard shortcuts (<kbd>SUPER</kbd>+<kbd>�
 [Tile with Keyboard Video](https://github.com/user-attachments/assets/6f8dedbb-2733-41d8-8a94-0fa62dffb915)
 
 > It can be enabled/disabled from the preferences
+
+<p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
+
+### Spatial Focus Switching ###
+
+Navigate between windows using "Focus Next Window" and "Focus Previous Window" keybindings. Unlike the default GNOME behavior which uses Most Recently Used (MRU) order, this feature uses **spatial ordering** based on window positions.
+
+**How it works:**
+
+Windows are ordered left-to-right, then top-to-bottom. When two windows have similar horizontal positions (within 50 pixels), they are ordered top-to-bottom instead. This creates a natural reading order that matches the visual layout on screen.
+
+```
+┌───────┐  ┌───────┐  ┌───────┐
+│   1   │  │   3   │  │   4   │
+└───────┘  │       │  └───────┘
+┌───────┐  │       │  ┌───────┐
+│   2   │  └───────┘  │   5   │
+└───────┘             └───────┘
+
+Navigation order: 1 → 2 → 3 → 4 → 5
+(Windows 1 and 2 have similar x-coordinates, so 1 comes first as it is closer to the top)
+```
+
+**Multi-monitor support:**
+
+Monitors are also sorted spatially (left-to-right, top-to-bottom). When you reach the last window on a monitor and press "Next", focus moves to the first window on the next monitor. The "Wraparound focus" setting controls whether navigation wraps from the last window on the last monitor back to the first window on the first monitor.
+
+> This feature provides an alternative to directional focus switching (up/down/left/right) for users who prefer simpler next/previous navigation while still maintaining spatially predictable ordering.
 
 <p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
 

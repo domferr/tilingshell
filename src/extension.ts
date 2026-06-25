@@ -25,6 +25,7 @@ import { Gio, GLib, Meta } from './gi/ext';
 import { logger } from './utils/logger';
 import {
     filterUnfocusableWindows,
+    getGlobalWindowList,
     getMonitors,
     getWindows,
     squaredEuclideanDistance,
@@ -693,33 +694,48 @@ export default class TilingShellExtension extends Extension {
         )
             return;
 
-        const windowList = filterUnfocusableWindows(
-            focus_window.get_workspace().list_windows(),
-        );
+        // Get spatially ordered list of all windows across all monitors
+        const workspace = focus_window.get_workspace();
+        const windowList = getGlobalWindowList(workspace);
+
+        if (windowList.length === 0) return;
+
         const focusParent = focus_window.get_transient_for() || focus_window;
         const focusedIdx = windowList.findIndex((win) => {
             // in case we are iterating over a modal dialog for our focused window
             return win === focusParent;
         });
 
-        let nextIndex = -1;
+        if (focusedIdx === -1) return;
+
+        let targetIndex = -1;
         switch (direction) {
             case FocusSwitchDirection.PREV:
-                if (focusedIdx === 0 && Settings.WRAPAROUND_FOCUS) {
-                    windowList[windowList.length - 1].activate(
-                        global.get_current_time(),
-                    );
+                if (focusedIdx === 0) {
+                    // At first window globally
+                    if (Settings.WRAPAROUND_FOCUS) {
+                        targetIndex = windowList.length - 1;
+                    }
+                    // else do nothing (targetIndex stays -1)
                 } else {
-                    windowList[focusedIdx - 1].activate(
-                        global.get_current_time(),
-                    );
+                    targetIndex = focusedIdx - 1;
                 }
                 break;
             case FocusSwitchDirection.NEXT:
-                nextIndex = (focusedIdx + 1) % windowList.length;
-                if (nextIndex > 0 || Settings.WRAPAROUND_FOCUS)
-                    windowList[nextIndex].activate(global.get_current_time());
+                if (focusedIdx === windowList.length - 1) {
+                    // At last window globally
+                    if (Settings.WRAPAROUND_FOCUS) {
+                        targetIndex = 0;
+                    }
+                    // else do nothing (targetIndex stays -1)
+                } else {
+                    targetIndex = focusedIdx + 1;
+                }
                 break;
+        }
+
+        if (targetIndex >= 0 && targetIndex < windowList.length) {
+            windowList[targetIndex].activate(global.get_current_time());
         }
     }
 

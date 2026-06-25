@@ -221,3 +221,99 @@ export function squaredEuclideanDistance(
         (pointA.y - pointB.y) * (pointA.y - pointB.y)
     );
 }
+
+/**
+ * Get the center point of a window's frame rect
+ */
+export function getWindowCenter(window: Meta.Window): { x: number; y: number } {
+    const rect = window.get_frame_rect();
+    return {
+        x: rect.x + rect.width / 2,
+        y: rect.y + rect.height / 2,
+    };
+}
+
+/**
+ * Get the center point of a monitor
+ */
+export function getMonitorCenter(monitor: Monitor): { x: number; y: number } {
+    return {
+        x: monitor.x + monitor.width / 2,
+        y: monitor.y + monitor.height / 2,
+    };
+}
+
+/**
+ * Spatial comparison for sorting: left-to-right, then top-to-bottom within epsilon.
+ * Returns negative if a comes before b, positive if b comes before a, 0 if equal.
+ */
+export function spatialCompare(
+    centerA: { x: number; y: number },
+    centerB: { x: number; y: number },
+    epsilon: number = 50,
+): number {
+    const dx = centerA.x - centerB.x;
+    // If x coordinates are within epsilon, sort by y (top to bottom)
+    if (Math.abs(dx) <= epsilon) {
+        return centerA.y - centerB.y;
+    }
+    // Otherwise sort by x (left to right)
+    return dx;
+}
+
+/**
+ * Sort windows spatially: left-to-right, then top-to-bottom within epsilon
+ */
+export function sortWindowsSpatially(
+    windows: Meta.Window[],
+    epsilon: number = 50,
+): Meta.Window[] {
+    return [...windows].sort((a, b) => {
+        const centerA = getWindowCenter(a);
+        const centerB = getWindowCenter(b);
+        return spatialCompare(centerA, centerB, epsilon);
+    });
+}
+
+/**
+ * Sort monitors spatially: left-to-right, then top-to-bottom within epsilon
+ */
+export function sortMonitorsSpatially(
+    monitors: Monitor[],
+    epsilon: number = 50,
+): Monitor[] {
+    return [...monitors].sort((a, b) => {
+        const centerA = getMonitorCenter(a);
+        const centerB = getMonitorCenter(b);
+        return spatialCompare(centerA, centerB, epsilon);
+    });
+}
+
+/**
+ * Get all windows across all monitors, ordered spatially.
+ * Monitors are sorted spatially, then windows within each monitor are sorted spatially.
+ * Returns a flat list representing the global window order.
+ */
+export function getGlobalWindowList(
+    workspace: Meta.Workspace,
+    epsilon: number = 50,
+): Meta.Window[] {
+    const monitors = sortMonitorsSpatially(getMonitors(), epsilon);
+    const allWindows: Meta.Window[] = [];
+
+    for (const monitor of monitors) {
+        // Get windows on this monitor for the given workspace
+        const monitorWindows = filterUnfocusableWindows(
+            workspace.list_windows().filter(
+                (win) =>
+                    win.get_window_type() === Meta.WindowType.NORMAL &&
+                    win.get_monitor() === monitor.index,
+            ),
+        );
+        // Sort windows on this monitor spatially
+        const sortedWindows = sortWindowsSpatially(monitorWindows, epsilon);
+        allWindows.push(...sortedWindows);
+    }
+
+    return allWindows;
+}
