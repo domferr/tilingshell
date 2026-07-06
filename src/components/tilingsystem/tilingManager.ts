@@ -507,6 +507,7 @@ export class TilingManager {
                     this._easeWindowRectFromTile(
                         (win as ExtendedWindow).assignedTile!,
                         win,
+                        true,
                     );
                 });
         });
