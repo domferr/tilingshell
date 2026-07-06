@@ -487,11 +487,24 @@ export class TilingManager {
             `new work area for monitor ${this._monitor.index}: ${newWorkArea.x} ${newWorkArea.y} ${newWorkArea.width}x${newWorkArea.height}`,
         );
 
-        // notify the tiling layout that the workarea changed and trigger a new relayout
-        // so we will have the layout already computed to be shown quickly when needed
-        this._workspaceTilingLayout.forEach((tl) =>
-            tl.relayout({ containerRect: this._workArea }),
-        );
+        // notify the tiling layout that the workarea changed, trigger a new
+        // relayout, and resize each tiled window to match the new workarea
+        this._workspaceTilingLayout.forEach((tl, workspace) => {
+            tl.relayout({ containerRect: this._workArea });
+            workspace
+                .list_windows()
+                .filter((win) =>
+                    win.get_monitor() === this._monitor.index &&
+                        (win as ExtendedWindow).assignedTile !== undefined
+                )
+                .forEach((win) => {
+                    this._easeWindowRectFromTile(
+                        (win as ExtendedWindow).assignedTile!,
+                        win,
+                        true,
+                    );
+                });
+        });
         this._snapAssist.workArea = this._workArea;
         this._edgeTilingManager.workarea = this._workArea;
     }
