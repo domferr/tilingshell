@@ -617,6 +617,7 @@ export default class TilingShellExtension extends Extension {
 
         let bestWindow: Meta.Window | undefined;
         let bestWindowDistance = -1;
+        let bestWindowStackIndex = -1;
 
         const focusWindowRect = focus_window.get_frame_rect();
         const focusWindowCenter = {
@@ -629,8 +630,12 @@ export default class TilingShellExtension extends Extension {
         );
         const onlyTiledWindows = Settings.ENABLE_DIRECTIONAL_FOCUS_TILED_ONLY;
 
-        windowList
-            .filter((win) => {
+        const stackingOrder =
+            global.display.sort_windows_by_stacking(windowList);
+
+        stackingOrder
+            .map((win, winStackIndex) => ({ win, winStackIndex }))
+            .filter(({ win }) => {
                 if (win === focus_window || win.minimized) return false;
                 if (
                     onlyTiledWindows &&
@@ -651,7 +656,7 @@ export default class TilingShellExtension extends Extension {
                 }
                 return false;
             })
-            .forEach((win) => {
+            .forEach(({ win, winStackIndex }) => {
                 const winRect = win.get_frame_rect();
                 const winCenter = {
                     x: winRect.x + winRect.width / 2,
@@ -667,10 +672,11 @@ export default class TilingShellExtension extends Extension {
                     !bestWindow ||
                     euclideanDistance < bestWindowDistance ||
                     (euclideanDistance === bestWindowDistance &&
-                        bestWindow.get_frame_rect().y > winRect.y)
+                        winStackIndex > bestWindowStackIndex)
                 ) {
                     bestWindow = win;
                     bestWindowDistance = euclideanDistance;
+                    bestWindowStackIndex = winStackIndex;
                 }
             });
 
