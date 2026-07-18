@@ -182,7 +182,7 @@ export default class DefaultMenu implements CurrentMenu {
                 this._container,
             );
             const scalingFactor = getMonitorScalingFactor(
-                monitor?.index || Main.layoutManager.primaryIndex,
+                monitor?.index ?? Main.layoutManager.primaryIndex,
             );
             enableScalingFactorSupport(this._container, scalingFactor);
         }
@@ -248,7 +248,7 @@ export default class DefaultMenu implements CurrentMenu {
                 this._container,
             );
             const scalingFactor = getMonitorScalingFactor(
-                monitor?.index || Main.layoutManager.primaryIndex,
+                monitor?.index ?? Main.layoutManager.primaryIndex,
             );
             enableScalingFactorSupport(this._container, scalingFactor);
 
