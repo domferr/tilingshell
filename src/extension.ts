@@ -27,6 +27,7 @@ import {
     filterUnfocusableWindows,
     getMonitors,
     getWindows,
+    isFractionalScalingEnabled,
     squaredEuclideanDistance,
 } from './utils/ui';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -240,7 +241,7 @@ export default class TilingShellExtension extends Extension {
                 if (this._windowBorderManager)
                     this._windowBorderManager.destroy();
                 this._windowBorderManager = new WindowBorderManager(
-                    this._fractionalScalingEnabled,
+                    !this._fractionalScalingEnabled,
                 );
                 this._windowBorderManager.enable();
             },
@@ -751,15 +752,7 @@ export default class TilingShellExtension extends Extension {
     private _isFractionalScalingEnabled(
         _mutterSettings: Gio.Settings,
     ): boolean {
-        return (
-            _mutterSettings
-                .get_strv('experimental-features')
-                .find(
-                    (feat) =>
-                        feat === 'scale-monitor-framebuffer' ||
-                        feat === 'x11-randr-fractional-scaling',
-                ) !== undefined
-        );
+        return isFractionalScalingEnabled(_mutterSettings);
     }
 
     disable(): void {

@@ -149,7 +149,6 @@ export class TilingManager {
         this._snapAssist = new SnapAssist(
             Main.uiGroup,
             this._workArea,
-            this._monitor.index,
             monitorScalingFactor,
         );
     }
@@ -392,7 +391,7 @@ export class TilingManager {
                 64, // if the gaps are all 0 we choose 64 instead
                 tilingLayout.innerGaps.right,
                 tilingLayout.innerGaps.left,
-                tilingLayout.innerGaps.right,
+                tilingLayout.innerGaps.top,
                 tilingLayout.innerGaps.bottom,
             );
             destination = tilingLayout.findNearestTileDirection(
@@ -1335,8 +1334,8 @@ export class TilingManager {
         let bestTileIndex = 0;
         let bestDistance = Math.abs(
             0.5 -
-                vacantTiles[bestTileIndex].x +
-                vacantTiles[bestTileIndex].width / 2,
+                (vacantTiles[bestTileIndex].x +
+                    vacantTiles[bestTileIndex].width / 2),
         );
         for (let index = 1; index < vacantTiles.length; index++) {
             const distance = Math.abs(
