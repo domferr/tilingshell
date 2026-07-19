@@ -42,7 +42,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         if (params.enableScaling) {
             const monitor = Main.layoutManager.findMonitorForActor(this);
             const scalingFactor = getMonitorScalingFactor(
-                monitor?.index || Main.layoutManager.primaryIndex,
+                monitor?.index ?? Main.layoutManager.primaryIndex,
             );
             enableScalingFactorSupport(this, scalingFactor);
         }
@@ -60,7 +60,52 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
             styleClass: 'layouts-box-layout',
             xAlign: Clutter.ActorAlign.CENTER,
         });
-        this.contentLayout.add_child(this._layoutsBoxLayout);
+        // place the layouts inside a horizontal scroll view so the dialog
+        // fits the screen when there are many layouts or a low resolution
+        const scrollView = new St.ScrollView({
+            style_class: 'hfade',
+            hscrollbar_policy: St.PolicyType.AUTOMATIC,
+            vscrollbar_policy: St.PolicyType.NEVER,
+            x_expand: true,
+        });
+        // @ts-expect-error "add_actor is valid for GNOME <= 45"
+        if (scrollView.add_actor)
+            // @ts-expect-error "add_actor is valid for GNOME <= 45"
+            scrollView.add_actor(this._layoutsBoxLayout);
+        else scrollView.add_child(this._layoutsBoxLayout);
+        this.contentLayout.add_child(scrollView);
+
+        // St.ScrollView scrolls horizontally on LEFT/RIGHT scroll events only,
+        // so map mouse wheel scrolling to the horizontal axis
+        const hadjustment: St.Adjustment =
+            scrollView.hadjustment ??
+            // @ts-expect-error "get_hscroll_bar is valid for GNOME < 48"
+            scrollView.get_hscroll_bar().adjustment;
+        scrollView.connect(
+            'scroll-event',
+            (_: St.ScrollView, event: Clutter.Event) => {
+                let delta = 0;
+                switch (event.get_scroll_direction()) {
+                    case Clutter.ScrollDirection.UP:
+                    case Clutter.ScrollDirection.LEFT:
+                        delta = -1;
+                        break;
+                    case Clutter.ScrollDirection.DOWN:
+                    case Clutter.ScrollDirection.RIGHT:
+                        delta = 1;
+                        break;
+                    case Clutter.ScrollDirection.SMOOTH: {
+                        const [dx, dy] = event.get_scroll_delta();
+                        delta = dx !== 0 ? dx : dy;
+                        break;
+                    }
+                    default:
+                        return Clutter.EVENT_PROPAGATE;
+                }
+                hadjustment.adjust_for_scroll_event(delta);
+                return Clutter.EVENT_STOP;
+            },
+        );
 
         if (!params.legend) {
             this._drawLayouts({
