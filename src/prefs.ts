@@ -64,6 +64,17 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         Settings.initialize(this.getSettings());
         this.loadCssAndResources();
 
+        // by default the window is too small for its content, give it a
+        // larger default size, clamped to the monitor size for low resolutions
+        const monitor = Gdk.Display.get_default()
+            ?.get_monitors()
+            ?.get_item(0) as Gdk.Monitor | null;
+        const geometry = monitor?.get_geometry();
+        window.set_default_size(
+            Math.min(720, Math.round(0.9 * (geometry?.width ?? 720))),
+            Math.min(940, Math.round(0.9 * (geometry?.height ?? 940))),
+        );
+
         const prefsPage = new Adw.PreferencesPage({
             name: 'general',
             title: _('General'),
