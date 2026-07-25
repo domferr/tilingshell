@@ -931,7 +931,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                     _('Cancel'),
                     new Gtk.FileFilter({
                         suffixes: ['txt'],
-                        name: 'Text file',
+                        name: _('Text file'),
                     }),
                     (_source: Gtk.FileChooserNative, response_id: number) => {
                         try {
@@ -1266,7 +1266,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             ActivationKey.SUPER,
         ];
         activationKeys.forEach((k) => options.append(ActivationKey[k]));
-        options.append('(None)');
+        options.append(_('(None)'));
         const dropdown = new Gtk.DropDown({
             model: options,
             selected: initialValue,

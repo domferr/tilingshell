@@ -62,7 +62,7 @@ class LayoutsRow extends St.BoxLayout {
         });
         this._monitor = monitor;
         this._label = new St.Label({
-            text: `Monitor ${this._monitor.index + 1}`,
+            text: `${_('Monitor')} ${this._monitor.index + 1}`,
             styleClass: 'monitor-layouts-title',
         });
         this.add_child(this._label);

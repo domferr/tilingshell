@@ -20,15 +20,15 @@ msgstr ""
 
 #: dist/components/altTab/MultipleWindowsIcon.js:42
 msgid "Tiled windows"
-msgstr ""
+msgstr "Окна в тайлинге"
 
 #: dist/components/editor/editorDialog.js:36
 msgid "Select the layout to edit"
-msgstr ""
+msgstr "Выберите макет для редактирования"
 
 #: dist/components/editor/editorDialog.js:54
 msgid "Close"
-msgstr ""
+msgstr "Закрыть"
 
 #: dist/components/editor/editorDialog.js:81
 msgid "to split a tile"
@@ -48,23 +48,23 @@ msgstr "используйте кнопку-индикатор для сохра
 
 #: dist/components/editor/editorDialog.js:182
 msgid "How to use the editor"
-msgstr ""
+msgstr "Как пользоваться редактором"
 
 #: dist/components/editor/editorDialog.js:191
 msgid "Start editing"
-msgstr ""
+msgstr "Начать редактирование"
 
 #: dist/components/window_menu/overriddenWindowMenu.js:117
 msgid "Move to best tile"
-msgstr ""
+msgstr "Переместить в лучшую плитку"
 
 #: dist/components/window_menu/overriddenWindowMenu.js:137
 msgid "Move to leftmost tile"
-msgstr ""
+msgstr "Переместить в крайнюю левую плитку"
 
 #: dist/components/window_menu/overriddenWindowMenu.js:156
 msgid "Move to rightmost tile"
-msgstr ""
+msgstr "Переместить в крайнюю правую плитку"
 
 #: dist/indicator/defaultMenu.js:297
 msgid "Edit Layouts"
@@ -76,11 +76,11 @@ msgstr "Новый макет"
 
 #: dist/indicator/editingMenu.js:19
 msgid "Menu"
-msgstr ""
+msgstr "Меню"
 
 #: dist/indicator/editingMenu.js:26
 msgid "Info"
-msgstr ""
+msgstr "Информация"
 
 #: dist/indicator/editingMenu.js:33 dist/prefs.js:404 dist/prefs.js:793
 msgid "Save"
@@ -178,7 +178,7 @@ msgstr "Умный радиус границ"
 
 #: dist/prefs.js:133
 msgid "Dynamically adapt to the window's actual border radius"
-msgstr ""
+msgstr "Динамически подстраиваться под фактический радиус границ окна"
 
 #: dist/prefs.js:139
 msgid "Width"
@@ -239,7 +239,7 @@ msgstr "Переместите окно к верхнему краю экран�
 
 #: dist/prefs.js:201
 msgid "Sync layout when tiling with Snap Assistant"
-msgstr ""
+msgstr "Синхронизировать макет при тайлинге с Snap Assistant"
 
 #: dist/prefs.js:203
 msgid ""
@@ -316,7 +316,7 @@ msgstr ""
 
 #: dist/prefs.js:273
 msgid "Add tiled windows to ALT+TAB menu"
-msgstr ""
+msgstr "Добавить окна в тайлинге в меню ALT+TAB"
 
 #: dist/prefs.js:275
 msgid ""
@@ -326,7 +326,7 @@ msgstr ""
 
 #: dist/prefs.js:281
 msgid "Raise tiled windows together"
-msgstr ""
+msgstr "Поднимать окна в тайлинге вместе"
 
 #: dist/prefs.js:283
 msgid ""
@@ -364,11 +364,11 @@ msgstr "Область активации тайлинга на четверть
 
 #: dist/prefs.js:331
 msgid "Edge tiling offset"
-msgstr ""
+msgstr "Смещение тайлинга по краям"
 
 #: dist/prefs.js:332
 msgid "Offset from the screen edge to trigger edge tiling (in pixels)"
-msgstr ""
+msgstr "Смещение от края экрана для активации тайлинга по краям (в пикселях)"
 
 #: dist/prefs.js:354
 msgid "Windows suggestions"
@@ -401,11 +401,11 @@ msgstr ""
 
 #: dist/prefs.js:376
 msgid "Enable window suggestions for screen edge tiling"
-msgstr ""
+msgstr "Включить подсказки размещения окон для тайлинга по краям экрана"
 
 #: dist/prefs.js:378
 msgid "Suggests windows to occupy empty tiles when tiling to screen edges"
-msgstr ""
+msgstr "Предлагает окна для заполнения пустых плиток при тайлинге по краям экрана"
 
 #: dist/prefs.js:384
 msgid "Layouts"
@@ -605,11 +605,11 @@ msgstr "Свернуть все остальные окна и показать 
 
 #: dist/prefs.js:680
 msgid "Cycle layouts"
-msgstr ""
+msgstr "Переключать макеты"
 
 #: dist/prefs.js:681
 msgid "Cycle through available workspace layouts"
-msgstr ""
+msgstr "Переключаться между доступными макетами рабочего пространства"
 
 #: dist/prefs.js:711
 msgid "View and Customize all the Shortcuts"
@@ -630,11 +630,11 @@ msgstr ""
 
 #: dist/prefs.js:771
 msgid "Restrict directional focus to tiled windows"
-msgstr ""
+msgstr "Ограничить переключение фокуса окнами в тайлинге"
 
 #: dist/prefs.js:773
 msgid "When using directional focus navigation, only consider tiled windows"
-msgstr ""
+msgstr "При использовании навигации фокуса стрелками учитывать только окна в тайлинге"
 
 #: dist/prefs.js:778
 msgid "Import, export and reset"
@@ -702,39 +702,39 @@ msgstr "Открыть новую задачу на"
 
 #: dist/prefs.js:999
 msgid "Choose how windows snap to screen edges"
-msgstr ""
+msgstr "Выберите, как окна прилипают к границам экрана"
 
 #: dist/prefs.js:1014
 msgid "Default"
-msgstr ""
+msgstr "По умолчанию"
 
 #: dist/prefs.js:1015
 msgid "Follow quarters or screen halves"
-msgstr ""
+msgstr "Следовать четвертям или половинам экрана"
 
 #: dist/prefs.js:1020
 msgid "Adaptive"
-msgstr ""
+msgstr "Адаптивный"
 
 #: dist/prefs.js:1021
 msgid "Follow corners of selected layout or screen halves"
-msgstr ""
+msgstr "Следовать углам выбранного макета или половинам экрана"
 
 #: dist/prefs.js:1026
 msgid "Granular"
-msgstr ""
+msgstr "Зернистый"
 
 #: dist/prefs.js:1027
 msgid "Follow currently selected layout"
-msgstr ""
+msgstr "Следовать текущему выбранному макету"
 
 #: dist/prefs.js:1216
 msgid "Choose custom color"
-msgstr ""
+msgstr "Выбрать произвольный цвет"
 
 #: dist/prefs.js:1217
 msgid "Use system accent color"
-msgstr ""
+msgstr "Использовать системный цвет акцента"
 
 #: dist/prefs.js:1271 dist/prefs.js:1298
 msgid "New accelerator…"
@@ -743,3 +743,12 @@ msgstr "Новое сочетание клавиш…"
 #: dist/prefs.js:1301
 msgid "Use Backspace to clear"
 msgstr "Нажмите Backspace для очистки"
+
+#: src/indicator/defaultMenu.ts:65
+msgid "Monitor"
+msgstr "Монитор"
+
+#: src/prefs.ts:1269
+msgid "(None)"
+msgstr "(Нет)"
+
