@@ -337,19 +337,17 @@ export default class DefaultMenu implements CurrentMenu {
             const metaMonitor = metaMonitors[0];
             if (!metaMonitor.get_display_name) return;
 
-            // MetaLogicalMonitor has x, y as direct properties
-            const x = (logicalMonitor as any).x ?? 0;
-            const y = (logicalMonitor as any).y ?? 0;
-            // take width and height from the shell's monitor with the
-            // same index, since MetaLogicalMonitor does not expose them
+            // MetaLogicalMonitor exposes no geometry to GJS (only
+            // get_monitors() and get_number()), so take x, y, width and
+            // height from the shell's monitor with the same index
             const shellMonitor = shellMonitors.find(
                 (m) => m.index === logicalMonitor.get_number(),
             );
             monitorsDetails.push({
                 name: metaMonitor.get_display_name(),
                 index: logicalMonitor.get_number(),
-                x,
-                y,
+                x: shellMonitor?.x ?? 0,
+                y: shellMonitor?.y ?? 0,
                 width: shellMonitor?.width,
                 height: shellMonitor?.height,
             });
