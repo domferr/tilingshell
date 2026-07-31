@@ -508,6 +508,7 @@ export default class TilingShellExtension extends Extension {
         if (
             !focus_window ||
             !focus_window.has_focus() ||
+            focus_window.windowType !== Meta.WindowType.NORMAL ||
             (focus_window.get_wm_class() &&
                 focus_window.get_wm_class() === 'gjs') ||
             focus_window.is_fullscreen()
