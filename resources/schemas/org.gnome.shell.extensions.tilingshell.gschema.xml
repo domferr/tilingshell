@@ -107,6 +107,11 @@
             <summary>Enable auto tiling</summary>
             <description>Automatically tile a new window to the best tile according to the current layout.</description>
         </key>
+        <key name="enable-dynamic-tiling" type="b">
+            <default>false</default>
+            <summary>Enable dynamic tiling</summary>
+            <description>Windows always fill the screen, following the proportions of the selected layout. A single window is fullscreen; opening another splits the space; closing one gives it back.</description>
+        </key>
         <key name="raise-together" type="b">
             <default>false</default>
             <summary>Raise tiled windows together</summary>

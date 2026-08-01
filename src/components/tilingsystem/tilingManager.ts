@@ -21,6 +21,8 @@ import SignalHandling from '../../utils/signalHandling';
 import Layout from '../layout/Layout';
 import Tile from '../layout/Tile';
 import TileUtils from '../layout/TileUtils';
+import { buildLayoutTree } from '../layout/dynamic/layoutTree';
+import { reflow } from '../layout/dynamic/reflow';
 import GlobalState from '../../utils/globalState';
 import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
 import ExtendedWindow from './extendedWindow';
@@ -75,6 +77,8 @@ export class TilingManager {
     private _snapAssistingInfo: SnapAssistingInfo;
 
     private _movingWindowTimerId: number | null = null;
+    // Windows placed by dynamic tiling, in the order they claim slots.
+    private _dynamicWindows: Meta.Window[] = [];
 
     private readonly _signals: SignalHandling;
     private readonly _debug: (..._content: unknown[]) => void;
@@ -296,7 +300,9 @@ export class TilingManager {
             global.display,
             'window-created',
             (_display: Meta.Display, window: Meta.Window) => {
-                if (Settings.ENABLE_AUTO_TILING) this._autoTile(window, true);
+                if (Settings.ENABLE_DYNAMIC_TILING) this._dynamicAdd(window);
+                else if (Settings.ENABLE_AUTO_TILING)
+                    this._autoTile(window, true);
             },
         );
         this._signals.connect(
@@ -1256,6 +1262,102 @@ export class TilingManager {
             }),
             window,
         );
+    }
+
+    /** Windows that dynamic tiling is willing to place. */
+    private _isDynamicCandidate(window: Meta.Window): boolean {
+        return (
+            window !== null &&
+            window.windowType === Meta.WindowType.NORMAL &&
+            window.get_transient_for() === null &&
+            !window.is_attached_dialog() &&
+            !window.minimized &&
+            !window.maximizedHorizontally &&
+            !window.maximizedVertically
+        );
+    }
+
+    /**
+     * Gives a newly created window a slot and reflows everything else to make
+     * room for it. Closing is the mirror image: the window gives its slot back
+     * and the survivors reflow into the space.
+     */
+    private _dynamicAdd(window: Meta.Window) {
+        if (window.get_monitor() !== this._monitor.index) return;
+        if (!this._isDynamicCandidate(window)) return;
+        if (this._dynamicWindows.includes(window)) return;
+
+        this._dynamicWindows.push(window);
+
+        window.connect('unmanaged', () => {
+            const slot = this._dynamicWindows.indexOf(window);
+            if (slot < 0) return;
+            this._dynamicWindows.splice(slot, 1);
+            this._applyDynamicTiling();
+        });
+
+        const windowActor =
+            window.get_compositor_private() as Meta.WindowActor | null;
+        if (!windowActor) {
+            this._applyDynamicTiling();
+            return;
+        }
+
+        // wait for the window to be drawn, exactly as auto-tiling does, so it
+        // does not visibly jump from its default position
+        const id = windowActor.connect('first-frame', () => {
+            this._applyDynamicTiling();
+            windowActor.disconnect(id);
+        });
+    }
+
+    /**
+     * Recomputes every managed window's rectangle for the current window count
+     * and eases them all into place.
+     */
+    private _applyDynamicTiling() {
+        if (!Settings.ENABLE_DYNAMIC_TILING) return;
+
+        const ws = global.workspaceManager.get_active_workspace();
+        if (!ws) return;
+
+        const layout = GlobalState.get().getSelectedLayoutOfMonitor(
+            this._monitor.index,
+            ws.index(),
+        );
+        const tree = buildLayoutTree(
+            layout.tiles.map((t) => ({
+                x: t.x,
+                y: t.y,
+                width: t.width,
+                height: t.height,
+            })),
+        );
+        // a layout with no guillotine decomposition keeps the static behaviour
+        if (!tree) return;
+
+        const windows = this._dynamicWindows.filter(
+            (w) =>
+                this._isDynamicCandidate(w) &&
+                w.get_workspace() === ws &&
+                w.get_monitor() === this._monitor.index,
+        );
+        if (windows.length === 0) return;
+
+        const rects = reflow(tree, windows.length);
+        windows.forEach((window, index) => {
+            const rect = rects[index];
+            this._easeWindowRectFromTile(
+                new Tile({
+                    x: rect.x,
+                    y: rect.y,
+                    width: rect.width,
+                    height: rect.height,
+                    groups: [],
+                }),
+                window,
+            );
+        });
     }
 
     private _autoTile(window: Meta.Window, windowCreated: boolean) {
