@@ -48,6 +48,24 @@ test('more windows than tiles subdivides the largest tile', () => {
     ]);
 });
 
+test('overflow splits the focused tile rather than the largest', () => {
+    // slot 1 is the narrow right tile; focusing it should split it even though
+    // the left tile is roomier
+    assert.deepEqual(reflow(twoColumns(), 3, 1), [
+        { x: 0, y: 0, width: 0.67, height: 1 },
+        { x: 0.67, y: 0, width: 0.33, height: 0.5 },
+        { x: 0.67, y: 0.5, width: 0.33, height: 0.5 },
+    ]);
+});
+
+test('overflow falls back to the largest tile when nothing is focused', () => {
+    assert.deepEqual(reflow(twoColumns(), 3), [
+        { x: 0, y: 0, width: 0.67, height: 0.5 },
+        { x: 0, y: 0.5, width: 0.67, height: 0.5 },
+        { x: 0.67, y: 0, width: 0.33, height: 1 },
+    ]);
+});
+
 test('every window always gets exactly one rectangle', () => {
     for (let n = 1; n <= 8; n++)
         assert.equal(reflow(twoColumns(), n).length, n, `for ${n} windows`);

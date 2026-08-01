@@ -824,6 +824,11 @@ export class TilingManager {
         this._snapAssist.close(true);
         this._lastCursorPos = null;
 
+        // Dynamic tiling owns every drop of a window it manages: the window
+        // trades places with whatever occupies the slot under the pointer.
+        if (Settings.ENABLE_DYNAMIC_TILING && this._dynamicSwapOnDrop(window))
+            return;
+
         const isTilingSystemActivated = this._activationKeyStatus(
             global.get_pointer()[2],
             Settings.TILING_SYSTEM_ACTIVATION_KEY,
@@ -1287,6 +1292,11 @@ export class TilingManager {
         if (!this._isDynamicCandidate(window)) return;
         if (this._dynamicWindows.includes(window)) return;
 
+        // Whatever the user was looking at when this window appeared is the
+        // window whose space the newcomer should take half of, once the layout
+        // has run out of tiles.
+        const splitTarget = global.display.focus_window ?? undefined;
+
         this._dynamicWindows.push(window);
 
         window.connect('unmanaged', () => {
@@ -1299,33 +1309,25 @@ export class TilingManager {
         const windowActor =
             window.get_compositor_private() as Meta.WindowActor | null;
         if (!windowActor) {
-            this._applyDynamicTiling();
+            this._applyDynamicTiling(splitTarget);
             return;
         }
 
         // wait for the window to be drawn, exactly as auto-tiling does, so it
         // does not visibly jump from its default position
         const id = windowActor.connect('first-frame', () => {
-            this._applyDynamicTiling();
+            this._applyDynamicTiling(splitTarget);
             windowActor.disconnect(id);
         });
     }
 
-    /**
-     * Recomputes every managed window's rectangle for the current window count
-     * and eases them all into place.
-     */
-    private _applyDynamicTiling() {
-        if (!Settings.ENABLE_DYNAMIC_TILING) return;
-
-        const ws = global.workspaceManager.get_active_workspace();
-        if (!ws) return;
-
+    /** The split tree of the layout selected for a workspace, if it has one. */
+    private _dynamicTree(ws: Meta.Workspace) {
         const layout = GlobalState.get().getSelectedLayoutOfMonitor(
             this._monitor.index,
             ws.index(),
         );
-        const tree = buildLayoutTree(
+        return buildLayoutTree(
             layout.tiles.map((t) => ({
                 x: t.x,
                 y: t.y,
@@ -1333,31 +1335,102 @@ export class TilingManager {
                 height: t.height,
             })),
         );
-        // a layout with no guillotine decomposition keeps the static behaviour
-        if (!tree) return;
+    }
 
-        const windows = this._dynamicWindows.filter(
+    /** Managed windows currently on this monitor and workspace, in slot order. */
+    private _dynamicManagedWindows(ws: Meta.Workspace): Meta.Window[] {
+        return this._dynamicWindows.filter(
             (w) =>
                 this._isDynamicCandidate(w) &&
                 w.get_workspace() === ws &&
                 w.get_monitor() === this._monitor.index,
         );
+    }
+
+    private _tileOf(rect: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    }): Tile {
+        return new Tile({ ...rect, groups: [] });
+    }
+
+    /**
+     * Recomputes every managed window's rectangle for the current window count
+     * and eases them all into place.
+     */
+    private _applyDynamicTiling(splitTarget?: Meta.Window) {
+        if (!Settings.ENABLE_DYNAMIC_TILING) return;
+
+        const ws = global.workspaceManager.get_active_workspace();
+        if (!ws) return;
+
+        // a layout with no guillotine decomposition keeps the static behaviour
+        const tree = this._dynamicTree(ws);
+        if (!tree) return;
+
+        const windows = this._dynamicManagedWindows(ws);
         if (windows.length === 0) return;
 
-        const rects = reflow(tree, windows.length);
+        const focusedIndex = splitTarget
+            ? windows.indexOf(splitTarget)
+            : undefined;
+        const rects = reflow(
+            tree,
+            windows.length,
+            focusedIndex !== undefined && focusedIndex >= 0
+                ? focusedIndex
+                : undefined,
+        );
         windows.forEach((window, index) => {
-            const rect = rects[index];
-            this._easeWindowRectFromTile(
-                new Tile({
-                    x: rect.x,
-                    y: rect.y,
-                    width: rect.width,
-                    height: rect.height,
-                    groups: [],
-                }),
-                window,
-            );
+            this._easeWindowRectFromTile(this._tileOf(rects[index]), window);
         });
+    }
+
+    /**
+     * Drops a dragged window into whichever slot the pointer is over,
+     * exchanging places with the window already living there. Returns true
+     * when dynamic tiling has taken responsibility for the drop.
+     */
+    private _dynamicSwapOnDrop(window: Meta.Window): boolean {
+        const ws = global.workspaceManager.get_active_workspace();
+        if (!ws) return false;
+
+        const tree = this._dynamicTree(ws);
+        if (!tree) return false;
+
+        const windows = this._dynamicManagedWindows(ws);
+        const from = windows.indexOf(window);
+        if (from < 0) return false;
+
+        // nothing to exchange with, but the window still belongs in its slot
+        if (windows.length < 2) {
+            this._applyDynamicTiling();
+            return true;
+        }
+
+        const rects = reflow(tree, windows.length);
+        const [pointerX, pointerY] = global.get_pointer();
+        const to = rects.findIndex((rect) =>
+            isPointInsideRect(
+                { x: pointerX, y: pointerY },
+                TileUtils.apply_props(this._tileOf(rect), this._workArea),
+            ),
+        );
+
+        if (to >= 0 && to !== from) {
+            const a = this._dynamicWindows.indexOf(windows[from]);
+            const b = this._dynamicWindows.indexOf(windows[to]);
+            [this._dynamicWindows[a], this._dynamicWindows[b]] = [
+                this._dynamicWindows[b],
+                this._dynamicWindows[a],
+            ];
+        }
+
+        // dropped outside every slot, or back where it started: snap it home
+        this._applyDynamicTiling();
+        return true;
     }
 
     private _autoTile(window: Meta.Window, windowCreated: boolean) {

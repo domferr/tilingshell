@@ -28,12 +28,17 @@ export function boundsOf(tree: SplitTree): TileRect {
  * Returns one rectangle per window. With a single window the whole area is
  * used; the layout is only followed once there are enough windows to fill it.
  */
-export function reflow(tree: SplitTree, windowCount: number): TileRect[] {
+export function reflow(
+    tree: SplitTree,
+    windowCount: number,
+    focusedIndex?: number,
+): TileRect[] {
     if (windowCount <= 1) return [boundsOf(tree)];
 
     const leaves = leavesOf(tree);
     if (windowCount === leaves.length) return leaves;
-    if (windowCount > leaves.length) return subdivide(leaves, windowCount);
+    if (windowCount > leaves.length)
+        return subdivide(leaves, windowCount, focusedIndex);
 
     // Fewer windows than tiles: share them between the two subtrees in
     // proportion to how many tiles each holds, giving each at least one. A
@@ -57,13 +62,29 @@ export function reflow(tree: SplitTree, windowCount: number): TileRect[] {
  * always cut across its longer side, which keeps the pieces from growing into
  * slivers.
  */
-function subdivide(leaves: TileRect[], windowCount: number): TileRect[] {
+function subdivide(
+    leaves: TileRect[],
+    windowCount: number,
+    focusedIndex?: number,
+): TileRect[] {
     const rects = [...leaves];
+    // the first new window takes half of the focused window's space, the way
+    // a tiling WM splits whatever you are looking at
+    let target =
+        focusedIndex !== undefined &&
+        focusedIndex >= 0 &&
+        focusedIndex < rects.length
+            ? focusedIndex
+            : undefined;
 
     while (rects.length < windowCount) {
         let widest = 0;
         for (let i = 1; i < rects.length; i++) {
             if (areaOf(rects[i]) > areaOf(rects[widest])) widest = i;
+        }
+        if (target !== undefined) {
+            widest = target;
+            target = undefined;
         }
 
         const r = rects[widest];
