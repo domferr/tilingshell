@@ -19,7 +19,13 @@ export function pickLayoutIndex(
     const exact = tileCounts.indexOf(windowCount);
     if (exact >= 0) return exact;
 
-    const roomier = tileCounts.findIndex((count) => count > windowCount);
+    // Collapse as little as possible: the smallest tile count still large
+    // enough, and the leftmost layout having it.
+    let roomier = -1;
+    for (let i = 0; i < tileCounts.length; i++) {
+        if (tileCounts[i] <= windowCount) continue;
+        if (roomier < 0 || tileCounts[i] < tileCounts[roomier]) roomier = i;
+    }
     if (roomier >= 0) return roomier;
 
     let roomiest = 0;

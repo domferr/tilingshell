@@ -20,8 +20,21 @@ test('with no exact match the leftmost roomier layout is collapsed', () => {
     assert.equal(pickLayoutIndex(layouts, 3), 0);
 });
 
-test('a single window uses the leftmost layout, which reflow makes fullscreen', () => {
-    assert.equal(pickLayoutIndex(layouts, 1), 0);
+test('the least roomier layout is preferred, to collapse as little as possible', () => {
+    // two windows, no 2-tile layout: 3 collapses less than 8, whatever the
+    // order the layouts happen to sit in
+    assert.equal(pickLayoutIndex([8, 3, 5], 2), 1);
+    assert.equal(pickLayoutIndex([5, 8, 3], 2), 2);
+});
+
+test('within the chosen tile count the leftmost still wins', () => {
+    assert.equal(pickLayoutIndex([8, 3, 3], 2), 1);
+});
+
+test('a single window picks the least roomy layout, and reflow makes it fullscreen', () => {
+    // any layout collapses to fullscreen for one window, so this only decides
+    // which one does the collapsing: the 2-tile group, not the 4-tile one
+    assert.equal(pickLayoutIndex(layouts, 1), 1);
 });
 
 test('when nothing is big enough the roomiest layout is subdivided', () => {
