@@ -1333,12 +1333,8 @@ export class TilingManager {
         vacantTiles.sort((a, b) => a.x - b.x);
 
         let bestTileIndex = 0;
-        let bestDistance = Math.abs(
-            0.5 -
-                vacantTiles[bestTileIndex].x +
-                vacantTiles[bestTileIndex].width / 2,
-        );
-        for (let index = 1; index < vacantTiles.length; index++) {
+        let bestDistance = Number.MAX_VALUE;
+        for (let index = 0; index < vacantTiles.length; index++) {
             const distance = Math.abs(
                 0.5 - (vacantTiles[index].x + vacantTiles[index].width / 2),
             );
