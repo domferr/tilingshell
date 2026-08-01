@@ -23,6 +23,7 @@ import Tile from '../layout/Tile';
 import TileUtils from '../layout/TileUtils';
 import { buildLayoutTree } from '../layout/dynamic/layoutTree';
 import { reflow } from '../layout/dynamic/reflow';
+import { pickLayoutIndex } from '../layout/dynamic/pickLayout';
 import GlobalState from '../../utils/globalState';
 import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
 import ExtendedWindow from './extendedWindow';
@@ -1321,20 +1322,33 @@ export class TilingManager {
         });
     }
 
-    /** The split tree of the layout selected for a workspace, if it has one. */
-    private _dynamicTree(ws: Meta.Workspace) {
-        const layout = GlobalState.get().getSelectedLayoutOfMonitor(
-            this._monitor.index,
-            ws.index(),
+    /**
+     * The split tree dynamic tiling should follow for a given number of
+     * windows. Layout order is preference: a layout with exactly as many tiles
+     * as there are windows is used as drawn, otherwise the leftmost roomier
+     * one is collapsed to fit, otherwise the roomiest is subdivided. Layouts
+     * with no guillotine decomposition are not candidates at all.
+     */
+    private _dynamicTree(windowCount: number) {
+        const candidates = GlobalState.get()
+            .layouts.map((layout) => ({
+                tileCount: layout.tiles.length,
+                tree: buildLayoutTree(
+                    layout.tiles.map((t) => ({
+                        x: t.x,
+                        y: t.y,
+                        width: t.width,
+                        height: t.height,
+                    })),
+                ),
+            }))
+            .filter((candidate) => candidate.tree !== null);
+
+        const index = pickLayoutIndex(
+            candidates.map((candidate) => candidate.tileCount),
+            windowCount,
         );
-        return buildLayoutTree(
-            layout.tiles.map((t) => ({
-                x: t.x,
-                y: t.y,
-                width: t.width,
-                height: t.height,
-            })),
-        );
+        return index < 0 ? null : candidates[index].tree;
     }
 
     /** Managed windows currently on this monitor and workspace, in slot order. */
@@ -1366,12 +1380,12 @@ export class TilingManager {
         const ws = global.workspaceManager.get_active_workspace();
         if (!ws) return;
 
-        // a layout with no guillotine decomposition keeps the static behaviour
-        const tree = this._dynamicTree(ws);
-        if (!tree) return;
-
         const windows = this._dynamicManagedWindows(ws);
         if (windows.length === 0) return;
+
+        // no decomposable layout at all keeps the static behaviour
+        const tree = this._dynamicTree(windows.length);
+        if (!tree) return;
 
         const focusedIndex = splitTarget
             ? windows.indexOf(splitTarget)
@@ -1397,12 +1411,12 @@ export class TilingManager {
         const ws = global.workspaceManager.get_active_workspace();
         if (!ws) return false;
 
-        const tree = this._dynamicTree(ws);
-        if (!tree) return false;
-
         const windows = this._dynamicManagedWindows(ws);
         const from = windows.indexOf(window);
         if (from < 0) return false;
+
+        const tree = this._dynamicTree(windows.length);
+        if (!tree) return false;
 
         // nothing to exchange with, but the window still belongs in its slot
         if (windows.length < 2) {
