@@ -1,3 +1,29 @@
+> ### This is a modified fork of [Tiling Shell](https://github.com/domferr/tilingshell)
+>
+> **All of the work below, and the extension itself, is by [Domenico Ferraro (@domferr)](https://github.com/domferr).**
+> I did not write Tiling Shell. This fork only adds a dynamic tiling mode on top of
+> it, and everything else you see here is his.
+>
+> If you find this useful, the person to support is him:
+> [Ko-fi](https://ko-fi.com/domferr) · [Patreon](https://patreon.com/domferr).
+>
+> **Why a fork rather than a pull request?** Not because the feature was turned down.
+> On [issue #342](https://github.com/domferr/tilingshell/issues/342) domferr said he'd
+> been asked for dynamic tiling many times and that it seemed like something people
+> would enjoy. The repository is simply slow to review right now, and I wanted to run
+> the feature on my own machine. The design has been offered upstream and I'd be glad
+> to see it merged there instead, at which point this fork stops being necessary.
+>
+> **What is added here:** a dynamic tiling mode, off by default, in which windows always
+> fill the screen following the proportions of a layout drawn in Tiling Shell's own
+> editor — one window fullscreen, a second splits the space, closing one gives it back.
+> The layout used is chosen by how many windows are open. Bug fixes found along the way
+> are sent upstream separately ([#595](https://github.com/domferr/tilingshell/pull/595)).
+>
+> **Installing this replaces upstream Tiling Shell**, since it deliberately keeps the
+> same extension UUID rather than masquerading as a different extension. Licensed
+> GPLv3, exactly as the original.
+
 <img src="https://raw.githubusercontent.com/domferr/tilingshell/main/logo.png" align="right" width="76"/>
 
 [![release](https://img.shields.io/badge/Release_v16-blue?style=for-the-badge)]([https://ko-fi.com/domferr](https://github.com/domferr/tilingshell/releases))
