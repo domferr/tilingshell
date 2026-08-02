@@ -239,6 +239,28 @@ export class TilingManager {
             this._onSnapAssist.bind(this),
         );
 
+        // A minimized window gives up its slot to the windows behind it and
+        // reclaims it when restored, since it keeps its place in the slot
+        // list. Both need a reflow, deferred so the window's own minimized
+        // state has settled before it is read.
+        const reflowAfterMinimizeChange = () => {
+            if (!Settings.ENABLE_DYNAMIC_TILING) return;
+            GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => {
+                this._applyDynamicTiling();
+                return GLib.SOURCE_REMOVE;
+            });
+        };
+        this._signals.connect(
+            global.windowManager,
+            'minimize',
+            reflowAfterMinimizeChange,
+        );
+        this._signals.connect(
+            global.windowManager,
+            'unminimize',
+            reflowAfterMinimizeChange,
+        );
+
         this._signals.connect(
             global.workspaceManager,
             'active-workspace-changed',
