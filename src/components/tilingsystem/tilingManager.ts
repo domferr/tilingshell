@@ -24,7 +24,7 @@ import TileUtils from '../layout/TileUtils';
 import { buildLayoutTree } from '../layout/dynamic/layoutTree';
 import { assign, neighbourIndex } from '../layout/dynamic/reflow';
 import type { Direction } from '../layout/dynamic/reflow';
-import { pickLayoutIndex } from '../layout/dynamic/pickLayout';
+import { pickLayoutIndexAt } from '../layout/dynamic/pickLayout';
 import GlobalState from '../../utils/globalState';
 import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
 import ExtendedWindow from './extendedWindow';
@@ -97,6 +97,9 @@ export class TilingManager {
     // reflow time so it cannot be misapplied to an unrelated workspace.
     private _splitTarget: Meta.Window | null = null;
     private _dynamicReflowSourceId: number | null = null;
+    // How many layouts to step past the default pick, per workspace, within
+    // whichever tile-count group currently applies. Set by cycleDynamicLayout.
+    private _dynamicLayoutOffset: Map<Meta.Workspace, number> = new Map();
 
     private readonly _signals: SignalHandling;
     private readonly _debug: (..._content: unknown[]) => void;
@@ -336,6 +339,14 @@ export class TilingManager {
                 );
                 this._workspaceTilingLayout.clear();
                 this._workspaceTilingLayout = newMap;
+
+                // drop the cycle offset of whichever workspace was removed,
+                // rather than hold a reference to a dead one forever
+                const liveWorkspaces = new Set(newMap.keys());
+                [...this._dynamicLayoutOffset.keys()]
+                    .filter((ws) => !liveWorkspaces.has(ws))
+                    .forEach((ws) => this._dynamicLayoutOffset.delete(ws));
+
                 this._debug('deleted workspace');
             },
         );
@@ -537,6 +548,7 @@ export class TilingManager {
         );
         this._dynamicWindowSignals.clear();
         this._dynamicWindows.length = 0;
+        this._dynamicLayoutOffset.clear();
         this._splitTarget = null;
         this._signals.disconnect();
         this._isGrabbingWindow = false;
@@ -1359,7 +1371,7 @@ export class TilingManager {
         if (from < 0) return false; // not ours: let the static path have it
         if (windows.length < 2) return true;
 
-        const tree = this._dynamicTree(windows.length);
+        const tree = this._dynamicTree(windows.length, ws);
         if (!tree) return false;
 
         const splitSlot = this._splitTarget
@@ -1514,12 +1526,17 @@ export class TilingManager {
 
     /**
      * The split tree dynamic tiling should follow for a given number of
-     * windows. Layout order is preference: a layout with exactly as many tiles
-     * as there are windows is used as drawn, otherwise the leftmost roomier
-     * one is collapsed to fit, otherwise the roomiest is subdivided. Layouts
-     * with no guillotine decomposition are not candidates at all.
+     * windows on a given workspace. Layout order is preference: a layout with
+     * exactly as many tiles as there are windows is used as drawn, otherwise
+     * the leftmost roomier one is collapsed to fit, otherwise the roomiest is
+     * subdivided. Layouts with no guillotine decomposition are not candidates
+     * at all.
+     *
+     * That default pick can be stepped away from with cycleDynamicLayout,
+     * which moves within the group of layouts sharing the same tile count —
+     * the offset is per workspace and read here.
      */
-    private _dynamicTree(windowCount: number) {
+    private _dynamicTree(windowCount: number, ws: Meta.Workspace) {
         const candidates = GlobalState.get()
             .layouts.map((layout) => ({
                 tileCount: layout.tiles.length,
@@ -1534,11 +1551,32 @@ export class TilingManager {
             }))
             .filter((candidate) => candidate.tree !== null);
 
-        const index = pickLayoutIndex(
+        const index = pickLayoutIndexAt(
             candidates.map((candidate) => candidate.tileCount),
             windowCount,
+            this._dynamicLayoutOffset.get(ws) ?? 0,
         );
         return index < 0 ? null : candidates[index].tree;
+    }
+
+    /**
+     * Steps to the next (or, with a negative direction, previous) layout that
+     * shares the tile count currently in use on the active workspace, and
+     * reflows immediately. A group of one layout — nothing else the same
+     * size — is a harmless no-op.
+     */
+    public cycleDynamicLayout(direction: 1 | -1) {
+        if (!Settings.ENABLE_DYNAMIC_TILING) return;
+
+        const ws = global.workspaceManager.get_active_workspace();
+        if (!ws) return;
+        if (this._dynamicManagedWindows(ws).length === 0) return;
+
+        this._dynamicLayoutOffset.set(
+            ws,
+            (this._dynamicLayoutOffset.get(ws) ?? 0) + direction,
+        );
+        this._applyDynamicTiling();
     }
 
     /**
@@ -1601,7 +1639,7 @@ export class TilingManager {
             if (windows.length === 0) return;
 
             // no decomposable layout at all keeps the static behaviour
-            const tree = this._dynamicTree(windows.length);
+            const tree = this._dynamicTree(windows.length, ws);
             if (!tree) return;
 
             // the split target only applies to the workspace it is actually
@@ -1634,7 +1672,7 @@ export class TilingManager {
         const from = windows.indexOf(window);
         if (from < 0) return false;
 
-        const tree = this._dynamicTree(windows.length);
+        const tree = this._dynamicTree(windows.length, ws);
         if (!tree) return false;
 
         // nothing to exchange with, but the window still belongs in its slot

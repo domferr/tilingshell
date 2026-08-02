@@ -281,6 +281,17 @@ export default class TilingShellExtension extends Extension {
             );
             this._signals.connect(
                 this._keybindings,
+                'cycle-dynamic-layout',
+                (kb: KeyBindings, dp: Meta.Display, direction: number) => {
+                    const window = dp.focus_window;
+                    if (!window) return;
+                    const manager = this._tilingManagers[window.get_monitor()];
+                    if (manager)
+                        manager.cycleDynamicLayout(direction > 0 ? 1 : -1);
+                },
+            );
+            this._signals.connect(
+                this._keybindings,
                 'untile-window',
                 this._onKeyboardUntileWindow.bind(this),
             );

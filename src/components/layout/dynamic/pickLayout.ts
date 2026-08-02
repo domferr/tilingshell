@@ -35,3 +35,29 @@ export function pickLayoutIndex(
     }
     return roomiest;
 }
+
+/**
+ * Like `pickLayoutIndex`, but lets the caller step through every layout that
+ * shares the picked one's tile count — a manual "use a different layout of
+ * this size" override. `offset` is taken modulo the group size and may be
+ * negative, so cycling forward and backward from any starting point always
+ * lands on a member of the group. `offset` 0 always agrees with
+ * `pickLayoutIndex`.
+ */
+export function pickLayoutIndexAt(
+    tileCounts: number[],
+    windowCount: number,
+    offset: number,
+): number {
+    const picked = pickLayoutIndex(tileCounts, windowCount);
+    if (picked < 0) return -1;
+
+    const group = tileCounts
+        .map((count, index) => ({ count, index }))
+        .filter((entry) => entry.count === tileCounts[picked])
+        .map((entry) => entry.index);
+
+    const position = group.indexOf(picked);
+    const wrapped = ((offset % group.length) + group.length) % group.length;
+    return group[(position + wrapped) % group.length];
+}

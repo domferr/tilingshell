@@ -294,6 +294,14 @@
             <default><![CDATA[['']]]></default>
             <summary>Cycle backwards through available workspace layouts</summary>
         </key>
+        <key type="as" name="cycle-dynamic-layout">
+            <default><![CDATA[['<Super>semicolon']]]></default>
+            <summary>In dynamic tiling, use the next layout of the same size</summary>
+        </key>
+        <key type="as" name="cycle-dynamic-layout-backward">
+            <default><![CDATA[['<Shift><Super>semicolon']]]></default>
+            <summary>In dynamic tiling, use the previous layout of the same size</summary>
+        </key>
     </schema>
 
 </schemalist>
