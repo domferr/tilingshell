@@ -22,7 +22,7 @@ import Layout from '../layout/Layout';
 import Tile from '../layout/Tile';
 import TileUtils from '../layout/TileUtils';
 import { buildLayoutTree } from '../layout/dynamic/layoutTree';
-import { reflow } from '../layout/dynamic/reflow';
+import { reflow, slotOrder, leavesOf } from '../layout/dynamic/reflow';
 import { pickLayoutIndex } from '../layout/dynamic/pickLayout';
 import GlobalState from '../../utils/globalState';
 import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
@@ -1270,16 +1270,22 @@ export class TilingManager {
         );
     }
 
-    /** Windows that dynamic tiling is willing to place. */
+    /**
+     * Windows that dynamic tiling is willing to place.
+     *
+     * Being maximized is deliberately not disqualifying. Plenty of
+     * applications maximize themselves the moment they are mapped, and in a
+     * mode whose whole premise is that windows fill the screen according to a
+     * layout, refusing them would mean refusing almost everything. They are
+     * unmaximized on placement instead.
+     */
     private _isDynamicCandidate(window: Meta.Window): boolean {
         return (
             window !== null &&
             window.windowType === Meta.WindowType.NORMAL &&
             window.get_transient_for() === null &&
             !window.is_attached_dialog() &&
-            !window.minimized &&
-            !window.maximizedHorizontally &&
-            !window.maximizedVertically
+            !window.minimized
         );
     }
 
@@ -1289,8 +1295,21 @@ export class TilingManager {
      * and the survivors reflow into the space.
      */
     private _dynamicAdd(window: Meta.Window) {
-        if (window.get_monitor() !== this._monitor.index) return;
-        if (!this._isDynamicCandidate(window)) return;
+        this._debug(
+            `[dyn] created "${window.get_title()}" monitor=${window.get_monitor()} ` +
+                `(mine=${this._monitor.index}) type=${window.windowType} ` +
+                `transient=${window.get_transient_for() !== null} ` +
+                `dialog=${window.is_attached_dialog()} min=${window.minimized} ` +
+                `maxH=${window.maximizedHorizontally} maxV=${window.maximizedVertically}`,
+        );
+        if (window.get_monitor() !== this._monitor.index) {
+            this._debug('[dyn] skipped: other monitor');
+            return;
+        }
+        if (!this._isDynamicCandidate(window)) {
+            this._debug('[dyn] skipped: not a candidate');
+            return;
+        }
         if (this._dynamicWindows.includes(window)) return;
 
         // Whatever the user was looking at when this window appeared is the
@@ -1381,24 +1400,49 @@ export class TilingManager {
         if (!ws) return;
 
         const windows = this._dynamicManagedWindows(ws);
+        this._debug(
+            `[dyn] apply: tracked=${this._dynamicWindows.length} eligible=${windows.length} ` +
+                `[${this._dynamicWindows
+                    .map(
+                        (w) =>
+                            `"${w.get_title()}" cand=${this._isDynamicCandidate(w)} ` +
+                            `ws=${w.get_workspace() === ws} mon=${w.get_monitor()}`,
+                    )
+                    .join(' | ')}]`,
+        );
         if (windows.length === 0) return;
 
         // no decomposable layout at all keeps the static behaviour
         const tree = this._dynamicTree(windows.length);
-        if (!tree) return;
+        if (!tree) {
+            this._debug('[dyn] no decomposable layout, leaving static');
+            return;
+        }
 
-        const focusedIndex = splitTarget
-            ? windows.indexOf(splitTarget)
-            : undefined;
-        const rects = reflow(
-            tree,
-            windows.length,
-            focusedIndex !== undefined && focusedIndex >= 0
-                ? focusedIndex
-                : undefined,
-        );
-        windows.forEach((window, index) => {
-            this._easeWindowRectFromTile(this._tileOf(rects[index]), window);
+        // Slots run oldest window first and claim the roomiest region first,
+        // so the window opened first keeps the most space whichever side of
+        // the layout it is drawn on. A focused slot has to be translated into
+        // the tile it currently occupies before overflow can split it.
+        const focusedSlot = splitTarget ? windows.indexOf(splitTarget) : -1;
+        const leafOrder = slotOrder(leavesOf(tree));
+        const focusedTile =
+            focusedSlot >= 0 && focusedSlot < leafOrder.length
+                ? leafOrder[focusedSlot]
+                : undefined;
+
+        const rects = reflow(tree, windows.length, focusedTile);
+        const order = slotOrder(rects);
+
+        windows.forEach((window, slot) => {
+            // a maximized window cannot be moved into a tile, and many
+            // applications maximize themselves as they open
+            if (window.maximizedHorizontally || window.maximizedVertically)
+                unmaximizeWindow(window);
+
+            this._easeWindowRectFromTile(
+                this._tileOf(rects[order[slot]]),
+                window,
+            );
         });
     }
 
@@ -1425,13 +1469,16 @@ export class TilingManager {
         }
 
         const rects = reflow(tree, windows.length);
+        const order = slotOrder(rects);
         const [pointerX, pointerY] = global.get_pointer();
-        const to = rects.findIndex((rect) =>
+        const droppedOn = rects.findIndex((rect) =>
             isPointInsideRect(
                 { x: pointerX, y: pointerY },
                 TileUtils.apply_props(this._tileOf(rect), this._workArea),
             ),
         );
+        // the hit test yields a rectangle; slots are ordered by area
+        const to = droppedOn < 0 ? -1 : order.indexOf(droppedOn);
 
         if (to >= 0 && to !== from) {
             const a = this._dynamicWindows.indexOf(windows[from]);

@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildLayoutTree } from './layoutTree.ts';
 import type { TileRect } from './layoutTree.ts';
-import { reflow } from './reflow.ts';
+import { reflow, slotOrder } from './reflow.ts';
 
 const twoColumns = () =>
     buildLayoutTree([
@@ -125,4 +125,51 @@ test('the rectangles always tile the whole area with no gaps or overlaps', () =>
             }
         }
     }
+});
+
+test('slots are ordered by area so the first window gets the biggest region', () => {
+    // 67/33 drawn big-first: order is unchanged
+    assert.deepEqual(
+        slotOrder([
+            { x: 0, y: 0, width: 0.67, height: 1 },
+            { x: 0.67, y: 0, width: 0.33, height: 1 },
+        ]),
+        [0, 1],
+    );
+
+    // 33/67 drawn small-first: the big one is promoted
+    assert.deepEqual(
+        slotOrder([
+            { x: 0, y: 0, width: 0.33, height: 1 },
+            { x: 0.33, y: 0, width: 0.67, height: 1 },
+        ]),
+        [1, 0],
+    );
+});
+
+test('equal areas keep a stable top-then-left order', () => {
+    assert.deepEqual(
+        slotOrder([
+            { x: 0.5, y: 0.5, width: 0.5, height: 0.5 },
+            { x: 0, y: 0, width: 0.5, height: 0.5 },
+            { x: 0.5, y: 0, width: 0.5, height: 0.5 },
+            { x: 0, y: 0.5, width: 0.5, height: 0.5 },
+        ]),
+        [1, 2, 3, 0],
+    );
+});
+
+test("Layout 2 at four windows gives the oldest window a widest column", () => {
+    const rects = reflow(
+        buildLayoutTree([
+            { x: 0, y: 0, width: 0.26, height: 0.5 },
+            { x: 0.26, y: 0, width: 0.37, height: 1 },
+            { x: 0.63, y: 0, width: 0.37, height: 1 },
+            { x: 0, y: 0.5, width: 0.26, height: 0.5 },
+        ])!,
+        4,
+    );
+    const first = rects[slotOrder(rects)[0]];
+    assert.equal(first.width, 0.37);
+    assert.equal(first.height, 1);
 });

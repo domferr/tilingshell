@@ -107,6 +107,26 @@ function subdivide(
 
 const areaOf = (r: TileRect) => r.width * r.height;
 
+/**
+ * The order in which windows should claim rectangles: roomiest first, so the
+ * window opened first — the one the user came for — gets the most space, on
+ * whichever side of the layout it happens to be drawn. Equal areas keep a
+ * stable top-then-left order.
+ *
+ * Returns indices into `rects`, not rectangles.
+ */
+export function slotOrder(rects: TileRect[]): number[] {
+    return rects
+        .map((_, index) => index)
+        .sort((a, b) => {
+            const byArea = areaOf(rects[b]) - areaOf(rects[a]);
+            if (Math.abs(byArea) > 1e-9) return byArea;
+            if (Math.abs(rects[a].y - rects[b].y) > 1e-9)
+                return rects[a].y - rects[b].y;
+            return rects[a].x - rects[b].x;
+        });
+}
+
 /** The tiles of a subtree, left-to-right then top-to-bottom. */
 export function leavesOf(tree: SplitTree): TileRect[] {
     if (tree.kind === 'leaf') return [tree.tile];
