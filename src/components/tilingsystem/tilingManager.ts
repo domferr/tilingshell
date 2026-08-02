@@ -1317,21 +1317,8 @@ export class TilingManager {
      * and the survivors reflow into the space.
      */
     private _dynamicAdd(window: Meta.Window) {
-        this._debug(
-            `[dyn] created "${window.get_title()}" monitor=${window.get_monitor()} ` +
-                `(mine=${this._monitor.index}) type=${window.windowType} ` +
-                `transient=${window.get_transient_for() !== null} ` +
-                `dialog=${window.is_attached_dialog()} min=${window.minimized} ` +
-                `maxH=${window.maximizedHorizontally} maxV=${window.maximizedVertically}`,
-        );
-        if (window.get_monitor() !== this._monitor.index) {
-            this._debug('[dyn] skipped: other monitor');
-            return;
-        }
-        if (!this._isDynamicCandidate(window)) {
-            this._debug('[dyn] skipped: not a candidate');
-            return;
-        }
+        if (window.get_monitor() !== this._monitor.index) return;
+        if (!this._isDynamicCandidate(window)) return;
         if (this._dynamicWindows.includes(window)) return;
 
         // Whatever the user was looking at when this window appeared is the
@@ -1422,24 +1409,11 @@ export class TilingManager {
         if (!ws) return;
 
         const windows = this._dynamicManagedWindows(ws);
-        this._debug(
-            `[dyn] apply: tracked=${this._dynamicWindows.length} eligible=${windows.length} ` +
-                `[${this._dynamicWindows
-                    .map(
-                        (w) =>
-                            `"${w.get_title()}" cand=${this._isDynamicCandidate(w)} ` +
-                            `ws=${w.get_workspace() === ws} mon=${w.get_monitor()}`,
-                    )
-                    .join(' | ')}]`,
-        );
         if (windows.length === 0) return;
 
         // no decomposable layout at all keeps the static behaviour
         const tree = this._dynamicTree(windows.length);
-        if (!tree) {
-            this._debug('[dyn] no decomposable layout, leaving static');
-            return;
-        }
+        if (!tree) return;
 
         // Slots run oldest window first and claim the roomiest region first,
         // so the window opened first keeps the most space whichever side of
