@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildLayoutTree } from './layoutTree.ts';
 import type { TileRect } from './layoutTree.ts';
-import { reflow, slotOrder } from './reflow.ts';
+import { reflow, slotOrder, neighbourIndex } from './reflow.ts';
 
 const twoColumns = () =>
     buildLayoutTree([
@@ -172,4 +172,48 @@ test("Layout 2 at four windows gives the oldest window a widest column", () => {
     const first = rects[slotOrder(rects)[0]];
     assert.equal(first.width, 0.37);
     assert.equal(first.height, 1);
+});
+
+test('the neighbour in a direction is the nearest region that overlaps across it', () => {
+    // 67/33 side by side
+    const cols = reflow(twoColumns(), 2);
+    assert.equal(neighbourIndex(cols, 0, 'right'), 1);
+    assert.equal(neighbourIndex(cols, 1, 'left'), 0);
+    assert.equal(neighbourIndex(cols, 0, 'up'), -1, 'nothing above');
+    assert.equal(neighbourIndex(cols, 0, 'down'), -1, 'nothing below');
+});
+
+test('a neighbour must actually share the crossing edge', () => {
+    // left column split in two, one tall column on the right:
+    //   0: top-left    1: bottom-left    2: right
+    const rects = reflow(
+        buildLayoutTree([
+            { x: 0, y: 0, width: 0.5, height: 0.5 },
+            { x: 0, y: 0.5, width: 0.5, height: 0.5 },
+            { x: 0.5, y: 0, width: 0.5, height: 1 },
+        ])!,
+        3,
+    );
+    const top = rects.findIndex((r) => r.y === 0 && r.x === 0);
+    const bottom = rects.findIndex((r) => r.y === 0.5);
+    const right = rects.findIndex((r) => r.x === 0.5);
+
+    assert.equal(neighbourIndex(rects, top, 'down'), bottom);
+    assert.equal(neighbourIndex(rects, bottom, 'up'), top);
+    assert.equal(neighbourIndex(rects, top, 'right'), right);
+    assert.equal(neighbourIndex(rects, right, 'left'), top, 'ties go to the topmost');
+});
+
+test('the nearest neighbour wins when several lie in the same direction', () => {
+    const three = reflow(
+        buildLayoutTree([
+            { x: 0, y: 0, width: 0.25, height: 1 },
+            { x: 0.25, y: 0, width: 0.5, height: 1 },
+            { x: 0.75, y: 0, width: 0.25, height: 1 },
+        ])!,
+        3,
+    );
+    const left = three.findIndex((r) => r.x === 0);
+    const mid = three.findIndex((r) => r.x === 0.25);
+    assert.equal(neighbourIndex(three, left, 'right'), mid, 'not the far right one');
 });

@@ -107,6 +107,70 @@ function subdivide(
 
 const areaOf = (r: TileRect) => r.width * r.height;
 
+export type Direction = 'left' | 'right' | 'up' | 'down';
+
+/**
+ * The region adjacent to `from` in a direction, or -1 if the edge of the screen
+ * lies that way.
+ *
+ * A candidate must lie wholly on the far side of the starting region and must
+ * overlap it across the perpendicular axis, so that the two genuinely share the
+ * edge being crossed rather than merely sitting somewhere off to that side. The
+ * nearest such region wins; ties go to the one nearest the top-left, matching
+ * how slots are ordered elsewhere.
+ */
+export function neighbourIndex(
+    rects: TileRect[],
+    from: number,
+    direction: Direction,
+): number {
+    const start = rects[from];
+    if (!start) return -1;
+
+    const horizontal = direction === 'left' || direction === 'right';
+
+    // near/far edges along the axis being crossed
+    const startNear = horizontal ? start.x : start.y;
+    const startFar = startNear + (horizontal ? start.width : start.height);
+
+    let best = -1;
+    let bestGap = Number.MAX_VALUE;
+
+    rects.forEach((rect, index) => {
+        if (index === from) return;
+
+        const near = horizontal ? rect.x : rect.y;
+        const far = near + (horizontal ? rect.width : rect.height);
+
+        const gap =
+            direction === 'right' || direction === 'down'
+                ? near - startFar
+                : startNear - far;
+        if (gap < -1e-9) return; // overlaps or lies behind us
+
+        // must share the edge we are crossing
+        const aNear = horizontal ? start.y : start.x;
+        const aFar = aNear + (horizontal ? start.height : start.width);
+        const bNear = horizontal ? rect.y : rect.x;
+        const bFar = bNear + (horizontal ? rect.height : rect.width);
+        if (Math.min(aFar, bFar) - Math.max(aNear, bNear) <= 1e-9) return;
+
+        if (gap < bestGap - 1e-9) {
+            best = index;
+            bestGap = gap;
+        } else if (Math.abs(gap - bestGap) <= 1e-9 && best >= 0) {
+            const current = rects[best];
+            if (
+                rect.y < current.y - 1e-9 ||
+                (Math.abs(rect.y - current.y) <= 1e-9 && rect.x < current.x)
+            )
+                best = index;
+        }
+    });
+
+    return best;
+}
+
 /**
  * The order in which windows should claim rectangles: roomiest first, so the
  * window opened first — the one the user came for — gets the most space, on

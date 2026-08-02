@@ -22,7 +22,13 @@ import Layout from '../layout/Layout';
 import Tile from '../layout/Tile';
 import TileUtils from '../layout/TileUtils';
 import { buildLayoutTree } from '../layout/dynamic/layoutTree';
-import { reflow, slotOrder, leavesOf } from '../layout/dynamic/reflow';
+import {
+    reflow,
+    slotOrder,
+    leavesOf,
+    neighbourIndex,
+} from '../layout/dynamic/reflow';
+import type { Direction } from '../layout/dynamic/reflow';
 import { pickLayoutIndex } from '../layout/dynamic/pickLayout';
 import GlobalState from '../../utils/globalState';
 import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
@@ -35,6 +41,13 @@ import TilingLayoutWithSuggestions from '../windowsSuggestions/tilingLayoutWithS
 import { maximizeWindow, unmaximizeWindow } from '../../utils/gnomesupport';
 
 const MINIMUM_DISTANCE_TO_RESTORE_ORIGINAL_SIZE = 90;
+
+const DYNAMIC_DIRECTION: Partial<Record<KeyBindingsDirection, Direction>> = {
+    [KeyBindingsDirection.LEFT]: 'left',
+    [KeyBindingsDirection.RIGHT]: 'right',
+    [KeyBindingsDirection.UP]: 'up',
+    [KeyBindingsDirection.DOWN]: 'down',
+};
 
 class SnapAssistingInfo {
     private _snapAssistantLayoutId: string | undefined;
@@ -362,6 +375,13 @@ export class TilingManager {
         spanFlag: boolean,
         clamp: boolean,
     ): boolean {
+        // Dynamic tiling owns the arrow keys for windows it manages. Falling
+        // through would move the window into a tile of the static layout,
+        // which the next reflow would immediately undo.
+        if (Settings.ENABLE_DYNAMIC_TILING && !spanFlag) {
+            if (this._dynamicMoveByKeyboard(window, direction)) return true;
+        }
+
         let destination: { rect: Mtk.Rectangle; tile: Tile } | undefined;
         const isMaximized =
             window.maximizedHorizontally || window.maximizedVertically;
@@ -1301,6 +1321,47 @@ export class TilingManager {
      * layout, refusing them would mean refusing almost everything. They are
      * unmaximized on placement instead.
      */
+    /**
+     * Swaps the focused window with the region beside it. Returns true when
+     * dynamic tiling has taken responsibility for the keypress, including when
+     * there is nothing in that direction — reaching the edge of the screen
+     * should do nothing, rather than fall through to the static layout.
+     */
+    private _dynamicMoveByKeyboard(
+        window: Meta.Window,
+        direction: KeyBindingsDirection,
+    ): boolean {
+        const towards = DYNAMIC_DIRECTION[direction];
+        if (!towards) return false;
+
+        const ws = global.workspaceManager.get_active_workspace();
+        if (!ws) return false;
+
+        const windows = this._dynamicManagedWindows(ws);
+        const from = windows.indexOf(window);
+        if (from < 0) return false; // not ours: let the static path have it
+        if (windows.length < 2) return true;
+
+        const tree = this._dynamicTree(windows.length);
+        if (!tree) return false;
+
+        const rects = reflow(tree, windows.length);
+        const order = slotOrder(rects);
+        const neighbour = neighbourIndex(rects, order[from], towards);
+        if (neighbour < 0) return true; // at the edge of the screen
+
+        const to = order.indexOf(neighbour);
+        const a = this._dynamicWindows.indexOf(windows[from]);
+        const b = this._dynamicWindows.indexOf(windows[to]);
+        [this._dynamicWindows[a], this._dynamicWindows[b]] = [
+            this._dynamicWindows[b],
+            this._dynamicWindows[a],
+        ];
+
+        this._applyDynamicTiling();
+        return true;
+    }
+
     private _isDynamicCandidate(window: Meta.Window): boolean {
         return (
             window !== null &&
