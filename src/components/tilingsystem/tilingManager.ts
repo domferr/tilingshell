@@ -24,7 +24,7 @@ import TileUtils from '../layout/TileUtils';
 import { buildLayoutTree } from '../layout/dynamic/layoutTree';
 import { assign, neighbourIndex } from '../layout/dynamic/reflow';
 import type { Direction } from '../layout/dynamic/reflow';
-import { pickLayoutIndexAt } from '../layout/dynamic/pickLayout';
+import { pickLayoutIndex, pickLayoutIndexAt } from '../layout/dynamic/pickLayout';
 import GlobalState from '../../utils/globalState';
 import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
 import ExtendedWindow from './extendedWindow';
@@ -97,9 +97,15 @@ export class TilingManager {
     // reflow time so it cannot be misapplied to an unrelated workspace.
     private _splitTarget: Meta.Window | null = null;
     private _dynamicReflowSourceId: number | null = null;
-    // How many layouts to step past the default pick, per workspace, within
-    // whichever tile-count group currently applies. Set by cycleDynamicLayout.
-    private _dynamicLayoutOffset: Map<Meta.Workspace, number> = new Map();
+    // How many layouts to step past the default pick, per workspace and per
+    // tile-count group (outer key: workspace, inner key: the tile count of
+    // the group's default pick), so an offset set while N windows are open
+    // cannot leak into the group that applies once the window count changes.
+    // Set by cycleDynamicLayout.
+    private _dynamicLayoutOffset: Map<
+        Meta.Workspace,
+        Map<number, number>
+    > = new Map();
 
     private readonly _signals: SignalHandling;
     private readonly _debug: (..._content: unknown[]) => void;
@@ -212,6 +218,7 @@ export class TilingManager {
                     ws.index(),
                 );
                 this._workspaceTilingLayout.get(ws)?.relayout({ layout });
+                this._queueDynamicReflow();
             },
         );
 
@@ -576,6 +583,7 @@ export class TilingManager {
         );
         this._snapAssist.workArea = this._workArea;
         this._edgeTilingManager.workarea = this._workArea;
+        this._queueDynamicReflow();
     }
 
     private _onWindowGrabBegin(window: Meta.Window, grabOp: number) {
@@ -1534,10 +1542,36 @@ export class TilingManager {
      *
      * That default pick can be stepped away from with cycleDynamicLayout,
      * which moves within the group of layouts sharing the same tile count —
-     * the offset is per workspace and read here.
+     * the offset is per workspace and per tile-count group, and read here.
      */
     private _dynamicTree(windowCount: number, ws: Meta.Workspace) {
-        const candidates = GlobalState.get()
+        const candidates = this._dynamicLayoutCandidates();
+        const tileCounts = candidates.map((candidate) => candidate.tileCount);
+
+        // The offset only ever applies within the tile-count group of the
+        // *default* (offset-0) pick for this window count, so find that
+        // group before looking the offset up — otherwise an offset set while
+        // a different window count was current would be misapplied here.
+        const defaultIndex = pickLayoutIndex(tileCounts, windowCount);
+        const offset =
+            defaultIndex < 0
+                ? 0
+                : (this._dynamicLayoutOffset
+                      .get(ws)
+                      ?.get(tileCounts[defaultIndex]) ?? 0);
+
+        const index = pickLayoutIndexAt(tileCounts, windowCount, offset);
+        return index < 0 ? null : candidates[index].tree;
+    }
+
+    /**
+     * Every layout with a valid guillotine decomposition, paired with its
+     * tile count, in the user's preferred order. Shared by `_dynamicTree`
+     * and `cycleDynamicLayout` so both agree on what the tile-count groups
+     * are.
+     */
+    private _dynamicLayoutCandidates() {
+        return GlobalState.get()
             .layouts.map((layout) => ({
                 tileCount: layout.tiles.length,
                 tree: buildLayoutTree(
@@ -1550,13 +1584,6 @@ export class TilingManager {
                 ),
             }))
             .filter((candidate) => candidate.tree !== null);
-
-        const index = pickLayoutIndexAt(
-            candidates.map((candidate) => candidate.tileCount),
-            windowCount,
-            this._dynamicLayoutOffset.get(ws) ?? 0,
-        );
-        return index < 0 ? null : candidates[index].tree;
     }
 
     /**
@@ -1570,12 +1597,26 @@ export class TilingManager {
 
         const ws = global.workspaceManager.get_active_workspace();
         if (!ws) return;
-        if (this._dynamicManagedWindows(ws).length === 0) return;
+        const windowCount = this._dynamicManagedWindows(ws).length;
+        if (windowCount === 0) return;
 
-        this._dynamicLayoutOffset.set(
-            ws,
-            (this._dynamicLayoutOffset.get(ws) ?? 0) + direction,
+        // The offset being stepped belongs to whichever tile-count group the
+        // default (offset-0) pick falls into for the window count currently
+        // on this workspace, not to the workspace as a whole.
+        const tileCounts = this._dynamicLayoutCandidates().map(
+            (candidate) => candidate.tileCount,
         );
+        const defaultIndex = pickLayoutIndex(tileCounts, windowCount);
+        if (defaultIndex < 0) return;
+        const tileCount = tileCounts[defaultIndex];
+
+        const groupOffsets = this._dynamicLayoutOffset.get(ws) ?? new Map();
+        groupOffsets.set(
+            tileCount,
+            (groupOffsets.get(tileCount) ?? 0) + direction,
+        );
+        this._dynamicLayoutOffset.set(ws, groupOffsets);
+
         this._applyDynamicTiling();
     }
 
