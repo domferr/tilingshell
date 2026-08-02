@@ -24,6 +24,63 @@
 > same extension UUID rather than masquerading as a different extension. Licensed
 > GPLv3, exactly as the original.
 
+## ⚠️ Read this before installing
+
+This fork keeps Tiling Shell's extension UUID, `tilingshell@ferrarodomenico.com`. That
+has one consequence you need to know about:
+
+**You will stop receiving Tiling Shell updates.** The extension reports version `99`,
+while the version published on extensions.gnome.org is `76`. Because 99 is the higher
+number, GNOME will never offer you an update — you will silently stay on this fork,
+believing you are up to date, until you go back manually. New releases and bug fixes
+from domferr will not reach you.
+
+That version number is inherited from upstream's development branch, not something
+invented here, but the effect on you is the same either way.
+
+You also cannot run this and upstream Tiling Shell side by side. Same UUID, one wins.
+
+### Installing
+
+Download the zip for your GNOME version from the
+[Releases](https://github.com/J4KE-B/tilingshell/releases) page, then:
+
+```sh
+gnome-extensions install --force tilingshell@ferrarodomenico.com.zip
+# log out and log back in — GNOME caches extension code and will not
+# pick up the new version any other way
+gnome-extensions enable tilingshell@ferrarodomenico.com
+```
+
+Dynamic tiling is **off** by default. Turn it on from the switch at the top of the
+Tiling Shell menu in the top bar. With it off, this behaves like ordinary Tiling Shell.
+
+### Going back to the real Tiling Shell
+
+```sh
+gnome-extensions uninstall tilingshell@ferrarodomenico.com
+```
+
+Then reinstall from
+[extensions.gnome.org](https://extensions.gnome.org/extension/7065/tiling-shell/), or
+through the Extension Manager app, and log out and back in.
+
+Your layouts and settings live in dconf, not in the extension, so they survive the
+round trip and upstream will pick them straight up. The one setting it will not know
+about is `enable-dynamic-tiling`, which it simply ignores. To wipe everything and start
+from stock defaults instead:
+
+```sh
+dconf reset -f /org/gnome/shell/extensions/tilingshell/
+```
+
+### If something breaks
+
+File it [here](https://github.com/J4KE-B/tilingshell/issues), not on domferr's tracker.
+The dynamic tiling code is mine and he should not be answering for it. If you can still
+reproduce the problem with dynamic tiling switched **off**, then it probably is an
+upstream issue and belongs [there](https://github.com/domferr/tilingshell/issues).
+
 <img src="https://raw.githubusercontent.com/domferr/tilingshell/main/logo.png" align="right" width="76"/>
 
 [![release](https://img.shields.io/badge/Release_v16-blue?style=for-the-badge)]([https://ko-fi.com/domferr](https://github.com/domferr/tilingshell/releases))
