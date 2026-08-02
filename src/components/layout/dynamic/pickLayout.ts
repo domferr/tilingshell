@@ -6,8 +6,9 @@
  * preferred order, and returns an index into that list.
  *
  * Order is preference. A layout that has exactly as many tiles as there are
- * windows is used as drawn, and the leftmost such layout wins. Failing that
- * the leftmost roomier layout is collapsed down to fit. Failing that the
+ * windows is used as drawn, and the leftmost such layout wins. Failing that,
+ * the smallest layout still large enough is collapsed to fit — collapsing as
+ * little as possible — again leftmost among equals. Failing that, the
  * roomiest layout is subdivided.
  */
 export function pickLayoutIndex(

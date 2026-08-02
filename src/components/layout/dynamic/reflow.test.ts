@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildLayoutTree } from './layoutTree.ts';
 import type { TileRect } from './layoutTree.ts';
-import { reflow, slotOrder, neighbourIndex } from './reflow.ts';
+import { reflow, slotOrder, neighbourIndex, assign } from './reflow.ts';
 
 const twoColumns = () =>
     buildLayoutTree([
@@ -216,4 +216,45 @@ test('the nearest neighbour wins when several lie in the same direction', () => 
     const left = three.findIndex((r) => r.x === 0);
     const mid = three.findIndex((r) => r.x === 0.25);
     assert.equal(neighbourIndex(three, left, 'right'), mid, 'not the far right one');
+});
+
+test('assign hands the roomiest region to the first slot', () => {
+    assert.deepEqual(assign(twoColumns(), 2), [
+        { x: 0, y: 0, width: 0.67, height: 1 },
+        { x: 0.67, y: 0, width: 0.33, height: 1 },
+    ]);
+});
+
+test('overflow leaves the owner in place and gives the newcomer the other half', () => {
+    // slot 0 owns the wide region; splitting it must keep slot 0 in the first
+    // half rather than evicting it to the end of the order
+    assert.deepEqual(assign(twoColumns(), 3), [
+        { x: 0, y: 0, width: 0.67, height: 0.5 },
+        { x: 0.67, y: 0, width: 0.33, height: 1 },
+        { x: 0, y: 0.5, width: 0.67, height: 0.5 },
+    ]);
+});
+
+test('overflow splits the nominated slot', () => {
+    assert.deepEqual(assign(twoColumns(), 3, 1), [
+        { x: 0, y: 0, width: 0.67, height: 1 },
+        { x: 0.67, y: 0, width: 0.33, height: 0.5 },
+        { x: 0.67, y: 0.5, width: 0.33, height: 0.5 },
+    ]);
+});
+
+test('assign is deterministic and total for every window count', () => {
+    const tree = buildLayoutTree([
+        { x: 0, y: 0, width: 0.26, height: 0.5 },
+        { x: 0.26, y: 0, width: 0.37, height: 1 },
+        { x: 0.63, y: 0, width: 0.37, height: 1 },
+        { x: 0, y: 0.5, width: 0.26, height: 0.5 },
+    ])!;
+    for (let n = 1; n <= 9; n++) {
+        const once = assign(tree, n);
+        assert.equal(once.length, n, `count for ${n}`);
+        assert.deepEqual(assign(tree, n), once, `stable for ${n}`);
+        const covered = once.reduce((s, r) => s + r.width * r.height, 0);
+        assert.ok(Math.abs(covered - 1) < 1e-9, `coverage for ${n}`);
+    }
 });

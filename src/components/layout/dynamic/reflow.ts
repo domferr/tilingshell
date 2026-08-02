@@ -107,6 +107,63 @@ function subdivide(
 
 const areaOf = (r: TileRect) => r.width * r.height;
 
+/**
+ * One rectangle per slot, indexed by slot rather than by position on screen.
+ *
+ * Slot 0 gets the roomiest region, so the window opened first keeps the most
+ * space whichever side of the layout it is drawn on.
+ *
+ * Past the last tile a region is halved. The slot that owned it **keeps the
+ * first half** and the newcomer is appended, so overflow never evicts a window
+ * from the region it was already in. `splitSlot` nominates which slot is
+ * halved first; any further overflow takes the roomiest.
+ *
+ * The result depends only on its arguments, so every caller that passes the
+ * same arguments sees the same geometry the windows are actually in.
+ */
+export function assign(
+    tree: SplitTree,
+    windowCount: number,
+    splitSlot?: number,
+): TileRect[] {
+    if (windowCount <= 0) return [];
+
+    const leaves = leavesOf(tree);
+    if (windowCount <= leaves.length) {
+        const rects = reflow(tree, windowCount);
+        return slotOrder(rects).map((index) => rects[index]);
+    }
+
+    const slots = slotOrder(leaves).map((index) => leaves[index]);
+    let nominated =
+        splitSlot !== undefined && splitSlot >= 0 && splitSlot < slots.length
+            ? splitSlot
+            : undefined;
+
+    while (slots.length < windowCount) {
+        let target = nominated;
+        nominated = undefined;
+
+        if (target === undefined) {
+            target = 0;
+            for (let i = 1; i < slots.length; i++) {
+                if (areaOf(slots[i]) > areaOf(slots[target])) target = i;
+            }
+        }
+
+        const r = slots[target];
+        if (r.height >= r.width) {
+            slots[target] = { ...r, height: r.height / 2 };
+            slots.push({ ...r, y: r.y + r.height / 2, height: r.height / 2 });
+        } else {
+            slots[target] = { ...r, width: r.width / 2 };
+            slots.push({ ...r, x: r.x + r.width / 2, width: r.width / 2 });
+        }
+    }
+
+    return slots;
+}
+
 export type Direction = 'left' | 'right' | 'up' | 'down';
 
 /**
