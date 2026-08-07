@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:09+0100\n"
+"POT-Creation-Date: 2026-08-07 17:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,10 +16,6 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: dist/components/altTab/MultipleWindowsIcon.js:42
-msgid "Tiled windows"
-msgstr ""
 
 #: dist/components/editor/editorDialog.js:36
 msgid "Select the layout to edit"
@@ -53,6 +49,10 @@ msgstr ""
 msgid "Start editing"
 msgstr ""
 
+#: dist/components/altTab/MultipleWindowsIcon.js:42
+msgid "Tiled windows"
+msgstr ""
+
 #: dist/components/window_menu/overriddenWindowMenu.js:117
 msgid "Move to best tile"
 msgstr ""
@@ -65,11 +65,11 @@ msgstr ""
 msgid "Move to rightmost tile"
 msgstr ""
 
-#: dist/indicator/defaultMenu.js:297
+#: dist/indicator/defaultMenu.js:298
 msgid "Edit Layouts"
 msgstr ""
 
-#: dist/indicator/defaultMenu.js:307
+#: dist/indicator/defaultMenu.js:308
 msgid "New Layout"
 msgstr ""
 
@@ -81,12 +81,12 @@ msgstr ""
 msgid "Info"
 msgstr ""
 
-#: dist/indicator/editingMenu.js:33 dist/prefs.js:404 dist/prefs.js:793
+#: dist/indicator/editingMenu.js:33 dist/prefs.js:425 dist/prefs.js:821
 msgid "Save"
 msgstr ""
 
-#: dist/indicator/editingMenu.js:43 dist/prefs.js:405 dist/prefs.js:459
-#: dist/prefs.js:794 dist/prefs.js:849
+#: dist/indicator/editingMenu.js:43 dist/prefs.js:426 dist/prefs.js:480
+#: dist/prefs.js:822 dist/prefs.js:877
 msgid "Cancel"
 msgstr ""
 
@@ -325,416 +325,764 @@ msgid ""
 "together"
 msgstr ""
 
-#: dist/prefs.js
-msgid "Limit to current display"
+#: dist/prefs.js:289
+msgid "Raise tiled windows together: limit to current display"
 msgstr ""
 
-#: dist/prefs.js
+#: dist/prefs.js:291
 msgid ""
 "When raising tiled windows together, only raise tiled windows on the same "
 "display as the window being raised"
 msgstr ""
 
-#: dist/prefs.js:288
+#: dist/prefs.js:302
+msgid "Sync layout across workspaces"
+msgstr ""
+
+#: dist/prefs.js:304
+msgid ""
+"When a layout is selected, apply it to all workspaces instead of just the "
+"active one"
+msgstr ""
+
+#: dist/prefs.js:309
 msgid "Screen Edges"
 msgstr ""
 
-#: dist/prefs.js:290
+#: dist/prefs.js:311
 msgid ""
 "Drag windows against the top, left and right screen edges to resize them"
 msgstr ""
 
-#: dist/prefs.js:304
+#: dist/prefs.js:325
 msgid "Drag against top edge to maximize window"
 msgstr ""
 
-#: dist/prefs.js:305
+#: dist/prefs.js:326
 msgid "Drag windows against the top edge to maximize them"
 msgstr ""
 
-#: dist/prefs.js:314
+#: dist/prefs.js:335
 msgid "Quarter tiling activation area"
 msgstr ""
 
-#: dist/prefs.js:315
+#: dist/prefs.js:336
 #, javascript-format
 msgid "Activation area to trigger quarter tiling (%% of the screen)"
 msgstr ""
 
-#: dist/prefs.js:331
+#: dist/prefs.js:352
 msgid "Edge tiling offset"
 msgstr ""
 
-#: dist/prefs.js:332
+#: dist/prefs.js:353
 msgid "Offset from the screen edge to trigger edge tiling (in pixels)"
 msgstr ""
 
-#: dist/prefs.js:354
+#: dist/prefs.js:375
 msgid "Windows suggestions"
 msgstr ""
 
-#: dist/prefs.js:355
+#: dist/prefs.js:376
 msgid "Enable and disable windows suggestions"
 msgstr ""
 
-#: dist/prefs.js:360
+#: dist/prefs.js:381
 msgid "Enable window suggestions for the tiling system"
 msgstr ""
 
-#: dist/prefs.js:362
+#: dist/prefs.js:383
 msgid ""
 "Provides smart suggestions to fill empty tiles when using the tiling system"
 msgstr ""
 
-#: dist/prefs.js:368
+#: dist/prefs.js:389
 msgid "Enable window suggestions for the snap assistant"
 msgstr ""
 
-#: dist/prefs.js:370
+#: dist/prefs.js:391
 msgid ""
 "Offers suggestions to populate empty tiles when using the snap assistant"
 msgstr ""
 
-#: dist/prefs.js:376
+#: dist/prefs.js:397
 msgid "Enable window suggestions for screen edge tiling"
 msgstr ""
 
-#: dist/prefs.js:378
+#: dist/prefs.js:399
 msgid "Suggests windows to occupy empty tiles when tiling to screen edges"
 msgstr ""
 
-#: dist/prefs.js:384
+#: dist/prefs.js:405
 msgid "Layouts"
 msgstr ""
 
-#: dist/prefs.js:385
+#: dist/prefs.js:406
 msgid "Configure the layouts of Tiling Shell"
 msgstr ""
 
-#: dist/prefs.js:389 dist/prefs.js:390
+#: dist/prefs.js:410 dist/prefs.js:411
 msgid "Edit layouts"
 msgstr ""
 
-#: dist/prefs.js:391
+#: dist/prefs.js:412
 msgid "Open the layouts editor"
 msgstr ""
 
-#: dist/prefs.js:396 dist/prefs.js:397 dist/prefs.js:401
+#: dist/prefs.js:417 dist/prefs.js:418 dist/prefs.js:422
 msgid "Export layouts"
 msgstr ""
 
-#: dist/prefs.js:398
+#: dist/prefs.js:419
 msgid "Export layouts to a file"
 msgstr ""
 
-#: dist/prefs.js:450 dist/prefs.js:451
+#: dist/prefs.js:471 dist/prefs.js:472
 msgid "Import layouts"
 msgstr ""
 
-#: dist/prefs.js:452
+#: dist/prefs.js:473
 msgid "Import layouts from a file"
 msgstr ""
 
-#: dist/prefs.js:455
+#: dist/prefs.js:476
 msgid "Select layouts file"
 msgstr ""
 
-#: dist/prefs.js:458 dist/prefs.js:848
+#: dist/prefs.js:479 dist/prefs.js:876
 msgid "Open"
 msgstr ""
 
-#: dist/prefs.js:506 dist/prefs.js:507
+#: dist/prefs.js:527 dist/prefs.js:528
 msgid "Reset layouts"
 msgstr ""
 
-#: dist/prefs.js:508
+#: dist/prefs.js:529
 msgid "Bring back the default layouts"
 msgstr ""
 
-#: dist/prefs.js:521
+#: dist/prefs.js:542
 msgid "Keybindings"
 msgstr ""
 
-#: dist/prefs.js:523
+#: dist/prefs.js:544
 msgid "Use hotkeys to perform actions on the focused window"
 msgstr ""
 
-#: dist/prefs.js:541
+#: dist/prefs.js:562
 msgid "Move window to right tile"
 msgstr ""
 
-#: dist/prefs.js:543
+#: dist/prefs.js:564
 msgid "Move the focused window to the tile on its right"
 msgstr ""
 
-#: dist/prefs.js:552
+#: dist/prefs.js:573
 msgid "Move window to left tile"
 msgstr ""
 
-#: dist/prefs.js:553
+#: dist/prefs.js:574
 msgid "Move the focused window to the tile on its left"
 msgstr ""
 
-#: dist/prefs.js:559
+#: dist/prefs.js:580
 msgid "Move window to tile above"
 msgstr ""
 
-#: dist/prefs.js:560
+#: dist/prefs.js:581
 msgid "Move the focused window to the tile above"
 msgstr ""
 
-#: dist/prefs.js:566
+#: dist/prefs.js:587
 msgid "Move window to tile below"
 msgstr ""
 
-#: dist/prefs.js:567
+#: dist/prefs.js:588
 msgid "Move the focused window to the tile below"
 msgstr ""
 
-#: dist/prefs.js:573
+#: dist/prefs.js:594
 msgid "Span window to right tile"
 msgstr ""
 
-#: dist/prefs.js:574
+#: dist/prefs.js:595
 msgid "Span the focused window to the tile on its right"
 msgstr ""
 
-#: dist/prefs.js:580
+#: dist/prefs.js:601
 msgid "Span window to left tile"
 msgstr ""
 
-#: dist/prefs.js:581
+#: dist/prefs.js:602
 msgid "Span the focused window to the tile on its left"
 msgstr ""
 
-#: dist/prefs.js:587
+#: dist/prefs.js:608
 msgid "Span window above"
 msgstr ""
 
-#: dist/prefs.js:588
+#: dist/prefs.js:609
 msgid "Span the focused window to the tile above"
 msgstr ""
 
-#: dist/prefs.js:594
+#: dist/prefs.js:615
 msgid "Span window down"
 msgstr ""
 
-#: dist/prefs.js:595
+#: dist/prefs.js:616
 msgid "Span the focused window to the tile below"
 msgstr ""
 
-#: dist/prefs.js:601
+#: dist/prefs.js:622
 msgid "Span window to all tiles"
 msgstr ""
 
-#: dist/prefs.js:602
+#: dist/prefs.js:623
 msgid "Span the focused window to all the tiles"
 msgstr ""
 
-#: dist/prefs.js:608
+#: dist/prefs.js:629
 msgid "Untile focused window"
 msgstr ""
 
-#: dist/prefs.js:616
-msgid "Move window to the center"
-msgstr ""
-
-#: dist/prefs.js:618
-msgid "Move the focused window to the center of the screen"
-msgstr ""
-
-#: dist/prefs.js:627
-msgid "Focus window to the right"
-msgstr ""
-
-#: dist/prefs.js:629
-msgid "Focus the window to the right of the current focused window"
-msgstr ""
-
 #: dist/prefs.js:636
-msgid "Focus window to the left"
-msgstr ""
-
-#: dist/prefs.js:637
-msgid "Focus the window to the left of the current focused window"
-msgstr ""
-
-#: dist/prefs.js:643
-msgid "Focus window above"
+msgid "Untile all windows from current workspace"
 msgstr ""
 
 #: dist/prefs.js:644
-msgid "Focus the window above the current focused window"
+msgid "Move window to the center"
 msgstr ""
 
-#: dist/prefs.js:650
-msgid "Focus window below"
+#: dist/prefs.js:646
+msgid "Move the focused window to the center of the screen"
 msgstr ""
 
-#: dist/prefs.js:651
-msgid "Focus the window below the current focused window"
+#: dist/prefs.js:655
+msgid "Focus window to the right"
 msgstr ""
 
 #: dist/prefs.js:657
-msgid "Focus next window"
-msgstr ""
-
-#: dist/prefs.js:658
-msgid "Focus the window next to the current focused window"
+msgid "Focus the window to the right of the current focused window"
 msgstr ""
 
 #: dist/prefs.js:664
-msgid "Focus previous window"
+msgid "Focus window to the left"
 msgstr ""
 
 #: dist/prefs.js:665
-msgid "Focus the window prior to the current focused window"
+msgid "Focus the window to the left of the current focused window"
 msgstr ""
 
 #: dist/prefs.js:671
+msgid "Focus window above"
+msgstr ""
+
+#: dist/prefs.js:672
+msgid "Focus the window above the current focused window"
+msgstr ""
+
+#: dist/prefs.js:678
+msgid "Focus window below"
+msgstr ""
+
+#: dist/prefs.js:679
+msgid "Focus the window below the current focused window"
+msgstr ""
+
+#: dist/prefs.js:685
+msgid "Focus next window"
+msgstr ""
+
+#: dist/prefs.js:686
+msgid "Focus the window next to the current focused window"
+msgstr ""
+
+#: dist/prefs.js:692
+msgid "Focus previous window"
+msgstr ""
+
+#: dist/prefs.js:693
+msgid "Focus the window prior to the current focused window"
+msgstr ""
+
+#: dist/prefs.js:699
 msgid "Highlight focused window"
 msgstr ""
 
-#: dist/prefs.js:673
+#: dist/prefs.js:701
 msgid "Minimize all the other windows and show only the focused window"
 msgstr ""
 
-#: dist/prefs.js:680
+#: dist/prefs.js:708
 msgid "Cycle layouts"
 msgstr ""
 
-#: dist/prefs.js:681
+#: dist/prefs.js:709
 msgid "Cycle through available workspace layouts"
 msgstr ""
 
-#: dist/prefs.js:711
+#: dist/prefs.js:739
 msgid "View and Customize all the Shortcuts"
 msgstr ""
 
-#: dist/prefs.js:739 dist/prefs.js:740
+#: dist/prefs.js:767 dist/prefs.js:768
 msgid "View and Customize Shortcuts"
 msgstr ""
 
-#: dist/prefs.js:763
+#: dist/prefs.js:791
 msgid "Enable next/previous window focus to wrap around"
 msgstr ""
 
-#: dist/prefs.js:765
+#: dist/prefs.js:793
 msgid "When focusing next or previous window, wrap around at the window edge"
 msgstr ""
 
-#: dist/prefs.js:771
+#: dist/prefs.js:799
 msgid "Restrict directional focus to tiled windows"
 msgstr ""
 
-#: dist/prefs.js:773
+#: dist/prefs.js:801
 msgid "When using directional focus navigation, only consider tiled windows"
 msgstr ""
 
-#: dist/prefs.js:778
+#: dist/prefs.js:806
 msgid "Import, export and reset"
 msgstr ""
 
-#: dist/prefs.js:780
+#: dist/prefs.js:808
 msgid "Import, export and reset the settings of Tiling Shell"
 msgstr ""
 
-#: dist/prefs.js:785 dist/prefs.js:786
+#: dist/prefs.js:813 dist/prefs.js:814
 msgid "Export settings"
 msgstr ""
 
-#: dist/prefs.js:787
+#: dist/prefs.js:815
 msgid "Export settings to a file"
 msgstr ""
 
-#: dist/prefs.js:790
+#: dist/prefs.js:818
 msgid "Export settings to a text file"
 msgstr ""
 
-#: dist/prefs.js:797
+#: dist/prefs.js:825
 msgid "Text file"
 msgstr ""
 
-#: dist/prefs.js:840 dist/prefs.js:841
+#: dist/prefs.js:868 dist/prefs.js:869
 msgid "Import settings"
 msgstr ""
 
-#: dist/prefs.js:842
+#: dist/prefs.js:870
 msgid "Import settings from a file"
 msgstr ""
 
-#: dist/prefs.js:845
+#: dist/prefs.js:873
 msgid "Select a text file to import from"
 msgstr ""
 
-#: dist/prefs.js:887 dist/prefs.js:888
+#: dist/prefs.js:915 dist/prefs.js:916
 msgid "Reset settings"
 msgstr ""
 
-#: dist/prefs.js:889
+#: dist/prefs.js:917
 msgid "Bring back the default settings"
 msgstr ""
 
-#: dist/prefs.js:904
+#: dist/prefs.js:932
 msgid "Donate on ko-fi"
 msgstr ""
 
-#: dist/prefs.js:910
+#: dist/prefs.js:938
 msgid "Report a bug"
 msgstr ""
 
-#: dist/prefs.js:916
+#: dist/prefs.js:944
 msgid "Request a feature"
 msgstr ""
 
-#: dist/prefs.js:924
+#: dist/prefs.js:952
 msgid "Have issues, you want to suggest a new feature or contribute?"
 msgstr ""
 
-#: dist/prefs.js:931
+#: dist/prefs.js:959
 msgid "Open a new issue on"
 msgstr ""
 
-#: dist/prefs.js:999
+#: dist/prefs.js:1027
 msgid "Choose how windows snap to screen edges"
 msgstr ""
 
-#: dist/prefs.js:1014
+#: dist/prefs.js:1042
 msgid "Default"
 msgstr ""
 
-#: dist/prefs.js:1015
+#: dist/prefs.js:1043
 msgid "Follow quarters or screen halves"
 msgstr ""
 
-#: dist/prefs.js:1020
+#: dist/prefs.js:1048
 msgid "Adaptive"
 msgstr ""
 
-#: dist/prefs.js:1021
+#: dist/prefs.js:1049
 msgid "Follow corners of selected layout or screen halves"
 msgstr ""
 
-#: dist/prefs.js:1026
+#: dist/prefs.js:1054
 msgid "Granular"
 msgstr ""
 
-#: dist/prefs.js:1027
+#: dist/prefs.js:1055
 msgid "Follow currently selected layout"
 msgstr ""
 
-#: dist/prefs.js:1216
+#: dist/prefs.js:1160
+msgid "Right Mouse Button"
+msgstr ""
+
+#: dist/prefs.js:1162
+msgid "(None)"
+msgstr ""
+
+#: dist/prefs.js:1246
 msgid "Choose custom color"
 msgstr ""
 
-#: dist/prefs.js:1217
+#: dist/prefs.js:1247
 msgid "Use system accent color"
 msgstr ""
 
-#: dist/prefs.js:1271 dist/prefs.js:1298
+#: dist/prefs.js:1301 dist/prefs.js:1328
 msgid "New accelerator…"
 msgstr ""
 
-#: dist/prefs.js:1301
+#: dist/prefs.js:1331
 msgid "Use Backspace to clear"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Active Screen Edges"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Add snap assistant and auto-tile buttons in the menu that shows up whe"
+"n you right click on a window title."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Add the tiled windows to the alt+tab menu to open all the tiled window"
+"s at once"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Add tiled windows group to alt+tab menu"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Animation time in milliseconds of the snap assistant"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Animation time in milliseconds of the tiles"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Automatically tile a new window to the best tile according to the curr"
+"ent layout."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Blur selected tile previews"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Blur snap assistant"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Change the desktop layout to match the layout used when tiling a windo"
+"w with Snap Assistant."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Controls how windows snap to screen edges:\\n'default' (corners snap t"
+"o quarters, edges to halves),\\n'adaptive' (snap to layout tiles by co"
+"lumn),\\n'granular' (snap to exact tile under cursor)."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Cycle backwards through available workspace layouts"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Dinamically adapt to the window's border radius."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Drag agains top edge to maximize window"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Drag windows against the top, left and right screen edges to resize th"
+"em."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Each monitor's active layout used by the monitor tiling manager."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Edge tiling behavior"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Enable Snap Assistant blur"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Enable auto tiling"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Enable keybindings"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Enable selected tile preview blur"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Enable smart window border radius"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Enable snap assist"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Enable tiling system"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Enable window border"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "External gaps between the layout and the monitor borders."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Focus the window to the right the current focused window"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Focused window border color"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Focused window border width"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Hold ALT to span multiple tiles."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Hold CTRL while moving a window to tile it."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Internal gaps between tiles in a layout."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Key to span multiple tiles"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Last version installed"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Last version installed of this extension."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Move focused window through tiles by using keybindings."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Move focused window to the tile above"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Move focused window to the tile below"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Move focused window to the tile to its left"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Move focused window to the tile to its right"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Move the window on top of the screen to snap assist it."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Offers suggestions to populate empty tiles when using the snap assista"
+"nt."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Offset to trigger edge tiling (left and right edge)."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Overridden settings"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Provides smart suggestions to fill empty tiles when using the tiling s"
+"ystem."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Quarter tiling threshold"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Raise tiled windows on current display only"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Resize the focused window to span all tiles"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Restore the windows to their original size when untiled."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Selected layouts"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Show a border around focused window."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Shows an indicator on top panel."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Shows indicator"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Snap Assistant's threshold to enlarge, shrink, open and close it."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Snap assistant animation time (milliseconds)"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Span focused window to the tile above"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Span focused window to the tile below"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Span focused window to the tile to its left"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Span focused window to the tile to its right"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Suggests windows to occupy empty tiles when tiling to screen edges."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "The color of the focused window's border."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "The layouts available to the tiling managers and the snap assist."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "The settings that are overridden and their old value."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "The width of the focused window's border."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Threshold to trigger quarter tiling."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Tile animation time (milliseconds)"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Tiling system activation key"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Tiling system deactivation key"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Untile the focused window"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Use custom color"
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Use the color defined here for the focused window's border."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "When a layout is selected, apply it to all workspaces instead of just "
+"the active one."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "When a tiled window is resized, auto-resize the other tiled windows ne"
+"ar it."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "When one tiled window is raised, raise all tiled windows into the fore"
+"ground together."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "When raising tiled windows together, only raise tiled windows on the s"
+"ame display as the window being raised."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Which key to hold to span multiple tiles."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Which key to hold while moving a window to activate the tiling system."
+msgstr ""
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
+msgid "Which key to hold while moving a window to deactivate the tiling syste"
+"m."
 msgstr ""
