@@ -1,13 +1,14 @@
 # pkly @github <>, 2025.
 # Adam Lewicki <a.lewick95@gmail.com>, 2025.
+# Rafał Widło <rafal.widlo@gmail.com>, 2026.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Tiling Shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-02-01 10:26+0100\n"
-"PO-Revision-Date: 2026-02-01 10:45+0100\n"
-"Last-Translator: Adam Lewicki <a.lewicki95@gmail.com>\n"
+"PO-Revision-Date: 2026-08-07 17:02+0200\n"
+"Last-Translator: Rafał Widło <rafal.widlo@gmail.com>\n"
 "Language-Team: Polish\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -66,7 +67,7 @@ msgstr ""
 #: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:32
 #: src/prefs.ts:224
 msgid "Sync layout when tiling with Snap Assistant"
-msgstr "Synchronizacja układu podczas kafelkowania z asystentem przyciągania"
+msgstr "Synchronizuj układ przy układaniu za pomocą Asystenta przyciągania"
 
 #: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:33
 msgid ""
@@ -87,7 +88,7 @@ msgstr "Wyświetla wskaźnik na górnym panelu."
 #: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:42
 #: src/prefs.ts:89
 msgid "Inner gaps"
-msgstr "Wewnętrzna przerwa"
+msgstr "Wewnętrzne przerwy"
 
 #: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:43
 msgid "Internal gaps between tiles in a layout."
@@ -221,7 +222,7 @@ msgstr ""
 #: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:112
 #: src/prefs.ts:316
 msgid "Raise tiled windows together"
-msgstr "Wspólne podnoszenie okien kafelkowych"
+msgstr "Podnieś jednocześnie wszystkie ułożone okna"
 
 #: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:113
 msgid ""
@@ -398,7 +399,7 @@ msgstr ""
 #: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:202
 #: src/prefs.ts:424
 msgid "Enable window suggestions for screen edge tiling"
-msgstr "Włączanie sugestii okien dla kafelkowania przy krawędziach ekranu"
+msgstr "Włącz podpowiedzi okien dla układania krawędziowego"
 
 #: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:203
 msgid "Suggests windows to occupy empty tiles when tiling to screen edges."
@@ -543,7 +544,7 @@ msgstr "Jak używać edytora"
 
 #: src/components/editor/editorDialog.ts:224
 msgid "Start editing"
-msgstr "Rozpocznij edycje"
+msgstr "Rozpocznij edycję"
 
 #: src/components/window_menu/overriddenWindowMenu.ts:166
 msgid "Move to best tile"
@@ -551,11 +552,11 @@ msgstr "Przesuń do najlepszego kafelka"
 
 #: src/components/window_menu/overriddenWindowMenu.ts:188
 msgid "Move to leftmost tile"
-msgstr "Przesuń do strefy najbardziej po lewej"
+msgstr "Przesuń do kafelka najbardziej po lewej"
 
 #: src/components/window_menu/overriddenWindowMenu.ts:211
 msgid "Move to rightmost tile"
-msgstr "Przesuń do strefy najbardziej po prawej"
+msgstr "Przesuń do kafelka najbardziej po prawej"
 
 #: src/indicator/defaultMenu.ts:382
 msgid "Edit Layouts"
@@ -620,8 +621,7 @@ msgstr "Zastosuj efekt rozmycia do Asystenta przyciągania i podglądów kafelk�
 
 #: src/prefs.ts:113
 msgid "Minimum distance from the Snap Assistant to the pointer to open it"
-msgstr ""
-"Minimalna odległość otwarcia względem wskaźnika od Asystenta przyciągania"
+msgstr "Minimalna odległość od wskaźnika, przy której otwiera się Asystent przyciągania"
 
 #: src/prefs.ts:123
 msgid "Snap Assistant"
@@ -633,11 +633,11 @@ msgstr "Zastosuj efekt rozmycia do Asystenta przyciągania"
 
 #: src/prefs.ts:130
 msgid "Selected tile preview"
-msgstr "Podgląd wybra kafelka"
+msgstr "Podgląd wybranego kafelka"
 
 #: src/prefs.ts:131
 msgid "Apply blur effect to selected tile preview"
-msgstr "Zastosuj efekt rozmycia do zaznaczonej strefy"
+msgstr "Zastosuj efekt rozmycia do podglądu wybranego kafelka"
 
 #: src/prefs.ts:136
 msgid "Window border"
@@ -657,7 +657,7 @@ msgstr "Inteligentny promień obramowania"
 
 #: src/prefs.ts:151
 msgid "Dynamically adapt to the window's actual border radius"
-msgstr "Dynamiczne dostosowanie do rzeczywistego promienia obramowania okna"
+msgstr "Dostosuj dynamicznie do rzeczywistego promienia obramowania okna"
 
 #: src/prefs.ts:157
 msgid "Width"
@@ -673,7 +673,7 @@ msgstr "Kolor obramowania"
 
 #: src/prefs.ts:168
 msgid "Choose the color of the border"
-msgstr "Wybiera kolor obramowania"
+msgstr "Wybierz kolor obramowania"
 
 #: src/prefs.ts:185
 msgid "Animations"
@@ -720,9 +720,7 @@ msgstr ""
 msgid ""
 "Change the active layout to match the layout used when tiling a window with "
 "Snap Assistant"
-msgstr ""
-"Zmiana aktywnego układu, aby dopasować go do układu używanego podczas "
-"kafelkowania okna za pomocą asystenta przyciągania"
+msgstr "Zmieniaj aktywny układ tak, aby odpowiadał układowi używanemu przy układaniu okna przy pomocy Asystenta przyciągania"
 
 #: src/prefs.ts:238
 msgid "Enable Tiling System"
@@ -790,9 +788,7 @@ msgstr ""
 msgid ""
 "When one tiled window is raised, raise all tiled windows into the foreground "
 "together"
-msgstr ""
-"Gdy jedno kafelkowe okno zostanie podniesione, podnieś wszystkie kafelkowe "
-"okna na pierwszy plan razem"
+msgstr "Gdy jedno ułożone okno zostanie podniesione, wszystkie ułożone okna zostaną podniesione wraz z nim"
 
 #: src/prefs.ts:325
 msgid "Screen Edges"
@@ -848,9 +844,7 @@ msgstr ""
 
 #: src/prefs.ts:426
 msgid "Suggests windows to occupy empty tiles when tiling to screen edges"
-msgstr ""
-"Sugerowanie okien do zajęcia pustych kafelków podczas kafelkowania do "
-"krawędzi ekranu"
+msgstr "Sugeruj okna do zajęcia pustych kafelków podczas układania do krawędzi ekranu"
 
 #: src/prefs.ts:436
 msgid "Configure the layouts of Tiling Shell"
@@ -1094,15 +1088,15 @@ msgstr "Otwórz nowe zgłoszenie na"
 
 #: src/prefs.ts:1101
 msgid "Choose how windows snap to screen edges"
-msgstr "Wybór sposobu przyciągania okien do krawędzi ekranu"
+msgstr "Wybierz sposób przyciągania okien do krawędzi ekranu"
 
 #: src/prefs.ts:1116
 msgid "Default"
-msgstr "Domyślne"
+msgstr "Domyślny"
 
 #: src/prefs.ts:1117
 msgid "Follow quarters or screen halves"
-msgstr "Podążanie za ćwiartkami lub połowami ekranu"
+msgstr "Przyciągaj do ćwiartek lub połówek ekranu"
 
 #: src/prefs.ts:1122
 msgid "Adaptive"
@@ -1110,15 +1104,15 @@ msgstr "Adaptacyjne"
 
 #: src/prefs.ts:1123
 msgid "Follow corners of selected layout or screen halves"
-msgstr "Podążanie za narożnikami wybranego układu lub połowami ekranu"
+msgstr "Przyciągaj do narożników wybranego układu lub połówek ekranu"
 
 #: src/prefs.ts:1128
 msgid "Granular"
-msgstr "Szczegółowe"
+msgstr "Precyzyjne"
 
 #: src/prefs.ts:1129
 msgid "Follow currently selected layout"
-msgstr "Podążanie za obecnie wybranym układem"
+msgstr "Przyciągaj zgodnie z aktualnie wybranym układem"
 
 #: src/prefs.ts:1380
 msgid "Choose custom color"
