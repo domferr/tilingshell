@@ -15,7 +15,7 @@
   ],
   "version": 99,
   "version-name": "17.3",
-  "url": "https://github.com/J4KE-B/tilingshell",
+  "url": "https://github.com/domferr/tilingshell",
   "settings-schema": "org.gnome.shell.extensions.tilingshell",
   "gettext-domain": "tilingshell",
   "donations": {
