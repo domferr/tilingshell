@@ -133,7 +133,7 @@ export default class TilingShellExtension extends Extension {
         // force initialization and tracking of windows
         TilingShellWindowManager.get();
 
-        this._fractionalScalingEnabled = this._isFractionalScalingEnabled(
+        this._fractionalScalingEnabled = isFractionalScalingEnabled(
             new Gio.Settings({ schema: 'org.gnome.mutter' }),
         );
 
@@ -227,7 +227,7 @@ export default class TilingShellExtension extends Extension {
                 if (!_mutterSettings) return;
 
                 const fractionalScalingEnabled =
-                    this._isFractionalScalingEnabled(_mutterSettings);
+                    isFractionalScalingEnabled(_mutterSettings);
 
                 if (this._fractionalScalingEnabled === fractionalScalingEnabled)
                     return;
@@ -753,8 +753,8 @@ export default class TilingShellExtension extends Extension {
 
         monitorTilingManager.onUntileWindow(focus_window, true);
     }
-    
-    private _onKeyboardUntileAllWindows(kb: KeyBindings, display: Meta.Display) {
+
+    private _onKeyboardUntileAllWindows(_kb: KeyBindings, _display: Meta.Display) {
         getWindows().forEach((extWin) => {
             if (extWin && !extWin.minimized && (extWin as ExtendedWindow).assignedTile) {
                 if (
@@ -773,15 +773,9 @@ export default class TilingShellExtension extends Extension {
                     this._tilingManagers[extWin.get_monitor()];
                 if (!monitorTilingManager) return;
 
-                monitorTilingManager.onUntileWindow(extWin, true);      
+                monitorTilingManager.onUntileWindow(extWin, true);
             }
         });
-    }
-
-    private _isFractionalScalingEnabled(
-        _mutterSettings: Gio.Settings,
-    ): boolean {
-        return isFractionalScalingEnabled(_mutterSettings);
     }
 
     disable(): void {
