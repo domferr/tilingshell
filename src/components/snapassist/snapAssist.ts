@@ -10,7 +10,6 @@ import SignalHandling from '../../utils/signalHandling';
 import {
     buildMarginOf,
     enableScalingFactorSupport,
-    getMonitorScalingFactor,
     getScalingFactorOf,
 } from '../../utils/ui';
 import { buildBlurEffect } from '../../utils/gnomesupport';
@@ -65,9 +64,8 @@ class SnapAssistContent extends St.BoxLayout {
     private _blur: boolean;
     private _snapAssistantThreshold: number;
     private _snapAssistantAnimationTime: number;
-    private _monitorIndex: number;
 
-    constructor(container: St.Widget, monitorIndex: number) {
+    constructor(container: St.Widget) {
         super({
             name: 'snap_assist_content',
             xAlign: Clutter.ActorAlign.CENTER,
@@ -85,9 +83,7 @@ class SnapAssistContent extends St.BoxLayout {
         this._padding = 0;
         this._blur = false;
         this._snapAssistantAnimationTime = 100;
-        this._monitorIndex = monitorIndex;
-        this._snapAssistantThreshold =
-            54 * getMonitorScalingFactor(this._monitorIndex);
+        this._snapAssistantThreshold = 54 * getScalingFactorOf(this)[1];
 
         Settings.bind(
             Settings.KEY_ENABLE_BLUR_SNAP_ASSISTANT,
@@ -140,8 +136,7 @@ class SnapAssistContent extends St.BoxLayout {
     }
 
     private set snapAssistantThreshold(value: number) {
-        this._snapAssistantThreshold =
-            value * getMonitorScalingFactor(this._monitorIndex);
+        this._snapAssistantThreshold = value * getScalingFactorOf(this)[1];
     }
 
     private set snapAssistantAnimationTime(value: number) {
@@ -402,7 +397,6 @@ export default class SnapAssist extends St.Widget {
     constructor(
         parent: Clutter.Actor,
         workArea: Mtk.Rectangle,
-        monitorIndex: number,
         scalingFactor?: number,
     ) {
         super();
@@ -411,7 +405,7 @@ export default class SnapAssist extends St.Widget {
         this.set_clip(0, 0, workArea.width, workArea.height);
         if (scalingFactor) enableScalingFactorSupport(this, scalingFactor);
 
-        this._content = new SnapAssistContent(this, monitorIndex);
+        this._content = new SnapAssistContent(this);
     }
 
     public set workArea(newWorkArea: Mtk.Rectangle) {
