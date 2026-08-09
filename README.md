@@ -24,6 +24,31 @@
 > same extension UUID rather than masquerading as a different extension. Licensed
 > GPLv3, exactly as the original.
 
+## Dynamic Tiling
+
+The reason this fork exists. Turn it on from the switch at the top of the Tiling
+Shell panel menu — it's **off by default**, and with it off this behaves exactly
+like upstream Tiling Shell.
+
+With it on, windows always fill the screen automatically as you open and close
+them, following the proportions of whichever layout you've selected: one window
+is fullscreen, opening a second splits the space in half, opening a third takes
+half of whatever region you're currently focused on, and so on. Closing a window
+gives its space back to whatever was sharing it. No manual tiling needed.
+
+| Shortcut | Action |
+|---|---|
+| <kbd>SUPER</kbd>+<kbd>←</kbd>/<kbd>↑</kbd>/<kbd>↓</kbd>/<kbd>→</kbd> | Swap the focused window with the region next to it |
+| <kbd>SUPER</kbd>+<kbd>;</kbd> | Cycle to the next layout with the same number of tiles |
+| <kbd>SHIFT</kbd>+<kbd>SUPER</kbd>+<kbd>;</kbd> | Cycle to the previous layout with the same number of tiles |
+| Drag a window onto another | Swap their positions |
+
+In dynamic mode, <kbd>SUPER</kbd>+arrows swaps windows instead of moving to a
+static tile, since there's no fixed grid to move to.
+
+> Multi-monitor isn't fully exercised yet — dragging a tiled window from one
+> monitor to another isn't handled specially.
+
 ## ⚠️ Read this before installing
 
 This fork keeps Tiling Shell's extension UUID, `tilingshell@ferrarodomenico.com`. That
