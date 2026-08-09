@@ -112,6 +112,11 @@
             <summary>Raise tiled windows together</summary>
             <description>When one tiled window is raised, raise all tiled windows into the foreground together.</description>
         </key>
+        <key name="raise-together-current-monitor-only" type="b">
+            <default>false</default>
+            <summary>Raise tiled windows on current display only</summary>
+            <description>When raising tiled windows together, only raise tiled windows on the same display as the window being raised.</description>
+        </key>
         <key name="overridden-settings" type="s">
             <default>'{}'</default>
             <summary>Overridden settings</summary>
@@ -208,6 +213,12 @@
             <description>Controls how windows snap to screen edges:\n'default' (corners snap to quarters, edges to halves),\n'adaptive' (snap to layout tiles by column),\n'granular' (snap to exact tile under cursor).</description>
         </key>
 
+        <key name="sync-layout-across-workspaces" type="b">
+            <default>false</default>
+            <summary>Sync layout across workspaces</summary>
+            <description>When a layout is selected, apply it to all workspaces instead of just the active one.</description>
+        </key>
+
         <!-- keybindings -->
 		<key type="as" name="move-window-right">
 			<default><![CDATA[['<Super>Right']]]></default>
@@ -248,6 +259,10 @@
 		<key type="as" name="untile-window">
 			<default><![CDATA[['']]]></default>
 			<summary>Untile the focused window</summary>
+		</key>
+		<key type="as" name="untile-all-windows">
+			<default><![CDATA[['']]]></default>
+			<summary>Untile all windows from current workspace</summary>
 		</key>
 		<key type="as" name="move-window-center">
 			<default><![CDATA[['']]]></default>

@@ -286,6 +286,11 @@ export default class TilingShellExtension extends Extension {
             );
             this._signals.connect(
                 this._keybindings,
+                'untile-all-windows',
+                this._onKeyboardUntileAllWindows.bind(this),
+            );
+            this._signals.connect(
+                this._keybindings,
                 'move-window-center',
                 (kb: KeyBindings, dp: Meta.Display) => {
                     this._onKeyboardMoveWin(
@@ -747,6 +752,30 @@ export default class TilingShellExtension extends Extension {
 
         monitorTilingManager.onUntileWindow(focus_window, true);
     }
+    
+    private _onKeyboardUntileAllWindows(kb: KeyBindings, display: Meta.Display) {
+        getWindows().forEach((extWin) => {
+            if (extWin && !extWin.minimized && (extWin as ExtendedWindow).assignedTile) {
+                if (
+                    extWin.windowType !== Meta.WindowType.NORMAL ||
+                    (extWin.get_wm_class() &&
+                        extWin.get_wm_class() === 'gjs')
+                )
+                    return;
+                // if the window is maximized, unmaximize it
+                if (
+                    extWin.maximizedHorizontally ||
+                    extWin.maximizedVertically
+                )
+                    unmaximizeWindow(extWin);
+                const monitorTilingManager =
+                    this._tilingManagers[extWin.get_monitor()];
+                if (!monitorTilingManager) return;
+
+                monitorTilingManager.onUntileWindow(extWin, true);      
+            }
+        });
+    }
 
     private _isFractionalScalingEnabled(
         _mutterSettings: Gio.Settings,
@@ -763,21 +792,17 @@ export default class TilingShellExtension extends Extension {
     }
 
     disable(): void {
-        // bring back overridden keybindings
+        // disconnect signals
+        this._signals?.disconnect();
+        this._signals = null;
+
+       // bring back overridden keybindings
         this._keybindings?.destroy();
         this._keybindings = null;
 
         // destroy indicator
         this._indicator?.destroy();
         this._indicator = null;
-
-        // destroy tiling managers
-        this._tilingManagers.forEach((tm) => tm.destroy());
-        this._tilingManagers = [];
-
-        // disconnect signals
-        this._signals?.disconnect();
-        this._signals = null;
 
         this._resizingManager?.destroy();
         this._resizingManager = null;

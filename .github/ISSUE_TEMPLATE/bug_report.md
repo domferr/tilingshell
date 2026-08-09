@@ -21,7 +21,7 @@ Steps to reproduce the behavior:
 If applicable, add screenshots to help explain your problem.
 
 **Information (please complete the following):**
- - Tiling Shell version: [e.g. v9.0]
+ - Tiling Shell version: [e.g. v15.0]
  - GNOME version: [e.g. 42, 46]. If you don't know, run `gnome-shell --version`
 
 **Additional context**

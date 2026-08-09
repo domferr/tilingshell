@@ -2,13 +2,13 @@
 
 [![release](https://img.shields.io/badge/Release_v16-blue?style=for-the-badge)]([https://ko-fi.com/domferr](https://github.com/domferr/tilingshell/releases))
 ![](https://img.shields.io/github/license/domferr/tilingshell?style=for-the-badge)
-![](https://img.shields.io/badge/GNOME-42--49-e04196?style=for-the-badge&logo=gnome&logoColor=white)
+![](https://img.shields.io/badge/GNOME-42--50-e04196?style=for-the-badge&logo=gnome&logoColor=white)
 [![kofi](https://img.shields.io/badge/Donate_on_Ko--fi-purple?logo=ko-fi&style=for-the-badge)](https://ko-fi.com/domferr)
 [![patreon](https://img.shields.io/badge/Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white)](https://patreon.com/domferr)
 
 # Tiling Shell #
 
-This is a Gnome Shell extension implementing modern windows tiling system by extending GNOME's default 2 columns to any layout you want! Can be installed on Gnome Shells from **42 to 49** on X11 and Wayland: the most recent GNOME Shell is supported, and older releases will include all the features and bug fixes!
+This is a Gnome Shell extension implementing modern windows tiling system by extending GNOME's default 2 columns to any layout you want! Can be installed on Gnome Shells from **42 to 50** on X11 and Wayland: the most recent GNOME Shell is supported, and older releases will include all the features and bug fixes!
 
 - 🤩 First and only extension that provides Windows 11's **snap assistant**
 - 🖥️🖥️ **multiple monitors support**, even with different scaling factors!
@@ -26,7 +26,7 @@ This is a Gnome Shell extension implementing modern windows tiling system by ext
 
 <details>
   <summary><span align="center">See here the video overview</span></summary>
-  
+
   https://github.com/user-attachments/assets/2905f0a1-ecd4-47b5-a6bc-59f91716e685
 </details>
 
@@ -38,7 +38,7 @@ Have issues, you want to suggest a new feature or contribute? Please open a new 
 |:---|:---|:---|:---|
 | [⬇️](#layout-editor) **Layout editor** | [⬇️](#smart-resize) **Smart resize** | [⬇️](#tile-with-keyboard) **Tile with Keyboard** | [⬇️](#edge-tiling) **Edge Tiling** |
 | [⬇️](#tiling-buttons) **Tiling Buttons** | [⬇️](#per-workspace-layout) **Per-workspace layout** | [⬇️](#auto-tiling) **Auto-tiling** | [⬇️](#tiling-context-menu) **Tiling context menu** |
-| [⬇️](#smart-border-radius) **Smart border radius** | [⬇️](#windows-suggestions) **Windows Suggestions** 
+| [⬇️](#smart-border-radius) **Smart border radius** | [⬇️](#windows-suggestions) **Windows Suggestions**
 
 ## 🎉🎉 Tiling Shell's AWESOME Supporters!
 Thank you to the :star2: **amazing** <a href="https://patreon.com/domferr"><img src="https://img.shields.io/badge/Patreons-F96854?logo=patreon&logoColor=white)" height="14px"/><a/> and **everyone** who donated on <a href="https://ko-fi.com/domferr"><img src="https://img.shields.io/badge/_Ko--fi-794bc4?logo=ko-fi&logoColor=white" height="14px"/><a/>! :medal_sports:Sean, Markus Huggler, Kostja Palović, Mike Empey, Miguel and Jesse Dhillon on Patreon:medal_sports: and Zorin OS, Nick, thy-fi, iatanas0v, Chris, wbezs, DaneshManoharan, Tamas, Ivan Banha and many more on Ko-fi! You are on a mission to **make Linux window management better for everyone**!
@@ -179,7 +179,7 @@ https://github.com/user-attachments/assets/fbf68458-199d-490b-90cf-3e976d5b511b
 
 _Can I choose to opt in or out?_
 
-Yes. From the extension's preferences you find a section called Windows Suggestions. You can enable and disable windows suggestions for tiling system, snap assistant and screen edges. You can choose which of the three to keep enabled, or all of them, to personalize for your needs and preferences. 
+Yes. From the extension's preferences you find a section called Windows Suggestions. You can enable and disable windows suggestions for tiling system, snap assistant and screen edges. You can choose which of the three to keep enabled, or all of them, to personalize for your needs and preferences.
 
 <p align="right"><b>Go to Usage</b> <a href="#usage">⬆️</a></p>
 
@@ -206,7 +206,7 @@ Clone the repo then run ```npm i``` to install dependencies and then run ```npm 
 npm run install:extension
 ```
 You can restart your GNOME shell e.g. logout then login, or restart in place with an `alt-F2` and entering `r` (X11 only) and enable the extension. Enjoy it!
-To enable via the command line you can run 
+To enable via the command line you can run
 ```bash
 /usr/bin/gnome-extensions enable tilingshell@ferrarodomenico.com
 ```
@@ -224,7 +224,7 @@ journalctl -f -o cat /usr/bin/gjs
 ```
 ### Uninstall Tiling Shell
 
-To uninstall, first disable the extension and then remove it. To disable via the command line you can run 
+To uninstall, first disable the extension and then remove it. To disable via the command line you can run
 ```bash
 /usr/bin/gnome-extensions disable tilingshell@ferrarodomenico.com
 ```
