@@ -21,7 +21,7 @@ import SignalHandling from '../../utils/signalHandling';
 import Layout from '../layout/Layout';
 import Tile from '../layout/Tile';
 import TileUtils from '../layout/TileUtils';
-import { buildLayoutTree } from '../layout/dynamic/layoutTree';
+import { buildLayoutTree, SplitTree } from '../layout/dynamic/layoutTree';
 import { assign, neighbourIndex } from '../layout/dynamic/reflow';
 import type { Direction } from '../layout/dynamic/reflow';
 import { pickLayoutIndex, pickLayoutIndexAt } from '../layout/dynamic/pickLayout';
@@ -97,6 +97,13 @@ export class TilingManager {
     // reflow time so it cannot be misapplied to an unrelated workspace.
     private _splitTarget: Meta.Window | null = null;
     private _dynamicReflowSourceId: number | null = null;
+    // Cache of _dynamicLayoutCandidates(), rebuilt only when the saved
+    // layouts change rather than on every reflow.
+    private _dynamicLayoutCandidatesCache: {
+        tileCount: number;
+        tree: SplitTree | null;
+    }[] | null = null;
+
     // How many layouts to step past the default pick, per workspace and per
     // tile-count group (outer key: workspace, inner key: the tile count of
     // the group's default pick), so an offset set while N windows are open
@@ -210,6 +217,8 @@ export class TilingManager {
             GlobalState.get(),
             GlobalState.SIGNAL_LAYOUTS_CHANGED,
             () => {
+                this._dynamicLayoutCandidatesCache = null;
+
                 const ws = global.workspaceManager.get_active_workspace();
                 if (!ws) return;
 
@@ -1449,6 +1458,15 @@ export class TilingManager {
             window.connect('workspace-changed', () =>
                 this._queueDynamicReflow(),
             ),
+            // dragging a window onto another monitor is the one way a
+            // tracked window can leave this manager's domain without being
+            // destroyed, so it is caught by polling get_monitor() on move
+            // rather than a notify::monitor signal (which windowBorder.ts
+            // does not rely on existing either)
+            window.connect('position-changed', () => {
+                if (window.get_monitor() !== this._monitor.index)
+                    this._releaseDynamicWindow(window);
+            }),
         ]);
         return true;
     }
@@ -1465,6 +1483,25 @@ export class TilingManager {
         if (slot < 0) return;
         this._dynamicWindows.splice(slot, 1);
         this._applyDynamicTiling();
+    }
+
+    /**
+     * Stops managing a window that is still alive, e.g. one dragged onto
+     * another monitor. Unlike `_untrackDynamicWindow`, this disconnects the
+     * window's handlers first, since the window survives and would
+     * otherwise keep firing reflows into a manager that no longer owns it
+     * — and, if dragged back later, `_trackDynamicWindow` would refuse to
+     * re-track it while a stale entry lingers.
+     *
+     * The window is only dropped here, not adopted by the destination
+     * monitor's manager; it is picked back up the next time dynamic tiling
+     * is toggled or that manager re-adopts open windows.
+     */
+    private _releaseDynamicWindow(window: Meta.Window) {
+        this._dynamicWindowSignals
+            .get(window)
+            ?.forEach((id) => window.disconnect(id));
+        this._untrackDynamicWindow(window);
     }
 
     /**
@@ -1571,7 +1608,10 @@ export class TilingManager {
      * are.
      */
     private _dynamicLayoutCandidates() {
-        return GlobalState.get()
+        if (this._dynamicLayoutCandidatesCache !== null)
+            return this._dynamicLayoutCandidatesCache;
+
+        const candidates = GlobalState.get()
             .layouts.map((layout) => ({
                 tileCount: layout.tiles.length,
                 tree: buildLayoutTree(
@@ -1584,6 +1624,9 @@ export class TilingManager {
                 ),
             }))
             .filter((candidate) => candidate.tree !== null);
+
+        this._dynamicLayoutCandidatesCache = candidates;
+        return candidates;
     }
 
     /**
