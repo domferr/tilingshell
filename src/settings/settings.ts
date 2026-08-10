@@ -102,6 +102,7 @@ export default class Settings {
     static KEY_ENABLE_BLUR_SELECTED_TILEPREVIEW = 'enable-blur-selected-tilepreview';
     static KEY_ENABLE_MOVE_KEYBINDINGS = 'enable-move-keybindings';
     static KEY_ENABLE_AUTO_TILING = 'enable-autotiling';
+    static KEY_ENABLE_DYNAMIC_TILING = 'enable-dynamic-tiling';
     static KEY_RAISE_TOGETHER = 'raise-together';
     static KEY_ACTIVE_SCREEN_EDGES = 'active-screen-edges';
     static KEY_TOP_EDGE_MAXIMIZE = 'top-edge-maximize';
@@ -144,6 +145,9 @@ export default class Settings {
     static SETTING_HIGHLIGHT_CURRENT_WINDOW = 'highlight-current-window';
     static SETTING_CYCLE_LAYOUTS = 'cycle-layouts';
     static SETTING_CYCLE_LAYOUTS_BACKWARD = 'cycle-layouts-backward';
+    static SETTING_CYCLE_DYNAMIC_LAYOUT = 'cycle-dynamic-layout';
+    static SETTING_CYCLE_DYNAMIC_LAYOUT_BACKWARD =
+        'cycle-dynamic-layout-backward';
 
     static initialize(settings: Gio.Settings) {
         if (this._is_initialized) return;
@@ -339,6 +343,14 @@ export default class Settings {
 
     static set ENABLE_AUTO_TILING(val: boolean) {
         set_boolean(Settings.KEY_ENABLE_AUTO_TILING, val);
+    }
+
+    static get ENABLE_DYNAMIC_TILING(): boolean {
+        return get_boolean(Settings.KEY_ENABLE_DYNAMIC_TILING);
+    }
+
+    static set ENABLE_DYNAMIC_TILING(val: boolean) {
+        set_boolean(Settings.KEY_ENABLE_DYNAMIC_TILING, val);
     }
 
     static get RAISE_TOGETHER(): boolean {

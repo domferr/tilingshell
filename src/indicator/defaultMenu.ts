@@ -160,6 +160,27 @@ export default class DefaultMenu implements CurrentMenu {
         this._signals = new SignalHandling();
         this._openPrefsFn = openPrefsFn;
         this._children = [];
+        const dynamicToggle = new PopupMenu.PopupSwitchMenuItem(
+            _('Dynamic tiling'),
+            Settings.ENABLE_DYNAMIC_TILING,
+            {},
+        );
+        this._children.push(dynamicToggle);
+        dynamicToggle.connect('toggled', (_item: unknown, state: boolean) => {
+            Settings.ENABLE_DYNAMIC_TILING = state;
+        });
+        // keep the switch honest if the setting is changed from anywhere else
+        this._signals.connect(
+            Settings,
+            Settings.KEY_ENABLE_DYNAMIC_TILING,
+            () => {
+                dynamicToggle.setToggleState(Settings.ENABLE_DYNAMIC_TILING);
+            },
+        );
+        (this._indicator.menu as PopupMenu.PopupMenu).addMenuItem(
+            dynamicToggle,
+        );
+
         const layoutsPopupMenu = new PopupMenu.PopupBaseMenuItem({
             style_class: 'indicator-menu-item',
         });
