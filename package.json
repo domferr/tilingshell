@@ -37,7 +37,7 @@
     "dev:vm:gnome49": "npm run vm:sync gnome49; vagrant up gnome49",
     "vm:destroy:gnome49": "vagrant destroy gnome49",
     "vm:halt:gnome49": "vagrant halt gnome49",
-    "test": "node --test \"src/**/*.test.ts\""
+    "test": "tsx --test \"src/**/*.test.ts\""
   },
   "devDependencies": {
     "@babel/generator": "^7.28.3",
@@ -52,6 +52,7 @@
     "glob": "^11.0.3",
     "globals": "^16.4.0",
     "prettier": "^3.7.3",
+    "tsx": "^4.23.12",
     "typescript": "^5.9.2"
   },
   "dependencies": {
