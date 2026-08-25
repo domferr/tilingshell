@@ -27,6 +27,7 @@ import {
     filterUnfocusableWindows,
     getMonitors,
     getWindows,
+    isFractionalScalingEnabled,
     squaredEuclideanDistance,
 } from './utils/ui';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -132,7 +133,7 @@ export default class TilingShellExtension extends Extension {
         // force initialization and tracking of windows
         TilingShellWindowManager.get();
 
-        this._fractionalScalingEnabled = this._isFractionalScalingEnabled(
+        this._fractionalScalingEnabled = isFractionalScalingEnabled(
             new Gio.Settings({ schema: 'org.gnome.mutter' }),
         );
 
@@ -226,7 +227,7 @@ export default class TilingShellExtension extends Extension {
                 if (!_mutterSettings) return;
 
                 const fractionalScalingEnabled =
-                    this._isFractionalScalingEnabled(_mutterSettings);
+                    isFractionalScalingEnabled(_mutterSettings);
 
                 if (this._fractionalScalingEnabled === fractionalScalingEnabled)
                     return;
@@ -240,7 +241,7 @@ export default class TilingShellExtension extends Extension {
                 if (this._windowBorderManager)
                     this._windowBorderManager.destroy();
                 this._windowBorderManager = new WindowBorderManager(
-                    this._fractionalScalingEnabled,
+                    !this._fractionalScalingEnabled,
                 );
                 this._windowBorderManager.enable();
             },
@@ -746,20 +747,6 @@ export default class TilingShellExtension extends Extension {
         if (!monitorTilingManager) return;
 
         monitorTilingManager.onUntileWindow(focus_window, true);
-    }
-
-    private _isFractionalScalingEnabled(
-        _mutterSettings: Gio.Settings,
-    ): boolean {
-        return (
-            _mutterSettings
-                .get_strv('experimental-features')
-                .find(
-                    (feat) =>
-                        feat === 'scale-monitor-framebuffer' ||
-                        feat === 'x11-randr-fractional-scaling',
-                ) !== undefined
-        );
     }
 
     disable(): void {

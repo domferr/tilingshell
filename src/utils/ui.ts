@@ -1,8 +1,39 @@
-import { St, Meta, Mtk, Clutter } from '../gi/ext';
+import { St, Meta, Mtk, Clutter, Gio, GLib } from '../gi/ext';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
+import * as Config from 'resource:///org/gnome/shell/misc/config.js';
 
 export const getMonitors = (): Monitor[] => Main.layoutManager.monitors;
+
+export const isFractionalScalingEnabled = (
+    mutterSettings: Gio.Settings,
+): boolean => {
+    // Since GNOME 49, fractional scaling (the logical monitor layout mode) is
+    // enabled by default on Wayland and is no longer an experimental feature
+    const GNOME_VERSION_MAJOR = Number(Config.PACKAGE_VERSION.split('.')[0]);
+    // Meta.is_wayland_compositor() was removed in newer GNOME versions
+    const isWayland = Meta.is_wayland_compositor
+        ? Meta.is_wayland_compositor()
+        : GLib.getenv('XDG_SESSION_TYPE') === 'wayland';
+    if (isWayland && GNOME_VERSION_MAJOR >= 49) return true;
+
+    // The experimental-features key was removed from the org.gnome.mutter
+    // schema in mutter 51, so only read it when the schema still has it
+    const source = Gio.SettingsSchemaSource.get_default();
+    const schema = source?.lookup('org.gnome.mutter', true);
+    if (!schema || !schema.list_keys().includes('experimental-features'))
+        return false;
+
+    return (
+        mutterSettings
+            .get_strv('experimental-features')
+            .find(
+                (feat) =>
+                    feat === 'scale-monitor-framebuffer' ||
+                    feat === 'x11-randr-fractional-scaling',
+            ) !== undefined
+    );
+};
 
 export const isPointInsideRect = (
     point: { x: number; y: number },
