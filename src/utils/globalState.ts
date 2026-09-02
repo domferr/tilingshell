@@ -157,7 +157,7 @@ export default class GlobalState extends GObject.Object {
                     to_be_saved.push(monitors_layouts);
                 }
 
-                Settings.save_selected_layouts(to_be_saved);
+                this._persistSelectedLayouts(to_be_saved);
             },
         );
 
@@ -179,7 +179,7 @@ export default class GlobalState extends GObject.Object {
                     newMap.set(ws, monitors_layouts);
                     to_be_saved.push(monitors_layouts);
                 }
-                Settings.save_selected_layouts(to_be_saved);
+                this._persistSelectedLayouts(to_be_saved);
 
                 this._selected_layouts.clear();
                 this._selected_layouts = newMap;
@@ -199,7 +199,27 @@ export default class GlobalState extends GObject.Object {
 
     public validate_selected_layouts() {
         const n_monitors = Main.layoutManager.monitors.length;
-        const old_selected_layouts = Settings.get_selected_layouts();
+        const currentSignatures = this._getMonitorSignatures();
+        const topologyMatch = this._findTopologyMatch(
+            Settings.get_selected_layouts_by_topology(),
+            currentSignatures,
+        );
+        const defaultLayoutId = this._layouts[0].id;
+        let old_selected_layouts =
+            topologyMatch?.selections ?? Settings.get_selected_layouts();
+        if (topologyMatch) {
+            const fromKey = this._buildTopologyKey(
+                topologyMatch.signatures,
+            );
+            if (fromKey !== this._buildTopologyKey(currentSignatures)) {
+                old_selected_layouts = this._remapSelections(
+                    old_selected_layouts,
+                    topologyMatch.signatures,
+                    currentSignatures,
+                    defaultLayoutId,
+                );
+            }
+        }
         for (let i = 0; i < global.workspaceManager.get_n_workspaces(); i++) {
             const ws = global.workspaceManager.get_workspace_by_index(i);
             if (!ws) continue;
@@ -207,7 +227,7 @@ export default class GlobalState extends GObject.Object {
             const monitors_layouts =
                 i < old_selected_layouts.length ? old_selected_layouts[i] : [];
             while (monitors_layouts.length < n_monitors)
-                monitors_layouts.push(this._layouts[0].id);
+                monitors_layouts.push(defaultLayoutId);
             while (monitors_layouts.length > n_monitors) monitors_layouts.pop();
 
             monitors_layouts.forEach((_, ind) => {
@@ -236,7 +256,103 @@ export default class GlobalState extends GObject.Object {
             to_be_saved.push(monitors_layouts);
         }
 
-        Settings.save_selected_layouts(to_be_saved);
+        this._persistSelectedLayouts(to_be_saved);
+    }
+
+    private _persistSelectedLayouts(selectedLayouts: string[][]) {
+        Settings.save_selected_layouts(selectedLayouts);
+        const topologyMap = Settings.get_selected_layouts_by_topology();
+        const topologyKey = this._buildTopologyKey(
+            this._getMonitorSignatures(),
+        );
+        if (selectedLayouts.length === 0) {
+            delete topologyMap[topologyKey];
+        } else {
+            topologyMap[topologyKey] = selectedLayouts;
+        }
+        Settings.save_selected_layouts_by_topology(topologyMap);
+    }
+
+    private _getMonitorSignatures(): string[] {
+        return Main.layoutManager.monitors.map((monitor) => {
+            const geometryScale =
+                (monitor as { geometryScale?: number }).geometryScale ??
+                (monitor as { geometry_scale?: number }).geometry_scale ??
+                (monitor as { scale?: number }).scale ??
+                (monitor as { scaleFactor?: number }).scaleFactor ??
+                1;
+            return `${monitor.x},${monitor.y},${monitor.width},${monitor.height},${geometryScale}`;
+        });
+    }
+
+    private _buildTopologyKey(signatures: string[]): string {
+        return signatures.join('|');
+    }
+
+    private _findTopologyMatch(
+        topologyMap: Record<string, string[][]>,
+        currentSignatures: string[],
+    ): { selections: string[][]; signatures: string[] } | null {
+        const exactKey = this._buildTopologyKey(currentSignatures);
+        if (topologyMap[exactKey]) {
+            return {
+                selections: topologyMap[exactKey],
+                signatures: currentSignatures,
+            };
+        }
+
+        for (const [key, selections] of Object.entries(topologyMap)) {
+            const signatures = key.length > 0 ? key.split('|') : [];
+            if (this._signaturesMatch(signatures, currentSignatures)) {
+                return {
+                    selections,
+                    signatures,
+                };
+            }
+        }
+
+        return null;
+    }
+
+    private _signaturesMatch(
+        source: string[],
+        target: string[],
+    ): boolean {
+        if (source.length !== target.length) return false;
+        const counts = new Map<string, number>();
+        source.forEach((signature) => {
+            counts.set(signature, (counts.get(signature) ?? 0) + 1);
+        });
+        for (const signature of target) {
+            const count = counts.get(signature);
+            if (!count) return false;
+            if (count === 1) counts.delete(signature);
+            else counts.set(signature, count - 1);
+        }
+        return counts.size === 0;
+    }
+
+    private _remapSelections(
+        selections: string[][],
+        fromSignatures: string[],
+        toSignatures: string[],
+        defaultLayoutId: string,
+    ): string[][] {
+        const indexMap = toSignatures.map((signature) =>
+            fromSignatures.indexOf(signature),
+        );
+        return selections.map((workspaceSelections) => {
+            const remapped: string[] = [];
+            for (let i = 0; i < toSignatures.length; i++) {
+                const fromIndex = indexMap[i];
+                const layoutId =
+                    fromIndex >= 0
+                        ? workspaceSelections?.[fromIndex]
+                        : undefined;
+                remapped.push(layoutId ?? defaultLayoutId);
+            }
+            return remapped;
+        });
     }
 
     get layouts(): Layout[] {
@@ -365,6 +481,6 @@ export default class GlobalState extends GObject.Object {
             }
         }
 
-        Settings.save_selected_layouts(selected);
+        this._persistSelectedLayouts(selected);
     }
 }
