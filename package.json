@@ -37,7 +37,7 @@
     "dev:vm:gnome49": "npm run vm:sync gnome49; vagrant up gnome49",
     "vm:destroy:gnome49": "vagrant destroy gnome49",
     "vm:halt:gnome49": "vagrant halt gnome49",
-    "test": "tsx --test \"src/**/*.test.ts\""
+    "test": "tsx --test \"src/**/*.test.ts\" \"test/**/*.test.ts\""
   },
   "devDependencies": {
     "@babel/generator": "^7.28.3",
