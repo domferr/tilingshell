@@ -26,10 +26,10 @@ export class ReflowScheduler {
             reflow();
         } finally {
             this._running = false;
-        }
-        if (this._pending) {
-            this._pending = false;
-            this._queueIdle();
+            if (this._pending) {
+                this._pending = false;
+                this._queueIdle();
+            }
         }
         return 'ran';
     }

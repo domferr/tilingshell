@@ -49,3 +49,15 @@ test('a throwing reflow leaves the scheduler usable', () => {
         'ran',
     );
 });
+
+test('a reflow that throws after a nested request still queues the follow-up', () => {
+    let idleQueued = 0;
+    const s = new ReflowScheduler(() => idleQueued++);
+    assert.throws(() =>
+        s.run(() => {
+            s.run(() => {});
+            throw new Error('boom');
+        }),
+    );
+    assert.equal(idleQueued, 1);
+});

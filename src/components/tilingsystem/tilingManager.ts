@@ -552,7 +552,7 @@ export class TilingManager {
             );
         }
 
-        if (isMaximized) unmaximizeWindow(window);
+        if (isMaximized) this._unmaximizeForPlacement(window);
 
         this._easeWindowRect(window, destination.rect, false, force);
 
@@ -1098,6 +1098,19 @@ export class TilingManager {
         );
     }
 
+    /**
+     * Unmaximizes a window that is about to be placed. mutter would animate
+     * the unmaximize on its own and the placement would then animate again on
+     * top of it, so mutter's effect is skipped; the placer's animation covers
+     * the whole way from the maximized rect to the tile.
+     */
+    private _unmaximizeForPlacement(window: Meta.Window) {
+        const actor =
+            window.get_compositor_private() as Meta.WindowActor | null;
+        if (actor) Main.wm.skipNextEffect(actor);
+        unmaximizeWindow(window);
+    }
+
     private _easeWindowRect(
         window: Meta.Window,
         destRect: Mtk.Rectangle,
@@ -1324,14 +1337,7 @@ export class TilingManager {
         const isMaximized =
             window.maximizedHorizontally || window.maximizedVertically;
         const rememberOriginalSize = !isMaximized;
-        if (isMaximized) {
-            // mutter would animate the unmaximize on its own and then our
-            // placement would animate again on top of it; skip mutter's
-            const actor =
-                window.get_compositor_private() as Meta.WindowActor | null;
-            if (actor) Main.wm.skipNextEffect(actor);
-            unmaximizeWindow(window);
-        }
+        if (isMaximized) this._unmaximizeForPlacement(window);
 
         if (rememberOriginalSize && !(window as ExtendedWindow).assignedTile) {
             (window as ExtendedWindow).originalSize = window
@@ -1722,6 +1728,14 @@ export class TilingManager {
      * Recomputes rectangles and eases every managed window into place, on
      * every workspace that holds one — a window closing on another workspace
      * must not leave a hole there.
+     *
+     * Two ways in: call this directly only when the caller is the last thing
+     * before a frame the user is watching for (a drop, a keybinding, a
+     * window's first frame); everything that is merely a consequence of
+     * window state changing (open/close/minimize/workspace/layout/work area)
+     * goes through `_queueDynamicReflow`, which coalesces bursts into one
+     * idle reflow. A reflow requested from inside a running one is deferred
+     * to that same idle by the scheduler.
      */
     private _applyDynamicTiling() {
         if (!Settings.ENABLE_DYNAMIC_TILING) return;

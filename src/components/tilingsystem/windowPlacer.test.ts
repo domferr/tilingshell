@@ -14,9 +14,9 @@ function fakeTarget(frame: Rect, alive = true) {
     const calls: string[] = [];
     let current = { ...frame };
     const target: PlacementTarget = {
-        key: {},
         isAlive: () => alive,
         getFrameRect: () => ({ ...current }),
+        getBufferRect: () => ({ ...current }),
         moveToMonitor: (i) => calls.push(`monitor:${i}`),
         moveFrame: (_u, x, y) => calls.push(`move:${x},${y}`),
         moveResizeFrame: (_u, r) =>
@@ -94,5 +94,14 @@ test('after a settle, the same dest is skipped while the frame is unchanged and 
         'requested',
         'the frame changed since the settle',
     );
-    assert.equal(calls.filter((c) => c.startsWith('moveResize')).length, 2);
+    // re-asking for the very rect mutter last sent would be dropped as an
+    // equivalent configure, so it is preceded by a one-pixel nudge
+    assert.deepEqual(
+        calls.filter((c) => c.startsWith('moveResize')),
+        [
+            'moveResize:10,10,500,400',
+            'moveResize:10,10,501,400',
+            'moveResize:10,10,500,400',
+        ],
+    );
 });

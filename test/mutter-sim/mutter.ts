@@ -61,6 +61,7 @@ export class SignalBus<Name extends string> {
 
 export interface EaseParams {
     duration: number;
+    mode?: unknown;
     onStopped?: (finished: boolean) => void;
     [prop: string]: unknown;
 }
@@ -135,12 +136,40 @@ export class SimActor {
         this.height = height;
     }
 
+    /**
+     * gnome-shell environment.js `_easeActor`: the animated properties are
+     * `Object.keys(params).map(p => p.replaceAll('_', '-'))`, looked up by
+     * Clutter's kebab-case pspec names. A key that does not map to one (e.g.
+     * camelCase `scaleX`) is still *set* by `actor.set(params)` but yields no
+     * transition, and with no transition at all the callback runs at once.
+     */
     ease(params: EaseParams): void {
-        const { duration, onStopped, ...rest } = params;
+        const { duration, onStopped, mode: _mode, ...rest } = params;
         const props: Partial<Record<Animatable, number>> = {};
-        for (const [k, v] of Object.entries(rest))
-            if ((ANIMATABLE as readonly string[]).includes(k))
-                props[k as Animatable] = v as number;
+        for (const [k, v] of Object.entries(rest)) {
+            const kebab = k.replaceAll('_', '-');
+            const snake = kebab.replaceAll('-', '_');
+            if (
+                kebab === k.replaceAll('_', '-') &&
+                k === snake &&
+                (ANIMATABLE as readonly string[]).includes(snake)
+            ) {
+                props[snake as Animatable] = v as number;
+            } else {
+                // GObject `set` accepts camelCase too: applied, not animated
+                const camelToSnake = k.replace(
+                    /[A-Z]/g,
+                    (c) => `_${c.toLowerCase()}`,
+                );
+                if ((ANIMATABLE as readonly string[]).includes(camelToSnake))
+                    (this as unknown as Record<string, number>)[camelToSnake] =
+                        v as number;
+            }
+        }
+        if (Object.keys(props).length === 0) {
+            onStopped?.(true);
+            return;
+        }
 
         // Clutter replaces an in-flight transition on the same property; the
         // replaced transition is stopped early (onStopped(false)).
@@ -333,6 +362,8 @@ export const enum SizeChange {
 
 export type AckPolicy =
     | { kind: 'comply' }
+    /** acks inside move_resize_frame, like an X11 client under mutter */
+    | { kind: 'sync' }
     | { kind: 'clampMin'; minWidth: number; minHeight: number }
     | { kind: 'ignore' }
     | { kind: 'delayed'; ms: number; then: AckPolicy };
@@ -590,6 +621,9 @@ export class SimWindow {
                 this.clock.timeout(this._ackDelay + extraDelay, () =>
                     this.clientAck(undefined, cfg),
                 );
+                return;
+            case 'sync':
+                this.clientAck(undefined, cfg);
                 return;
             case 'clampMin': {
                 const size = {

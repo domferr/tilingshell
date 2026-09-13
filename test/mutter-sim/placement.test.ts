@@ -270,3 +270,120 @@ test('(x) placer.destroy() cancels everything in flight', () => {
     clock.tick(1000);
     assert.equal(window.get_compositor_private()!.scale_x, 1);
 });
+
+test('(xi) a request for the current frame cancels a conflicting in-flight request', () => {
+    // window B opened (A asked to shrink to R1) and closed again before the
+    // client answered: A must end where it already is, not at R1
+    const { clock, window, placer } = fixture({
+        kind: 'delayed',
+        ms: 100,
+        then: { kind: 'comply' },
+    });
+    const target = simTargetFor(window);
+    const r0 = window.get_frame_rect();
+    const r1 = { x: 8, y: 40, width: 600, height: 500 };
+    assert.equal(placer.place(target, r1), 'requested');
+    assert.equal(
+        placer.place(target, r0),
+        'requested',
+        'must supersede the pending request',
+    );
+    clock.tick(500);
+    assert.deepEqual(window.get_frame_rect(), r0);
+});
+
+test('(xii) animate:false leaves an in-flight actor transition (the map animation) alone', () => {
+    const { clock, window, placer } = fixture();
+    const actor = window.get_compositor_private()!;
+    actor.opacity = 0;
+    actor.ease({ opacity: 255, duration: 250 }); // gnome-shell _mapWindow
+    placer.place(simTargetFor(window), TILE_S, { animate: false });
+    assert.equal(actor.hasTransitions, true, 'map animation still running');
+    clock.tick(300);
+    assert.equal(actor.opacity, 255);
+});
+
+test('(xiii) after the client resized itself, the same tile is asked for again in a way mutter sends', () => {
+    // Brave grew from 512 to 634 tall six seconds after being placed
+    const { clock, compositor, wm, window, placer } = fixture();
+    const actor = window.get_compositor_private()!;
+    const target = simTargetFor(window);
+    assert.equal(placer.place(target, TILE_S), 'requested');
+    clock.tick(400);
+    assert.deepEqual(window.get_frame_rect(), TILE_S);
+
+    window.clientResize(600, 634);
+    assert.deepEqual(window.get_frame_rect(), { ...TILE_S, height: 634 });
+
+    assert.equal(placer.place(target, TILE_S), 'requested');
+    clock.tick(400);
+    assert.deepEqual(
+        window.get_frame_rect(),
+        TILE_S,
+        'mutter must not have dropped the configure',
+    );
+    assertHealthy(actor, window, compositor, wm);
+});
+
+test('(xiv) the animation start accounts for CSD extents around the frame', () => {
+    const clock = new SimClock();
+    const compositor = new SimCompositor(clock, WORK_AREA);
+    new ShellWindowManager(compositor, clock);
+    const window = compositor.createWindow(
+        'csd',
+        { x: 8, y: 40, width: 800, height: 600 },
+        { kind: 'comply' },
+        {
+            extents: { left: 40, right: 40, top: 30, bottom: 50 },
+        },
+    );
+    const actor = window.get_compositor_private()!;
+    const placer = new WindowPlacer(simClock(clock), { monitorIndex: 0 });
+    placer.place(simTargetFor(window), TILE_S, { animate: true });
+    clock.tick(20); // acked, animation starts now
+    const s = 800 / 600;
+    assert.equal(actor.scale_x, s);
+    // visual frame edge: buffer.x + tx + s*left must equal the old frame x (8)
+    const buffer = window.get_buffer_rect();
+    assert.equal(Math.round(buffer.x + actor.translation_x + s * 40), 8);
+});
+
+test('(xv) X11-style client that acks synchronously inside move_resize_frame settles in-call', () => {
+    const { clock, compositor, wm, window, placer } = fixture({ kind: 'sync' });
+    const actor = window.get_compositor_private()!;
+    let settled = 0;
+    assert.equal(
+        placer.place(simTargetFor(window), TILE_S, {
+            animate: true,
+            onSettled: () => settled++,
+        }),
+        'requested',
+    );
+    assert.equal(settled, 1, 'settled before place() returned');
+    assert.deepEqual(window.get_frame_rect(), TILE_S);
+    assert.equal(clock.pendingTimeouts, 1, 'only the animation is left');
+    clock.tick(300);
+    assertHealthy(actor, window, compositor, wm);
+});
+
+test('(xvi) onSettled is per request and reports what was asked and what the client gave', () => {
+    const { clock, window, placer } = fixture({
+        kind: 'clampMin',
+        minWidth: 700,
+        minHeight: 600,
+    });
+    const seen: Array<[Rect, Rect]> = [];
+    placer.place(simTargetFor(window), TILE_S, {
+        onSettled: (req, actual) => seen.push([req, actual]),
+    });
+    placer.place(simTargetFor(window), { ...TILE_S, x: 100 }); // supersedes: the first never settles
+    clock.tick(400);
+    assert.deepEqual(seen, [], 'superseded request did not report');
+    placer.place(simTargetFor(window), TILE_S, {
+        onSettled: (req, actual) => seen.push([req, actual]),
+    });
+    clock.tick(400);
+    assert.deepEqual(seen, [
+        [TILE_S, { x: 8, y: 40, width: 700, height: 600 }],
+    ]);
+});

@@ -47,13 +47,16 @@ export interface PlacementActor {
     cancelTransitions(): void;
 }
 
-/** The bits of Meta.Window the placer needs. */
+/**
+ * The bits of Meta.Window the placer needs. One target per window: the
+ * placer keeps its per-window history keyed by the target object.
+ */
 export interface PlacementTarget {
-    /** identity of the underlying window, used as a WeakMap key */
-    readonly key: object;
     /** false once the compositor actor is gone (before/after unmanage) */
     isAlive(): boolean;
     getFrameRect(): Rect;
+    /** frame plus client-side decorations/shadows; the actor's own rect */
+    getBufferRect(): Rect;
     moveToMonitor(index: number): void;
     moveFrame(userOp: boolean, x: number, y: number): void;
     moveResizeFrame(userOp: boolean, rect: Rect): void;
@@ -74,6 +77,11 @@ export interface PlaceOptions {
     /** also call move_frame first (GNOME 42 restart-grab path) */
     forceMove?: boolean;
     animate?: boolean;
+    /**
+     * Called once this request settled — not if it was superseded — with the
+     * rect that was asked for and the frame the client actually ended on.
+     */
+    onSettled?: (requested: Rect, actual: Rect) => void;
 }
 
 export type PlaceResult =
@@ -85,6 +93,11 @@ export type PlaceResult =
     | 'coalesced';
 
 export interface PlacerOptions {
+    /**
+     * Every request first moves the window to this monitor, preserving the
+     * move_to_monitor → move_frame → move_resize_frame order the extension
+     * has always used.
+     */
     monitorIndex: number;
     /** give up waiting for the client after this long */
     settleTimeoutMs: number;
@@ -97,6 +110,7 @@ interface Pending {
     dest: Rect;
     before: Rect;
     animate: boolean;
+    onSettled?: (requested: Rect, actual: Rect) => void;
     disconnectGeometry: () => void;
     disconnectGone: () => void;
     timeout: unknown;
@@ -111,15 +125,8 @@ interface History {
 
 export class WindowPlacer {
     private readonly _opts: PlacerOptions;
-    private readonly _history = new WeakMap<object, History>();
+    private readonly _history = new WeakMap<PlacementTarget, History>();
     private readonly _inFlight = new Set<PlacementTarget>();
-
-    /** Called once a request settled, with what was asked and what the client gave. */
-    public onSettled?: (
-        target: PlacementTarget,
-        requested: Rect,
-        actual: Rect,
-    ) => void;
 
     constructor(
         private readonly _clock: PlacerClock,
@@ -144,14 +151,16 @@ export class WindowPlacer {
         const hist = this._historyOf(target);
         const frame = target.getFrameRect();
 
-        if (rectEquals(frame, dest)) {
+        if (hist.pending && rectEquals(hist.pending.dest, dest))
+            return 'coalesced';
+
+        // a pending request for another rect is about to move the window
+        // away from `dest`, so "already there" only holds without one
+        if (rectEquals(frame, dest) && !hist.pending) {
             hist.lastRequested = copyRect(dest);
             hist.settledFrame = copyRect(frame);
             return 'skipped-identical';
         }
-
-        if (hist.pending && rectEquals(hist.pending.dest, dest))
-            return 'coalesced';
 
         const sameAsLast =
             hist.lastRequested !== undefined &&
@@ -161,7 +170,10 @@ export class WindowPlacer {
             // the client already answered exactly this request with this
             // frame and nothing moved it since; mutter would drop the
             // configure anyway (meta-window-wayland.c: equivalent
-            // configurations are not re-sent), so do not wait on it
+            // configurations are not re-sent), so do not wait on it.
+            // Known limitation: a client whose constraints relax later
+            // (a collapsed sidebar, a changed min size) is only asked
+            // again once its frame or its tile changes.
             return 'skipped-settled';
         }
 
@@ -184,21 +196,35 @@ export class WindowPlacer {
             return 'requested-move-only';
         }
 
-        this._request(target, hist, dest, dest, frame, options, userOp);
+        // the same rect as last time but the window changed on its own since
+        // (e.g. a browser restoring its saved size after start-up): mutter
+        // still remembers `dest` as the last configuration it sent and would
+        // drop an identical one, so nudge it with a rect one pixel wider
+        // first; the real configure is then not equivalent to the previous
+        // one and goes out
+        this._request(
+            target,
+            hist,
+            dest,
+            dest,
+            frame,
+            options,
+            userOp,
+            sameAsLast,
+        );
         return 'requested';
     }
 
     /** Drop everything known about a window (it is no longer managed). */
     public forget(target: PlacementTarget): void {
-        const hist = this._history.get(target.key);
+        const hist = this._history.get(target);
         if (hist?.pending) this._cancelPending(hist);
-        this._history.delete(target.key);
+        this._history.delete(target);
         this._inFlight.delete(target);
     }
 
     public destroy(): void {
         for (const target of [...this._inFlight]) this.forget(target);
-        this.onSettled = undefined;
     }
 
     private _request(
@@ -209,17 +235,22 @@ export class WindowPlacer {
         before: Rect,
         options: PlaceOptions,
         userOp: boolean,
+        nudge = false,
     ): void {
         // a newer request supersedes the previous one, but the animation
         // still starts from where the window was before the first of them
         const earlierBefore = hist.pending?.before;
         if (hist.pending) this._cancelPending(hist);
-        target.getActor()?.cancelTransitions();
+        const animate = options.animate ?? false;
+        // only an animated placement owns the actor's transitions; a plain
+        // one must not cut short e.g. gnome-shell's map animation
+        if (animate) target.getActor()?.cancelTransitions();
 
         const pending: Pending = {
             dest: copyRect(dest),
             before: copyRect(earlierBefore ?? before),
-            animate: options.animate ?? false,
+            animate,
+            onSettled: options.onSettled,
             disconnectGeometry: () => {},
             disconnectGone: () => {},
             timeout: null,
@@ -228,6 +259,8 @@ export class WindowPlacer {
         hist.pending = pending;
         this._inFlight.add(target);
 
+        // handlers go in before the request: an X11 client (or a pure move)
+        // can settle synchronously inside moveResizeFrame
         pending.disconnectGeometry = target.onGeometryChanged(() => {
             if (hist.pending !== pending) return;
             if (rectEquals(target.getFrameRect(), pending.dest)) {
@@ -256,6 +289,11 @@ export class WindowPlacer {
 
         target.moveToMonitor(this._opts.monitorIndex);
         if (options.forceMove) target.moveFrame(userOp, request.x, request.y);
+        if (nudge)
+            target.moveResizeFrame(userOp, {
+                ...request,
+                width: request.width + 1,
+            });
         target.moveResizeFrame(userOp, request);
     }
 
@@ -276,11 +314,19 @@ export class WindowPlacer {
             const actor = target.getActor();
             if (actor) {
                 const before = pending.before;
+                const scaleX = before.width / frame.width;
+                const scaleY = before.height / frame.height;
+                // the actor is scaled about the buffer's origin, which sits
+                // extents.left/top outside the frame; keep the visual frame
+                // edge where the old frame was
+                const buffer = target.getBufferRect();
+                const left = frame.x - buffer.x;
+                const top = frame.y - buffer.y;
                 actor.setTransform(
-                    before.width / frame.width,
-                    before.height / frame.height,
-                    before.x - frame.x,
-                    before.y - frame.y,
+                    scaleX,
+                    scaleY,
+                    before.x - frame.x + left * (1 - scaleX),
+                    before.y - frame.y + top * (1 - scaleY),
                 );
                 actor.easeToIdentity(this._opts.animationMs, () => {
                     // whether it finished or was cancelled, never leave a
@@ -290,7 +336,7 @@ export class WindowPlacer {
             }
         }
 
-        this.onSettled?.(target, pending.dest, frame);
+        pending.onSettled?.(copyRect(pending.dest), copyRect(frame));
     }
 
     private _cancelPending(hist: History): void {
@@ -304,10 +350,10 @@ export class WindowPlacer {
     }
 
     private _historyOf(target: PlacementTarget): History {
-        let hist = this._history.get(target.key);
+        let hist = this._history.get(target);
         if (!hist) {
             hist = {};
-            this._history.set(target.key, hist);
+            this._history.set(target, hist);
         }
         return hist;
     }
