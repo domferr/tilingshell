@@ -30,12 +30,23 @@ export function easeWindowRectHead(
 
     // apply animations when tiling the window
     windowActor.remove_all_transitions();
-    wm._prepareAnimationInfo(undefined as never, windowActor, { ...beforeRect }, SizeChange.UNMAXIMIZE);
+    wm._prepareAnimationInfo(
+        undefined as never,
+        windowActor,
+        { ...beforeRect },
+        SizeChange.UNMAXIMIZE,
+    );
 
     // move and resize the window to the current selection
     window.move_to_monitor(monitorIndex);
     if (force) window.move_frame(user_op, destRect.x, destRect.y);
-    window.move_resize_frame(user_op, destRect.x, destRect.y, destRect.width, destRect.height);
+    window.move_resize_frame(
+        user_op,
+        destRect.x,
+        destRect.y,
+        destRect.width,
+        destRect.height,
+    );
 }
 
 export function easeWindowRectWorkingTree(
@@ -61,10 +72,21 @@ export function easeWindowRectWorkingTree(
 
     const alreadyAnimating = !!windowActor.__animationInfo;
     if (!alreadyAnimating) {
-        wm._prepareAnimationInfo(undefined as never, windowActor, { ...beforeRect }, SizeChange.UNMAXIMIZE);
+        wm._prepareAnimationInfo(
+            undefined as never,
+            windowActor,
+            { ...beforeRect },
+            SizeChange.UNMAXIMIZE,
+        );
     }
 
     window.move_to_monitor(monitorIndex);
     if (force) window.move_frame(user_op, destRect.x, destRect.y);
-    window.move_resize_frame(user_op, destRect.x, destRect.y, destRect.width, destRect.height);
+    window.move_resize_frame(
+        user_op,
+        destRect.x,
+        destRect.y,
+        destRect.width,
+        destRect.height,
+    );
 }

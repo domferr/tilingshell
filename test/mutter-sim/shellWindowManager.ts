@@ -16,7 +16,13 @@
  * contract changes rather than when our reading of it does.
  */
 import { SimClock } from './clock.ts';
-import { Rect, SimActor, SimCompositor, SimWindowActor, SizeChange } from './mutter.ts';
+import {
+    Rect,
+    SimActor,
+    SimCompositor,
+    SimWindowActor,
+    SizeChange,
+} from './mutter.ts';
 
 export const WINDOW_ANIMATION_TIME = 250;
 
@@ -34,14 +40,16 @@ export class ShellWindowManager {
         compositor.shellwm.connect('kill-window-effects', (actor) => {
             this._sizeChangeWindowDone(this._shellwm, actor as SimWindowActor);
         });
-        compositor.shellwm.connect('size-change', (actor, which, oldFrame, oldBuffer) =>
-            this._sizeChangeWindow(
-                this._shellwm,
-                actor as SimWindowActor,
-                which as SizeChange,
-                oldFrame as Rect,
-                oldBuffer as Rect,
-            ),
+        compositor.shellwm.connect(
+            'size-change',
+            (actor, which, oldFrame, oldBuffer) =>
+                this._sizeChangeWindow(
+                    this._shellwm,
+                    actor as SimWindowActor,
+                    which as SizeChange,
+                    oldFrame as Rect,
+                    oldBuffer as Rect,
+                ),
         );
         compositor.shellwm.connect('size-changed', (actor) =>
             this._sizeChangedWindow(this._shellwm, actor as SimWindowActor),
@@ -66,8 +74,16 @@ export class ShellWindowManager {
         _oldBufferRect: Rect,
     ): void {
         const shouldAnimate =
-            this._shouldAnimateActor(actor, []) && oldFrameRect.width > 0 && oldFrameRect.height > 0;
-        if (shouldAnimate) this._prepareAnimationInfo(shellwm, actor, oldFrameRect, whichChange);
+            this._shouldAnimateActor(actor, []) &&
+            oldFrameRect.width > 0 &&
+            oldFrameRect.height > 0;
+        if (shouldAnimate)
+            this._prepareAnimationInfo(
+                shellwm,
+                actor,
+                oldFrameRect,
+                whichChange,
+            );
         else shellwm.completed_size_change(actor);
     }
 
@@ -91,7 +107,11 @@ export class ShellWindowManager {
             this._shellwm.completed_size_change(actor);
         }
 
-        actor.connectObject('destroy', () => this._clearAnimationInfo(actor), actorClone);
+        actor.connectObject(
+            'destroy',
+            () => this._clearAnimationInfo(actor),
+            actorClone,
+        );
 
         this._resizePending.add(actor);
         actor.__animationInfo = {
@@ -166,7 +186,10 @@ export class ShellWindowManager {
         return false;
     }
 
-    _sizeChangeWindowDone(_shellwm: SimCompositor, actor: SimWindowActor): void {
+    _sizeChangeWindowDone(
+        _shellwm: SimCompositor,
+        actor: SimWindowActor,
+    ): void {
         if (this._resizing.delete(actor)) {
             actor.remove_all_transitions();
             actor.scale_x = 1.0;

@@ -145,7 +145,8 @@ export class SimActor {
         // Clutter replaces an in-flight transition on the same property; the
         // replaced transition is stopped early (onStopped(false)).
         for (const t of [...this._transitions])
-            if (Object.keys(props).some((p) => p in t.props)) this._stop(t, false);
+            if (Object.keys(props).some((p) => p in t.props))
+                this._stop(t, false);
 
         if (duration <= 0) {
             Object.assign(this, props);
@@ -181,7 +182,8 @@ export class SimActor {
     }
 
     connect(signal: 'destroy', cb: () => void): number {
-        if (signal !== 'destroy') throw new Error(`unsupported signal ${signal}`);
+        if (signal !== 'destroy')
+            throw new Error(`unsupported signal ${signal}`);
         this._destroyHandlers.push(cb);
         return this._destroyHandlers.length;
     }
@@ -190,7 +192,9 @@ export class SimActor {
     connectObject(signal: 'destroy', cb: () => void, owner: SimActor): void {
         this.connect(signal, cb);
         owner.connect('destroy', () => {
-            this._destroyHandlers = this._destroyHandlers.filter((h) => h !== cb);
+            this._destroyHandlers = this._destroyHandlers.filter(
+                (h) => h !== cb,
+            );
         });
     }
 
@@ -298,7 +302,13 @@ export class SimWindowActor extends SimActor {
     /** meta_window_actor_size_change: counts the in-flight effect, then asks the plugin */
     sizeChange(which: SizeChange, oldFrame: Rect, oldBuffer: Rect): void {
         this.sizeChangeInProgress++;
-        this.compositor.shellwm.emit('size-change', this, which, copy(oldFrame), copy(oldBuffer));
+        this.compositor.shellwm.emit(
+            'size-change',
+            this,
+            which,
+            copy(oldFrame),
+            copy(oldBuffer),
+        );
     }
 
     /** meta_window_actor_effect_completed (META_PLUGIN_SIZE_CHANGE) */
@@ -337,7 +347,10 @@ export interface Configuration {
     maximized: boolean;
 }
 
-const configurationEquivalent = (a: Configuration, b: Configuration | null): boolean =>
+const configurationEquivalent = (
+    a: Configuration,
+    b: Configuration | null,
+): boolean =>
     b !== null &&
     a.x === b.x &&
     a.y === b.y &&
@@ -363,7 +376,8 @@ const enum Result {
     STATE_CHANGED = 4,
 }
 
-export type WindowSignal = 'size-changed' | 'position-changed' | 'unmanaging' | 'unmanaged';
+export type WindowSignal =
+    'size-changed' | 'position-changed' | 'unmanaging' | 'unmanaged';
 
 export interface WindowOptions {
     /** decorations/shadows around the frame (custom_frame_extents) */
@@ -405,8 +419,16 @@ export class SimWindow {
         opts: WindowOptions = {},
     ) {
         this._frame = copy(frame);
-        this._extents = opts.extents ?? { left: 0, right: 0, top: 0, bottom: 0 };
-        this._bufferPos = { x: frame.x - this._extents.left, y: frame.y - this._extents.top };
+        this._extents = opts.extents ?? {
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0,
+        };
+        this._bufferPos = {
+            x: frame.x - this._extents.left,
+            y: frame.y - this._extents.top,
+        };
         this._minHint = opts.minSizeHint ?? { width: 1, height: 1 };
         this._ackDelay = opts.ackDelayMs ?? 16;
         this.maximized = opts.maximized ?? false;
@@ -424,7 +446,8 @@ export class SimWindow {
             x: this._bufferPos.x,
             y: this._bufferPos.y,
             width: this._frame.width + this._extents.left + this._extents.right,
-            height: this._frame.height + this._extents.top + this._extents.bottom,
+            height:
+                this._frame.height + this._extents.top + this._extents.bottom,
         };
     }
 
@@ -450,12 +473,28 @@ export class SimWindow {
 
     move_frame(userOp: boolean, x: number, y: number): void {
         void userOp;
-        this._moveResizeInternal(Flags.MOVE_ACTION, { x, y, width: this._frame.width, height: this._frame.height });
+        this._moveResizeInternal(Flags.MOVE_ACTION, {
+            x,
+            y,
+            width: this._frame.width,
+            height: this._frame.height,
+        });
     }
 
-    move_resize_frame(userOp: boolean, x: number, y: number, width: number, height: number): void {
+    move_resize_frame(
+        userOp: boolean,
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+    ): void {
         void userOp;
-        this._moveResizeInternal(Flags.MOVE_ACTION | Flags.RESIZE_ACTION, { x, y, width, height });
+        this._moveResizeInternal(Flags.MOVE_ACTION | Flags.RESIZE_ACTION, {
+            x,
+            y,
+            width,
+            height,
+        });
     }
 
     /** meta_window_unmaximize: mutter's own size-change effect, then a configure for the saved rect */
@@ -467,7 +506,10 @@ export class SimWindow {
         const target = this._savedRect ?? oldFrame;
         this._actor?.sizeChange(SizeChange.UNMAXIMIZE, oldFrame, oldBuffer);
         this._moveResizeInternal(
-            Flags.MOVE_ACTION | Flags.RESIZE_ACTION | Flags.STATE_CHANGED | Flags.UNMAXIMIZE,
+            Flags.MOVE_ACTION |
+                Flags.RESIZE_ACTION |
+                Flags.STATE_CHANGED |
+                Flags.UNMAXIMIZE,
             target,
         );
     }
@@ -511,30 +553,52 @@ export class SimWindow {
     }
 
     /** the client acks the given (or latest pending) configure with a size */
-    clientAck(size?: { width: number; height: number }, configuration?: Configuration): void {
-        const cfg = configuration ?? this.pendingConfigurations[this.pendingConfigurations.length - 1];
+    clientAck(
+        size?: { width: number; height: number },
+        configuration?: Configuration,
+    ): void {
+        const cfg =
+            configuration ??
+            this.pendingConfigurations[this.pendingConfigurations.length - 1];
         if (!cfg) return;
-        this.pendingConfigurations = this.pendingConfigurations.filter((c) => c.serial > cfg.serial);
+        this.pendingConfigurations = this.pendingConfigurations.filter(
+            (c) => c.serial > cfg.serial,
+        );
         this.lastAckedConfiguration = cfg;
-        this._finishMoveResize(cfg, size ?? { width: cfg.width, height: cfg.height });
+        this._finishMoveResize(
+            cfg,
+            size ?? { width: cfg.width, height: cfg.height },
+        );
     }
 
-    private _scheduleClientResponse(cfg: Configuration, policy: AckPolicy = this.policy, extraDelay = 0): void {
+    private _scheduleClientResponse(
+        cfg: Configuration,
+        policy: AckPolicy = this.policy,
+        extraDelay = 0,
+    ): void {
         switch (policy.kind) {
             case 'ignore':
                 return;
             case 'delayed':
-                this._scheduleClientResponse(cfg, policy.then, extraDelay + policy.ms);
+                this._scheduleClientResponse(
+                    cfg,
+                    policy.then,
+                    extraDelay + policy.ms,
+                );
                 return;
             case 'comply':
-                this.clock.timeout(this._ackDelay + extraDelay, () => this.clientAck(undefined, cfg));
+                this.clock.timeout(this._ackDelay + extraDelay, () =>
+                    this.clientAck(undefined, cfg),
+                );
                 return;
             case 'clampMin': {
                 const size = {
                     width: Math.max(cfg.width, policy.minWidth),
                     height: Math.max(cfg.height, policy.minHeight),
                 };
-                this.clock.timeout(this._ackDelay + extraDelay, () => this.clientAck(size, cfg));
+                this.clock.timeout(this._ackDelay + extraDelay, () =>
+                    this.clientAck(size, cfg),
+                );
             }
         }
     }
@@ -549,7 +613,8 @@ export class SimWindow {
         r.height = Math.max(r.height, this._minHint.height);
         // constrain_fully_onscreen: shift, never shrink
         if (r.x + r.width > wa.x + wa.width) r.x = wa.x + wa.width - r.width;
-        if (r.y + r.height > wa.y + wa.height) r.y = wa.y + wa.height - r.height;
+        if (r.y + r.height > wa.y + wa.height)
+            r.y = wa.y + wa.height - r.height;
         if (r.x < wa.x) r.x = wa.x;
         if (r.y < wa.y) r.y = wa.y;
         return r;
@@ -561,17 +626,24 @@ export class SimWindow {
         if (!last) return true;
         if (
             flags & Flags.RESIZE_ACTION &&
-            (constrained.width !== last.width || constrained.height !== last.height)
+            (constrained.width !== last.width ||
+                constrained.height !== last.height)
         )
             return true;
-        if (constrained.width !== this._frame.width || constrained.height !== this._frame.height)
+        if (
+            constrained.width !== this._frame.width ||
+            constrained.height !== this._frame.height
+        )
             return true;
         if (flags & Flags.STATE_CHANGED) return true;
         return false;
     }
 
     /** the client committed a buffer: meta_window_wayland_finish_move_resize */
-    private _finishMoveResize(cfg: Configuration | null, size: { width: number; height: number }): void {
+    private _finishMoveResize(
+        cfg: Configuration | null,
+        size: { width: number; height: number },
+    ): void {
         if (this.unmanaging) return;
         const rect: Rect = {
             x: cfg ? cfg.x : this._frame.x,
@@ -596,7 +668,10 @@ export class SimWindow {
             canMoveNow = true;
         } else if (flags & Flags.FINISH_MOVE_RESIZE) {
             // the size is whatever the client committed
-            if (frame.width !== unconstrained.width || frame.height !== unconstrained.height) {
+            if (
+                frame.width !== unconstrained.width ||
+                frame.height !== unconstrained.height
+            ) {
                 result |= Result.RESIZED;
                 this._frame.width = unconstrained.width;
                 this._frame.height = unconstrained.height;
@@ -633,11 +708,15 @@ export class SimWindow {
         }
         const newBufferX = newX - this._extents.left;
         const newBufferY = newY - this._extents.top;
-        if (newBufferX !== this._bufferPos.x || newBufferY !== this._bufferPos.y) {
+        if (
+            newBufferX !== this._bufferPos.x ||
+            newBufferY !== this._bufferPos.y
+        ) {
             result |= Result.MOVED;
             this._bufferPos = { x: newBufferX, y: newBufferY };
         }
-        if (canMoveNow && flags & Flags.STATE_CHANGED) result |= Result.STATE_CHANGED;
+        if (canMoveNow && flags & Flags.STATE_CHANGED)
+            result |= Result.STATE_CHANGED;
 
         // back in meta_window_move_resize_internal
         let movedOrResized = false;
@@ -656,7 +735,8 @@ export class SimWindow {
 
 // ------------------------------------------------------------ compositor
 
-export type ShellWmSignal = 'size-change' | 'size-changed' | 'kill-window-effects';
+export type ShellWmSignal =
+    'size-change' | 'size-changed' | 'kill-window-effects';
 
 export class SimCompositor {
     readonly shellwm = new SignalBus<ShellWmSignal>();
@@ -673,7 +753,12 @@ export class SimCompositor {
         this.uiGroup = new SimActor(clock);
     }
 
-    createWindow(id: string, frame: Rect, policy: AckPolicy, opts: WindowOptions = {}): SimWindow {
+    createWindow(
+        id: string,
+        frame: Rect,
+        policy: AckPolicy,
+        opts: WindowOptions = {},
+    ): SimWindow {
         const window = new SimWindow(id, frame, policy, this, this.clock, opts);
         const actor = new SimWindowActor(this.clock, window, this);
         window._attachActor(actor);
@@ -695,7 +780,8 @@ export class SimCompositor {
         const actor = window.get_compositor_private();
         if (!actor) return;
         const changes = actor.syncActorGeometry(didPlacement);
-        if (changes & ActorChanges.SIZE) this.shellwm.emit('size-changed', actor);
+        if (changes & ActorChanges.SIZE)
+            this.shellwm.emit('size-changed', actor);
     }
 
     /** shellwm.completed_size_change */
