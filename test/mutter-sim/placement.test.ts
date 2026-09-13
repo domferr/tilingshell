@@ -92,8 +92,8 @@ test('(iii) clamping client: repeated identical requests never freeze and never 
         'nothing re-sent by the reflow itself',
     );
     clock.tick(10_000);
-    // the placer's own bounded retries (2 × nudge + real) went out and were refused
-    assert.equal(window.sentConfigurations.length, 5);
+    // the placer's own bounded retries (3 × nudge + real) went out and were refused
+    assert.equal(window.sentConfigurations.length, 7);
     assert.deepEqual(window.get_frame_rect(), {
         x: 8,
         y: 40,
@@ -255,7 +255,7 @@ test('(viii) a client that never acks: the request settles by timeout and is not
         'skipped-settled',
     );
     clock.tick(30_000); // bounded retries, all ignored as well
-    assert.equal(window.sentConfigurations.length, 5);
+    assert.equal(window.sentConfigurations.length, 7);
     assert.equal(clock.pendingTimeouts, 0);
     assert.equal(
         placer.place(target, TILE_S, { animate: true }),
@@ -452,8 +452,8 @@ test('(xviii) a client that always refuses is retried a bounded number of times,
     const target = simTargetFor(window);
     placer.place(target, TILE_S);
     clock.tick(30_000);
-    // initial + 2 retries × (nudge + real)
-    assert.equal(window.sentConfigurations.length, 5);
+    // initial + 3 retries × (nudge + real)
+    assert.equal(window.sentConfigurations.length, 7);
     assert.equal(clock.pendingTimeouts, 0, 'no watch or retry left armed');
     assert.equal(placer.place(target, TILE_S), 'skipped-settled');
 });
