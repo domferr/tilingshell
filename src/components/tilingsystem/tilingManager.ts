@@ -1596,22 +1596,12 @@ export class TilingManager {
         const ws = global.workspaceManager.get_active_workspace();
         if (!ws) return false;
 
-        const windows = this._dynamicManagedWindows(ws);
-        const from = windows.indexOf(window);
-        if (from < 0) return false; // not ours: let the static path have it
+        const slots = this._dynamicSlots(ws);
+        const from = slots ? slots.windows.indexOf(window) : -1;
+        if (!slots || from < 0) return false; // not ours: let the static path have it
+        const { windows, rects } = slots;
         if (windows.length < 2) return true;
 
-        const tree = this._dynamicTree(windows.length, ws);
-        if (!tree) return false;
-
-        const splitSlot = this._splitTarget
-            ? windows.indexOf(this._splitTarget)
-            : -1;
-        const rects = assign(
-            tree,
-            windows.length,
-            splitSlot >= 0 ? splitSlot : undefined,
-        );
         const to = neighbourIndex(rects, from, towards);
         if (to < 0) return true; // at the edge of the screen
 

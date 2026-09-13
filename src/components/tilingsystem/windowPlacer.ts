@@ -123,6 +123,8 @@ interface Pending {
     dest: Rect;
     before: Rect;
     animate: boolean;
+    /** a one-shot drift correction: not retried, and never reported final */
+    fromDrift: boolean;
     onSettled?: (requested: Rect, actual: Rect, final: boolean) => void;
     disconnectGeometry: () => void;
     disconnectGone: () => void;
@@ -271,6 +273,7 @@ export class WindowPlacer {
         options: PlaceOptions,
         userOp: boolean,
         nudge = false,
+        fromDrift = false,
     ): void {
         // a newer request supersedes the previous one, but the animation
         // still starts from where the window was before the first of them
@@ -287,6 +290,7 @@ export class WindowPlacer {
             dest: copyRect(dest),
             before: copyRect(earlierBefore ?? before),
             animate,
+            fromDrift,
             onSettled: options.onSettled,
             disconnectGeometry: () => {},
             disconnectGone: () => {},
@@ -373,9 +377,12 @@ export class WindowPlacer {
             }
         }
 
+        // a drift correction is a single attempt with no retries behind it,
+        // so a refusal there says nothing definite about the client
         const final =
             sizeEquals(frame, pending.dest) ||
-            hist.retries >= this._opts.retryDelaysMs.length;
+            (!pending.fromDrift &&
+                hist.retries >= this._opts.retryDelaysMs.length);
         pending.onSettled?.(copyRect(pending.dest), copyRect(frame), final);
 
         this._verify(target, hist, pending.dest, frame);
@@ -447,6 +454,7 @@ export class WindowPlacer {
                     target.getFrameRect(),
                     hist.lastOptions ?? {},
                     hist.lastOptions?.userOp ?? false,
+                    true,
                     true,
                 );
             });

@@ -79,3 +79,39 @@ test('applyPins never produces a rect outside the unit square, even for absurd p
     assertPartition(out);
     assert.ok(out[1].width > 0);
 });
+
+test('applyPins meets a pin that needs the divider above it to move, without over-allocating', () => {
+    // three columns 0.5 | 0.25 | 0.25; the middle one must reach 0.49 —
+    // more than its own split can give, so the root divider has to move
+    const rects = [
+        { x: 0, y: 0, width: 0.5, height: 1 },
+        { x: 0.5, y: 0, width: 0.25, height: 1 },
+        { x: 0.75, y: 0, width: 0.25, height: 1 },
+    ];
+    const out = applyPins(rects, [{ slot: 1, minWidth: 0.49 }]);
+    assert.ok(out[1].width >= 0.49 - 1e-6, `middle got ${out[1].width}`);
+    assert.ok(
+        out[1].width <= 0.49 + 0.03,
+        `middle over-allocated: ${out[1].width}`,
+    );
+    assert.ok(
+        out[0].width >= 0.4,
+        `left column needlessly crushed: ${out[0].width}`,
+    );
+    assertPartition(out);
+});
+
+test('applyPins keeps an already satisfied pin satisfied when a later pin moves its divider', () => {
+    const rects = [
+        { x: 0, y: 0, width: 0.5, height: 1 },
+        { x: 0.5, y: 0, width: 0.25, height: 1 },
+        { x: 0.75, y: 0, width: 0.25, height: 1 },
+    ];
+    const out = applyPins(rects, [
+        { slot: 0, minWidth: 0.45 },
+        { slot: 1, minWidth: 0.49 },
+    ]);
+    assert.ok(out[0].width >= 0.45 - 1e-6, `slot 0: ${out[0].width}`);
+    assert.ok(out[1].width >= 0.49 - 1e-6, `slot 1: ${out[1].width}`);
+    assertPartition(out);
+});

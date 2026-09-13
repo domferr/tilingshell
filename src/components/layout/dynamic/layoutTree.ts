@@ -118,12 +118,8 @@ export function leafCount(tree: SplitTree): number {
 }
 
 /**
- * The area a subtree covers: the union of its leaves. Duplicated from
- * reflow.ts's `boundsOf` rather than imported — this file is executed two
- * ways (esbuild for the shipped extension, Node's native TS runner for
- * tests) that disagree on whether a relative import needs a `.ts`
- * extension, so a cross-file value import between these two pure-layer
- * files can't satisfy both at once.
+ * The area a subtree covers: the union of its leaves (same as reflow.ts's
+ * `boundsOf`, kept local so this file has no dependency on reflow.ts).
  */
 function treeBounds(tree: SplitTree): TileRect {
     if (tree.kind === 'leaf') return tree.tile;
@@ -212,8 +208,9 @@ export function pinLeaf(
 
                 const achievedExtent = clampedAt - oldBounds[startProp];
                 if (Math.abs(achievedExtent - requestedExtent) > EPSILON) {
-                    myRequestedExtent =
-                        requestedExtent + treeBounds(node.second)[extentProp];
+                    // the sibling is already at its floor: the parent has to
+                    // grow this node by exactly what is missing
+                    myRequestedExtent = requestedExtent + minSize;
                 }
 
                 const firstBounds = { ...oldBounds };
@@ -244,8 +241,7 @@ export function pinLeaf(
                 const achievedExtent =
                     oldBounds[startProp] + oldExtent - clampedAt;
                 if (Math.abs(achievedExtent - requestedExtent) > EPSILON) {
-                    myRequestedExtent =
-                        requestedExtent + treeBounds(node.first)[extentProp];
+                    myRequestedExtent = requestedExtent + minSize;
                 }
 
                 const firstBounds = { ...oldBounds };

@@ -9,7 +9,7 @@
  */
 
 import { buildLayoutTree, pathOf, pinLeaf, rectAtPath } from './layoutTree';
-import type { TileRect } from './layoutTree';
+import type { SplitPath, SplitTree, TileRect } from './layoutTree';
 
 export interface SlotPin {
     /** index into the rects `assign()` returned */
@@ -21,12 +21,14 @@ export interface SlotPin {
 
 const EPSILON = 1e-9;
 
-/**
- * Returns the rects with every pinned slot at least as large as its pin,
- * in the same order. Rects are returned untouched when no pin needs work.
- */
-export function applyPins(rects: TileRect[], pins: SlotPin[]): TileRect[] {
-    const needed = pins.filter((pin) => {
+const readBack = (
+    tree: SplitTree,
+    rects: TileRect[],
+    paths: (SplitPath | null)[],
+): TileRect[] => rects.map((r, i) => rectAtPath(tree, paths[i]!) ?? r);
+
+const unsatisfied = (rects: TileRect[], pins: SlotPin[]): SlotPin[] =>
+    pins.filter((pin) => {
         const r = rects[pin.slot];
         if (!r) return false;
         return (
@@ -34,30 +36,46 @@ export function applyPins(rects: TileRect[], pins: SlotPin[]): TileRect[] {
             (pin.minHeight !== undefined && r.height < pin.minHeight - EPSILON)
         );
     });
-    if (needed.length === 0) return rects;
+
+/**
+ * Returns the rects with every pinned slot at least as large as its pin,
+ * in the same order. Rects are returned untouched when no pin needs work.
+ *
+ * Growing one slot can shrink another pinned one (they may share a
+ * divider, or a clamped divider makes an ancestor rescale a whole
+ * subtree), so the pins are re-applied until they all hold or the passes
+ * run out; pins that cannot all be met leave the last one short.
+ */
+export function applyPins(rects: TileRect[], pins: SlotPin[]): TileRect[] {
+    if (unsatisfied(rects, pins).length === 0) return rects;
 
     let tree = buildLayoutTree(rects);
     if (!tree) return rects;
     const paths = rects.map((r) => pathOf(tree!, r));
     if (paths.some((p) => p === null)) return rects;
 
-    for (const pin of needed) {
-        const path = paths[pin.slot]!;
-        const current = rectAtPath(tree, path);
-        if (!current) continue;
-        if (
-            pin.minWidth !== undefined &&
-            current.width < pin.minWidth - EPSILON
-        )
-            tree = pinLeaf(tree, path, Math.min(pin.minWidth, 1), 'x');
-        const grown = rectAtPath(tree, path);
-        if (
-            grown &&
-            pin.minHeight !== undefined &&
-            grown.height < pin.minHeight - EPSILON
-        )
-            tree = pinLeaf(tree, path, Math.min(pin.minHeight, 1), 'y');
+    let current = rects;
+    for (let pass = 0; pass < 4; pass++) {
+        const needed = unsatisfied(current, pins);
+        if (needed.length === 0) break;
+        for (const pin of needed) {
+            const path = paths[pin.slot]!;
+            const leaf = rectAtPath(tree, path);
+            if (!leaf) continue;
+            if (
+                pin.minWidth !== undefined &&
+                leaf.width < pin.minWidth - EPSILON
+            )
+                tree = pinLeaf(tree, path, Math.min(pin.minWidth, 1), 'x');
+            const grown = rectAtPath(tree, path);
+            if (
+                grown &&
+                pin.minHeight !== undefined &&
+                grown.height < pin.minHeight - EPSILON
+            )
+                tree = pinLeaf(tree, path, Math.min(pin.minHeight, 1), 'y');
+        }
+        current = readBack(tree, rects, paths);
     }
-
-    return rects.map((r, i) => rectAtPath(tree!, paths[i]!) ?? r);
+    return current;
 }

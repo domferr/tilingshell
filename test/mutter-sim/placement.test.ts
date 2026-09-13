@@ -511,7 +511,11 @@ test('(xxi) placer.destroy() also cancels retries and drift watches', () => {
 });
 
 test('(xxii) onSettled reports whether the answer is final: matched size, or retries exhausted', () => {
-    const { clock, window, placer } = fixture({ kind: 'clampMin', minWidth: 700, minHeight: 600 });
+    const { clock, window, placer } = fixture({
+        kind: 'clampMin',
+        minWidth: 700,
+        minHeight: 600,
+    });
     const finals: boolean[] = [];
     placer.place(simTargetFor(window), TILE_S, {
         onSettled: (_req, _actual, final) => finals.push(final),
@@ -522,7 +526,29 @@ test('(xxii) onSettled reports whether the answer is final: matched size, or ret
 
     const { clock: c2, window: w2, placer: p2 } = fixture({ kind: 'comply' });
     const finals2: boolean[] = [];
-    p2.place(simTargetFor(w2), TILE_S, { onSettled: (_r, _a, final) => finals2.push(final) });
+    p2.place(simTargetFor(w2), TILE_S, {
+        onSettled: (_r, _a, final) => finals2.push(final),
+    });
     c2.tick(1000);
     assert.deepEqual(finals2, [true], 'a matching answer is final at once');
+});
+
+test('(xxiii) a refused drift correction is not reported as final', () => {
+    const { clock, window, placer } = fixture();
+    const finals: boolean[] = [];
+    placer.place(simTargetFor(window), TILE_S, {
+        onSettled: (_r, _a, f) => finals.push(f),
+    });
+    clock.tick(400);
+    assert.deepEqual(finals, [true]);
+    // the client grows on its own and then refuses the single correction
+    window.policy = { kind: 'clampMin', minWidth: 1400, minHeight: 900 };
+    window.clientResize(1400, 900);
+    clock.tick(2000);
+    assert.deepEqual(
+        finals,
+        [true, false],
+        'one correction, refused, not final',
+    );
+    assert.equal(clock.pendingTimeouts, 0);
 });
