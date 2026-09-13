@@ -1,4 +1,4 @@
-import { GObject, St, Clutter, Gio } from '../gi/ext';
+import { GObject, St, Clutter, Gio, GLib } from '../gi/ext';
 import SignalHandling from '../utils/signalHandling';
 import Indicator from './indicator';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -195,8 +195,11 @@ export default class DefaultMenu implements CurrentMenu {
             () => {
                 dynamicToggle.setToggleState(Settings.ENABLE_DYNAMIC_TILING);
                 // switching sources (static vs. dynamic template) for the
-                // highlight, not just the checked state of this one switch
-                this._refreshSelectedLayouts();
+                // highlight, not just the checked state of this one switch.
+                // Deferred: the TilingManagers listen to the same setting
+                // and, depending on who connected first, may only adopt the
+                // open windows after this handler ran
+                this._queueRefreshSelectedLayouts();
             },
         );
         (this._indicator.menu as PopupMenu.PopupMenu).addMenuItem(
@@ -539,7 +542,22 @@ export default class DefaultMenu implements CurrentMenu {
         });
     }
 
+    private _refreshSourceId: number | null = null;
+
+    private _queueRefreshSelectedLayouts() {
+        if (this._refreshSourceId !== null) return;
+        this._refreshSourceId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+            this._refreshSourceId = null;
+            this._refreshSelectedLayouts();
+            return GLib.SOURCE_REMOVE;
+        });
+    }
+
     public destroy() {
+        if (this._refreshSourceId !== null) {
+            GLib.Source.remove(this._refreshSourceId);
+            this._refreshSourceId = null;
+        }
         this._signals.disconnect();
         this._layoutsRows.forEach((lr) => lr.destroy());
         this._layoutsRows = [];

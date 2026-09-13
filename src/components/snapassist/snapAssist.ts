@@ -21,6 +21,8 @@ const GAPS = 4;
 // 16:9 ratio and then rounded to int
 const SNAP_ASSIST_LAYOUT_WIDTH = 120;
 const SNAP_ASSIST_LAYOUT_HEIGHT = 68;
+// keep in sync with .snap-assist-layout border-width in snap_assist.scss
+const SNAP_ASSIST_LAYOUT_BORDER = 2;
 
 class SnapAssistContent extends St.BoxLayout {
     static { registerGObjectClass(this, {
@@ -246,7 +248,9 @@ class SnapAssistContent extends St.BoxLayout {
                 this,
                 lay,
                 layoutGaps,
-                new Clutter.Margin(),
+                // the tiles are placed at fixed positions inside the
+                // widget, so leave room for its 2px selection border
+                buildMarginOf(SNAP_ASSIST_LAYOUT_BORDER),
                 width,
                 height,
             );
