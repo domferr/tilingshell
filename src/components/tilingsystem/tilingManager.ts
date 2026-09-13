@@ -10,6 +10,7 @@ import {
     getWindows,
     isPointInsideRect,
     isTileOnContainerBorder,
+    isWindowAlive,
     squaredEuclideanDistance,
 } from '../../utils/ui';
 import TilingLayout from '../../components/tilingsystem/tilingLayout';
@@ -34,6 +35,13 @@ import { KeyBindingsDirection } from '../../keybindings';
 import TilingShellWindowManager from '../../components/windowManager/tilingShellWindowManager';
 import TilingLayoutWithSuggestions from '../windowsSuggestions/tilingLayoutWithSuggestions';
 import { maximizeWindow, unmaximizeWindow } from '../../utils/gnomesupport';
+import { WindowPlacer } from './windowPlacer';
+import { ReflowScheduler } from './reflowScheduler';
+import {
+    gjsPlacerClock,
+    placementTargetFor,
+    toRect,
+} from './metaPlacementTarget';
 
 const MINIMUM_DISTANCE_TO_RESTORE_ORIGINAL_SIZE = 90;
 
@@ -114,6 +122,12 @@ export class TilingManager {
         Map<number, number>
     > = new Map();
 
+    // Places windows without freezing their actors, and remembers what each
+    // client answered so a refused rect is not asked for again.
+    private readonly _placer: WindowPlacer;
+    // Defers a reflow requested from inside a running reflow.
+    private readonly _reflow: ReflowScheduler;
+
     private readonly _signals: SignalHandling;
     private readonly _debug: (..._content: unknown[]) => void;
 
@@ -129,6 +143,10 @@ export class TilingManager {
         this._enableScaling = enableScaling;
         this._monitor = monitor;
         this._signals = new SignalHandling();
+        this._placer = new WindowPlacer(gjsPlacerClock, {
+            monitorIndex: monitor.index,
+        });
+        this._reflow = new ReflowScheduler(() => this._queueDynamicReflow());
 
         this._debug = logger(`TilingManager ${monitor.index}`);
 
@@ -551,6 +569,7 @@ export class TilingManager {
      * Destroys the tiling manager and cleans up resources.
      */
     public destroy() {
+        this._placer.destroy();
         if (this._movingWindowTimerId) {
             GLib.Source.remove(this._movingWindowTimerId);
             this._movingWindowTimerId = null;
@@ -917,6 +936,14 @@ export class TilingManager {
         this._snapAssist.close(true);
         this._lastCursorPos = null;
 
+        // mutter ends the grab of a window that is being closed; its actor is
+        // already gone by then, and there is nothing left to place
+        if (!isWindowAlive(window)) {
+            this._snapAssistingInfo.update(undefined);
+            this._edgeTilingManager.abortEdgeTiling();
+            return;
+        }
+
         // Dynamic tiling owns every drop of a window it manages: the window
         // trades places with whatever occupies the slot under the pointer.
         if (Settings.ENABLE_DYNAMIC_TILING && this._dynamicSwapOnDrop(window)) {
@@ -1077,38 +1104,14 @@ export class TilingManager {
         user_op: boolean = false,
         force: boolean = false,
     ) {
-        const windowActor = window.get_compositor_private() as Clutter.Actor;
-
-        const beforeRect = window.get_frame_rect();
-        // do not animate the window if it will not move or scale
-        if (
-            destRect.x === beforeRect.x &&
-            destRect.y === beforeRect.y &&
-            destRect.width === beforeRect.width &&
-            destRect.height === beforeRect.height
-        )
-            return;
-
-        // apply animations when tiling the window
-        windowActor.remove_all_transitions();
-        // @ts-expect-error "Main.wm has the "private" function _prepareAnimationInfo"
-        Main.wm._prepareAnimationInfo(
-            global.windowManager,
-            windowActor,
-            beforeRect.copy(),
-            Meta.SizeChange.UNMAXIMIZE,
-        );
-
-        // move and resize the window to the current selection
-        window.move_to_monitor(this._monitor.index);
-        if (force) window.move_frame(user_op, destRect.x, destRect.y);
-        window.move_resize_frame(
-            user_op,
-            destRect.x,
-            destRect.y,
-            destRect.width,
-            destRect.height,
-        );
+        // Never freeze the actor or touch Main.wm's size-change bookkeeping:
+        // on Wayland the resize is a request the client answers (or does
+        // not), and the placer animates only once mutter reports the result.
+        this._placer.place(placementTargetFor(window), toRect(destRect), {
+            userOp: user_op,
+            forceMove: force,
+            animate: true,
+        });
     }
 
     private _onSnapAssist(_: SnapAssist, tile: Tile, layoutId: string) {
@@ -1321,7 +1324,14 @@ export class TilingManager {
         const isMaximized =
             window.maximizedHorizontally || window.maximizedVertically;
         const rememberOriginalSize = !isMaximized;
-        if (isMaximized) unmaximizeWindow(window);
+        if (isMaximized) {
+            // mutter would animate the unmaximize on its own and then our
+            // placement would animate again on top of it; skip mutter's
+            const actor =
+                window.get_compositor_private() as Meta.WindowActor | null;
+            if (actor) Main.wm.skipNextEffect(actor);
+            unmaximizeWindow(window);
+        }
 
         if (rememberOriginalSize && !(window as ExtendedWindow).assignedTile) {
             (window as ExtendedWindow).originalSize = window
@@ -1337,17 +1347,9 @@ export class TilingManager {
             }),
             this._workArea,
         );
-        if (skipAnimation) {
-            window.move_resize_frame(
-                false,
-                destinationRect.x,
-                destinationRect.y,
-                destinationRect.width,
-                destinationRect.height,
-            );
-        } else {
-            this._easeWindowRect(window, destinationRect);
-        }
+        this._placer.place(placementTargetFor(window), toRect(destinationRect), {
+            animate: !skipAnimation,
+        });
     }
 
     public onTileFromWindowMenu(tile: Tile, window: Meta.Window) {
@@ -1436,7 +1438,11 @@ export class TilingManager {
 
     /** Trackable windows that additionally have a rectangle to be placed in. */
     private _isDynamicEligible(window: Meta.Window): boolean {
-        return this._isDynamicTrackable(window) && !window.minimized;
+        return (
+            this._isDynamicTrackable(window) &&
+            isWindowAlive(window) &&
+            !window.minimized
+        );
     }
 
     /**
@@ -1478,11 +1484,16 @@ export class TilingManager {
     private _untrackDynamicWindow(window: Meta.Window) {
         this._dynamicWindowSignals.delete(window);
         if (this._splitTarget === window) this._splitTarget = null;
+        this._placer.forget(placementTargetFor(window));
 
         const slot = this._dynamicWindows.indexOf(window);
         if (slot < 0) return;
         this._dynamicWindows.splice(slot, 1);
-        this._applyDynamicTiling();
+        // this runs from inside mutter's unmanage (and from a position-changed
+        // handler when a window leaves the monitor), so the reflow is queued
+        // rather than run on the spot; several windows closing at once then
+        // produce one reflow instead of one each
+        this._queueDynamicReflow();
     }
 
     /**
@@ -1529,7 +1540,7 @@ export class TilingManager {
         inCreationOrder.forEach((window) => {
             if (this._trackDynamicWindow(window)) adopted = true;
         });
-        if (adopted) this._applyDynamicTiling();
+        if (adopted) this._queueDynamicReflow();
     }
 
     /**
@@ -1557,7 +1568,10 @@ export class TilingManager {
         const windowActor =
             window.get_compositor_private() as Meta.WindowActor | null;
         if (!windowActor) {
-            this._applyDynamicTiling();
+            // no actor yet: placing it now would fail, so let the idle reflow
+            // pick it up once it has one (a dying window is filtered out by
+            // _isDynamicEligible)
+            this._queueDynamicReflow();
             return;
         }
 
@@ -1711,7 +1725,10 @@ export class TilingManager {
      */
     private _applyDynamicTiling() {
         if (!Settings.ENABLE_DYNAMIC_TILING) return;
+        this._reflow.run(() => this._reflowDynamicWindows());
+    }
 
+    private _reflowDynamicWindows() {
         const workspaces = new Set<Meta.Workspace>();
         this._dynamicWindows.forEach((window) => {
             const ws = window.get_workspace();
@@ -1738,6 +1755,9 @@ export class TilingManager {
                 splitSlot >= 0 ? splitSlot : undefined,
             );
             windows.forEach((window, slot) => {
+                // a window can be unmanaged by a placement earlier in this
+                // very loop; skip it rather than abort the others
+                if (!isWindowAlive(window)) return;
                 this._easeWindowRectFromTile(this._tileOf(rects[slot]), window);
             });
         });
@@ -1816,7 +1836,8 @@ export class TilingManager {
 
         if (windowCreated) {
             const windowActor =
-                window.get_compositor_private() as Meta.WindowActor;
+                window.get_compositor_private() as Meta.WindowActor | null;
+            if (!windowActor) return;
             const id = windowActor.connect('first-frame', () => {
                 // while we restore the opacity, making the window visible
                 // again, we perform easing of movement too

@@ -189,6 +189,15 @@ export function filterUnfocusableWindows(
         });
 }
 
+/**
+ * A window has a compositor actor only between being mapped and the start of
+ * its unmanage; placement code must not touch it outside that span (mutter
+ * clears compositor_private before it emits 'unmanaged').
+ */
+export function isWindowAlive(window: Meta.Window | null): window is Meta.Window {
+    return window !== null && window.get_compositor_private() !== null;
+}
+
 /** From Gnome Shell: https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/main/js/ui/altTab.js#L53 */
 export function getWindows(workspace?: Meta.Workspace): Meta.Window[] {
     if (!workspace) workspace = global.workspaceManager.get_active_workspace();
