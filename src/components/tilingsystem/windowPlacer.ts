@@ -154,7 +154,7 @@ export class WindowPlacer {
             settleTimeoutMs: 300,
             quietMs: 40,
             animationMs: 250,
-            retryDelaysMs: [400, 2000],
+            retryDelaysMs: [200, 2000],
             driftWatchMs: 10_000,
             ...opts,
         };

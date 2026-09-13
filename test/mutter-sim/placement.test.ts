@@ -73,9 +73,9 @@ test('(iii) clamping client: repeated identical requests never freeze and never 
         width: 700,
         height: 600,
     });
-    clock.tick(300); // our animation settles
-    assertHealthy(actor, window, compositor, wm);
-    assert.equal(actor.scale_x, 1);
+    clock.tick(100); // settled, animation still easing, first retry not yet due
+    assert.equal(wm._resizePending.size, 0);
+    assert.equal(actor.freezeCount, 0);
 
     // identical request twice: the client already gave its answer to exactly this rect
     assert.equal(
@@ -424,13 +424,13 @@ test('(xvii) a client that refuses the size only at first is asked again and end
     });
     const actor = window.get_compositor_private()!;
     placer.place(simTargetFor(window), TILE_S, { animate: true });
-    clock.tick(400);
+    clock.tick(100);
     assert.deepEqual(
         window.get_frame_rect(),
         { x: 8, y: 40, width: 820, height: 634 },
         'first answer refused',
     );
-    clock.tick(1500); // first retry (nudged) went out and was answered
+    clock.tick(1800); // first retry (nudged) went out and was answered
     assert.deepEqual(window.get_frame_rect(), TILE_S);
     assert.equal(window.sentConfigurations.length, 3, 'initial + nudge + real');
     clock.tick(20_000);
@@ -485,7 +485,7 @@ test('(xx) a new request cancels pending retries and the drift watch', () => {
     });
     const target = simTargetFor(window);
     placer.place(target, TILE_S);
-    clock.tick(400); // settled clamped, retry armed
+    clock.tick(100); // settled clamped, retry armed but not due
     const other = { x: 900, y: 40, width: 900, height: 900 };
     placer.place(target, other);
     clock.tick(30_000);
