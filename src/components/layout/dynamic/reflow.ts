@@ -253,3 +253,28 @@ export function leavesOf(tree: SplitTree): TileRect[] {
     if (tree.kind === 'leaf') return [tree.tile];
     return [...leavesOf(tree.first), ...leavesOf(tree.second)];
 }
+
+/**
+ * The index of the slot whose screen rectangle contains `point`, or -1.
+ * `rects` are the normalised (0..1) slot rectangles of `assign()`, scaled
+ * to `workArea` the same way TileUtils.apply_props does (rounded), so a
+ * drop and its preview agree on which slot the pointer is over.
+ */
+export function slotUnderPoint(
+    rects: TileRect[],
+    workArea: { x: number; y: number; width: number; height: number },
+    point: { x: number; y: number },
+): number {
+    return rects.findIndex((r) => {
+        const x = Math.round(workArea.x + r.x * workArea.width);
+        const y = Math.round(workArea.y + r.y * workArea.height);
+        const width = Math.round(r.width * workArea.width);
+        const height = Math.round(r.height * workArea.height);
+        return (
+            point.x >= x &&
+            point.x < x + width &&
+            point.y >= y &&
+            point.y < y + height
+        );
+    });
+}

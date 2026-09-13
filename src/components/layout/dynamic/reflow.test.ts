@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildLayoutTree } from './layoutTree.ts';
 import type { TileRect } from './layoutTree.ts';
-import { reflow, slotOrder, neighbourIndex, assign } from './reflow.ts';
+import { reflow, slotOrder, neighbourIndex, assign, slotUnderPoint } from './reflow.ts';
 
 const twoColumns = () =>
     buildLayoutTree([
@@ -257,4 +257,20 @@ test('assign is deterministic and total for every window count', () => {
         const covered = once.reduce((s, r) => s + r.width * r.height, 0);
         assert.ok(Math.abs(covered - 1) < 1e-9, `coverage for ${n}`);
     }
+});
+
+test('slotUnderPoint: maps a screen point to the slot whose rect contains it', () => {
+    const workArea = { x: 0, y: 32, width: 1920, height: 1048 };
+    const rects = [
+        { x: 0, y: 0, width: 0.5, height: 1 },
+        { x: 0.5, y: 0, width: 0.5, height: 0.5 },
+        { x: 0.5, y: 0.5, width: 0.5, height: 0.5 },
+    ];
+    assert.equal(slotUnderPoint(rects, workArea, { x: 100, y: 100 }), 0);
+    assert.equal(slotUnderPoint(rects, workArea, { x: 1500, y: 100 }), 1);
+    assert.equal(slotUnderPoint(rects, workArea, { x: 1500, y: 900 }), 2);
+    // outside the work area (the top panel)
+    assert.equal(slotUnderPoint(rects, workArea, { x: 100, y: 10 }), -1);
+    // the last pixel of the work area still belongs to the last slot
+    assert.equal(slotUnderPoint(rects, workArea, { x: 1919, y: 1079 }), 2);
 });

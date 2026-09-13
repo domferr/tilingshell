@@ -23,7 +23,7 @@ import Layout from '../layout/Layout';
 import Tile from '../layout/Tile';
 import TileUtils from '../layout/TileUtils';
 import { buildLayoutTree, SplitTree } from '../layout/dynamic/layoutTree';
-import { assign, neighbourIndex } from '../layout/dynamic/reflow';
+import { assign, neighbourIndex, slotUnderPoint } from '../layout/dynamic/reflow';
 import type { Direction } from '../layout/dynamic/reflow';
 import { pickLayoutIndex, pickLayoutIndexAt } from '../layout/dynamic/pickLayout';
 import GlobalState from '../../utils/globalState';
@@ -128,6 +128,10 @@ export class TilingManager {
     private readonly _placer: WindowPlacer;
     // Defers a reflow requested from inside a running reflow.
     private readonly _reflow: ReflowScheduler;
+    // While a dynamically managed window is dragged: the slot whose preview
+    // is on screen (null when none), so the preview is only redrawn when the
+    // pointer crosses into another slot.
+    private _dynamicPreviewSlot: number | null = null;
 
     private readonly _signals: SignalHandling;
     private readonly _debug: (..._content: unknown[]) => void;
@@ -837,6 +841,20 @@ export class TilingManager {
         this._wasTilingSystemActivated = isTilingSystemActivated;
         this._wasSpanMultipleTilesActivated = isSpanMultiTilesActivated;
 
+        // a dynamically managed window is dropped into the slot under the
+        // pointer, whatever the static layout or the snap assistant would
+        // suggest, so that slot is what gets previewed
+        if (
+            Settings.ENABLE_DYNAMIC_TILING &&
+            this._previewDynamicSlot(
+                window,
+                currentWs,
+                currPointerPos,
+                tilingLayout,
+            )
+        )
+            return GLib.SOURCE_CONTINUE;
+
         // layout must not be shown if it was disabled or if it is enabled but tiling system activation key is not pressed
         // then close it and open snap assist (if enabled)
         if (!showTilingSystem) {
@@ -948,6 +966,7 @@ export class TilingManager {
         this._selectedTilesPreview.close(true);
         this._snapAssist.close(true);
         this._lastCursorPos = null;
+        this._dynamicPreviewSlot = null;
 
         // mutter ends the grab of a window that is being closed; its actor is
         // already gone by then, and there is nothing left to place
@@ -1141,6 +1160,11 @@ export class TilingManager {
     }
 
     private _onSnapAssist(_: SnapAssist, tile: Tile, layoutId: string) {
+        // during a dynamic drag the popup only shows which layout is in use;
+        // its tiles say nothing about where the drop lands (see
+        // _previewDynamicSlot), so they must not drive the preview
+        if (this._dynamicPreviewSlot !== null) return;
+
         // if there isn't a tile hovered, then close selection
         if (tile.width === 0 || tile.height === 0) {
             this._selectedTilesPreview.close(true);
@@ -1293,15 +1317,15 @@ export class TilingManager {
         this.openSelectionTilePreview(edgeTile, false, true, window);
     }
 
-    private _easeWindowRectFromTile(
+    /**
+     * The rectangle a window gets for a tile: the tile scaled to the work
+     * area, clamped to it, minus the configured gaps. Null when nothing is
+     * left after the gaps.
+     */
+    private _windowRectForTile(
         tile: Tile,
-        window: Meta.Window,
-        skipAnimation: boolean = false,
-    ) {
-        const currentWs = window.get_workspace();
-        const tilingLayout = this._workspaceTilingLayout.get(currentWs);
-        if (!tilingLayout) return;
-
+        tilingLayout: TilingLayout,
+    ): Mtk.Rectangle | null {
         // We apply the proportions to get tile size and position relative to the work area
         const scaledRect = TileUtils.apply_props(tile, this._workArea);
         // ensure the rect doesn't go horizontally beyond the workarea
@@ -1337,15 +1361,102 @@ export class TilingManager {
                 : undefined,
         ).gaps;
 
-        const destinationRect = buildRectangle({
+        const rect = buildRectangle({
             x: scaledRect.x + gaps.left,
             y: scaledRect.y + gaps.top,
             width: scaledRect.width - gaps.left - gaps.right,
             height: scaledRect.height - gaps.top - gaps.bottom,
         });
+        return rect.width <= 0 || rect.height <= 0 ? null : rect;
+    }
 
+    /**
+     * The managed windows of a workspace and the slot rectangles dynamic
+     * tiling gives them, or null when there is nothing to place.
+     */
+    private _dynamicSlots(
+        ws: Meta.Workspace,
+    ): { windows: Meta.Window[]; rects: ReturnType<typeof assign> } | null {
+        const windows = this._dynamicManagedWindows(ws);
+        if (windows.length === 0) return null;
+        const tree = this._dynamicTree(windows.length, ws);
+        if (!tree) return null;
+        const splitSlot = this._splitTarget
+            ? windows.indexOf(this._splitTarget)
+            : -1;
+        return {
+            windows,
+            rects: assign(
+                tree,
+                windows.length,
+                splitSlot >= 0 ? splitSlot : undefined,
+            ),
+        };
+    }
+
+    /**
+     * Previews, for a dragged window dynamic tiling manages, the slot it
+     * would be dropped into: the one under the pointer, or its own when the
+     * pointer is outside every slot. Returns false when the window is not
+     * managed, leaving the static previews to their usual logic.
+     */
+    private _previewDynamicSlot(
+        window: Meta.Window,
+        ws: Meta.Workspace,
+        pointer: { x: number; y: number },
+        tilingLayout: TilingLayout,
+    ): boolean {
+        const slots = this._dynamicSlots(ws);
+        const from = slots ? slots.windows.indexOf(window) : -1;
+        if (!slots || from < 0) return false;
+
+        // none of the static machinery applies to this drop
+        if (tilingLayout.showing) tilingLayout.close();
+        if (this._edgeTilingManager.isPerformingEdgeTiling())
+            this._edgeTilingManager.abortEdgeTiling();
+        this._snapAssistingInfo.update(undefined);
+
+        // the popup stays: it shows (and highlights) the layout in use
+        if (Settings.SNAP_ASSIST) {
+            this._snapAssist.setDynamicLayoutId(
+                this.getCurrentDynamicLayoutId(ws),
+            );
+            this._snapAssist.onMovingWindow(window, pointer, true);
+        } else {
+            this._snapAssist.close(true);
+        }
+
+        const under = slotUnderPoint(slots.rects, this._workArea, pointer);
+        const to = under >= 0 ? under : from;
+        if (to === this._dynamicPreviewSlot) return true;
+
+        const rect = this._windowRectForTile(
+            this._tileOf(slots.rects[to]),
+            tilingLayout,
+        );
+        if (rect) {
+            this._selectedTilesPreview.open(
+                rect,
+                this._dynamicPreviewSlot !== null,
+            );
+            this._dynamicPreviewSlot = to;
+        }
+        return true;
+    }
+
+    private _easeWindowRectFromTile(
+        tile: Tile,
+        window: Meta.Window,
+        skipAnimation: boolean = false,
+    ) {
+        const currentWs = window.get_workspace();
+        const tilingLayout = this._workspaceTilingLayout.get(currentWs);
+        if (!tilingLayout) return;
+
+        const scaledRect = TileUtils.apply_props(tile, this._workArea);
+        const destinationRect = this._windowRectForTile(tile, tilingLayout);
         // abort if there is an invalid selection
-        if (destinationRect.width <= 0 || destinationRect.height <= 0) return;
+        if (!destinationRect) return;
 
         const isMaximized =
             window.maximizedHorizontally || window.maximizedVertically;
@@ -1893,12 +2004,10 @@ export class TilingManager {
         const ws = global.workspaceManager.get_active_workspace();
         if (!ws) return false;
 
-        const windows = this._dynamicManagedWindows(ws);
-        const from = windows.indexOf(window);
-        if (from < 0) return false;
-
-        const tree = this._dynamicTree(windows.length, ws);
-        if (!tree) return false;
+        const slots = this._dynamicSlots(ws);
+        const from = slots ? slots.windows.indexOf(window) : -1;
+        if (!slots || from < 0) return false;
+        const { windows, rects } = slots;
 
         // nothing to exchange with, but the window still belongs in its slot
         if (windows.length < 2) {
@@ -1906,21 +2015,11 @@ export class TilingManager {
             return true;
         }
 
-        const splitSlot = this._splitTarget
-            ? windows.indexOf(this._splitTarget)
-            : -1;
-        const rects = assign(
-            tree,
-            windows.length,
-            splitSlot >= 0 ? splitSlot : undefined,
-        );
         const [pointerX, pointerY] = global.get_pointer();
-        const to = rects.findIndex((rect) =>
-            isPointInsideRect(
-                { x: pointerX, y: pointerY },
-                TileUtils.apply_props(this._tileOf(rect), this._workArea),
-            ),
-        );
+        const to = slotUnderPoint(rects, this._workArea, {
+            x: pointerX,
+            y: pointerY,
+        });
 
         if (to >= 0 && to !== from) {
             const a = this._dynamicWindows.indexOf(windows[from]);
