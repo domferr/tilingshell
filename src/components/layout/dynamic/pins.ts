@@ -54,6 +54,16 @@ export function applyPins(rects: TileRect[], pins: SlotPin[]): TileRect[] {
     const paths = rects.map((r) => pathOf(tree!, r));
     if (paths.some((p) => p === null)) return rects;
 
+    // what every other pinned leaf must keep when a divider next to it
+    // moves, so two pins on the same cut line ask the parent for room
+    // instead of taking it from each other
+    const floors = new Map<string, SlotPin>();
+    for (const pin of pins) floors.set(paths[pin.slot]!.join('/'), pin);
+    const widthFloor = (p: SplitPath) =>
+        Math.min(floors.get(p.join('/'))?.minWidth ?? 0, 1);
+    const heightFloor = (p: SplitPath) =>
+        Math.min(floors.get(p.join('/'))?.minHeight ?? 0, 1);
+
     let current = rects;
     for (let pass = 0; pass < 4; pass++) {
         const needed = unsatisfied(current, pins);
@@ -66,14 +76,26 @@ export function applyPins(rects: TileRect[], pins: SlotPin[]): TileRect[] {
                 pin.minWidth !== undefined &&
                 leaf.width < pin.minWidth - EPSILON
             )
-                tree = pinLeaf(tree, path, Math.min(pin.minWidth, 1), 'x');
+                tree = pinLeaf(
+                    tree,
+                    path,
+                    Math.min(pin.minWidth, 1),
+                    'x',
+                    widthFloor,
+                );
             const grown = rectAtPath(tree, path);
             if (
                 grown &&
                 pin.minHeight !== undefined &&
                 grown.height < pin.minHeight - EPSILON
             )
-                tree = pinLeaf(tree, path, Math.min(pin.minHeight, 1), 'y');
+                tree = pinLeaf(
+                    tree,
+                    path,
+                    Math.min(pin.minHeight, 1),
+                    'y',
+                    heightFloor,
+                );
         }
         current = readBack(tree, rects, paths);
     }

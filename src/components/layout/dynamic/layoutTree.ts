@@ -165,12 +165,42 @@ function applyBounds(tree: SplitTree, bounds: TileRect): SplitTree {
     };
 }
 
-/** Mutates a split tree to allocate `actualExtent` to the leaf at `path`. */
+/**
+ * The smallest extent a subtree can shrink to along `axis` without any of
+ * its leaves dropping under the floor `leafFloor` gives for it: floors add
+ * up across a cut on the same axis and compete across a cut on the other.
+ */
+function subtreeFloor(
+    node: SplitTree,
+    path: SplitPath,
+    axis: 'x' | 'y',
+    leafFloor: (path: SplitPath) => number,
+): number {
+    if (node.kind === 'leaf') return leafFloor(path);
+    const first = subtreeFloor(node.first, [...path, 'first'], axis, leafFloor);
+    const second = subtreeFloor(
+        node.second,
+        [...path, 'second'],
+        axis,
+        leafFloor,
+    );
+    return node.axis === axis ? first + second : Math.max(first, second);
+}
+
+/**
+ * Mutates a split tree to allocate `actualExtent` to the leaf at `path`.
+ *
+ * A sibling on the other side of a moved divider is never shrunk under a
+ * small fraction of the split, nor under `leafFloor` of the leaves it holds
+ * (other pins); when that stops the divider short, the parent split is asked
+ * for the missing room instead.
+ */
 export function pinLeaf(
     tree: SplitTree,
     path: SplitPath,
     actualExtent: number,
     axis: 'x' | 'y',
+    leafFloor: (path: SplitPath) => number = () => 0,
 ): SplitTree {
     const MIN_SIBLING_FRACTION = 0.05;
     const extentProp = axis === 'x' ? 'width' : 'height';
@@ -192,6 +222,16 @@ export function pinLeaf(
             const oldBounds = treeBounds(node);
             const oldExtent = oldBounds[extentProp];
             const minSize = MIN_SIBLING_FRACTION * oldExtent;
+            const siblingDir = dir === 'first' ? 'second' : 'first';
+            const siblingFloor = Math.max(
+                minSize,
+                subtreeFloor(
+                    node[siblingDir],
+                    [...path.slice(0, pathIndex), siblingDir],
+                    axis,
+                    leafFloor,
+                ),
+            );
 
             let newAt = node.at;
             let myRequestedExtent = oldExtent;
@@ -199,8 +239,11 @@ export function pinLeaf(
             if (dir === 'first') {
                 newAt = oldBounds[startProp] + requestedExtent;
                 let clampedAt = newAt;
-                if (clampedAt > oldBounds[startProp] + oldExtent - minSize) {
-                    clampedAt = oldBounds[startProp] + oldExtent - minSize;
+                if (
+                    clampedAt >
+                    oldBounds[startProp] + oldExtent - siblingFloor
+                ) {
+                    clampedAt = oldBounds[startProp] + oldExtent - siblingFloor;
                 }
                 if (clampedAt < oldBounds[startProp] + minSize) {
                     clampedAt = oldBounds[startProp] + minSize;
@@ -210,7 +253,7 @@ export function pinLeaf(
                 if (Math.abs(achievedExtent - requestedExtent) > EPSILON) {
                     // the sibling is already at its floor: the parent has to
                     // grow this node by exactly what is missing
-                    myRequestedExtent = requestedExtent + minSize;
+                    myRequestedExtent = requestedExtent + siblingFloor;
                 }
 
                 const firstBounds = { ...oldBounds };
@@ -231,8 +274,8 @@ export function pinLeaf(
             } else {
                 newAt = oldBounds[startProp] + oldExtent - requestedExtent;
                 let clampedAt = newAt;
-                if (clampedAt < oldBounds[startProp] + minSize) {
-                    clampedAt = oldBounds[startProp] + minSize;
+                if (clampedAt < oldBounds[startProp] + siblingFloor) {
+                    clampedAt = oldBounds[startProp] + siblingFloor;
                 }
                 if (clampedAt > oldBounds[startProp] + oldExtent - minSize) {
                     clampedAt = oldBounds[startProp] + oldExtent - minSize;
@@ -241,7 +284,7 @@ export function pinLeaf(
                 const achievedExtent =
                     oldBounds[startProp] + oldExtent - clampedAt;
                 if (Math.abs(achievedExtent - requestedExtent) > EPSILON) {
-                    myRequestedExtent = requestedExtent + minSize;
+                    myRequestedExtent = requestedExtent + siblingFloor;
                 }
 
                 const firstBounds = { ...oldBounds };
