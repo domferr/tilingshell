@@ -104,6 +104,17 @@ export interface PlacerOptions {
     /** after a geometry change that is not yet the target, wait this long for more */
     quietMs: number;
     animationMs: number;
+    /**
+     * When the client settled on a different size than asked, ask again after
+     * each of these delays (some clients, e.g. Brave right after start-up,
+     * refuse a size once and accept it a moment later). Empty disables.
+     */
+    retryDelaysMs: number[];
+    /**
+     * After a request settled, watch the window for this long: a client that
+     * resizes itself away from what it accepted is put back once.
+     */
+    driftWatchMs: number;
 }
 
 interface Pending {
@@ -121,6 +132,12 @@ interface History {
     lastRequested?: Rect;
     settledFrame?: Rect;
     pending?: Pending;
+    /** retries already spent on `lastRequested` */
+    retries: number;
+    retryTimeout: unknown;
+    watch?: { disconnect: () => void; timeout: unknown; quiet: unknown };
+    /** the options of the request being verified, reused by retries */
+    lastOptions?: PlaceOptions;
 }
 
 export class WindowPlacer {
@@ -137,6 +154,8 @@ export class WindowPlacer {
             settleTimeoutMs: 300,
             quietMs: 40,
             animationMs: 250,
+            retryDelaysMs: [1000, 3000],
+            driftWatchMs: 10_000,
             ...opts,
         };
     }
@@ -153,6 +172,17 @@ export class WindowPlacer {
 
         if (hist.pending && rectEquals(hist.pending.dest, dest))
             return 'coalesced';
+
+        // a different rect makes whatever was being verified moot; the same
+        // rect keeps its pending retry (a reflow re-asking for it must not
+        // silently drop the one chance the client gets)
+        if (
+            hist.lastRequested === undefined ||
+            !rectEquals(hist.lastRequested, dest)
+        ) {
+            this._cancelVerification(hist);
+            hist.retries = 0;
+        }
 
         // a pending request for another rect is about to move the window
         // away from `dest`, so "already there" only holds without one
@@ -218,7 +248,10 @@ export class WindowPlacer {
     /** Drop everything known about a window (it is no longer managed). */
     public forget(target: PlacementTarget): void {
         const hist = this._history.get(target);
-        if (hist?.pending) this._cancelPending(hist);
+        if (hist) {
+            this._cancelPending(hist);
+            this._cancelVerification(hist);
+        }
         this._history.delete(target);
         this._inFlight.delete(target);
     }
@@ -241,11 +274,13 @@ export class WindowPlacer {
         // still starts from where the window was before the first of them
         const earlierBefore = hist.pending?.before;
         if (hist.pending) this._cancelPending(hist);
+        this._cancelVerification(hist);
         const animate = options.animate ?? false;
         // only an animated placement owns the actor's transitions; a plain
         // one must not cut short e.g. gnome-shell's map animation
         if (animate) target.getActor()?.cancelTransitions();
 
+        hist.lastOptions = options;
         const pending: Pending = {
             dest: copyRect(dest),
             before: copyRect(earlierBefore ?? before),
@@ -337,6 +372,98 @@ export class WindowPlacer {
         }
 
         pending.onSettled?.(copyRect(pending.dest), copyRect(frame));
+
+        this._verify(target, hist, pending.dest, frame);
+    }
+
+    /**
+     * The client has answered. If it did not give the size that was asked
+     * for, ask again a little later (bounded); once it has, keep an eye on it
+     * for a while in case it changes its mind on its own.
+     */
+    private _verify(
+        target: PlacementTarget,
+        hist: History,
+        dest: Rect,
+        frame: Rect,
+    ): void {
+        const delays = this._opts.retryDelaysMs;
+        if (!sizeEquals(frame, dest)) {
+            if (hist.retries >= delays.length) return; // give up
+            const delay = delays[hist.retries++];
+            this._inFlight.add(target);
+            hist.retryTimeout = this._clock.timeout(delay, () => {
+                hist.retryTimeout = null;
+                this._inFlight.delete(target);
+                if (hist.pending || !target.isAlive()) return;
+                this._request(
+                    target,
+                    hist,
+                    dest,
+                    dest,
+                    target.getFrameRect(),
+                    hist.lastOptions ?? {},
+                    hist.lastOptions?.userOp ?? false,
+                    true,
+                );
+            });
+            return;
+        }
+
+        if (this._opts.driftWatchMs <= 0) return;
+        const watch: NonNullable<History['watch']> = {
+            disconnect: () => {},
+            timeout: null,
+            quiet: null,
+        };
+        hist.watch = watch;
+        this._inFlight.add(target);
+        const stop = () => {
+            if (hist.watch !== watch) return;
+            this._cancelVerification(hist);
+            this._inFlight.delete(target);
+        };
+        watch.disconnect = target.onGeometryChanged(() => {
+            if (hist.watch !== watch || hist.pending) return;
+            if (sizeEquals(target.getFrameRect(), frame)) return;
+            // the client changed its size on its own: let it finish, then
+            // put it back once
+            if (watch.quiet !== null) this._clock.cancel(watch.quiet);
+            watch.quiet = this._clock.timeout(this._opts.quietMs, () => {
+                watch.quiet = null;
+                stop();
+                if (!target.isAlive()) return;
+                hist.retries = delays.length; // one correction, no retries
+                this._request(
+                    target,
+                    hist,
+                    dest,
+                    dest,
+                    target.getFrameRect(),
+                    hist.lastOptions ?? {},
+                    hist.lastOptions?.userOp ?? false,
+                    true,
+                );
+            });
+        });
+        watch.timeout = this._clock.timeout(this._opts.driftWatchMs, () => {
+            watch.timeout = null;
+            stop();
+        });
+    }
+
+    private _cancelVerification(hist: History): void {
+        if (hist.retryTimeout !== null && hist.retryTimeout !== undefined) {
+            this._clock.cancel(hist.retryTimeout);
+            hist.retryTimeout = null;
+        }
+        const w = hist.watch;
+        if (w) {
+            hist.watch = undefined;
+            w.disconnect();
+            if (w.timeout !== null) this._clock.cancel(w.timeout);
+            if (w.quiet !== null) this._clock.cancel(w.quiet);
+        }
     }
 
     private _cancelPending(hist: History): void {
@@ -352,7 +479,7 @@ export class WindowPlacer {
     private _historyOf(target: PlacementTarget): History {
         let hist = this._history.get(target);
         if (!hist) {
-            hist = {};
+            hist = { retries: 0, retryTimeout: null };
             this._history.set(target, hist);
         }
         return hist;

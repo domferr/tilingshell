@@ -366,6 +366,13 @@ export type AckPolicy =
     | { kind: 'sync' }
     | { kind: 'clampMin'; minWidth: number; minHeight: number }
     | { kind: 'ignore' }
+    /** clamps the first `times` configures, then complies (Brave right after start-up) */
+    | {
+          kind: 'clampThenComply';
+          minWidth: number;
+          minHeight: number;
+          times: number;
+      }
     | { kind: 'delayed'; ms: number; then: AckPolicy };
 
 export interface Configuration {
@@ -431,6 +438,7 @@ export class SimWindow {
     private _serial = 1;
     private _signals = new SignalBus<WindowSignal>();
     private _savedRect: Rect | null = null;
+    private _clampsLeft?: number;
 
     maximized: boolean;
     unmanaging = false;
@@ -625,6 +633,20 @@ export class SimWindow {
             case 'sync':
                 this.clientAck(undefined, cfg);
                 return;
+            case 'clampThenComply': {
+                this._clampsLeft ??= policy.times;
+                const size =
+                    this._clampsLeft-- > 0
+                        ? {
+                              width: Math.max(cfg.width, policy.minWidth),
+                              height: Math.max(cfg.height, policy.minHeight),
+                          }
+                        : { width: cfg.width, height: cfg.height };
+                this.clock.timeout(this._ackDelay + extraDelay, () =>
+                    this.clientAck(size, cfg),
+                );
+                return;
+            }
             case 'clampMin': {
                 const size = {
                     width: Math.max(cfg.width, policy.minWidth),

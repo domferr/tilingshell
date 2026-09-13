@@ -86,8 +86,24 @@ test('(iii) clamping client: repeated identical requests never freeze and never 
         placer.place(target, TILE_S, { animate: true }),
         'skipped-settled',
     );
-    assert.equal(window.sentConfigurations.length, 1, 'nothing re-sent');
+    assert.equal(
+        window.sentConfigurations.length,
+        1,
+        'nothing re-sent by the reflow itself',
+    );
     clock.tick(10_000);
+    // the placer's own bounded retries (2 × nudge + real) went out and were refused
+    assert.equal(window.sentConfigurations.length, 5);
+    assert.deepEqual(window.get_frame_rect(), {
+        x: 8,
+        y: 40,
+        width: 700,
+        height: 600,
+    });
+    assert.equal(
+        placer.place(target, TILE_S, { animate: true }),
+        'skipped-settled',
+    );
     assertHealthy(actor, window, compositor, wm);
 
     // the user drags it away, then the tile is asked for again: only the position is off,
@@ -112,6 +128,7 @@ test('(iii) clamping client: repeated identical requests never freeze and never 
     });
     clock.tick(300);
     assertHealthy(actor, window, compositor, wm);
+    clock.tick(30_000); // retries exhausted long ago, nothing else armed
     assert.equal(clock.pendingTimeouts, 0, 'no leaked timeouts');
 });
 
@@ -148,6 +165,7 @@ test('(iv) rapid successive requests before any ack: one animation, from the fir
     assertHealthy(actor, window, compositor, wm);
     assert.equal(actor.scale_x, 1);
     assert.equal(actor.translation_x, 0);
+    clock.tick(10_000); // drift watch expires
     assert.equal(clock.pendingTimeouts, 0);
 });
 
@@ -232,12 +250,17 @@ test('(viii) a client that never acks: the request settles by timeout and is not
         'no animation for a rect that never changed',
     );
     assertHealthy(actor, window, compositor, wm);
+    assert.equal(
+        placer.place(target, TILE_S, { animate: true }),
+        'skipped-settled',
+    );
+    clock.tick(30_000); // bounded retries, all ignored as well
+    assert.equal(window.sentConfigurations.length, 5);
     assert.equal(clock.pendingTimeouts, 0);
     assert.equal(
         placer.place(target, TILE_S, { animate: true }),
         'skipped-settled',
     );
-    assert.equal(window.sentConfigurations.length, 1);
 });
 
 test('(ix) a window that is unmanaged mid-request cleans up without animating', () => {
@@ -361,7 +384,11 @@ test('(xv) X11-style client that acks synchronously inside move_resize_frame set
     );
     assert.equal(settled, 1, 'settled before place() returned');
     assert.deepEqual(window.get_frame_rect(), TILE_S);
-    assert.equal(clock.pendingTimeouts, 1, 'only the animation is left');
+    assert.equal(
+        clock.pendingTimeouts,
+        2,
+        'only the animation and the drift watch are left',
+    );
     clock.tick(300);
     assertHealthy(actor, window, compositor, wm);
 });
@@ -386,4 +413,99 @@ test('(xvi) onSettled is per request and reports what was asked and what the cli
     assert.deepEqual(seen, [
         [TILE_S, { x: 8, y: 40, width: 700, height: 600 }],
     ]);
+});
+
+test('(xvii) a client that refuses the size only at first is asked again and ends on the tile', () => {
+    const { clock, compositor, wm, window, placer } = fixture({
+        kind: 'clampThenComply',
+        minWidth: 820,
+        minHeight: 634,
+        times: 1,
+    });
+    const actor = window.get_compositor_private()!;
+    placer.place(simTargetFor(window), TILE_S, { animate: true });
+    clock.tick(400);
+    assert.deepEqual(
+        window.get_frame_rect(),
+        { x: 8, y: 40, width: 820, height: 634 },
+        'first answer refused',
+    );
+    clock.tick(1500); // first retry (nudged) went out and was answered
+    assert.deepEqual(window.get_frame_rect(), TILE_S);
+    assert.equal(window.sentConfigurations.length, 3, 'initial + nudge + real');
+    clock.tick(20_000);
+    assert.equal(
+        window.sentConfigurations.length,
+        3,
+        'nothing more once it complied',
+    );
+    assertHealthy(actor, window, compositor, wm);
+    assert.equal(clock.pendingTimeouts, 0);
+});
+
+test('(xviii) a client that always refuses is retried a bounded number of times, then left alone', () => {
+    const { clock, window, placer } = fixture({
+        kind: 'clampMin',
+        minWidth: 700,
+        minHeight: 600,
+    });
+    const target = simTargetFor(window);
+    placer.place(target, TILE_S);
+    clock.tick(30_000);
+    // initial + 2 retries × (nudge + real)
+    assert.equal(window.sentConfigurations.length, 5);
+    assert.equal(clock.pendingTimeouts, 0, 'no watch or retry left armed');
+    assert.equal(placer.place(target, TILE_S), 'skipped-settled');
+});
+
+test('(xix) a window that grows on its own shortly after placement is put back once', () => {
+    const { clock, window, placer } = fixture();
+    const target = simTargetFor(window);
+    placer.place(target, TILE_S);
+    clock.tick(400);
+    assert.deepEqual(window.get_frame_rect(), TILE_S);
+    clock.tick(3000);
+    window.clientResize(600, 634); // Brave six seconds later
+    clock.tick(400);
+    assert.deepEqual(window.get_frame_rect(), TILE_S, 'corrected');
+    assert.equal(window.sentConfigurations.length, 3, 'initial + nudge + real');
+    // outside the watch window it is the user's (or the next reflow's) business
+    clock.tick(20_000);
+    window.clientResize(600, 700);
+    clock.tick(2000);
+    assert.deepEqual(window.get_frame_rect(), { ...TILE_S, height: 700 });
+    assert.equal(clock.pendingTimeouts, 0);
+});
+
+test('(xx) a new request cancels pending retries and the drift watch', () => {
+    const { clock, window, placer } = fixture({
+        kind: 'clampMin',
+        minWidth: 700,
+        minHeight: 600,
+    });
+    const target = simTargetFor(window);
+    placer.place(target, TILE_S);
+    clock.tick(400); // settled clamped, retry armed
+    const other = { x: 900, y: 40, width: 900, height: 900 };
+    placer.place(target, other);
+    clock.tick(30_000);
+    assert.deepEqual(window.get_frame_rect(), other);
+    assert.equal(
+        window.sentConfigurations.length,
+        2,
+        'the retry for TILE_S never went out',
+    );
+    assert.equal(clock.pendingTimeouts, 0);
+});
+
+test('(xxi) placer.destroy() also cancels retries and drift watches', () => {
+    const { clock, window, placer } = fixture({
+        kind: 'clampMin',
+        minWidth: 700,
+        minHeight: 600,
+    });
+    placer.place(simTargetFor(window), TILE_S);
+    clock.tick(400);
+    placer.destroy();
+    assert.equal(clock.pendingTimeouts, 0);
 });

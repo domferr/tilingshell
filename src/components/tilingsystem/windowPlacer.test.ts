@@ -79,13 +79,16 @@ test('after a settle, the same dest is skipped while the frame is unchanged and 
         height: 100,
     });
     // a synchronous clock: every request settles immediately (as if the client never answered)
-    const placer = new WindowPlacer({
-        timeout: (_ms, cb) => {
-            cb();
-            return 0;
+    const placer = new WindowPlacer(
+        {
+            timeout: (_ms, cb) => {
+                cb();
+                return 0;
+            },
+            cancel: () => {},
         },
-        cancel: () => {},
-    });
+        { retryDelaysMs: [], driftWatchMs: 0 },
+    );
     assert.equal(placer.place(target, DEST), 'requested');
     assert.equal(placer.place(target, DEST), 'skipped-settled');
     setFrame({ x: 10, y: 10, width: 700, height: 400 }); // the client answered late, clamping width
