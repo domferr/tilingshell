@@ -39,8 +39,7 @@ gives its space back to whatever was sharing it. No manual tiling needed.
 | Shortcut | Action |
 |---|---|
 | <kbd>SUPER</kbd>+<kbd>←</kbd>/<kbd>↑</kbd>/<kbd>↓</kbd>/<kbd>→</kbd> | Swap the focused window with the region next to it |
-| <kbd>SUPER</kbd>+<kbd>;</kbd> | Cycle to the next layout with the same number of tiles |
-| <kbd>SHIFT</kbd>+<kbd>SUPER</kbd>+<kbd>;</kbd> | Cycle to the previous layout with the same number of tiles |
+| <kbd>SHIFT</kbd>+<kbd>SUPER</kbd>+<kbd>;</kbd> | Cycle to the next layout with the same number of tiles (<kbd>SUPER</kbd>+<kbd>;</kbd> is left to GNOME's emoji picker; a backward binding can be set in the preferences) |
 | Drag a window onto another | Swap their positions |
 
 In dynamic mode, <kbd>SUPER</kbd>+arrows swaps windows instead of moving to a
