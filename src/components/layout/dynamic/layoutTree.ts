@@ -250,9 +250,10 @@ export function pinLeaf(
                 }
 
                 const achievedExtent = clampedAt - oldBounds[startProp];
-                if (Math.abs(achievedExtent - requestedExtent) > EPSILON) {
-                    // the sibling is already at its floor: the parent has to
-                    // grow this node by exactly what is missing
+                if (achievedExtent < requestedExtent - EPSILON) {
+                    // the sibling is already at its floor: ask the parent
+                    // for enough room to hold both (a request under the
+                    // floor is simply granted more and must not escalate)
                     myRequestedExtent = requestedExtent + siblingFloor;
                 }
 
@@ -283,7 +284,7 @@ export function pinLeaf(
 
                 const achievedExtent =
                     oldBounds[startProp] + oldExtent - clampedAt;
-                if (Math.abs(achievedExtent - requestedExtent) > EPSILON) {
+                if (achievedExtent < requestedExtent - EPSILON) {
                     myRequestedExtent = requestedExtent + siblingFloor;
                 }
 

@@ -153,3 +153,31 @@ test('applyPins grows the parent for pinned siblings nested under a cross-axis s
     assert.ok(close(out[3].x, 0.54), `right column at ${out[3].x}`);
     assertPartition(out);
 });
+
+test('applyPins does not escalate a pin smaller than the sibling floor', () => {
+    // the 0.02 column asks for 0.024, less than the 5 % floor its split
+    // grants anyway; the root divider must not move
+    const rects = [
+        { x: 0, y: 0, width: 0.5, height: 1 },
+        { x: 0.5, y: 0, width: 0.02, height: 1 },
+        { x: 0.52, y: 0, width: 0.48, height: 1 },
+    ];
+    const out = applyPins(rects, [{ slot: 1, minWidth: 0.024 }]);
+    assert.ok(out[1].width >= 0.024 - 1e-6, `slot 1: ${out[1].width}`);
+    assert.ok(close(out[0].width, 0.5), `slot 0 moved: ${out[0].width}`);
+    assert.ok(out[2].width > 0.4, `slot 2 crushed: ${out[2].width}`);
+    assertPartition(out);
+});
+
+test('applyPins ignores a pin whose slot does not exist', () => {
+    const rects = [
+        { x: 0, y: 0, width: 0.5, height: 1 },
+        { x: 0.5, y: 0, width: 0.5, height: 1 },
+    ];
+    const out = applyPins(rects, [
+        { slot: 0, minWidth: 0.6 },
+        { slot: 7, minWidth: 0.6 },
+    ]);
+    assert.ok(close(out[0].width, 0.6));
+    assertPartition(out);
+});

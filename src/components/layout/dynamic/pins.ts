@@ -58,7 +58,10 @@ export function applyPins(rects: TileRect[], pins: SlotPin[]): TileRect[] {
     // moves, so two pins on the same cut line ask the parent for room
     // instead of taking it from each other
     const floors = new Map<string, SlotPin>();
-    for (const pin of pins) floors.set(paths[pin.slot]!.join('/'), pin);
+    for (const pin of pins) {
+        const path = paths[pin.slot];
+        if (path) floors.set(path.join('/'), pin);
+    }
     const widthFloor = (p: SplitPath) =>
         Math.min(floors.get(p.join('/'))?.minWidth ?? 0, 1);
     const heightFloor = (p: SplitPath) =>
