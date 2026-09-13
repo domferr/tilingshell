@@ -78,10 +78,12 @@ export interface PlaceOptions {
     forceMove?: boolean;
     animate?: boolean;
     /**
-     * Called once this request settled — not if it was superseded — with the
-     * rect that was asked for and the frame the client actually ended on.
+     * Called each time this request settled — not if it was superseded —
+     * with the rect that was asked for and the frame the client actually
+     * ended on. `final` is true when the placer will not ask again: the
+     * size matched, or every retry has been spent.
      */
-    onSettled?: (requested: Rect, actual: Rect) => void;
+    onSettled?: (requested: Rect, actual: Rect, final: boolean) => void;
 }
 
 export type PlaceResult =
@@ -121,7 +123,7 @@ interface Pending {
     dest: Rect;
     before: Rect;
     animate: boolean;
-    onSettled?: (requested: Rect, actual: Rect) => void;
+    onSettled?: (requested: Rect, actual: Rect, final: boolean) => void;
     disconnectGeometry: () => void;
     disconnectGone: () => void;
     timeout: unknown;
@@ -371,7 +373,10 @@ export class WindowPlacer {
             }
         }
 
-        pending.onSettled?.(copyRect(pending.dest), copyRect(frame));
+        const final =
+            sizeEquals(frame, pending.dest) ||
+            hist.retries >= this._opts.retryDelaysMs.length;
+        pending.onSettled?.(copyRect(pending.dest), copyRect(frame), final);
 
         this._verify(target, hist, pending.dest, frame);
     }

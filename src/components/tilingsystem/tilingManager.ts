@@ -24,6 +24,8 @@ import Tile from '../layout/Tile';
 import TileUtils from '../layout/TileUtils';
 import { buildLayoutTree, SplitTree } from '../layout/dynamic/layoutTree';
 import { assign, neighbourIndex, slotUnderPoint } from '../layout/dynamic/reflow';
+import { applyPins } from '../layout/dynamic/pins';
+import type { SlotPin } from '../layout/dynamic/pins';
 import type { Direction } from '../layout/dynamic/reflow';
 import { pickLayoutIndex, pickLayoutIndexAt } from '../layout/dynamic/pickLayout';
 import GlobalState from '../../utils/globalState';
@@ -132,6 +134,11 @@ export class TilingManager {
     // is on screen (null when none), so the preview is only redrawn when the
     // pointer crosses into another slot.
     private _dynamicPreviewSlot: number | null = null;
+    // Frame sizes (px) below which a window's client has refused to go, as
+    // learnt from its final answers to placements. A pinned window's slot is
+    // grown to fit and its neighbours shrink, so the gaps stay intact.
+    private _pinnedWindows: Map<Meta.Window, { width?: number; height?: number }> =
+        new Map();
 
     private readonly _signals: SignalHandling;
     private readonly _debug: (..._content: unknown[]) => void;
@@ -589,6 +596,7 @@ export class TilingManager {
         this._dynamicWindowSignals.clear();
         this._dynamicWindows.length = 0;
         this._dynamicLayoutOffset.clear();
+        this._pinnedWindows.clear();
         this._splitTarget = null;
         this._signals.disconnect();
         this._isGrabbingWindow = false;
@@ -1384,14 +1392,49 @@ export class TilingManager {
         const splitSlot = this._splitTarget
             ? windows.indexOf(this._splitTarget)
             : -1;
-        return {
-            windows,
-            rects: assign(
-                tree,
-                windows.length,
-                splitSlot >= 0 ? splitSlot : undefined,
-            ),
-        };
+        const rects = assign(
+            tree,
+            windows.length,
+            splitSlot >= 0 ? splitSlot : undefined,
+        );
+        return { windows, rects: this._applyWindowPins(ws, windows, rects) };
+    }
+
+    /**
+     * Grows the slots of pinned windows so the frame the client insists on
+     * fits inside them together with the gaps; the neighbours give way.
+     */
+    private _applyWindowPins(
+        ws: Meta.Workspace,
+        windows: Meta.Window[],
+        rects: ReturnType<typeof assign>,
+    ): ReturnType<typeof assign> {
+        if (this._pinnedWindows.size === 0) return rects;
+        const tilingLayout = this._workspaceTilingLayout.get(ws);
+        if (!tilingLayout) return rects;
+
+        const pins: SlotPin[] = [];
+        windows.forEach((window, slot) => {
+            const pin = this._pinnedWindows.get(window);
+            if (!pin) return;
+            const tile = this._tileOf(rects[slot]);
+            const tilePx = TileUtils.apply_props(tile, this._workArea);
+            const framePx = this._windowRectForTile(tile, tilingLayout);
+            if (!framePx) return;
+            // the gaps this slot loses to the frame stay the same once it
+            // grows, so the slot has to hold the frame plus those gaps
+            const entry: SlotPin = { slot };
+            if (pin.width !== undefined)
+                entry.minWidth =
+                    (pin.width + tilePx.width - framePx.width) /
+                    this._workArea.width;
+            if (pin.height !== undefined)
+                entry.minHeight =
+                    (pin.height + tilePx.height - framePx.height) /
+                    this._workArea.height;
+            pins.push(entry);
+        });
+        return pins.length === 0 ? rects : applyPins(rects, pins);
     }
 
     /**
@@ -1479,7 +1522,45 @@ export class TilingManager {
         );
         this._placer.place(placementTargetFor(window), toRect(destinationRect), {
             animate: !skipAnimation,
+            onSettled: (requested, actual, final) =>
+                this._onPlacementSettled(window, requested, actual, final),
         });
+    }
+
+    /**
+     * Learns from the client's final answer to a placement. A window that
+     * ends up larger than asked cannot be made that small, so its slot must
+     * grow (pin); one that accepted a size below its pin has proven the pin
+     * wrong. Either change means a reflow.
+     */
+    private _onPlacementSettled(
+        window: Meta.Window,
+        requested: { width: number; height: number },
+        actual: { width: number; height: number },
+        final: boolean,
+    ) {
+        if (!final || !Settings.ENABLE_DYNAMIC_TILING) return;
+        if (!this._dynamicWindowSignals.has(window)) return;
+
+        const pin = { ...(this._pinnedWindows.get(window) ?? {}) };
+        const update = (axis: 'width' | 'height') => {
+            if (actual[axis] > requested[axis]) pin[axis] = actual[axis];
+            else if (pin[axis] !== undefined && requested[axis] < pin[axis])
+                delete pin[axis];
+        };
+        update('width');
+        update('height');
+
+        const before = this._pinnedWindows.get(window);
+        const changed =
+            (before?.width ?? null) !== (pin.width ?? null) ||
+            (before?.height ?? null) !== (pin.height ?? null);
+        if (!changed) return;
+
+        if (pin.width === undefined && pin.height === undefined)
+            this._pinnedWindows.delete(window);
+        else this._pinnedWindows.set(window, pin);
+        this._queueDynamicReflow();
     }
 
     public onTileFromWindowMenu(tile: Tile, window: Meta.Window) {
@@ -1615,6 +1696,7 @@ export class TilingManager {
         this._dynamicWindowSignals.delete(window);
         if (this._splitTarget === window) this._splitTarget = null;
         this._placer.forget(placementTargetFor(window));
+        this._pinnedWindows.delete(window);
 
         const slot = this._dynamicWindows.indexOf(window);
         if (slot < 0) return;
@@ -1968,24 +2050,10 @@ export class TilingManager {
         });
 
         workspaces.forEach((ws) => {
-            const windows = this._dynamicManagedWindows(ws);
-            if (windows.length === 0) return;
-
             // no decomposable layout at all keeps the static behaviour
-            const tree = this._dynamicTree(windows.length, ws);
-            if (!tree) return;
-
-            // the split target only applies to the workspace it is actually
-            // on; elsewhere it resolves to -1 and overflow picks the roomiest
-            // region instead, exactly as when nothing is focused at all
-            const splitSlot = this._splitTarget
-                ? windows.indexOf(this._splitTarget)
-                : -1;
-            const rects = assign(
-                tree,
-                windows.length,
-                splitSlot >= 0 ? splitSlot : undefined,
-            );
+            const slots = this._dynamicSlots(ws);
+            if (!slots) return;
+            const { windows, rects } = slots;
             windows.forEach((window, slot) => {
                 // a window can be unmanaged by a placement earlier in this
                 // very loop; skip it rather than abort the others

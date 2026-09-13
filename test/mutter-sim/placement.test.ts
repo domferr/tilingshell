@@ -509,3 +509,20 @@ test('(xxi) placer.destroy() also cancels retries and drift watches', () => {
     placer.destroy();
     assert.equal(clock.pendingTimeouts, 0);
 });
+
+test('(xxii) onSettled reports whether the answer is final: matched size, or retries exhausted', () => {
+    const { clock, window, placer } = fixture({ kind: 'clampMin', minWidth: 700, minHeight: 600 });
+    const finals: boolean[] = [];
+    placer.place(simTargetFor(window), TILE_S, {
+        onSettled: (_req, _actual, final) => finals.push(final),
+    });
+    clock.tick(30_000);
+    // initial answer + 3 retries, only the last one is final
+    assert.deepEqual(finals, [false, false, false, true]);
+
+    const { clock: c2, window: w2, placer: p2 } = fixture({ kind: 'comply' });
+    const finals2: boolean[] = [];
+    p2.place(simTargetFor(w2), TILE_S, { onSettled: (_r, _a, final) => finals2.push(final) });
+    c2.tick(1000);
+    assert.deepEqual(finals2, [true], 'a matching answer is final at once');
+});
