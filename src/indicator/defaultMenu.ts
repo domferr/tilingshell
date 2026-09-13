@@ -35,6 +35,7 @@ class LayoutsRow extends St.BoxLayout {
 
     private _layoutsBox: St.BoxLayout;
     private _layoutsButtons: LayoutButton[];
+    private _layouts: Layout[];
     private _label: St.Label;
     private _monitor: Monitor;
 
@@ -44,6 +45,7 @@ class LayoutsRow extends St.BoxLayout {
         selectedId: string,
         showMonitorName: boolean,
         monitor: Monitor,
+        selectableIds?: Set<string>,
     ) {
         super({
             xAlign: Clutter.ActorAlign.CENTER,
@@ -71,6 +73,7 @@ class LayoutsRow extends St.BoxLayout {
 
         parent.add_child(this);
 
+        this._layouts = layouts;
         const selectedIndex = layouts.findIndex((lay) => lay.id === selectedId);
         const hasGaps = Settings.get_inner_gaps(1).top > 0;
 
@@ -90,6 +93,8 @@ class LayoutsRow extends St.BoxLayout {
                 () => !btn.checked && this.emit('selected-layout', lay.id),
             );
             if (ind === selectedIndex) btn.set_checked(true);
+            if (selectableIds && !selectableIds.has(lay.id))
+                btn.setDisabled(true);
             return btn;
         });
     }
@@ -101,6 +106,20 @@ class LayoutsRow extends St.BoxLayout {
         this._layoutsButtons.forEach((btn, ind) =>
             btn.set_checked(ind === selectedIndex),
         );
+    }
+
+    /**
+     * While dynamic tiling is on, only layouts sharing the current
+     * tile-count group can actually be switched to (see
+     * `TilingManager.selectDynamicLayout`) — everything else is disabled so
+     * it doesn't look clickable when it isn't. `undefined` (dynamic tiling
+     * off, or nothing placed yet) re-enables every button.
+     */
+    public setSelectable(selectableIds: Set<string> | undefined) {
+        this._layoutsButtons.forEach((btn, ind) => {
+            const lay = this._layouts[ind];
+            btn.setDisabled(!!selectableIds && !selectableIds.has(lay.id));
+        });
     }
 
     public updateMonitorName(
@@ -175,6 +194,9 @@ export default class DefaultMenu implements CurrentMenu {
             Settings.KEY_ENABLE_DYNAMIC_TILING,
             () => {
                 dynamicToggle.setToggleState(Settings.ENABLE_DYNAMIC_TILING);
+                // switching sources (static vs. dynamic template) for the
+                // highlight, not just the checked state of this one switch
+                this._refreshSelectedLayouts();
             },
         );
         (this._indicator.menu as PopupMenu.PopupMenu).addMenuItem(
@@ -232,33 +254,24 @@ export default class DefaultMenu implements CurrentMenu {
                 if (this._layoutsRows.length !== getMonitors().length)
                     this._drawLayouts();
 
-                const selected_layouts = Settings.get_selected_layouts();
-                const wsIndex =
-                    global.workspaceManager.get_active_workspace_index();
-                getMonitors().forEach((m, index) => {
-                    const selectedId =
-                        wsIndex < selected_layouts.length
-                            ? selected_layouts[wsIndex][index]
-                            : GlobalState.get().layouts[0].id;
-                    this._layoutsRows[index].selectLayout(selectedId);
-                });
+                this._refreshSelectedLayouts();
             },
         );
 
         this._signals.connect(
             global.workspaceManager,
             'active-workspace-changed',
-            () => {
-                const selected_layouts = Settings.get_selected_layouts();
-                const wsIndex =
-                    global.workspaceManager.get_active_workspace_index();
-                getMonitors().forEach((m, index) => {
-                    const selectedId =
-                        wsIndex < selected_layouts.length
-                            ? selected_layouts[wsIndex][index]
-                            : GlobalState.get().layouts[0].id;
-                    this._layoutsRows[index].selectLayout(selectedId);
-                });
+            () => this._refreshSelectedLayouts(),
+        );
+
+        // the menu is normally closed, so the highlight can go stale (e.g.
+        // dynamic tiling picking a different layout as windows open/close)
+        // without anything above firing; refresh right as it is opened
+        this._signals.connect(
+            this._indicator.menu,
+            'open-state-changed',
+            (_menu: unknown, isOpen: boolean) => {
+                if (isOpen) this._refreshSelectedLayouts();
             },
         );
 
@@ -441,24 +454,21 @@ export default class DefaultMenu implements CurrentMenu {
         this._container.destroy_all_children();
         this._layoutsRows = [];
 
-        const selected_layouts = Settings.get_selected_layouts();
         const ws_index = global.workspaceManager.get_active_workspace_index();
         const monitors = getMonitors();
         this._layoutsRows = monitors.map((monitor) => {
-            const ws_selected_layouts =
-                ws_index < selected_layouts.length
-                    ? selected_layouts[ws_index]
-                    : [];
-            const selectedId =
-                monitor.index < ws_selected_layouts.length
-                    ? ws_selected_layouts[monitor.index]
-                    : GlobalState.get().layouts[0].id;
+            const selectedId = this._selectedIdFor(monitor.index, ws_index);
+            const selectableIds = this._selectableIdsFor(
+                monitor.index,
+                ws_index,
+            );
             const row = new LayoutsRow(
                 this._container,
                 layouts,
                 selectedId,
                 monitors.length > 1,
                 monitor,
+                selectableIds,
             );
             row.connect(
                 'selected-layout',
@@ -470,6 +480,62 @@ export default class DefaultMenu implements CurrentMenu {
                 },
             );
             return row;
+        });
+    }
+
+    /**
+     * The layout that should show as selected for a monitor: while dynamic
+     * tiling is on and actually placing windows on that monitor's
+     * workspace, this is whichever saved layout it is using as its
+     * template right now (see `TilingManager.getCurrentDynamicLayoutId`) —
+     * otherwise it falls back to the static per-monitor selection.
+     */
+    private _selectedIdFor(monitorIndex: number, wsIndex: number): string {
+        if (Settings.ENABLE_DYNAMIC_TILING) {
+            const ws = global.workspaceManager.get_workspace_by_index(wsIndex);
+            const dynamicId = ws
+                ? this._indicator
+                      .getTilingManager(monitorIndex)
+                      ?.getCurrentDynamicLayoutId(ws)
+                : undefined;
+            if (dynamicId) return dynamicId;
+        }
+
+        const selected_layouts = Settings.get_selected_layouts();
+        const ws_selected_layouts =
+            wsIndex < selected_layouts.length ? selected_layouts[wsIndex] : [];
+        return monitorIndex < ws_selected_layouts.length
+            ? ws_selected_layouts[monitorIndex]
+            : GlobalState.get().layouts[0].id;
+    }
+
+    /**
+     * Which layouts are actually switchable to for a monitor right now —
+     * `undefined` (every button enabled) unless dynamic tiling is on and
+     * has a tile-count group to restrict to.
+     */
+    private _selectableIdsFor(
+        monitorIndex: number,
+        wsIndex: number,
+    ): Set<string> | undefined {
+        if (!Settings.ENABLE_DYNAMIC_TILING) return undefined;
+        const ws = global.workspaceManager.get_workspace_by_index(wsIndex);
+        return ws
+            ? this._indicator
+                  .getTilingManager(monitorIndex)
+                  ?.getCurrentDynamicLayoutGroupIds(ws)
+            : undefined;
+    }
+
+    private _refreshSelectedLayouts() {
+        const wsIndex = global.workspaceManager.get_active_workspace_index();
+        getMonitors().forEach((m, index) => {
+            this._layoutsRows[index]?.selectLayout(
+                this._selectedIdFor(m.index, wsIndex),
+            );
+            this._layoutsRows[index]?.setSelectable(
+                this._selectableIdsFor(m.index, wsIndex),
+            );
         });
     }
 

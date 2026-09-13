@@ -65,4 +65,11 @@ export default class LayoutButton extends St.Button {
             width * scalingFactor,
         );
     }
+
+    public setDisabled(disabled: boolean) {
+        this.reactive = !disabled;
+        this.can_focus = !disabled;
+        if (disabled) this.add_style_class_name('layout-button-disabled');
+        else this.remove_style_class_name('layout-button-disabled');
+    }
 }

@@ -108,6 +108,7 @@ export class TilingManager {
     // Cache of _dynamicLayoutCandidates(), rebuilt only when the saved
     // layouts change rather than on every reflow.
     private _dynamicLayoutCandidatesCache: {
+        id: string;
         tileCount: number;
         tree: SplitTree | null;
     }[] | null = null;
@@ -861,6 +862,18 @@ export class TilingManager {
                 }
 
                 if (Settings.SNAP_ASSIST) {
+                    // reflect whichever saved layout dynamic tiling is
+                    // actually using right now, rather than the static
+                    // per-monitor selection, so the popup doesn't offer a
+                    // layout unrelated to the arrangement already on screen
+                    const dynamicWs = Settings.ENABLE_DYNAMIC_TILING
+                        ? window.get_workspace()
+                        : null;
+                    this._snapAssist.setDynamicLayoutId(
+                        dynamicWs
+                            ? this.getCurrentDynamicLayoutId(dynamicWs)
+                            : undefined,
+                    );
                     this._snapAssist.onMovingWindow(
                         window,
                         currPointerPos,
@@ -1633,6 +1646,7 @@ export class TilingManager {
 
         const candidates = GlobalState.get()
             .layouts.map((layout) => ({
+                id: layout.id,
                 tileCount: layout.tiles.length,
                 tree: buildLayoutTree(
                     layout.tiles.map((t) => ({
@@ -1681,6 +1695,99 @@ export class TilingManager {
         this._dynamicLayoutOffset.set(ws, groupOffsets);
 
         this._applyDynamicTiling();
+    }
+
+    /**
+     * The saved layout currently acting as dynamic tiling's template on this
+     * workspace — the same one `_dynamicTree` resolves to, including any
+     * `cycleDynamicLayout` offset, whether or not the window count matches
+     * its tile count exactly. `undefined` when there is nothing to place
+     * (no windows, or no decomposable layout at all).
+     */
+    public getCurrentDynamicLayoutId(ws: Meta.Workspace): string | undefined {
+        const windowCount = this._dynamicManagedWindows(ws).length;
+        if (windowCount === 0) return undefined;
+
+        const candidates = this._dynamicLayoutCandidates();
+        const tileCounts = candidates.map((candidate) => candidate.tileCount);
+        const defaultIndex = pickLayoutIndex(tileCounts, windowCount);
+        if (defaultIndex < 0) return undefined;
+
+        const offset =
+            this._dynamicLayoutOffset.get(ws)?.get(tileCounts[defaultIndex]) ??
+            0;
+        const index = pickLayoutIndexAt(tileCounts, windowCount, offset);
+        return index < 0 ? undefined : candidates[index].id;
+    }
+
+    /**
+     * Every saved layout `selectDynamicLayout` would actually accept right
+     * now — the ones sharing the current tile-count group — so UI can grey
+     * out the rest instead of offering a choice that silently does nothing.
+     * `undefined` when there is nothing to place.
+     */
+    public getCurrentDynamicLayoutGroupIds(
+        ws: Meta.Workspace,
+    ): Set<string> | undefined {
+        const windowCount = this._dynamicManagedWindows(ws).length;
+        if (windowCount === 0) return undefined;
+
+        const candidates = this._dynamicLayoutCandidates();
+        const tileCounts = candidates.map((candidate) => candidate.tileCount);
+        const defaultIndex = pickLayoutIndex(tileCounts, windowCount);
+        if (defaultIndex < 0) return undefined;
+
+        const tileCount = tileCounts[defaultIndex];
+        return new Set(
+            candidates
+                .filter((candidate) => candidate.tileCount === tileCount)
+                .map((candidate) => candidate.id),
+        );
+    }
+
+    /**
+     * Jumps directly to a specific saved layout, the same way
+     * `cycleDynamicLayout` steps by one — this just computes the offset
+     * needed to land on `layoutId` in a single move instead of stepping.
+     * A no-op, returning false, when `layoutId` is not part of the
+     * tile-count group currently in use (there is nothing sensible to
+     * switch to outside that group: dynamic tiling picks the group from the
+     * window count, not from what is clicked).
+     */
+    public selectDynamicLayout(ws: Meta.Workspace, layoutId: string): boolean {
+        if (!Settings.ENABLE_DYNAMIC_TILING) return false;
+
+        const windowCount = this._dynamicManagedWindows(ws).length;
+        if (windowCount === 0) return false;
+
+        const candidates = this._dynamicLayoutCandidates();
+        const tileCounts = candidates.map((candidate) => candidate.tileCount);
+        const defaultIndex = pickLayoutIndex(tileCounts, windowCount);
+        if (defaultIndex < 0) return false;
+        const tileCount = tileCounts[defaultIndex];
+
+        const targetIndex = candidates.findIndex(
+            (candidate) => candidate.id === layoutId,
+        );
+        if (targetIndex < 0 || candidates[targetIndex].tileCount !== tileCount)
+            return false;
+
+        // Same group-membership search pickLayoutIndexAt does internally,
+        // reproduced here since it only accepts a numeric offset, not a
+        // target index or id.
+        const group = tileCounts
+            .map((count, index) => ({ count, index }))
+            .filter((entry) => entry.count === tileCount)
+            .map((entry) => entry.index);
+        const defaultPosition = group.indexOf(defaultIndex);
+        const targetPosition = group.indexOf(targetIndex);
+
+        const groupOffsets = this._dynamicLayoutOffset.get(ws) ?? new Map();
+        groupOffsets.set(tileCount, targetPosition - defaultPosition);
+        this._dynamicLayoutOffset.set(ws, groupOffsets);
+
+        this._applyDynamicTiling();
+        return true;
     }
 
     /**

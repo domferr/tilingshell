@@ -37,3 +37,10 @@
         background-color: #c4c4c4;
     }
 }
+
+// dynamic tiling limits switching to layouts sharing the current tile-count
+// group (see TilingManager.selectDynamicLayout); everything else is dimmed
+// and non-reactive rather than looking clickable and silently doing nothing
+.layout-button.layout-button-disabled {
+    opacity: 0.35;
+}
