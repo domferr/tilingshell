@@ -34,3 +34,20 @@ $snap-assist-tile-border-radius: 6px;
     border-color: rgba(94, 94, 94, 0.7);
     background-color: rgba(154, 154, 154, 0.6);
 }
+
+// the layout dynamic tiling is currently using as its template. A border
+// around the whole thumbnail rather than the individual tiles, following
+// the same pattern .layout-button uses for its own :checked state, so it
+// doesn't collide with (and blank out) each tile's own hover feedback. The
+// border space is reserved even when unselected so selecting one doesn't
+// shift its size.
+.snap-assist-layout {
+    border-style: solid;
+    border-width: 2px;
+    border-radius: constants.$base_border_radius;
+    border-color: transparent;
+}
+
+.snap-assist-layout.selected {
+    border-color: rgba(255, 255, 255, 0.7);
+}

@@ -12,6 +12,7 @@ import EditorDialog from '../components/editor/editorDialog';
 import CurrentMenu from './currentMenu';
 import { registerGObjectClass } from '../utils/gjs';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
+import type { TilingManager } from '../components/tilingsystem/tilingManager';
 
 enum IndicatorState {
     DEFAULT = 1,
@@ -36,10 +37,18 @@ export default class Indicator extends PanelMenu.Button {
     private _enableScaling: boolean;
     private _path: string;
     private _keyPressEvent: number | null;
+    private _getTilingManager: (
+        monitorIndex: number,
+    ) => TilingManager | undefined;
 
-    constructor(path: string, uuid: string) {
+    constructor(
+        path: string,
+        uuid: string,
+        getTilingManager: (monitorIndex: number) => TilingManager | undefined,
+    ) {
         super(0.5, 'Tiling Shell Indicator', false);
         Main.panel.addToStatusArea(uuid, this, 1, 'right');
+        this._getTilingManager = getTilingManager;
 
         // Bind the "show-indicator" setting to the "visible" property
         Settings.bind(
@@ -72,6 +81,10 @@ export default class Indicator extends PanelMenu.Button {
         return this._path;
     }
 
+    public getTilingManager(monitorIndex: number): TilingManager | undefined {
+        return this._getTilingManager(monitorIndex);
+    }
+
     public set enableScaling(value: boolean) {
         if (this._enableScaling === value) return;
         this._enableScaling = value;
@@ -88,6 +101,24 @@ export default class Indicator extends PanelMenu.Button {
     }
 
     public selectLayoutOnClick(monitorIndex: number, layoutToSelectId: string) {
+        if (Settings.ENABLE_DYNAMIC_TILING) {
+            const ws = global.workspaceManager.get_active_workspace();
+            const switched =
+                ws &&
+                this.getTilingManager(monitorIndex)?.selectDynamicLayout(
+                    ws,
+                    layoutToSelectId,
+                );
+            if (switched) {
+                this.menu.toggle();
+                return;
+            }
+            // Not part of the tile-count group dynamic tiling is currently
+            // using for this workspace: nothing sensible to switch to, so
+            // fall through and leave the static selection as a record of
+            // preference for when dynamic tiling is turned off.
+        }
+
         GlobalState.get().setSelectedLayoutOfMonitor(
             layoutToSelectId,
             monitorIndex,

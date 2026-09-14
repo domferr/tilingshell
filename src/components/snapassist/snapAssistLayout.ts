@@ -23,6 +23,7 @@ export default class SnapAssistLayout extends LayoutWidget<SnapAssistTile> {
             layout,
             innerGaps,
             outerGaps,
+            styleClass: 'snap-assist-layout',
         });
         this.set_size(width, height);
         super.relayout();
@@ -35,6 +36,11 @@ export default class SnapAssistLayout extends LayoutWidget<SnapAssistTile> {
         tile: Tile,
     ): SnapAssistTile {
         return new SnapAssistTile({ parent, rect, gaps, tile });
+    }
+
+    public setSelected(selected: boolean) {
+        if (selected) this.add_style_class_name('selected');
+        else this.remove_style_class_name('selected');
     }
 
     public getTileBelow(cursorPos: {

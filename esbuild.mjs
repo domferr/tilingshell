@@ -300,10 +300,17 @@ async function processLegacyFiles(files) {
     }));
 }
 
+// Unit tests run under `node --test` and import node:test, which does not exist
+// in GJS — they must never reach the built extension.
+const sourceEntryPoints = await glob('src/**/*.ts', {
+    ignore: 'src/**/*.test.ts',
+    posix: true,
+});
+
 // build extension
 build({
     logLevel: "info",
-    entryPoints: ['src/**/*.ts', 'src/styles/stylesheet.scss', 'src/styles/prefs.scss', 'src/prefs.ts'],
+    entryPoints: [...sourceEntryPoints, 'src/styles/stylesheet.scss', 'src/styles/prefs.scss', 'src/prefs.ts'],
     outdir: distDir,
     bundle: false,
     treeShaking: false,

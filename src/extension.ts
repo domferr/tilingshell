@@ -79,7 +79,11 @@ export default class TilingShellExtension extends Extension {
     }
 
     createIndicator() {
-        this._indicator = new Indicator(this.path, this.uuid);
+        this._indicator = new Indicator(
+            this.path,
+            this.uuid,
+            (monitorIndex) => this._tilingManagers[monitorIndex],
+        );
         this._indicator.enableScaling = !this._fractionalScalingEnabled;
         this._indicator.enable();
         this._signals?.connect(this._indicator, 'open-preferences', () => this.openPreferences());
@@ -277,6 +281,17 @@ export default class TilingShellExtension extends Extension {
                     const monitorIndex = window.get_monitor();
                     const manager = this._tilingManagers[monitorIndex];
                     if (manager) manager.onSpanAllTiles(window);
+                },
+            );
+            this._signals.connect(
+                this._keybindings,
+                'cycle-dynamic-layout',
+                (kb: KeyBindings, dp: Meta.Display, direction: number) => {
+                    const window = dp.focus_window;
+                    if (!window) return;
+                    const manager = this._tilingManagers[window.get_monitor()];
+                    if (manager)
+                        manager.cycleDynamicLayout(direction > 0 ? 1 : -1);
                 },
             );
             this._signals.connect(

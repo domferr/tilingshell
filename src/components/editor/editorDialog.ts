@@ -240,7 +240,36 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         const gaps = Settings.get_inner_gaps(1).top > 0 ? this._gapsSize : 0;
         this._layoutsBoxLayout.destroy_all_children();
 
-        params.layouts.forEach((lay, btnInd) => {
+        // Layouts are grouped by how many windows they hold. Dynamic tiling
+        // uses the leftmost layout of the group matching the window count, so
+        // ordering only means anything inside a group.
+        const ordered = params.layouts
+            .map((lay, index) => ({ lay, index }))
+            .sort(
+                (a, b) =>
+                    a.lay.tiles.length - b.lay.tiles.length ||
+                    a.index - b.index,
+            );
+
+        ordered.forEach(({ lay, index: btnInd }, position) => {
+            const previous = ordered[position - 1];
+            const next = ordered[position + 1];
+            const sameAsPrevious =
+                previous !== undefined &&
+                previous.lay.tiles.length === lay.tiles.length;
+            const sameAsNext =
+                next !== undefined &&
+                next.lay.tiles.length === lay.tiles.length;
+
+            if (previous !== undefined && !sameAsPrevious) {
+                this._layoutsBoxLayout.add_child(
+                    new St.Widget({
+                        styleClass: 'layout-group-separator',
+                        yExpand: true,
+                    }),
+                );
+            }
+
             const layoutBox = new St.BoxLayout({
                 xAlign: Clutter.ActorAlign.CENTER,
                 styleClass: 'layout-button-container',
@@ -261,8 +290,8 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
             });
             layoutBox.add_child(moveAndDeleteButtonsBox);
             if (params.layouts.length > 1) {
-                // move left button if not first layout
-                if (btnInd >= 1) {
+                // move left only within the group
+                if (sameAsPrevious) {
                     const moveLeftBtn = new St.Button({
                         xExpand: false,
                         xAlign: Clutter.ActorAlign.CENTER,
@@ -276,7 +305,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
                         iconSize: 16,
                     });
                     moveLeftBtn.connect('clicked', () => {
-                        params.onReorderLayout(btnInd, btnInd-1);
+                        params.onReorderLayout(btnInd, previous.index);
                         this._drawLayouts({
                             ...params,
                             layouts: GlobalState.get().layouts,
@@ -305,8 +334,8 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
                     });
                 });
                 moveAndDeleteButtonsBox.add_child(deleteBtn);
-                // move right button if not last layout
-                if (btnInd + 1 < params.layouts.length) {
+                // move right only within the group
+                if (sameAsNext) {
                     const moveRightBtn = new St.Button({
                         xExpand: false,
                         xAlign: Clutter.ActorAlign.CENTER,
@@ -320,7 +349,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
                         iconSize: 16,
                     });
                     moveRightBtn.connect('clicked', () => {
-                        params.onReorderLayout(btnInd, btnInd+1);
+                        params.onReorderLayout(btnInd, next.index);
                         this._drawLayouts({
                             ...params,
                             layouts: GlobalState.get().layouts,

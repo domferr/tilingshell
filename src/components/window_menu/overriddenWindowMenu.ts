@@ -4,6 +4,7 @@ import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { GObject, St, Clutter, Meta } from '../../gi/ext';
 import GlobalState from '../../utils/globalState';
+import Settings from '../../settings/settings';
 import { registerGObjectClass } from '../../utils/gjs';
 import Tile from '../../components/layout/Tile';
 import {
@@ -103,6 +104,12 @@ export default class OverriddenWindowMenu extends GObject.Object {
         const oldFunction = OverriddenWindowMenu._old_buildMenu?.bind(this);
         if (oldFunction) oldFunction(window);
 
+        // Every entry below moves the window into a fixed rectangle of the
+        // static layout. Dynamic tiling decides placement itself and would undo
+        // any of them at the next reflow, so the menu keeps GNOME's own items
+        // and nothing else.
+        if (Settings.ENABLE_DYNAMIC_TILING) return;
+
         const layouts = GlobalState.get().layouts;
         if (layouts.length === 0) return;
 
@@ -138,12 +145,8 @@ export default class OverriddenWindowMenu extends GObject.Object {
             vacantTiles.sort((a, b) => a.x - b.x);
 
             let bestTileIndex = 0;
-            let bestDistance = Math.abs(
-                0.5 -
-                    vacantTiles[bestTileIndex].x +
-                    vacantTiles[bestTileIndex].width / 2,
-            );
-            for (let index = 1; index < vacantTiles.length; index++) {
+            let bestDistance = Number.MAX_VALUE;
+            for (let index = 0; index < vacantTiles.length; index++) {
                 const distance = Math.abs(
                     0.5 - (vacantTiles[index].x + vacantTiles[index].width / 2),
                 );

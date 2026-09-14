@@ -56,6 +56,9 @@ export default class KeyBindings extends GObject.Object {
                     GObject.TYPE_INT
                 ], // Meta.Display, action number, mask number
             },
+            'cycle-dynamic-layout': {
+                param_types: [Meta.Display.$gtype, GObject.TYPE_INT], // Meta.Display, direction (1 or -1)
+            },
         },
     })};
 
@@ -280,6 +283,26 @@ export default class KeyBindings extends GObject.Object {
                 this._onCycleLayouts(display, event, binding, this._cycleLayoutsBackwardAction!);
             },
         );
+
+        Main.wm.addKeybinding(
+            Settings.SETTING_CYCLE_DYNAMIC_LAYOUT,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('cycle-dynamic-layout', display, 1);
+            },
+        );
+
+        Main.wm.addKeybinding(
+            Settings.SETTING_CYCLE_DYNAMIC_LAYOUT_BACKWARD,
+            extensionSettings,
+            Meta.KeyBindingFlags.NONE,
+            Shell.ActionMode.NORMAL,
+            (display: Meta.Display) => {
+                this.emit('cycle-dynamic-layout', display, -1);
+            },
+        );
     }
 
     private _onCycleLayouts(display: Meta.Display, event: Clutter.Event, binding: Meta.KeyBinding, action: number) {
@@ -383,6 +406,8 @@ export default class KeyBindings extends GObject.Object {
         Main.wm.removeKeybinding(Settings.SETTING_HIGHLIGHT_CURRENT_WINDOW);
         Main.wm.removeKeybinding(Settings.SETTING_CYCLE_LAYOUTS);
         Main.wm.removeKeybinding(Settings.SETTING_CYCLE_LAYOUTS_BACKWARD);
+        Main.wm.removeKeybinding(Settings.SETTING_CYCLE_DYNAMIC_LAYOUT);
+        Main.wm.removeKeybinding(Settings.SETTING_CYCLE_DYNAMIC_LAYOUT_BACKWARD);
     }
 
     private _restoreNatives() {

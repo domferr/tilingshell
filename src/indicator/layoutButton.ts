@@ -65,4 +65,21 @@ export default class LayoutButton extends St.Button {
             width * scalingFactor,
         );
     }
+
+    private _canFocusWhenEnabled: boolean | null = null;
+
+    public setDisabled(disabled: boolean) {
+        this.reactive = !disabled;
+        if (disabled) {
+            if (this._canFocusWhenEnabled === null)
+                this._canFocusWhenEnabled = this.can_focus;
+            this.can_focus = false;
+        } else if (this._canFocusWhenEnabled !== null) {
+            this.can_focus = this._canFocusWhenEnabled;
+            this._canFocusWhenEnabled = null;
+        }
+        // St's CSS has no opacity property, so the dimming is an actor
+        // property rather than a style class
+        this.opacity = disabled ? 89 : 255;
+    }
 }

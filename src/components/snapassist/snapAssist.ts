@@ -21,6 +21,8 @@ const GAPS = 4;
 // 16:9 ratio and then rounded to int
 const SNAP_ASSIST_LAYOUT_WIDTH = 120;
 const SNAP_ASSIST_LAYOUT_HEIGHT = 68;
+// keep in sync with .snap-assist-layout border-width in snap_assist.scss
+const SNAP_ASSIST_LAYOUT_BORDER = 2;
 
 class SnapAssistContent extends St.BoxLayout {
     static { registerGObjectClass(this, {
@@ -61,6 +63,7 @@ class SnapAssistContent extends St.BoxLayout {
     private _snapAssistLayouts: SnapAssistLayout[];
     private _isEnlarged = false;
     private _hoveredInfo: [SnapAssistTile, SnapAssistLayout] | undefined;
+    private _selectedLayoutId: string | undefined;
     private _padding: number;
     private _blur: boolean;
     private _snapAssistantThreshold: number;
@@ -245,10 +248,13 @@ class SnapAssistContent extends St.BoxLayout {
                 this,
                 lay,
                 layoutGaps,
-                new Clutter.Margin(),
+                // the tiles are placed at fixed positions inside the
+                // widget, so leave room for its 2px selection border
+                buildMarginOf(SNAP_ASSIST_LAYOUT_BORDER),
                 width,
                 height,
             );
+            saLay.setSelected(lay.id === this._selectedLayoutId);
             // build and place a spacer
             if (ind < layouts.length - 1) {
                 this.add_child(
@@ -259,6 +265,21 @@ class SnapAssistContent extends St.BoxLayout {
         });
         this.ensure_style();
         this.set_x(this._container.width / 2 - this.width / 2);
+    }
+
+    /**
+     * Which saved layout to show as selected, e.g. the one dynamic tiling
+     * is currently using as its template — independent of hover, which
+     * tracks the tile the pointer is over rather than what is "active".
+     * `undefined` clears the highlight (dynamic tiling off, or nothing to
+     * place yet).
+     */
+    public setDynamicLayoutId(layoutId: string | undefined) {
+        if (this._selectedLayoutId === layoutId) return;
+        this._selectedLayoutId = layoutId;
+        this._snapAssistLayouts.forEach((lay) =>
+            lay.setSelected(lay.layout.id === layoutId),
+        );
     }
 
     public onMovingWindow(
@@ -430,5 +451,9 @@ export default class SnapAssist extends St.Widget {
 
     public close(ease: boolean = false) {
         this._content.close(ease);
+    }
+
+    public setDynamicLayoutId(layoutId: string | undefined) {
+        this._content.setDynamicLayoutId(layoutId);
     }
 }

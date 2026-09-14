@@ -44,12 +44,17 @@ export default class WindowBorder extends St.DrawingArea {
         this._windowMonitor = win.get_monitor();
         this._enableScaling = enableScaling;
         this._delayedSmartBorderRadius = false;
+        // Smart mode detects each window's actual corner radius and matches
+        // it, computed asynchronously after first paint (see below) — these
+        // are only the values used before that completes, or permanently
+        // when smart mode is off, in which case corners are square rather
+        // than an arbitrary fixed round.
         const smartRadius = Settings.ENABLE_SMART_WINDOW_BORDER_RADIUS;
         this._borderRadiusValue = [
-            DEFAULT_BORDER_RADIUS,
-            DEFAULT_BORDER_RADIUS,
-            smartRadius ? 0 : DEFAULT_BORDER_RADIUS,
-            smartRadius ? 0 : DEFAULT_BORDER_RADIUS,
+            smartRadius ? DEFAULT_BORDER_RADIUS : 0,
+            smartRadius ? DEFAULT_BORDER_RADIUS : 0,
+            0,
+            0,
         ]; // default value
 
         this.close();

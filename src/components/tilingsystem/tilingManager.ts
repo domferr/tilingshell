@@ -10,6 +10,7 @@ import {
     getWindows,
     isPointInsideRect,
     isTileOnContainerBorder,
+    isWindowAlive,
     squaredEuclideanDistance,
 } from '../../utils/ui';
 import TilingLayout from '../../components/tilingsystem/tilingLayout';
@@ -21,6 +22,24 @@ import SignalHandling from '../../utils/signalHandling';
 import Layout from '../layout/Layout';
 import Tile from '../layout/Tile';
 import TileUtils from '../layout/TileUtils';
+import {
+    buildLayoutTree,
+    leafCount,
+    SplitTree,
+} from '../layout/dynamic/layoutTree';
+import { assign, neighbourIndex, slotUnderPoint } from '../layout/dynamic/reflow';
+import {
+    arrangementKeys,
+    arrangementRectOf,
+    buildArrangement,
+    insertIntoArrangement,
+    swapInArrangement,
+} from '../layout/dynamic/arrangement';
+import type { Arrangement } from '../layout/dynamic/arrangement';
+import { applyPins } from '../layout/dynamic/pins';
+import type { SlotPin } from '../layout/dynamic/pins';
+import type { Direction } from '../layout/dynamic/reflow';
+import { pickLayoutIndex, pickLayoutIndexAt } from '../layout/dynamic/pickLayout';
 import GlobalState from '../../utils/globalState';
 import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
 import ExtendedWindow from './extendedWindow';
@@ -30,8 +49,22 @@ import { KeyBindingsDirection } from '../../keybindings';
 import TilingShellWindowManager from '../../components/windowManager/tilingShellWindowManager';
 import TilingLayoutWithSuggestions from '../windowsSuggestions/tilingLayoutWithSuggestions';
 import { maximizeWindow, unmaximizeWindow } from '../../utils/gnomesupport';
+import { WindowPlacer } from './windowPlacer';
+import { ReflowScheduler } from './reflowScheduler';
+import {
+    gjsPlacerClock,
+    placementTargetFor,
+    toRect,
+} from './metaPlacementTarget';
 
 const MINIMUM_DISTANCE_TO_RESTORE_ORIGINAL_SIZE = 90;
+
+const DYNAMIC_DIRECTION: Partial<Record<KeyBindingsDirection, Direction>> = {
+    [KeyBindingsDirection.LEFT]: 'left',
+    [KeyBindingsDirection.RIGHT]: 'right',
+    [KeyBindingsDirection.UP]: 'up',
+    [KeyBindingsDirection.DOWN]: 'down',
+};
 
 class SnapAssistingInfo {
     private _snapAssistantLayoutId: string | undefined;
@@ -75,6 +108,60 @@ export class TilingManager {
     private _snapAssistingInfo: SnapAssistingInfo;
 
     private _movingWindowTimerId: number | null = null;
+    // Windows placed by dynamic tiling, in the order they claim slots.
+    private _dynamicWindows: Meta.Window[] = [];
+    // Per-window handlers, kept here because SignalHandling is keyed by signal
+    // name and so cannot hold one entry per window.
+    private _dynamicWindowSignals: Map<Meta.Window, number[]> = new Map();
+    // The window whose region overflow should halve, on the workspace it is
+    // actually on. Held as a window rather than a slot index so it survives
+    // windows ahead of it closing, and resolved to an index per workspace at
+    // reflow time so it cannot be misapplied to an unrelated workspace.
+    private _splitTarget: Meta.Window | null = null;
+    // Once there are more windows than the template layout has tiles, the
+    // arrangement is kept per workspace and only evolved on a fresh open
+    // (the focused window's leaf is halved); anything else rebuilds it.
+    private _dynamicArrangements: Map<
+        Meta.Workspace,
+        { layoutId: string; tree: Arrangement<Meta.Window> }
+    > = new Map();
+
+    // Windows _dynamicAdd tracked that no reflow has placed yet: the only
+    // ones an existing arrangement grows by a cut instead of a rebuild.
+    private _dynamicNewcomers: Set<Meta.Window> = new Set();
+    private _dynamicReflowSourceId: number | null = null;
+    // Cache of _dynamicLayoutCandidates(), rebuilt only when the saved
+    // layouts change rather than on every reflow.
+    private _dynamicLayoutCandidatesCache: {
+        id: string;
+        tileCount: number;
+        tree: SplitTree | null;
+    }[] | null = null;
+
+    // How many layouts to step past the default pick, per workspace and per
+    // tile-count group (outer key: workspace, inner key: the tile count of
+    // the group's default pick), so an offset set while N windows are open
+    // cannot leak into the group that applies once the window count changes.
+    // Set by cycleDynamicLayout.
+    private _dynamicLayoutOffset: Map<
+        Meta.Workspace,
+        Map<number, number>
+    > = new Map();
+
+    // Places windows without freezing their actors, and remembers what each
+    // client answered so a refused rect is not asked for again.
+    private readonly _placer: WindowPlacer;
+    // Defers a reflow requested from inside a running reflow.
+    private readonly _reflow: ReflowScheduler;
+    // While a dynamically managed window is dragged: the slot whose preview
+    // is on screen (null when none), so the preview is only redrawn when the
+    // pointer crosses into another slot.
+    private _dynamicPreviewSlot: number | null = null;
+    // Frame sizes (px) below which a window's client has refused to go, as
+    // learnt from its final answers to placements. A pinned window's slot is
+    // grown to fit and its neighbours shrink, so the gaps stay intact.
+    private _pinnedWindows: Map<Meta.Window, { width?: number; height?: number }> =
+        new Map();
 
     private readonly _signals: SignalHandling;
     private readonly _debug: (..._content: unknown[]) => void;
@@ -91,6 +178,10 @@ export class TilingManager {
         this._enableScaling = enableScaling;
         this._monitor = monitor;
         this._signals = new SignalHandling();
+        this._placer = new WindowPlacer(gjsPlacerClock, {
+            monitorIndex: monitor.index,
+        });
+        this._reflow = new ReflowScheduler(() => this._queueDynamicReflow());
 
         this._debug = logger(`TilingManager ${monitor.index}`);
 
@@ -179,6 +270,11 @@ export class TilingManager {
             GlobalState.get(),
             GlobalState.SIGNAL_LAYOUTS_CHANGED,
             () => {
+                this._dynamicLayoutCandidatesCache = null;
+                // an edited layout keeps its id, so the remembered
+                // arrangements cannot tell they are stale
+                this._dynamicArrangements.clear();
+
                 const ws = global.workspaceManager.get_active_workspace();
                 if (!ws) return;
 
@@ -187,6 +283,7 @@ export class TilingManager {
                     ws.index(),
                 );
                 this._workspaceTilingLayout.get(ws)?.relayout({ layout });
+                this._queueDynamicReflow();
             },
         );
 
@@ -233,6 +330,32 @@ export class TilingManager {
             'snap-assist',
             this._onSnapAssist.bind(this),
         );
+
+        // A minimized window gives up its slot to the windows behind it and
+        // reclaims it when restored, since it keeps its place in the slot
+        // list, and moving a window to another workspace must recompute both
+        // ends. All three are deferred through the same coalescer so several
+        // firing together — e.g. a workspace being torn down and reassigning
+        // every window on it — produce one reflow, not one each.
+        this._signals.connect(
+            global.windowManager,
+            'minimize',
+            () => this._queueDynamicReflow(),
+        );
+        this._signals.connect(
+            global.windowManager,
+            'unminimize',
+            () => this._queueDynamicReflow(),
+        );
+
+        // Turning the mode on mid-session must adopt what is already open,
+        // otherwise nothing happens until the next window is created.
+        this._signals.connect(
+            Settings,
+            Settings.KEY_ENABLE_DYNAMIC_TILING,
+            () => this._adoptOpenWindows(),
+        );
+        this._adoptOpenWindows();
 
         this._signals.connect(
             global.workspaceManager,
@@ -288,6 +411,17 @@ export class TilingManager {
                 );
                 this._workspaceTilingLayout.clear();
                 this._workspaceTilingLayout = newMap;
+
+                // drop the cycle offset of whichever workspace was removed,
+                // rather than hold a reference to a dead one forever
+                const liveWorkspaces = new Set(newMap.keys());
+                [...this._dynamicLayoutOffset.keys()]
+                    .filter((ws) => !liveWorkspaces.has(ws))
+                    .forEach((ws) => this._dynamicLayoutOffset.delete(ws));
+                [...this._dynamicArrangements.keys()]
+                    .filter((ws) => !liveWorkspaces.has(ws))
+                    .forEach((ws) => this._dynamicArrangements.delete(ws));
+
                 this._debug('deleted workspace');
             },
         );
@@ -296,13 +430,18 @@ export class TilingManager {
             global.display,
             'window-created',
             (_display: Meta.Display, window: Meta.Window) => {
-                if (Settings.ENABLE_AUTO_TILING) this._autoTile(window, true);
+                if (Settings.ENABLE_DYNAMIC_TILING) this._dynamicAdd(window);
+                else if (Settings.ENABLE_AUTO_TILING)
+                    this._autoTile(window, true);
             },
         );
         this._signals.connect(
             TilingShellWindowManager.get(),
             'unmaximized',
             (_, window: Meta.Window) => {
+                // dynamic tiling unmaximizes windows on purpose; without this
+                // guard auto-tiling would grab each one a frame later
+                if (Settings.ENABLE_DYNAMIC_TILING) return;
                 if (Settings.ENABLE_AUTO_TILING) this._autoTile(window, false);
             },
         );
@@ -333,6 +472,13 @@ export class TilingManager {
         spanFlag: boolean,
         clamp: boolean,
     ): boolean {
+        // Dynamic tiling owns the arrow keys for windows it manages. Falling
+        // through would move the window into a tile of the static layout,
+        // which the next reflow would immediately undo.
+        if (Settings.ENABLE_DYNAMIC_TILING && !spanFlag) {
+            if (this._dynamicMoveByKeyboard(window, direction)) return true;
+        }
+
         let destination: { rect: Mtk.Rectangle; tile: Tile } | undefined;
         const isMaximized =
             window.maximizedHorizontally || window.maximizedVertically;
@@ -447,7 +593,7 @@ export class TilingManager {
             );
         }
 
-        if (isMaximized) unmaximizeWindow(window);
+        if (isMaximized) this._unmaximizeForPlacement(window);
 
         this._easeWindowRect(window, destination.rect, false, force);
 
@@ -464,10 +610,25 @@ export class TilingManager {
      * Destroys the tiling manager and cleans up resources.
      */
     public destroy() {
+        this._placer.destroy();
         if (this._movingWindowTimerId) {
             GLib.Source.remove(this._movingWindowTimerId);
             this._movingWindowTimerId = null;
         }
+        if (this._dynamicReflowSourceId !== null) {
+            GLib.Source.remove(this._dynamicReflowSourceId);
+            this._dynamicReflowSourceId = null;
+        }
+        this._dynamicWindowSignals.forEach((ids, window) =>
+            ids.forEach((id) => window.disconnect(id)),
+        );
+        this._dynamicWindowSignals.clear();
+        this._dynamicWindows.length = 0;
+        this._dynamicLayoutOffset.clear();
+        this._pinnedWindows.clear();
+        this._splitTarget = null;
+        this._dynamicArrangements.clear();
+        this._dynamicNewcomers.clear();
         this._signals.disconnect();
         this._isGrabbingWindow = false;
         this._snapAssistingInfo.update(undefined);
@@ -494,6 +655,7 @@ export class TilingManager {
         );
         this._snapAssist.workArea = this._workArea;
         this._edgeTilingManager.workarea = this._workArea;
+        this._queueDynamicReflow();
     }
 
     private _onWindowGrabBegin(window: Meta.Window, grabOp: number) {
@@ -718,6 +880,20 @@ export class TilingManager {
         this._wasTilingSystemActivated = isTilingSystemActivated;
         this._wasSpanMultipleTilesActivated = isSpanMultiTilesActivated;
 
+        // a dynamically managed window is dropped into the slot under the
+        // pointer, whatever the static layout or the snap assistant would
+        // suggest, so that slot is what gets previewed
+        if (
+            Settings.ENABLE_DYNAMIC_TILING &&
+            this._previewDynamicSlot(
+                window,
+                currentWs,
+                currPointerPos,
+                tilingLayout,
+            )
+        )
+            return GLib.SOURCE_CONTINUE;
+
         // layout must not be shown if it was disabled or if it is enabled but tiling system activation key is not pressed
         // then close it and open snap assist (if enabled)
         if (!showTilingSystem) {
@@ -743,6 +919,18 @@ export class TilingManager {
                 }
 
                 if (Settings.SNAP_ASSIST) {
+                    // reflect whichever saved layout dynamic tiling is
+                    // actually using right now, rather than the static
+                    // per-monitor selection, so the popup doesn't offer a
+                    // layout unrelated to the arrangement already on screen
+                    const dynamicWs = Settings.ENABLE_DYNAMIC_TILING
+                        ? window.get_workspace()
+                        : null;
+                    this._snapAssist.setDynamicLayoutId(
+                        dynamicWs
+                            ? this.getCurrentDynamicLayoutId(dynamicWs)
+                            : undefined,
+                    );
                     this._snapAssist.onMovingWindow(
                         window,
                         currPointerPos,
@@ -817,6 +1005,25 @@ export class TilingManager {
         this._selectedTilesPreview.close(true);
         this._snapAssist.close(true);
         this._lastCursorPos = null;
+        this._dynamicPreviewSlot = null;
+
+        // mutter ends the grab of a window that is being closed; its actor is
+        // already gone by then, and there is nothing left to place
+        if (!isWindowAlive(window)) {
+            this._snapAssistingInfo.update(undefined);
+            this._edgeTilingManager.abortEdgeTiling();
+            return;
+        }
+
+        // Dynamic tiling owns every drop of a window it manages: the window
+        // trades places with whatever occupies the slot under the pointer.
+        if (Settings.ENABLE_DYNAMIC_TILING && this._dynamicSwapOnDrop(window)) {
+            // returning early must still leave the drag state clean, or edge
+            // tiling stays blocked for every later drag
+            this._snapAssistingInfo.update(undefined);
+            this._edgeTilingManager.abortEdgeTiling();
+            return;
+        }
 
         const isTilingSystemActivated = this._activationKeyStatus(
             global.get_pointer()[2],
@@ -962,47 +1169,41 @@ export class TilingManager {
         );
     }
 
+    /**
+     * Unmaximizes a window that is about to be placed. mutter would animate
+     * the unmaximize on its own and the placement would then animate again on
+     * top of it, so mutter's effect is skipped; the placer's animation covers
+     * the whole way from the maximized rect to the tile.
+     */
+    private _unmaximizeForPlacement(window: Meta.Window) {
+        const actor =
+            window.get_compositor_private() as Meta.WindowActor | null;
+        if (actor) Main.wm.skipNextEffect(actor);
+        unmaximizeWindow(window);
+    }
+
     private _easeWindowRect(
         window: Meta.Window,
         destRect: Mtk.Rectangle,
         user_op: boolean = false,
         force: boolean = false,
     ) {
-        const windowActor = window.get_compositor_private() as Clutter.Actor;
-
-        const beforeRect = window.get_frame_rect();
-        // do not animate the window if it will not move or scale
-        if (
-            destRect.x === beforeRect.x &&
-            destRect.y === beforeRect.y &&
-            destRect.width === beforeRect.width &&
-            destRect.height === beforeRect.height
-        )
-            return;
-
-        // apply animations when tiling the window
-        windowActor.remove_all_transitions();
-        // @ts-expect-error "Main.wm has the "private" function _prepareAnimationInfo"
-        Main.wm._prepareAnimationInfo(
-            global.windowManager,
-            windowActor,
-            beforeRect.copy(),
-            Meta.SizeChange.UNMAXIMIZE,
-        );
-
-        // move and resize the window to the current selection
-        window.move_to_monitor(this._monitor.index);
-        if (force) window.move_frame(user_op, destRect.x, destRect.y);
-        window.move_resize_frame(
-            user_op,
-            destRect.x,
-            destRect.y,
-            destRect.width,
-            destRect.height,
-        );
+        // Never freeze the actor or touch Main.wm's size-change bookkeeping:
+        // on Wayland the resize is a request the client answers (or does
+        // not), and the placer animates only once mutter reports the result.
+        this._placer.place(placementTargetFor(window), toRect(destRect), {
+            userOp: user_op,
+            forceMove: force,
+            animate: true,
+        });
     }
 
     private _onSnapAssist(_: SnapAssist, tile: Tile, layoutId: string) {
+        // during a dynamic drag the popup only shows which layout is in use;
+        // its tiles say nothing about where the drop lands (see
+        // _previewDynamicSlot), so they must not drive the preview
+        if (this._dynamicPreviewSlot !== null) return;
+
         // if there isn't a tile hovered, then close selection
         if (tile.width === 0 || tile.height === 0) {
             this._selectedTilesPreview.close(true);
@@ -1155,15 +1356,15 @@ export class TilingManager {
         this.openSelectionTilePreview(edgeTile, false, true, window);
     }
 
-    private _easeWindowRectFromTile(
+    /**
+     * The rectangle a window gets for a tile: the tile scaled to the work
+     * area, clamped to it, minus the configured gaps. Null when nothing is
+     * left after the gaps.
+     */
+    private _windowRectForTile(
         tile: Tile,
-        window: Meta.Window,
-        skipAnimation: boolean = false,
-    ) {
-        const currentWs = window.get_workspace();
-        const tilingLayout = this._workspaceTilingLayout.get(currentWs);
-        if (!tilingLayout) return;
-
+        tilingLayout: TilingLayout,
+    ): Mtk.Rectangle | null {
         // We apply the proportions to get tile size and position relative to the work area
         const scaledRect = TileUtils.apply_props(tile, this._workArea);
         // ensure the rect doesn't go horizontally beyond the workarea
@@ -1199,20 +1400,219 @@ export class TilingManager {
                 : undefined,
         ).gaps;
 
-        const destinationRect = buildRectangle({
+        const rect = buildRectangle({
             x: scaledRect.x + gaps.left,
             y: scaledRect.y + gaps.top,
             width: scaledRect.width - gaps.left - gaps.right,
             height: scaledRect.height - gaps.top - gaps.bottom,
         });
+        return rect.width <= 0 || rect.height <= 0 ? null : rect;
+    }
 
+    /**
+     * The managed windows of a workspace and the slot rectangles dynamic
+     * tiling gives them, or null when there is nothing to place.
+     *
+     * While the template layout has a tile per window the rects are a pure
+     * function of the window count. Past that, this is where the remembered
+     * arrangement advances: a window `_dynamicAdd` just tracked halves the
+     * focused window's leaf and nothing else moves; any other difference
+     * from what was remembered — a window closed, minimised or moved, the
+     * layout cycled — rebuilds from the layout in creation order, so the
+     * oldest windows get the roomiest tiles again. Calling this twice
+     * without a change in between returns the same rects.
+     */
+    private _dynamicSlots(
+        ws: Meta.Workspace,
+    ): { windows: Meta.Window[]; rects: ReturnType<typeof assign> } | null {
+        const windows = this._dynamicManagedWindows(ws);
+        if (windows.length === 0) {
+            this._dynamicArrangements.delete(ws);
+            return null;
+        }
+        const tree = this._dynamicTree(windows.length, ws);
+        if (!tree) return null;
+        const rects = this._dynamicRects(ws, tree, windows);
+        // placed once, a window is no longer a newcomer anywhere: if it
+        // later turns up on another workspace that is a move, not an open
+        windows.forEach((w) => this._dynamicNewcomers.delete(w));
+        return { windows, rects: this._applyWindowPins(ws, windows, rects) };
+    }
+
+    private _dynamicRects(
+        ws: Meta.Workspace,
+        tree: SplitTree,
+        windows: Meta.Window[],
+    ): ReturnType<typeof assign> {
+        if (windows.length <= leafCount(tree)) {
+            this._dynamicArrangements.delete(ws);
+            return assign(tree, windows.length);
+        }
+
+        const focused =
+            this._splitTarget && windows.includes(this._splitTarget)
+                ? this._splitTarget
+                : undefined;
+        const layoutId = this.getCurrentDynamicLayoutId(ws) ?? '';
+        const previous = this._dynamicArrangements.get(ws);
+
+        let arrangement: Arrangement<Meta.Window> | null = null;
+        if (previous && previous.layoutId === layoutId) {
+            const known = new Set(arrangementKeys(previous.tree));
+            const newcomers = windows.filter((w) => !known.has(w));
+            const onlyGrew =
+                known.size + newcomers.length === windows.length &&
+                [...known].every((w) => windows.includes(w)) &&
+                newcomers.every((w) => this._dynamicNewcomers.has(w));
+            if (onlyGrew) {
+                arrangement = newcomers.reduce(
+                    (t, w) => insertIntoArrangement(t, focused, w),
+                    previous.tree,
+                );
+            }
+        }
+        if (!arrangement)
+            arrangement = buildArrangement(tree, windows, focused);
+
+        if (!arrangement) {
+            // the geometry could not be read back as a tree: place without
+            // memory rather than not at all
+            this._dynamicArrangements.delete(ws);
+            const splitSlot = focused ? windows.indexOf(focused) : -1;
+            return assign(
+                tree,
+                windows.length,
+                splitSlot >= 0 ? splitSlot : undefined,
+            );
+        }
+        this._dynamicArrangements.set(ws, { layoutId, tree: arrangement });
+        const final = arrangement;
+        return windows.map((w) => arrangementRectOf(final, w)!);
+    }
+
+    /**
+     * Trades the places of two managed windows: their creation-order slots
+     * (what a rebuild hands out) and, when an arrangement is remembered for
+     * the workspace, their leaves in it.
+     */
+    private _dynamicSwap(ws: Meta.Workspace, a: Meta.Window, b: Meta.Window) {
+        const i = this._dynamicWindows.indexOf(a);
+        const j = this._dynamicWindows.indexOf(b);
+        if (i < 0 || j < 0) return;
+        [this._dynamicWindows[i], this._dynamicWindows[j]] = [
+            this._dynamicWindows[j],
+            this._dynamicWindows[i],
+        ];
+        const remembered = this._dynamicArrangements.get(ws);
+        if (remembered)
+            remembered.tree = swapInArrangement(remembered.tree, a, b);
+    }
+
+    /**
+     * Grows the slots of pinned windows so the frame the client insists on
+     * fits inside them together with the gaps; the neighbours give way.
+     */
+    private _applyWindowPins(
+        ws: Meta.Workspace,
+        windows: Meta.Window[],
+        rects: ReturnType<typeof assign>,
+    ): ReturnType<typeof assign> {
+        if (this._pinnedWindows.size === 0) return rects;
+        const tilingLayout = this._workspaceTilingLayout.get(ws);
+        if (!tilingLayout) return rects;
+
+        const pins: SlotPin[] = [];
+        windows.forEach((window, slot) => {
+            const pin = this._pinnedWindows.get(window);
+            if (!pin) return;
+            const tile = this._tileOf(rects[slot]);
+            const tilePx = TileUtils.apply_props(tile, this._workArea);
+            const framePx = this._windowRectForTile(tile, tilingLayout);
+            if (!framePx) return;
+            // the gaps this slot loses to the frame stay the same once it
+            // grows, so the slot has to hold the frame plus those gaps
+            const entry: SlotPin = { slot };
+            if (pin.width !== undefined)
+                entry.minWidth =
+                    (pin.width + tilePx.width - framePx.width) /
+                    this._workArea.width;
+            if (pin.height !== undefined)
+                entry.minHeight =
+                    (pin.height + tilePx.height - framePx.height) /
+                    this._workArea.height;
+            pins.push(entry);
+        });
+        return pins.length === 0 ? rects : applyPins(rects, pins);
+    }
+
+    /**
+     * Previews, for a dragged window dynamic tiling manages, the slot it
+     * would be dropped into: the one under the pointer, or its own when the
+     * pointer is outside every slot. Returns false when the window is not
+     * managed, leaving the static previews to their usual logic.
+     */
+    private _previewDynamicSlot(
+        window: Meta.Window,
+        ws: Meta.Workspace,
+        pointer: { x: number; y: number },
+        tilingLayout: TilingLayout,
+    ): boolean {
+        const slots = this._dynamicSlots(ws);
+        const from = slots ? slots.windows.indexOf(window) : -1;
+        if (!slots || from < 0) return false;
+
+        // none of the static machinery applies to this drop
+        if (tilingLayout.showing) tilingLayout.close();
+        if (this._edgeTilingManager.isPerformingEdgeTiling())
+            this._edgeTilingManager.abortEdgeTiling();
+        this._snapAssistingInfo.update(undefined);
+
+        // the popup stays: it shows (and highlights) the layout in use
+        if (Settings.SNAP_ASSIST) {
+            this._snapAssist.setDynamicLayoutId(
+                this.getCurrentDynamicLayoutId(ws),
+            );
+            this._snapAssist.onMovingWindow(window, pointer, true);
+        } else {
+            this._snapAssist.close(true);
+        }
+
+        const under = slotUnderPoint(slots.rects, this._workArea, pointer);
+        const to = under >= 0 ? under : from;
+        if (to === this._dynamicPreviewSlot) return true;
+
+        const rect = this._windowRectForTile(
+            this._tileOf(slots.rects[to]),
+            tilingLayout,
+        );
+        if (rect) {
+            this._selectedTilesPreview.open(
+                rect,
+                this._dynamicPreviewSlot !== null,
+            );
+            this._dynamicPreviewSlot = to;
+        }
+        return true;
+    }
+
+    private _easeWindowRectFromTile(
+        tile: Tile,
+        window: Meta.Window,
+        skipAnimation: boolean = false,
+    ) {
+        const currentWs = window.get_workspace();
+        const tilingLayout = this._workspaceTilingLayout.get(currentWs);
+        if (!tilingLayout) return;
+
+        const scaledRect = TileUtils.apply_props(tile, this._workArea);
+        const destinationRect = this._windowRectForTile(tile, tilingLayout);
         // abort if there is an invalid selection
-        if (destinationRect.width <= 0 || destinationRect.height <= 0) return;
+        if (!destinationRect) return;
 
         const isMaximized =
             window.maximizedHorizontally || window.maximizedVertically;
         const rememberOriginalSize = !isMaximized;
-        if (isMaximized) unmaximizeWindow(window);
+        if (isMaximized) this._unmaximizeForPlacement(window);
 
         if (rememberOriginalSize && !(window as ExtendedWindow).assignedTile) {
             (window as ExtendedWindow).originalSize = window
@@ -1228,17 +1628,47 @@ export class TilingManager {
             }),
             this._workArea,
         );
-        if (skipAnimation) {
-            window.move_resize_frame(
-                false,
-                destinationRect.x,
-                destinationRect.y,
-                destinationRect.width,
-                destinationRect.height,
-            );
-        } else {
-            this._easeWindowRect(window, destinationRect);
-        }
+        this._placer.place(placementTargetFor(window), toRect(destinationRect), {
+            animate: !skipAnimation,
+            onSettled: (requested, actual, final) =>
+                this._onPlacementSettled(window, requested, actual, final),
+        });
+    }
+
+    /**
+     * Learns from the client's final answer to a placement. A window that
+     * ends up larger than asked cannot be made that small, so its slot must
+     * grow (pin); one that accepted a size below its pin has proven the pin
+     * wrong. Either change means a reflow.
+     */
+    private _onPlacementSettled(
+        window: Meta.Window,
+        requested: { width: number; height: number },
+        actual: { width: number; height: number },
+        final: boolean,
+    ) {
+        if (!final || !Settings.ENABLE_DYNAMIC_TILING) return;
+        if (!this._dynamicWindowSignals.has(window)) return;
+
+        const pin = { ...(this._pinnedWindows.get(window) ?? {}) };
+        const update = (axis: 'width' | 'height') => {
+            if (actual[axis] > requested[axis]) pin[axis] = actual[axis];
+            else if (pin[axis] !== undefined && requested[axis] < pin[axis])
+                delete pin[axis];
+        };
+        update('width');
+        update('height');
+
+        const before = this._pinnedWindows.get(window);
+        const changed =
+            (before?.width ?? null) !== (pin.width ?? null) ||
+            (before?.height ?? null) !== (pin.height ?? null);
+        if (!changed) return;
+
+        if (pin.width === undefined && pin.height === undefined)
+            this._pinnedWindows.delete(window);
+        else this._pinnedWindows.set(window, pin);
+        this._queueDynamicReflow();
     }
 
     public onTileFromWindowMenu(tile: Tile, window: Meta.Window) {
@@ -1256,6 +1686,515 @@ export class TilingManager {
             }),
             window,
         );
+    }
+
+    /**
+     * Swaps the focused window with the region beside it. Returns true when
+     * dynamic tiling has taken responsibility for the keypress, including when
+     * there is nothing in that direction — reaching the edge of the screen
+     * should do nothing, rather than fall through to the static layout.
+     */
+    private _dynamicMoveByKeyboard(
+        window: Meta.Window,
+        direction: KeyBindingsDirection,
+    ): boolean {
+        const towards = DYNAMIC_DIRECTION[direction];
+        if (!towards) return false;
+
+        const ws = global.workspaceManager.get_active_workspace();
+        if (!ws) return false;
+
+        const slots = this._dynamicSlots(ws);
+        const from = slots ? slots.windows.indexOf(window) : -1;
+        if (!slots || from < 0) return false; // not ours: let the static path have it
+        const { windows, rects } = slots;
+        if (windows.length < 2) return true;
+
+        const to = neighbourIndex(rects, from, towards);
+        if (to < 0) return true; // at the edge of the screen
+
+        this._dynamicSwap(ws, windows[from], windows[to]);
+
+        this._applyDynamicTiling();
+        return true;
+    }
+
+    /**
+     * Windows dynamic tiling is willing to keep track of at all — including
+     * ones it cannot place right now, such as a minimized window, so that
+     * tracking survives a minimize/restore or a lock/unlock cycle rather than
+     * losing the window entirely.
+     *
+     * Being maximized is deliberately not disqualifying either. Plenty of
+     * applications maximize themselves the moment they are mapped, and in a
+     * mode whose whole premise is that windows fill the screen according to a
+     * layout, refusing them would mean refusing almost everything. They are
+     * unmaximized on placement instead, by `_easeWindowRectFromTile`.
+     */
+    private _isDynamicTrackable(window: Meta.Window): boolean {
+        return (
+            window !== null &&
+            window.windowType === Meta.WindowType.NORMAL &&
+            window.get_transient_for() === null &&
+            !window.is_attached_dialog()
+        );
+    }
+
+    /** Trackable windows that additionally have a rectangle to be placed in. */
+    private _isDynamicEligible(window: Meta.Window): boolean {
+        return (
+            this._isDynamicTrackable(window) &&
+            isWindowAlive(window) &&
+            !window.minimized
+        );
+    }
+
+    /**
+     * Starts managing a window: gives it a slot and listens for the events
+     * that must reflow. Returns false when the window is not ours to place.
+     */
+    private _trackDynamicWindow(window: Meta.Window): boolean {
+        if (window.get_monitor() !== this._monitor.index) return false;
+        if (!this._isDynamicTrackable(window)) return false;
+        if (this._dynamicWindowSignals.has(window)) return false;
+
+        this._dynamicWindows.push(window);
+        this._dynamicWindowSignals.set(window, [
+            window.connect('unmanaged', () =>
+                this._untrackDynamicWindow(window),
+            ),
+            // moving to another workspace leaves a hole behind and crowds the
+            // destination, so both ends need recomputing
+            window.connect('workspace-changed', () =>
+                this._queueDynamicReflow(),
+            ),
+            // dragging a window onto another monitor is the one way a
+            // tracked window can leave this manager's domain without being
+            // destroyed, so it is caught by polling get_monitor() on move
+            // rather than a notify::monitor signal (which windowBorder.ts
+            // does not rely on existing either)
+            window.connect('position-changed', () => {
+                if (window.get_monitor() !== this._monitor.index)
+                    this._releaseDynamicWindow(window);
+            }),
+        ]);
+        return true;
+    }
+
+    /**
+     * Stops managing a window. The handlers are dropped rather than
+     * disconnected because this runs while the window is being destroyed.
+     */
+    private _untrackDynamicWindow(window: Meta.Window) {
+        this._dynamicWindowSignals.delete(window);
+        this._dynamicNewcomers.delete(window);
+        // an arrangement holding this window is stale (the next reflow of
+        // that workspace rebuilds anyway) and must not keep a dead window
+        [...this._dynamicArrangements.entries()]
+            .filter(([, { tree }]) => arrangementKeys(tree).includes(window))
+            .forEach(([ws]) => this._dynamicArrangements.delete(ws));
+        if (this._splitTarget === window) this._splitTarget = null;
+        this._placer.forget(placementTargetFor(window));
+        this._pinnedWindows.delete(window);
+
+        const slot = this._dynamicWindows.indexOf(window);
+        if (slot < 0) return;
+        this._dynamicWindows.splice(slot, 1);
+        // this runs from inside mutter's unmanage (and from a position-changed
+        // handler when a window leaves the monitor), so the reflow is queued
+        // rather than run on the spot; several windows closing at once then
+        // produce one reflow instead of one each
+        this._queueDynamicReflow();
+    }
+
+    /**
+     * Stops managing a window that is still alive, e.g. one dragged onto
+     * another monitor. Unlike `_untrackDynamicWindow`, this disconnects the
+     * window's handlers first, since the window survives and would
+     * otherwise keep firing reflows into a manager that no longer owns it
+     * — and, if dragged back later, `_trackDynamicWindow` would refuse to
+     * re-track it while a stale entry lingers.
+     *
+     * The window is only dropped here, not adopted by the destination
+     * monitor's manager; it is picked back up the next time dynamic tiling
+     * is toggled or that manager re-adopts open windows.
+     */
+    private _releaseDynamicWindow(window: Meta.Window) {
+        this._dynamicWindowSignals
+            .get(window)
+            ?.forEach((id) => window.disconnect(id));
+        this._untrackDynamicWindow(window);
+    }
+
+    /**
+     * Takes on every window already open, on every workspace. Needed because
+     * windows are otherwise only picked up as they are created, and the
+     * extension is disabled and re-enabled on lock, unlock and monitor
+     * changes — after which nothing already on screen would be managed at
+     * all. Ordered by creation rather than by recency, so an unlock or a
+     * toggle does not promote whichever window was last focused into the
+     * master slot.
+     */
+    private _adoptOpenWindows() {
+        if (!Settings.ENABLE_DYNAMIC_TILING) return;
+
+        const byWorkspace: Meta.Window[] = [];
+        for (let i = 0; i < global.workspaceManager.get_n_workspaces(); i++) {
+            const ws = global.workspaceManager.get_workspace_by_index(i);
+            if (ws) byWorkspace.push(...getWindows(ws));
+        }
+        const inCreationOrder = [...new Set(byWorkspace)].sort(
+            (a, b) => a.get_stable_sequence() - b.get_stable_sequence(),
+        );
+
+        let adopted = false;
+        inCreationOrder.forEach((window) => {
+            if (this._trackDynamicWindow(window)) adopted = true;
+        });
+        if (adopted) this._queueDynamicReflow();
+    }
+
+    /**
+     * Gives a newly created window a slot and reflows everything else to make
+     * room for it. Closing is the mirror image: the window gives its slot back
+     * and the survivors reflow into the space.
+     */
+    private _dynamicAdd(window: Meta.Window) {
+        // Whatever the user was looking at is the window whose region the
+        // newcomer should take half of, once the layout runs out of tiles.
+        // Recorded before the newcomer is tracked so the lookup only sees
+        // windows already on screen, and kept as a window reference — not a
+        // slot index — so it resolves freshly, and only against the correct
+        // workspace, at every later reflow.
+        const ws = window.get_workspace();
+        const focused = global.display.focus_window;
+        const focusedIsManaged =
+            focused && ws
+                ? this._dynamicManagedWindows(ws).includes(focused)
+                : false;
+
+        if (!this._trackDynamicWindow(window)) return;
+        this._dynamicNewcomers.add(window);
+        this._splitTarget = focusedIsManaged ? focused : null;
+
+        const windowActor =
+            window.get_compositor_private() as Meta.WindowActor | null;
+        if (!windowActor) {
+            // no actor yet: placing it now would fail, so let the idle reflow
+            // pick it up once it has one (a dying window is filtered out by
+            // _isDynamicEligible)
+            this._queueDynamicReflow();
+            return;
+        }
+
+        // wait for the window to be drawn, exactly as auto-tiling does, so it
+        // does not visibly jump from its default position
+        const id = windowActor.connect('first-frame', () => {
+            this._applyDynamicTiling();
+            windowActor.disconnect(id);
+        });
+    }
+
+    /**
+     * The split tree dynamic tiling should follow for a given number of
+     * windows on a given workspace. Layout order is preference: a layout with
+     * exactly as many tiles as there are windows is used as drawn, otherwise
+     * the leftmost roomier one is collapsed to fit, otherwise the roomiest is
+     * subdivided. Layouts with no guillotine decomposition are not candidates
+     * at all.
+     *
+     * That default pick can be stepped away from with cycleDynamicLayout,
+     * which moves within the group of layouts sharing the same tile count —
+     * the offset is per workspace and per tile-count group, and read here.
+     */
+    private _dynamicTree(windowCount: number, ws: Meta.Workspace) {
+        const candidates = this._dynamicLayoutCandidates();
+        const tileCounts = candidates.map((candidate) => candidate.tileCount);
+
+        // The offset only ever applies within the tile-count group of the
+        // *default* (offset-0) pick for this window count, so find that
+        // group before looking the offset up — otherwise an offset set while
+        // a different window count was current would be misapplied here.
+        const defaultIndex = pickLayoutIndex(tileCounts, windowCount);
+        const offset =
+            defaultIndex < 0
+                ? 0
+                : (this._dynamicLayoutOffset
+                      .get(ws)
+                      ?.get(tileCounts[defaultIndex]) ?? 0);
+
+        const index = pickLayoutIndexAt(tileCounts, windowCount, offset);
+        return index < 0 ? null : candidates[index].tree;
+    }
+
+    /**
+     * Every layout with a valid guillotine decomposition, paired with its
+     * tile count, in the user's preferred order. Shared by `_dynamicTree`
+     * and `cycleDynamicLayout` so both agree on what the tile-count groups
+     * are.
+     */
+    private _dynamicLayoutCandidates() {
+        if (this._dynamicLayoutCandidatesCache !== null)
+            return this._dynamicLayoutCandidatesCache;
+
+        const candidates = GlobalState.get()
+            .layouts.map((layout) => ({
+                id: layout.id,
+                tileCount: layout.tiles.length,
+                tree: buildLayoutTree(
+                    layout.tiles.map((t) => ({
+                        x: t.x,
+                        y: t.y,
+                        width: t.width,
+                        height: t.height,
+                    })),
+                ),
+            }))
+            .filter((candidate) => candidate.tree !== null);
+
+        this._dynamicLayoutCandidatesCache = candidates;
+        return candidates;
+    }
+
+    /**
+     * Steps to the next (or, with a negative direction, previous) layout that
+     * shares the tile count currently in use on the active workspace, and
+     * reflows immediately. A group of one layout — nothing else the same
+     * size — is a harmless no-op.
+     */
+    public cycleDynamicLayout(direction: 1 | -1) {
+        if (!Settings.ENABLE_DYNAMIC_TILING) return;
+
+        const ws = global.workspaceManager.get_active_workspace();
+        if (!ws) return;
+        const windowCount = this._dynamicManagedWindows(ws).length;
+        if (windowCount === 0) return;
+
+        // The offset being stepped belongs to whichever tile-count group the
+        // default (offset-0) pick falls into for the window count currently
+        // on this workspace, not to the workspace as a whole.
+        const tileCounts = this._dynamicLayoutCandidates().map(
+            (candidate) => candidate.tileCount,
+        );
+        const defaultIndex = pickLayoutIndex(tileCounts, windowCount);
+        if (defaultIndex < 0) return;
+        const tileCount = tileCounts[defaultIndex];
+
+        const groupOffsets = this._dynamicLayoutOffset.get(ws) ?? new Map();
+        groupOffsets.set(
+            tileCount,
+            (groupOffsets.get(tileCount) ?? 0) + direction,
+        );
+        this._dynamicLayoutOffset.set(ws, groupOffsets);
+
+        this._applyDynamicTiling();
+    }
+
+    /**
+     * The saved layout currently acting as dynamic tiling's template on this
+     * workspace — the same one `_dynamicTree` resolves to, including any
+     * `cycleDynamicLayout` offset, whether or not the window count matches
+     * its tile count exactly. `undefined` when there is nothing to place
+     * (no windows, or no decomposable layout at all).
+     */
+    public getCurrentDynamicLayoutId(ws: Meta.Workspace): string | undefined {
+        const windowCount = this._dynamicManagedWindows(ws).length;
+        if (windowCount === 0) return undefined;
+
+        const candidates = this._dynamicLayoutCandidates();
+        const tileCounts = candidates.map((candidate) => candidate.tileCount);
+        const defaultIndex = pickLayoutIndex(tileCounts, windowCount);
+        if (defaultIndex < 0) return undefined;
+
+        const offset =
+            this._dynamicLayoutOffset.get(ws)?.get(tileCounts[defaultIndex]) ??
+            0;
+        const index = pickLayoutIndexAt(tileCounts, windowCount, offset);
+        return index < 0 ? undefined : candidates[index].id;
+    }
+
+    /**
+     * Every saved layout `selectDynamicLayout` would actually accept right
+     * now — the ones sharing the current tile-count group — so UI can grey
+     * out the rest instead of offering a choice that silently does nothing.
+     * `undefined` when there is nothing to place.
+     */
+    public getCurrentDynamicLayoutGroupIds(
+        ws: Meta.Workspace,
+    ): Set<string> | undefined {
+        const windowCount = this._dynamicManagedWindows(ws).length;
+        if (windowCount === 0) return undefined;
+
+        const candidates = this._dynamicLayoutCandidates();
+        const tileCounts = candidates.map((candidate) => candidate.tileCount);
+        const defaultIndex = pickLayoutIndex(tileCounts, windowCount);
+        if (defaultIndex < 0) return undefined;
+
+        const tileCount = tileCounts[defaultIndex];
+        return new Set(
+            candidates
+                .filter((candidate) => candidate.tileCount === tileCount)
+                .map((candidate) => candidate.id),
+        );
+    }
+
+    /**
+     * Jumps directly to a specific saved layout, the same way
+     * `cycleDynamicLayout` steps by one — this just computes the offset
+     * needed to land on `layoutId` in a single move instead of stepping.
+     * A no-op, returning false, when `layoutId` is not part of the
+     * tile-count group currently in use (there is nothing sensible to
+     * switch to outside that group: dynamic tiling picks the group from the
+     * window count, not from what is clicked).
+     */
+    public selectDynamicLayout(ws: Meta.Workspace, layoutId: string): boolean {
+        if (!Settings.ENABLE_DYNAMIC_TILING) return false;
+
+        const windowCount = this._dynamicManagedWindows(ws).length;
+        if (windowCount === 0) return false;
+
+        const candidates = this._dynamicLayoutCandidates();
+        const tileCounts = candidates.map((candidate) => candidate.tileCount);
+        const defaultIndex = pickLayoutIndex(tileCounts, windowCount);
+        if (defaultIndex < 0) return false;
+        const tileCount = tileCounts[defaultIndex];
+
+        const targetIndex = candidates.findIndex(
+            (candidate) => candidate.id === layoutId,
+        );
+        if (targetIndex < 0 || candidates[targetIndex].tileCount !== tileCount)
+            return false;
+
+        // Same group-membership search pickLayoutIndexAt does internally,
+        // reproduced here since it only accepts a numeric offset, not a
+        // target index or id.
+        const group = tileCounts
+            .map((count, index) => ({ count, index }))
+            .filter((entry) => entry.count === tileCount)
+            .map((entry) => entry.index);
+        const defaultPosition = group.indexOf(defaultIndex);
+        const targetPosition = group.indexOf(targetIndex);
+
+        const groupOffsets = this._dynamicLayoutOffset.get(ws) ?? new Map();
+        groupOffsets.set(tileCount, targetPosition - defaultPosition);
+        this._dynamicLayoutOffset.set(ws, groupOffsets);
+
+        this._applyDynamicTiling();
+        return true;
+    }
+
+    /**
+     * Managed windows currently placeable on this monitor and workspace, in
+     * slot order. Minimized windows stay tracked (see `_isDynamicTrackable`)
+     * but are excluded here, since they have nothing on screen to place.
+     */
+    private _dynamicManagedWindows(ws: Meta.Workspace): Meta.Window[] {
+        return this._dynamicWindows.filter(
+            (w) =>
+                this._isDynamicEligible(w) &&
+                w.get_workspace() === ws &&
+                w.get_monitor() === this._monitor.index,
+        );
+    }
+
+    private _tileOf(rect: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    }): Tile {
+        return new Tile({ ...rect, groups: [] });
+    }
+
+    /**
+     * Queues one reflow on the next idle, coalescing any further calls until
+     * it runs — several windows minimizing, unminimizing or changing
+     * workspace together must produce one reflow, not one each.
+     */
+    private _queueDynamicReflow() {
+        if (!Settings.ENABLE_DYNAMIC_TILING) return;
+        if (this._dynamicReflowSourceId !== null) return;
+        this._dynamicReflowSourceId = GLib.idle_add(
+            GLib.PRIORITY_DEFAULT_IDLE,
+            () => {
+                this._dynamicReflowSourceId = null;
+                this._applyDynamicTiling();
+                return GLib.SOURCE_REMOVE;
+            },
+        );
+    }
+
+    /**
+     * Recomputes rectangles and eases every managed window into place, on
+     * every workspace that holds one — a window closing on another workspace
+     * must not leave a hole there.
+     *
+     * Two ways in: call this directly only when the caller is the last thing
+     * before a frame the user is watching for (a drop, a keybinding, a
+     * window's first frame); everything that is merely a consequence of
+     * window state changing (open/close/minimize/workspace/layout/work area)
+     * goes through `_queueDynamicReflow`, which coalesces bursts into one
+     * idle reflow. A reflow requested from inside a running one is deferred
+     * to that same idle by the scheduler.
+     */
+    private _applyDynamicTiling() {
+        if (!Settings.ENABLE_DYNAMIC_TILING) return;
+        this._reflow.run(() => this._reflowDynamicWindows());
+    }
+
+    private _reflowDynamicWindows() {
+        const workspaces = new Set<Meta.Workspace>();
+        this._dynamicWindows.forEach((window) => {
+            const ws = window.get_workspace();
+            if (ws) workspaces.add(ws);
+        });
+
+        workspaces.forEach((ws) => {
+            // no decomposable layout at all keeps the static behaviour
+            const slots = this._dynamicSlots(ws);
+            if (!slots) return;
+            const { windows, rects } = slots;
+            windows.forEach((window, slot) => {
+                // a window can be unmanaged by a placement earlier in this
+                // very loop; skip it rather than abort the others
+                if (!isWindowAlive(window)) return;
+                this._easeWindowRectFromTile(this._tileOf(rects[slot]), window);
+            });
+        });
+    }
+
+    /**
+     * Drops a dragged window into whichever slot the pointer is over,
+     * exchanging places with the window already living there. Returns true
+     * when dynamic tiling has taken responsibility for the drop.
+     */
+    private _dynamicSwapOnDrop(window: Meta.Window): boolean {
+        const ws = global.workspaceManager.get_active_workspace();
+        if (!ws) return false;
+
+        const slots = this._dynamicSlots(ws);
+        const from = slots ? slots.windows.indexOf(window) : -1;
+        if (!slots || from < 0) return false;
+        const { windows, rects } = slots;
+
+        // nothing to exchange with, but the window still belongs in its slot
+        if (windows.length < 2) {
+            this._applyDynamicTiling();
+            return true;
+        }
+
+        const [pointerX, pointerY] = global.get_pointer();
+        const to = slotUnderPoint(rects, this._workArea, {
+            x: pointerX,
+            y: pointerY,
+        });
+
+        if (to >= 0 && to !== from)
+            this._dynamicSwap(ws, windows[from], windows[to]);
+
+        // dropped outside every slot, or back where it started: snap it home
+        this._applyDynamicTiling();
+        return true;
     }
 
     private _autoTile(window: Meta.Window, windowCreated: boolean) {
@@ -1279,7 +2218,8 @@ export class TilingManager {
 
         if (windowCreated) {
             const windowActor =
-                window.get_compositor_private() as Meta.WindowActor;
+                window.get_compositor_private() as Meta.WindowActor | null;
+            if (!windowActor) return;
             const id = windowActor.connect('first-frame', () => {
                 // while we restore the opacity, making the window visible
                 // again, we perform easing of movement too
@@ -1333,12 +2273,8 @@ export class TilingManager {
         vacantTiles.sort((a, b) => a.x - b.x);
 
         let bestTileIndex = 0;
-        let bestDistance = Math.abs(
-            0.5 -
-                vacantTiles[bestTileIndex].x +
-                vacantTiles[bestTileIndex].width / 2,
-        );
-        for (let index = 1; index < vacantTiles.length; index++) {
+        let bestDistance = Number.MAX_VALUE;
+        for (let index = 0; index < vacantTiles.length; index++) {
             const distance = Math.abs(
                 0.5 - (vacantTiles[index].x + vacantTiles[index].width / 2),
             );
