@@ -33,8 +33,10 @@ like upstream Tiling Shell.
 With it on, windows always fill the screen automatically as you open and close
 them, following the proportions of whichever layout you've selected: one window
 is fullscreen, opening a second splits the space in half, opening a third takes
-half of whatever region you're currently focused on, and so on. Closing a window
-gives its space back to whatever was sharing it. No manual tiling needed.
+half of whatever region you're currently focused on, and so on — and only that
+region changes; every other window stays where it is. Closing a window rebuilds
+the layout by seniority: the windows you opened first get the roomiest tiles.
+No manual tiling needed.
 
 | Shortcut | Action |
 |---|---|

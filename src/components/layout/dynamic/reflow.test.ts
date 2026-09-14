@@ -243,6 +243,28 @@ test('overflow splits the nominated slot', () => {
     ]);
 });
 
+test('overflow splits the nominated slot last, so the newest window gets its half', () => {
+    // two extra windows: the roomiest (left) is halved first for the older
+    // one, the nominated right tile is halved last for the newcomer
+    assert.deepEqual(assign(twoColumns(), 4, 1), [
+        { x: 0, y: 0, width: 0.67, height: 0.5 },
+        { x: 0.67, y: 0, width: 0.33, height: 0.5 },
+        { x: 0, y: 0.5, width: 0.67, height: 0.5 },
+        { x: 0.67, y: 0.5, width: 0.33, height: 0.5 },
+    ]);
+});
+
+test('overflow can nominate a slot that is itself an overflow half', () => {
+    // slot 2 is the bottom half of the left tile; it is wider than tall so
+    // it is cut vertically for the newcomer
+    assert.deepEqual(assign(twoColumns(), 4, 2), [
+        { x: 0, y: 0, width: 0.67, height: 0.5 },
+        { x: 0.67, y: 0, width: 0.33, height: 1 },
+        { x: 0, y: 0.5, width: 0.335, height: 0.5 },
+        { x: 0.335, y: 0.5, width: 0.335, height: 0.5 },
+    ]);
+});
+
 test('assign is deterministic and total for every window count', () => {
     const tree = buildLayoutTree([
         { x: 0, y: 0, width: 0.26, height: 0.5 },

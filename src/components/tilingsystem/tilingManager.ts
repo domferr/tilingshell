@@ -22,8 +22,20 @@ import SignalHandling from '../../utils/signalHandling';
 import Layout from '../layout/Layout';
 import Tile from '../layout/Tile';
 import TileUtils from '../layout/TileUtils';
-import { buildLayoutTree, SplitTree } from '../layout/dynamic/layoutTree';
+import {
+    buildLayoutTree,
+    leafCount,
+    SplitTree,
+} from '../layout/dynamic/layoutTree';
 import { assign, neighbourIndex, slotUnderPoint } from '../layout/dynamic/reflow';
+import {
+    arrangementKeys,
+    arrangementRectOf,
+    buildArrangement,
+    insertIntoArrangement,
+    swapInArrangement,
+} from '../layout/dynamic/arrangement';
+import type { Arrangement } from '../layout/dynamic/arrangement';
 import { applyPins } from '../layout/dynamic/pins';
 import type { SlotPin } from '../layout/dynamic/pins';
 import type { Direction } from '../layout/dynamic/reflow';
@@ -106,6 +118,17 @@ export class TilingManager {
     // windows ahead of it closing, and resolved to an index per workspace at
     // reflow time so it cannot be misapplied to an unrelated workspace.
     private _splitTarget: Meta.Window | null = null;
+    // Once there are more windows than the template layout has tiles, the
+    // arrangement is kept per workspace and only evolved on a fresh open
+    // (the focused window's leaf is halved); anything else rebuilds it.
+    private _dynamicArrangements: Map<
+        Meta.Workspace,
+        { layoutId: string; tree: Arrangement<Meta.Window> }
+    > = new Map();
+
+    // Windows _dynamicAdd tracked that no reflow has placed yet: the only
+    // ones an existing arrangement grows by a cut instead of a rebuild.
+    private _dynamicNewcomers: Set<Meta.Window> = new Set();
     private _dynamicReflowSourceId: number | null = null;
     // Cache of _dynamicLayoutCandidates(), rebuilt only when the saved
     // layouts change rather than on every reflow.
@@ -248,6 +271,9 @@ export class TilingManager {
             GlobalState.SIGNAL_LAYOUTS_CHANGED,
             () => {
                 this._dynamicLayoutCandidatesCache = null;
+                // an edited layout keeps its id, so the remembered
+                // arrangements cannot tell they are stale
+                this._dynamicArrangements.clear();
 
                 const ws = global.workspaceManager.get_active_workspace();
                 if (!ws) return;
@@ -392,6 +418,9 @@ export class TilingManager {
                 [...this._dynamicLayoutOffset.keys()]
                     .filter((ws) => !liveWorkspaces.has(ws))
                     .forEach((ws) => this._dynamicLayoutOffset.delete(ws));
+                [...this._dynamicArrangements.keys()]
+                    .filter((ws) => !liveWorkspaces.has(ws))
+                    .forEach((ws) => this._dynamicArrangements.delete(ws));
 
                 this._debug('deleted workspace');
             },
@@ -598,6 +627,8 @@ export class TilingManager {
         this._dynamicLayoutOffset.clear();
         this._pinnedWindows.clear();
         this._splitTarget = null;
+        this._dynamicArrangements.clear();
+        this._dynamicNewcomers.clear();
         this._signals.disconnect();
         this._isGrabbingWindow = false;
         this._snapAssistingInfo.update(undefined);
@@ -1381,23 +1412,98 @@ export class TilingManager {
     /**
      * The managed windows of a workspace and the slot rectangles dynamic
      * tiling gives them, or null when there is nothing to place.
+     *
+     * While the template layout has a tile per window the rects are a pure
+     * function of the window count. Past that, this is where the remembered
+     * arrangement advances: a window `_dynamicAdd` just tracked halves the
+     * focused window's leaf and nothing else moves; any other difference
+     * from what was remembered — a window closed, minimised or moved, the
+     * layout cycled — rebuilds from the layout in creation order, so the
+     * oldest windows get the roomiest tiles again. Calling this twice
+     * without a change in between returns the same rects.
      */
     private _dynamicSlots(
         ws: Meta.Workspace,
     ): { windows: Meta.Window[]; rects: ReturnType<typeof assign> } | null {
         const windows = this._dynamicManagedWindows(ws);
-        if (windows.length === 0) return null;
+        if (windows.length === 0) {
+            this._dynamicArrangements.delete(ws);
+            return null;
+        }
         const tree = this._dynamicTree(windows.length, ws);
         if (!tree) return null;
-        const splitSlot = this._splitTarget
-            ? windows.indexOf(this._splitTarget)
-            : -1;
-        const rects = assign(
-            tree,
-            windows.length,
-            splitSlot >= 0 ? splitSlot : undefined,
-        );
+        const rects = this._dynamicRects(ws, tree, windows);
         return { windows, rects: this._applyWindowPins(ws, windows, rects) };
+    }
+
+    private _dynamicRects(
+        ws: Meta.Workspace,
+        tree: SplitTree,
+        windows: Meta.Window[],
+    ): ReturnType<typeof assign> {
+        if (windows.length <= leafCount(tree)) {
+            this._dynamicArrangements.delete(ws);
+            return assign(tree, windows.length);
+        }
+
+        const focused =
+            this._splitTarget && windows.includes(this._splitTarget)
+                ? this._splitTarget
+                : undefined;
+        const layoutId = this.getCurrentDynamicLayoutId(ws) ?? '';
+        const previous = this._dynamicArrangements.get(ws);
+
+        let arrangement: Arrangement<Meta.Window> | null = null;
+        if (previous && previous.layoutId === layoutId) {
+            const known = new Set(arrangementKeys(previous.tree));
+            const newcomers = windows.filter((w) => !known.has(w));
+            const onlyGrew =
+                known.size + newcomers.length === windows.length &&
+                [...known].every((w) => windows.includes(w)) &&
+                newcomers.every((w) => this._dynamicNewcomers.has(w));
+            if (onlyGrew) {
+                arrangement = newcomers.reduce(
+                    (t, w) => insertIntoArrangement(t, focused, w),
+                    previous.tree,
+                );
+            }
+        }
+        if (!arrangement)
+            arrangement = buildArrangement(tree, windows, focused);
+
+        windows.forEach((w) => this._dynamicNewcomers.delete(w));
+        if (!arrangement) {
+            // the geometry could not be read back as a tree: place without
+            // memory rather than not at all
+            this._dynamicArrangements.delete(ws);
+            const splitSlot = focused ? windows.indexOf(focused) : -1;
+            return assign(
+                tree,
+                windows.length,
+                splitSlot >= 0 ? splitSlot : undefined,
+            );
+        }
+        this._dynamicArrangements.set(ws, { layoutId, tree: arrangement });
+        const final = arrangement;
+        return windows.map((w) => arrangementRectOf(final, w)!);
+    }
+
+    /**
+     * Trades the places of two managed windows: their creation-order slots
+     * (what a rebuild hands out) and, when an arrangement is remembered for
+     * the workspace, their leaves in it.
+     */
+    private _dynamicSwap(ws: Meta.Workspace, a: Meta.Window, b: Meta.Window) {
+        const i = this._dynamicWindows.indexOf(a);
+        const j = this._dynamicWindows.indexOf(b);
+        if (i < 0 || j < 0) return;
+        [this._dynamicWindows[i], this._dynamicWindows[j]] = [
+            this._dynamicWindows[j],
+            this._dynamicWindows[i],
+        ];
+        const remembered = this._dynamicArrangements.get(ws);
+        if (remembered)
+            remembered.tree = swapInArrangement(remembered.tree, a, b);
     }
 
     /**
@@ -1605,12 +1711,7 @@ export class TilingManager {
         const to = neighbourIndex(rects, from, towards);
         if (to < 0) return true; // at the edge of the screen
 
-        const a = this._dynamicWindows.indexOf(windows[from]);
-        const b = this._dynamicWindows.indexOf(windows[to]);
-        [this._dynamicWindows[a], this._dynamicWindows[b]] = [
-            this._dynamicWindows[b],
-            this._dynamicWindows[a],
-        ];
+        this._dynamicSwap(ws, windows[from], windows[to]);
 
         this._applyDynamicTiling();
         return true;
@@ -1684,6 +1785,7 @@ export class TilingManager {
      */
     private _untrackDynamicWindow(window: Meta.Window) {
         this._dynamicWindowSignals.delete(window);
+        this._dynamicNewcomers.delete(window);
         if (this._splitTarget === window) this._splitTarget = null;
         this._placer.forget(placementTargetFor(window));
         this._pinnedWindows.delete(window);
@@ -1765,6 +1867,7 @@ export class TilingManager {
                 : false;
 
         if (!this._trackDynamicWindow(window)) return;
+        this._dynamicNewcomers.add(window);
         this._splitTarget = focusedIsManaged ? focused : null;
 
         const windowActor =
@@ -2079,14 +2182,8 @@ export class TilingManager {
             y: pointerY,
         });
 
-        if (to >= 0 && to !== from) {
-            const a = this._dynamicWindows.indexOf(windows[from]);
-            const b = this._dynamicWindows.indexOf(windows[to]);
-            [this._dynamicWindows[a], this._dynamicWindows[b]] = [
-                this._dynamicWindows[b],
-                this._dynamicWindows[a],
-            ];
-        }
+        if (to >= 0 && to !== from)
+            this._dynamicSwap(ws, windows[from], windows[to]);
 
         // dropped outside every slot, or back where it started: snap it home
         this._applyDynamicTiling();

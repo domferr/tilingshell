@@ -115,8 +115,9 @@ const areaOf = (r: TileRect) => r.width * r.height;
  *
  * Past the last tile a region is halved. The slot that owned it **keeps the
  * first half** and the newcomer is appended, so overflow never evicts a window
- * from the region it was already in. `splitSlot` nominates which slot is
- * halved first; any further overflow takes the roomiest.
+ * from the region it was already in. Overflow takes the roomiest slot, except
+ * that `splitSlot` nominates the slot halved **last** — the one the newest
+ * window takes half of — and may name a slot that is itself an earlier half.
  *
  * The result depends only on its arguments, so every caller that passes the
  * same arguments sees the same geometry the windows are actually in.
@@ -135,14 +136,13 @@ export function assign(
     }
 
     const slots = slotOrder(leaves).map((index) => leaves[index]);
-    let nominated =
-        splitSlot !== undefined && splitSlot >= 0 && splitSlot < slots.length
+    const nominated =
+        splitSlot !== undefined && splitSlot >= 0 && splitSlot < windowCount - 1
             ? splitSlot
             : undefined;
 
     while (slots.length < windowCount) {
-        let target = nominated;
-        nominated = undefined;
+        let target = slots.length === windowCount - 1 ? nominated : undefined;
 
         if (target === undefined) {
             target = 0;
