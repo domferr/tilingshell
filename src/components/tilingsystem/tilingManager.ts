@@ -1433,6 +1433,9 @@ export class TilingManager {
         const tree = this._dynamicTree(windows.length, ws);
         if (!tree) return null;
         const rects = this._dynamicRects(ws, tree, windows);
+        // placed once, a window is no longer a newcomer anywhere: if it
+        // later turns up on another workspace that is a move, not an open
+        windows.forEach((w) => this._dynamicNewcomers.delete(w));
         return { windows, rects: this._applyWindowPins(ws, windows, rects) };
     }
 
@@ -1471,7 +1474,6 @@ export class TilingManager {
         if (!arrangement)
             arrangement = buildArrangement(tree, windows, focused);
 
-        windows.forEach((w) => this._dynamicNewcomers.delete(w));
         if (!arrangement) {
             // the geometry could not be read back as a tree: place without
             // memory rather than not at all
@@ -1786,6 +1788,11 @@ export class TilingManager {
     private _untrackDynamicWindow(window: Meta.Window) {
         this._dynamicWindowSignals.delete(window);
         this._dynamicNewcomers.delete(window);
+        // an arrangement holding this window is stale (the next reflow of
+        // that workspace rebuilds anyway) and must not keep a dead window
+        [...this._dynamicArrangements.entries()]
+            .filter(([, { tree }]) => arrangementKeys(tree).includes(window))
+            .forEach(([ws]) => this._dynamicArrangements.delete(ws));
         if (this._splitTarget === window) this._splitTarget = null;
         this._placer.forget(placementTargetFor(window));
         this._pinnedWindows.delete(window);
