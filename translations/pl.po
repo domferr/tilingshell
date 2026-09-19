@@ -22,31 +22,31 @@ msgstr ""
 msgid "Select the layout to edit"
 msgstr "Wybierz układ do edycji"
 
-#: dist/components/editor/editorDialog.js:54
+#: src/components/editor/editorDialog.ts:76
 msgid "Close"
 msgstr "Zamknij"
 
-#: dist/components/editor/editorDialog.js:81
+#: src/components/editor/editorDialog.ts:105
 msgid "to split a tile"
 msgstr "aby podzielić kafelek"
 
-#: dist/components/editor/editorDialog.js:120
+#: src/components/editor/editorDialog.ts:146
 msgid "to split a tile vertically"
 msgstr "aby podzielić kafelek pionowo"
 
-#: dist/components/editor/editorDialog.js:140
+#: src/components/editor/editorDialog.ts:168
 msgid "to delete a tile"
 msgstr "aby usunąć kafelek"
 
-#: dist/components/editor/editorDialog.js:164
+#: src/components/editor/editorDialog.ts:194
 msgid "use the indicator button to save or cancel"
 msgstr "użyj przycisku wskaźnika, aby zapisać lub anulować"
 
-#: dist/components/editor/editorDialog.js:182
+#: src/components/editor/editorDialog.ts:214
 msgid "How to use the editor"
 msgstr "Jak używać edytora"
 
-#: dist/components/editor/editorDialog.js:191
+#: src/components/editor/editorDialog.ts:224
 msgid "Start editing"
 msgstr "Rozpocznij edycję"
 
@@ -54,15 +54,15 @@ msgstr "Rozpocznij edycję"
 msgid "Tiled windows"
 msgstr "Ułożone okna"
 
-#: dist/components/window_menu/overriddenWindowMenu.js:117
+#: src/components/window_menu/overriddenWindowMenu.ts:166
 msgid "Move to best tile"
 msgstr "Przesuń do najlepszego kafelka"
 
-#: dist/components/window_menu/overriddenWindowMenu.js:137
+#: src/components/window_menu/overriddenWindowMenu.ts:188
 msgid "Move to leftmost tile"
 msgstr "Przesuń do kafelka najbardziej po lewej"
 
-#: dist/components/window_menu/overriddenWindowMenu.js:156
+#: src/components/window_menu/overriddenWindowMenu.ts:211
 msgid "Move to rightmost tile"
 msgstr "Przesuń do kafelka najbardziej po prawej"
 
@@ -74,11 +74,11 @@ msgstr "Edytuj układy"
 msgid "New Layout"
 msgstr "Nowy układ"
 
-#: dist/indicator/editingMenu.js:19
+#: src/indicator/editingMenu.ts:24
 msgid "Menu"
 msgstr "Menu"
 
-#: dist/indicator/editingMenu.js:26
+#: src/indicator/editingMenu.ts:32
 msgid "Info"
 msgstr "Info"
 
@@ -91,23 +91,23 @@ msgstr "Zapisz"
 msgid "Cancel"
 msgstr "Anuluj"
 
-#: dist/prefs.js:59
+#: src/prefs.ts:69
 msgid "General"
 msgstr "Ogólne"
 
-#: dist/prefs.js:64
+#: src/prefs.ts:76
 msgid "Appearance"
 msgstr "Wygląd"
 
-#: dist/prefs.js:65
+#: src/prefs.ts:77
 msgid "Configure the appearance of Tiling Shell"
 msgstr "Skonfiguruj wygląd Układania okien"
 
-#: dist/prefs.js:70
+#: src/prefs.ts:83
 msgid "Show Indicator"
 msgstr "Pokaż wskaźnik"
 
-#: dist/prefs.js:71
+#: src/prefs.ts:84
 msgid "Whether to show the panel indicator"
 msgstr "Pokazywanie ikony wskaźnika na panelu"
 
@@ -119,121 +119,113 @@ msgstr "Wewnętrzne przerwy"
 msgid "Gaps between windows"
 msgstr "Przerwy między oknami"
 
-#: dist/prefs.js:82
-msgid "Outer gaps"
-msgstr "Zewnętrzne przerwy"
-
-#: dist/prefs.js:83
+#: src/prefs.ts:97
 msgid "Gaps between a window and the monitor borders"
 msgstr "Przerwy pomiędzy oknami i granicami monitora"
 
-#: dist/prefs.js:87
+#: src/prefs.ts:102
 msgid "Blur (experimental feature)"
 msgstr "Rozmycie (funkcja eksperymentalna)"
 
-#: dist/prefs.js:89
+#: src/prefs.ts:104
 msgid "Apply blur effect to Snap Assistant and tile previews"
 msgstr "Zastosuj efekt rozmycia do Asystenta przyciągania i podglądów kafelków"
 
-#: dist/prefs.js:95
-msgid "Snap Assistant threshold"
-msgstr "Progi Asystenta przyciągania"
-
-#: dist/prefs.js:97
+#: src/prefs.ts:113
 msgid "Minimum distance from the Snap Assistant to the pointer to open it"
 msgstr ""
 "Minimalna odległość od wskaźnika, przy której otwiera się Asystent "
 "przyciągania"
 
-#: dist/prefs.js:106
+#: src/prefs.ts:123
 msgid "Snap Assistant"
 msgstr "Asystent przyciągania"
 
-#: dist/prefs.js:107
+#: src/prefs.ts:124
 msgid "Apply blur effect to Snap Assistant"
 msgstr "Zastosuj efekt rozmycia do Asystenta przyciągania"
 
-#: dist/prefs.js:113
+#: src/prefs.ts:130
 msgid "Selected tile preview"
 msgstr "Podgląd wybranego kafelka"
 
-#: dist/prefs.js:114
+#: src/prefs.ts:131
 msgid "Apply blur effect to selected tile preview"
 msgstr "Zastosuj efekt rozmycia do podglądu wybranego kafelka"
 
-#: dist/prefs.js:118
+#: src/prefs.ts:136
 msgid "Window border"
 msgstr "Obramowanie okna"
 
-#: dist/prefs.js:119 dist/prefs.js:126
+#: src/prefs.ts:137 src/prefs.ts:144
 msgid "Show a border around focused window"
 msgstr "Pokaż obramowanie wokół aktywnego okna"
 
-#: dist/prefs.js:125
+#: src/prefs.ts:143
 msgid "Enable"
 msgstr "Włącz"
 
-#: dist/prefs.js:132
+#: src/prefs.ts:150
 msgid "Smart border radius"
 msgstr "Inteligentny promień obramowania"
 
-#: dist/prefs.js:133
+#: src/prefs.ts:151
 msgid "Dynamically adapt to the window's actual border radius"
 msgstr "Dostosuj dynamicznie do rzeczywistego promienia obramowania okna"
 
-#: dist/prefs.js:139
+#: src/prefs.ts:157
 msgid "Width"
 msgstr "Szerokość"
 
-#: dist/prefs.js:140
+#: src/prefs.ts:158
 msgid "The size of the border"
 msgstr "Rozmiar obramowania"
 
-#: dist/prefs.js:149
+#: src/prefs.ts:167
 msgid "Border color"
 msgstr "Kolor obramowania"
 
-#: dist/prefs.js:150
+#: src/prefs.ts:168
 msgid "Choose the color of the border"
 msgstr "Wybierz kolor obramowania"
 
-#: dist/prefs.js:166
+#: src/prefs.ts:185
 msgid "Animations"
 msgstr "Animacje"
 
-#: dist/prefs.js:167
+#: src/prefs.ts:186
 msgid "Customize animations"
 msgstr "Dostosuj animacje"
 
-#: dist/prefs.js:173
+#: src/prefs.ts:192
 msgid "Snap assistant animation time"
 msgstr "Czas trwania animacji Asystenta przyciągania"
 
-#: dist/prefs.js:174
+#: src/prefs.ts:193
 msgid "The snap assistant animation time in milliseconds"
 msgstr "Czas trwania animacji Asystenta przyciągania w milisekundach"
 
-#: dist/prefs.js:182
+#: src/prefs.ts:201
 msgid "Tiles animation time"
 msgstr "Czas animacji"
 
-#: dist/prefs.js:183
+#: src/prefs.ts:202
 msgid "The tiles animation time in milliseconds"
 msgstr "Czas trwania animacji kafelków w milisekundach"
 
-#: dist/prefs.js:189
+#: src/prefs.ts:210
 msgid "Behaviour"
 msgstr "Zachowanie"
 
-#: dist/prefs.js:190
+#: src/prefs.ts:211
 msgid "Configure the behaviour of Tiling Shell"
 msgstr "Skonfiguruj zachowanie Układania okien"
 
-#: dist/prefs.js:195
+#: src/prefs.ts:217
 msgid "Enable Snap Assistant"
 msgstr "Włącz Asystenta przyciągania"
 
-#: dist/prefs.js:196
+#: src/prefs.ts:218
 msgid "Move the window on top of the screen to snap assist it"
 msgstr ""
 "Przesuń okno na górną krawędź ekranu, aby wywołać Asystenta przyciągania"
@@ -250,19 +242,19 @@ msgstr ""
 "Zmieniaj aktywny układ tak, aby odpowiadał układowi używanemu przy układaniu "
 "okna przy pomocy Asystenta przyciągania"
 
-#: dist/prefs.js:214
+#: src/prefs.ts:238
 msgid "Enable Tiling System"
 msgstr "Włącz system układania okien"
 
-#: dist/prefs.js:215
+#: src/prefs.ts:239
 msgid "Hold the activation key while moving a window to tile it"
 msgstr "Przytrzymaj klawisz aktywacji podczas przesuwania okna, aby je ułożyć"
 
-#: dist/prefs.js:223
+#: src/prefs.ts:249
 msgid "Tiling System deactivation key"
 msgstr "Klawisz deaktywacji systemu układania okien"
 
-#: dist/prefs.js:225
+#: src/prefs.ts:251
 msgid ""
 "Hold the deactivation key while moving a window to deactivate the tiling "
 "system"
@@ -270,48 +262,30 @@ msgstr ""
 "Przytrzymaj klawisz deaktywacji podczas przesuwania okna, aby wyłączyć "
 "system układania okien"
 
-#: dist/prefs.js:233
-msgid "Span multiple tiles"
-msgstr "Rozciągnij na wiele kafelków"
-
-#: dist/prefs.js:234
+#: src/prefs.ts:262
 msgid "Hold the activation key to span multiple tiles"
 msgstr "Przytrzymaj klawisz aktywacji, aby rozciągnąć na wiele kafelków"
 
-#: dist/prefs.js:243
+#: src/prefs.ts:273
 msgid "Enable Auto Tiling"
 msgstr "Włącz automatyczne układanie"
 
-#: dist/prefs.js:244
+#: src/prefs.ts:274
 msgid "Automatically tile new windows to the best tile"
 msgstr "Automatycznie układaj nowe okna do najlepszego kafelka"
 
-#: dist/prefs.js:249
-msgid "Enable auto-resize of the complementing tiled windows"
-msgstr "Włącz automatyczną zmianę rozmiaru sąsiednich ułożonych okien"
-
-#: dist/prefs.js:251
+#: src/prefs.ts:282
 msgid ""
 "When a tiled window is resized, auto-resize the other tiled windows near it"
 msgstr ""
 "Gdy rozmiar ułożonego okna jest zmieniany, automatycznie zmień rozmiar "
 "sąsiednich ułożonych okien"
 
-#: dist/prefs.js:257
-msgid "Restore window size"
-msgstr "Przywróć rozmiar okna"
-
-#: dist/prefs.js:259
+#: src/prefs.ts:291
 msgid "Whether to restore the windows to their original size when untiled"
 msgstr "Przywracaj okna do ich oryginalnego rozmiaru po usunięciu z układu"
 
-#: dist/prefs.js:265
-msgid "Add snap assistant and auto-tile buttons to window menu"
-msgstr ""
-"Dodaj przyciski Asystenta przyciągania i automatycznego układania do menu "
-"okna"
-
-#: dist/prefs.js:267
+#: src/prefs.ts:300
 msgid ""
 "Add snap assistant and auto-tile buttons in the menu that shows up when you "
 "right click on a window title"
@@ -319,11 +293,11 @@ msgstr ""
 "Dodaj przyciski Asystenta przyciągania i automatycznego układania do menu "
 "wyświetlanego po kliknięciu prawym przyciskiem myszy na pasku tytułu okna"
 
-#: dist/prefs.js:273
+#: src/prefs.ts:307
 msgid "Add tiled windows to ALT+TAB menu"
 msgstr "Dodaj ułożone okna do menu ALT+TAB"
 
-#: dist/prefs.js:275
+#: src/prefs.ts:309
 msgid ""
 "Add the tiled windows to the ALT+TAB menu to open all the tiled windows at "
 "once"

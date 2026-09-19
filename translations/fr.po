@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: Tiling Shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-25 18:00+0100\n"
-"PO-Revision-Date: 2025-03-23 14:33+0100\n"
+"PO-Revision-Date: 2026-05-01 08:51+0200\n"
 "Last-Translator: Nicolas Bénard <nico5b@msn.com>\n"
 "Language-Team: French\n"
 "Language: fr\n"
@@ -17,11 +17,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Gtranslator 47.1\n"
+"X-Generator: Poedit 3.8\n"
 
 #: dist/components/altTab/MultipleWindowsIcon.js:42
 msgid "Tiled windows"
-msgstr ""
+msgstr "Fenêtres en mosaïque"
 
 #: dist/components/editor/editorDialog.js:36
 msgid "Select the layout to edit"
@@ -57,7 +57,7 @@ msgstr "Commencer à modifier"
 
 #: dist/components/window_menu/overriddenWindowMenu.js:117
 msgid "Move to best tile"
-msgstr ""
+msgstr "Déplacezvers la meilleure tuile"
 
 #: dist/components/window_menu/overriddenWindowMenu.js:137
 msgid "Move to leftmost tile"
@@ -180,7 +180,7 @@ msgstr "Rayon de bordure intelligent"
 
 #: dist/prefs.js:133
 msgid "Dynamically adapt to the window's actual border radius"
-msgstr ""
+msgstr "S'adapter dynamiquement au rayon de bordure réel de la fenêtre"
 
 #: dist/prefs.js:139
 msgid "Width"
@@ -242,12 +242,15 @@ msgstr ""
 #: dist/prefs.js:201
 msgid "Sync layout when tiling with Snap Assistant"
 msgstr ""
+"Synchronisation de la mise en page lors de l'utilisation de Snap Assistant"
 
 #: dist/prefs.js:203
 msgid ""
 "Change the active layout to match the layout used when tiling a window with "
 "Snap Assistant"
 msgstr ""
+"Changer la disposition active pour correspondre à celle utilisée lors du "
+"tiling d'une fenêtre avec l'assistant d'accrochage"
 
 #: dist/prefs.js:214
 msgid "Enable Tiling System"
@@ -323,23 +326,27 @@ msgstr ""
 
 #: dist/prefs.js:273
 msgid "Add tiled windows to ALT+TAB menu"
-msgstr ""
+msgstr "Ajouter les fenêtres en mosaïque au menu ALT+TAB"
 
 #: dist/prefs.js:275
 msgid ""
 "Add the tiled windows to the ALT+TAB menu to open all the tiled windows at "
 "once"
 msgstr ""
+"Ajouter les fenêtres en mosaïque au menu ALT+TAB pour les ouvrir toutes en "
+"même temps"
 
 #: dist/prefs.js:281
 msgid "Raise tiled windows together"
-msgstr ""
+msgstr "Affichage groupé des fenêtres en mosaïque"
 
 #: dist/prefs.js:283
 msgid ""
 "When one tiled window is raised, raise all tiled windows into the foreground "
 "together"
 msgstr ""
+"Lorsqu'une fenêtre en mosaïque est mise au premier plan, remonter toutes les "
+"fenêtres en mosaïque ensemble"
 
 #: dist/prefs.js:288
 msgid "Screen Edges"
@@ -368,15 +375,15 @@ msgstr "Zone d'activation du quadrillage"
 #: dist/prefs.js:315
 #, javascript-format
 msgid "Activation area to trigger quarter tiling (%% of the screen)"
-msgstr ""
+msgstr "Zone de déclenchement du fractionnement en quarts (%% de l'écran)"
 
 #: dist/prefs.js:331
 msgid "Edge tiling offset"
-msgstr ""
+msgstr "Décalage de la mosaïque aux bords"
 
 #: dist/prefs.js:332
 msgid "Offset from the screen edge to trigger edge tiling (in pixels)"
-msgstr ""
+msgstr "Seuil de déclenchement de la mosaïque au bord de l'écran (en pixels)"
 
 #: dist/prefs.js:354
 msgid "Windows suggestions"
@@ -410,11 +417,13 @@ msgstr ""
 
 #: dist/prefs.js:376
 msgid "Enable window suggestions for screen edge tiling"
-msgstr ""
+msgstr "Proposer des fenêtres lors de l'ancrage au bord de l'écran"
 
 #: dist/prefs.js:378
 msgid "Suggests windows to occupy empty tiles when tiling to screen edges"
 msgstr ""
+"Proposer des fenêtres pour remplir les zones vides lors de l'ancrage aux "
+"bords"
 
 #: dist/prefs.js:384
 msgid "Layouts"
@@ -609,19 +618,19 @@ msgstr ""
 
 #: dist/prefs.js:671
 msgid "Highlight focused window"
-msgstr ""
+msgstr "Mettre en évidence la fenêtre active"
 
 #: dist/prefs.js:673
 msgid "Minimize all the other windows and show only the focused window"
-msgstr ""
+msgstr "Réduire toutes les autres fenêtres et n'afficher que la fenêtre active"
 
 #: dist/prefs.js:680
 msgid "Cycle layouts"
-msgstr ""
+msgstr "Faire défiler les dispositions"
 
 #: dist/prefs.js:681
 msgid "Cycle through available workspace layouts"
-msgstr ""
+msgstr "Faire défiler les dispositions d'espace de travail disponibles"
 
 #: dist/prefs.js:711
 msgid "View and Customize all the Shortcuts"
@@ -643,11 +652,13 @@ msgstr ""
 
 #: dist/prefs.js:771
 msgid "Restrict directional focus to tiled windows"
-msgstr ""
+msgstr "Restreindre le focus directionnel aux fenêtres en mosaïque"
 
 #: dist/prefs.js:773
 msgid "When using directional focus navigation, only consider tiled windows"
 msgstr ""
+"Lors de la navigation directionnelle, ne prendre en compte que les fenêtres "
+"en mosaïque"
 
 #: dist/prefs.js:778
 msgid "Import, export and reset"
@@ -717,39 +728,40 @@ msgstr "Ouvrir un nouveau problème sur"
 
 #: dist/prefs.js:999
 msgid "Choose how windows snap to screen edges"
-msgstr ""
+msgstr "Choisir comment les fenêtres s'ancreront aux bords de l'écran"
 
 #: dist/prefs.js:1014
 msgid "Default"
-msgstr ""
+msgstr "Défaut"
 
 #: dist/prefs.js:1015
 msgid "Follow quarters or screen halves"
-msgstr ""
+msgstr "S'ajuster par quarts ou par moitiés d'écran"
 
 #: dist/prefs.js:1020
 msgid "Adaptive"
-msgstr ""
+msgstr "Adaptatif"
 
 #: dist/prefs.js:1021
 msgid "Follow corners of selected layout or screen halves"
 msgstr ""
+"S'ajuster selon les coins de l'agencement choisi ou les moitiés d'écran"
 
 #: dist/prefs.js:1026
 msgid "Granular"
-msgstr ""
+msgstr "Précis"
 
 #: dist/prefs.js:1027
 msgid "Follow currently selected layout"
-msgstr ""
+msgstr "S'aligner sur l'agencement actif"
 
 #: dist/prefs.js:1216
 msgid "Choose custom color"
-msgstr ""
+msgstr "Choisir une couleur personnalisée"
 
 #: dist/prefs.js:1217
 msgid "Use system accent color"
-msgstr ""
+msgstr "Utiliser la couleur d'accentuation du système"
 
 #: dist/prefs.js:1271 dist/prefs.js:1298
 msgid "New accelerator…"
