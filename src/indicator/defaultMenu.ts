@@ -18,7 +18,6 @@ import { registerGObjectClass } from '../utils/gjs';
 import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
 import Layout from '../components/layout/Layout';
 import { _ } from '../translations';
-import { openPrefs } from '../polyfill';
 import { widgetOrientation } from '../utils/gnomesupport';
 import { createButton, createIconButton } from './utils';
 
@@ -63,7 +62,7 @@ class LayoutsRow extends St.BoxLayout {
         });
         this._monitor = monitor;
         this._label = new St.Label({
-            text: `Monitor ${this._monitor.index + 1}`,
+            text: `${_('Monitor')} ${this._monitor.index + 1}`,
             styleClass: 'monitor-layouts-title',
         });
         this.add_child(this._label);
@@ -154,10 +153,12 @@ export default class DefaultMenu implements CurrentMenu {
     private _container: St.BoxLayout;
     private _scalingFactor: number;
     private _children: St.Widget[];
+    private _openPrefsFn: () => void;
 
-    constructor(indicator: Indicator, enableScalingFactor: boolean) {
+    constructor(indicator: Indicator, enableScalingFactor: boolean, openPrefsFn: () => void) {
         this._indicator = indicator;
         this._signals = new SignalHandling();
+        this._openPrefsFn = openPrefsFn;
         this._children = [];
         const layoutsPopupMenu = new PopupMenu.PopupBaseMenuItem({
             style_class: 'indicator-menu-item',
@@ -181,7 +182,7 @@ export default class DefaultMenu implements CurrentMenu {
                 this._container,
             );
             const scalingFactor = getMonitorScalingFactor(
-                monitor?.index || Main.layoutManager.primaryIndex,
+                monitor?.index ?? Main.layoutManager.primaryIndex,
             );
             enableScalingFactorSupport(this._container, scalingFactor);
         }
@@ -247,7 +248,7 @@ export default class DefaultMenu implements CurrentMenu {
                 this._container,
             );
             const scalingFactor = getMonitorScalingFactor(
-                monitor?.index || Main.layoutManager.primaryIndex,
+                monitor?.index ?? Main.layoutManager.primaryIndex,
             );
             enableScalingFactorSupport(this._container, scalingFactor);
 
@@ -401,7 +402,7 @@ export default class DefaultMenu implements CurrentMenu {
             this._indicator.path,
         );
         prefsBtn.connect('clicked', () => {
-            openPrefs();
+            this._openPrefsFn();
             this._indicator.menu.toggle();
         });
         buttonsBoxLayout.add_child(prefsBtn);

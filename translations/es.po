@@ -3,94 +3,22 @@
 # Copyright (C) 2025 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # Óscar Fernández Díaz <oscfdezdz@tuta.io>, 2025.
+# Sergio Gil <sergio@sgil.es>, 2026.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Tiling Shell\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:00+0100\n"
-"PO-Revision-Date: 2025-01-13 23:11+0100\n"
-"Last-Translator: Óscar Fernández Díaz <oscfdezdz@tuta.io>\n"
+"POT-Creation-Date: 2026-07-09 23:12+0200\n"
+"PO-Revision-Date: 2026-07-09 23:19+0200\n"
+"Last-Translator: Sergio Gil <sergio@sgil.es>\n"
 "Language-Team: Spanish\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Gtranslator 47.1\n"
-
-#: dist/components/altTab/MultipleWindowsIcon.js:42
-msgid "Tiled windows"
-msgstr ""
-
-#: dist/components/editor/editorDialog.js:36
-msgid "Select the layout to edit"
-msgstr "Seleccionar el diseño a editar"
-
-#: dist/components/editor/editorDialog.js:54
-msgid "Close"
-msgstr "Cerrar"
-
-#: dist/components/editor/editorDialog.js:81
-msgid "to split a tile"
-msgstr "para dividir un mosaico"
-
-#: dist/components/editor/editorDialog.js:120
-msgid "to split a tile vertically"
-msgstr "para dividir un mosaico verticalmente"
-
-#: dist/components/editor/editorDialog.js:140
-msgid "to delete a tile"
-msgstr "para quitar un mosaico"
-
-#: dist/components/editor/editorDialog.js:164
-msgid "use the indicator button to save or cancel"
-msgstr "usar el botón indicador para guardar o cancelar"
-
-#: dist/components/editor/editorDialog.js:182
-msgid "How to use the editor"
-msgstr "Cómo usar el editor"
-
-#: dist/components/editor/editorDialog.js:191
-msgid "Start editing"
-msgstr "Comenzar edición"
-
-#: dist/components/window_menu/overriddenWindowMenu.js:117
-msgid "Move to best tile"
-msgstr ""
-
-#: dist/components/window_menu/overriddenWindowMenu.js:137
-msgid "Move to leftmost tile"
-msgstr "Mover al mosaico más a la izquierda"
-
-#: dist/components/window_menu/overriddenWindowMenu.js:156
-msgid "Move to rightmost tile"
-msgstr "Mover al mosaico más a la derecha"
-
-#: dist/indicator/defaultMenu.js:297
-msgid "Edit Layouts"
-msgstr "Editar diseños"
-
-#: dist/indicator/defaultMenu.js:307
-msgid "New Layout"
-msgstr "Diseño nuevo"
-
-#: dist/indicator/editingMenu.js:19
-msgid "Menu"
-msgstr "Menú"
-
-#: dist/indicator/editingMenu.js:26
-msgid "Info"
-msgstr "Información"
-
-#: dist/indicator/editingMenu.js:33 dist/prefs.js:404 dist/prefs.js:793
-msgid "Save"
-msgstr "Guardar"
-
-#: dist/indicator/editingMenu.js:43 dist/prefs.js:405 dist/prefs.js:459
-#: dist/prefs.js:794 dist/prefs.js:849
-msgid "Cancel"
-msgstr "Cancelar"
+"X-Generator: Gtranslator 49.0\n"
 
 #: dist/prefs.js:59
 msgid "General"
@@ -181,7 +109,7 @@ msgstr "Radio de bordes inteligente"
 
 #: dist/prefs.js:133
 msgid "Dynamically adapt to the window's actual border radius"
-msgstr ""
+msgstr "Adaptar dinámicamente al radio de borde real de la ventana"
 
 #: dist/prefs.js:139
 msgid "Width"
@@ -241,13 +169,15 @@ msgstr "Mover la ventana por encima de la pantalla para que se ajuste a ella"
 
 #: dist/prefs.js:201
 msgid "Sync layout when tiling with Snap Assistant"
-msgstr ""
+msgstr "Sincronizar diseño al colocar en mosaico con Snap Assistant"
 
 #: dist/prefs.js:203
 msgid ""
 "Change the active layout to match the layout used when tiling a window with "
 "Snap Assistant"
 msgstr ""
+"Cambiar el diseño activo al colocar una ventana con Snap Assistant para que "
+"coincida con el diseño usado"
 
 #: dist/prefs.js:214
 msgid "Enable Tiling System"
@@ -323,436 +253,556 @@ msgstr ""
 
 #: dist/prefs.js:273
 msgid "Add tiled windows to ALT+TAB menu"
-msgstr ""
+msgstr "Añadir ventanas en mosaico al menú ALT+TAB"
 
 #: dist/prefs.js:275
 msgid ""
 "Add the tiled windows to the ALT+TAB menu to open all the tiled windows at "
 "once"
 msgstr ""
+"Añadir las ventanas en mosaico al menú ALT+TAB para abrir todas a la vez"
 
 #: dist/prefs.js:281
 msgid "Raise tiled windows together"
-msgstr ""
+msgstr "Elevar en conjunto las ventanas en mosaico"
 
 #: dist/prefs.js:283
 msgid ""
 "When one tiled window is raised, raise all tiled windows into the foreground "
 "together"
 msgstr ""
+"Al traer al frente una ventana en mosaico, se elevan también el resto de "
+"ventanas en mosaico"
 
-#: dist/prefs.js:288
+#: dist/prefs.js:289
+msgid "Raise tiled windows together: limit to current display"
+msgstr ""
+"Elevar en conjunto las ventanas en mosaico: limitar a la pantalla actual"
+
+#: dist/prefs.js:291
+msgid ""
+"When raising tiled windows together, only raise tiled windows on the same "
+"display as the window being raised"
+msgstr ""
+"Al traer las ventanas en mosaico al frente, eleva únicamente las que estén "
+"en la misma pantalla"
+
+#: dist/prefs.js:302
+msgid "Sync layout across workspaces"
+msgstr "Sincronizar diseño entre áreas de trabajo"
+
+#: dist/prefs.js:304
+msgid ""
+"When a layout is selected, apply it to all workspaces instead of just the "
+"active one"
+msgstr ""
+"Al seleccionar un diseño, se aplica a todas las áreas de trabajo en lugar de "
+"sólo a la activa"
+
+#: dist/prefs.js:309
 msgid "Screen Edges"
 msgstr "Bordes de pantalla"
 
-#: dist/prefs.js:290
+#: dist/prefs.js:311
 msgid ""
 "Drag windows against the top, left and right screen edges to resize them"
 msgstr ""
 "Arrastra las ventanas contra los bordes superior, izquierdo y derecho de la "
 "pantalla para cambiar su tamaño"
 
-#: dist/prefs.js:304
+#: dist/prefs.js:325
 msgid "Drag against top edge to maximize window"
 msgstr "Arrastrar contra el borde superior para maximizar la ventana"
 
-#: dist/prefs.js:305
+#: dist/prefs.js:326
 msgid "Drag windows against the top edge to maximize them"
 msgstr "Arrastra las ventanas contra el borde superior para maximizarlas"
 
-#: dist/prefs.js:314
+#: dist/prefs.js:335
 msgid "Quarter tiling activation area"
 msgstr "Área de activación de cuartos de mosaico"
 
-#: dist/prefs.js:315
+#: dist/prefs.js:336
 #, javascript-format
 msgid "Activation area to trigger quarter tiling (%% of the screen)"
-msgstr ""
+msgstr "Área de activación para dividir en cuartos (%% de la pantalla)"
 
-#: dist/prefs.js:331
+#: dist/prefs.js:352
 msgid "Edge tiling offset"
-msgstr ""
+msgstr "Distancia de activación en los bordes"
 
-#: dist/prefs.js:332
+#: dist/prefs.js:353
 msgid "Offset from the screen edge to trigger edge tiling (in pixels)"
 msgstr ""
+"Distancia desde el borde de la pantalla para activar el mosaico en los "
+"bordes (en píxeles)"
 
-#: dist/prefs.js:354
+#: dist/prefs.js:375
 msgid "Windows suggestions"
 msgstr "Sugerencias de ventanas"
 
-#: dist/prefs.js:355
+#: dist/prefs.js:376
 msgid "Enable and disable windows suggestions"
 msgstr "Activar y desactivar las sugerencias de ventanas"
 
-#: dist/prefs.js:360
+#: dist/prefs.js:381
 msgid "Enable window suggestions for the tiling system"
 msgstr "Activar las sugerencias de ventanas para el sistema de mosaicos"
 
-#: dist/prefs.js:362
+#: dist/prefs.js:383
 msgid ""
 "Provides smart suggestions to fill empty tiles when using the tiling system"
 msgstr ""
 "Ofrece sugerencias inteligentes para rellenar los mosaicos vacíos al usar el "
 "sistema de mosaicos"
 
-#: dist/prefs.js:368
+#: dist/prefs.js:389
 msgid "Enable window suggestions for the snap assistant"
 msgstr "Activar las sugerencias de ventanas para el Snap Assistant"
 
-#: dist/prefs.js:370
+#: dist/prefs.js:391
 msgid ""
 "Offers suggestions to populate empty tiles when using the snap assistant"
 msgstr ""
 "Ofrece sugerencias para rellenar los mosaicos vacíos cuando se usa el Snap "
 "Assistant"
 
-#: dist/prefs.js:376
+#: dist/prefs.js:397
 msgid "Enable window suggestions for screen edge tiling"
-msgstr ""
+msgstr "Sugerir ventanas al ajustar en los bordes"
 
-#: dist/prefs.js:378
+#: dist/prefs.js:399
 msgid "Suggests windows to occupy empty tiles when tiling to screen edges"
 msgstr ""
+"Sugiere ventanas para ocupar los mosaicos vacíos al ajustar ventanas en los "
+"bordes de la pantalla"
 
-#: dist/prefs.js:384
+#: dist/prefs.js:405
 msgid "Layouts"
 msgstr "Diseños"
 
-#: dist/prefs.js:385
+#: dist/prefs.js:406
 msgid "Configure the layouts of Tiling Shell"
 msgstr "Configurar los diseños de Tiling Shell"
 
-#: dist/prefs.js:389 dist/prefs.js:390
+#: dist/prefs.js:410 dist/prefs.js:411
 msgid "Edit layouts"
 msgstr "Editar diseños"
 
-#: dist/prefs.js:391
+#: dist/prefs.js:412
 msgid "Open the layouts editor"
 msgstr "Abrir el editor de diseños"
 
-#: dist/prefs.js:396 dist/prefs.js:397 dist/prefs.js:401
+#: dist/prefs.js:417 dist/prefs.js:418 dist/prefs.js:422
 msgid "Export layouts"
 msgstr "Exportar diseños"
 
-#: dist/prefs.js:398
+#: dist/prefs.js:419
 msgid "Export layouts to a file"
 msgstr "Exportar diseños a un archivo"
 
-#: dist/prefs.js:450 dist/prefs.js:451
+#: dist/prefs.js:425 dist/prefs.js:821 dist/indicator/editingMenu.js:33
+msgid "Save"
+msgstr "Guardar"
+
+#: dist/prefs.js:426 dist/prefs.js:480 dist/prefs.js:822 dist/prefs.js:877
+#: dist/indicator/editingMenu.js:43
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: dist/prefs.js:471 dist/prefs.js:472
 msgid "Import layouts"
 msgstr "Importar diseños"
 
-#: dist/prefs.js:452
+#: dist/prefs.js:473
 msgid "Import layouts from a file"
 msgstr "Importar diseños desde un archivo"
 
-#: dist/prefs.js:455
+#: dist/prefs.js:476
 msgid "Select layouts file"
 msgstr "Seleccionar archivo de diseños"
 
-#: dist/prefs.js:458 dist/prefs.js:848
+#: dist/prefs.js:479 dist/prefs.js:876
 msgid "Open"
 msgstr "Abrir"
 
-#: dist/prefs.js:506 dist/prefs.js:507
+#: dist/prefs.js:527 dist/prefs.js:528
 msgid "Reset layouts"
 msgstr "Restablecer diseños"
 
-#: dist/prefs.js:508
+#: dist/prefs.js:529
 msgid "Bring back the default layouts"
 msgstr "Restablecer los diseños predeterminados"
 
-#: dist/prefs.js:521
+#: dist/prefs.js:542
 msgid "Keybindings"
 msgstr "Atajos del teclado"
 
-#: dist/prefs.js:523
+#: dist/prefs.js:544
 msgid "Use hotkeys to perform actions on the focused window"
 msgstr "Usar atajos del teclado para realizar acciones en la ventana enfocada"
 
-#: dist/prefs.js:541
+#: dist/prefs.js:562
 msgid "Move window to right tile"
 msgstr "Mover la ventana al mosaico de la derecha"
 
-#: dist/prefs.js:543
+#: dist/prefs.js:564
 msgid "Move the focused window to the tile on its right"
 msgstr "Mover la ventana enfocada al mosaico de su derecha"
 
-#: dist/prefs.js:552
+#: dist/prefs.js:573
 msgid "Move window to left tile"
 msgstr "Mover la ventana al mosaico de la izquierda"
 
-#: dist/prefs.js:553
+#: dist/prefs.js:574
 msgid "Move the focused window to the tile on its left"
 msgstr "Mover la ventana enfocada al mosaico de su izquierda"
 
-#: dist/prefs.js:559
+#: dist/prefs.js:580
 msgid "Move window to tile above"
 msgstr "Mover la ventana al mosaico de arriba"
 
-#: dist/prefs.js:560
+#: dist/prefs.js:581
 msgid "Move the focused window to the tile above"
 msgstr "Mover la ventana enfocada al mosaico de arriba"
 
-#: dist/prefs.js:566
+#: dist/prefs.js:587
 msgid "Move window to tile below"
 msgstr "Mover la ventana al mosaico de abajo"
 
-#: dist/prefs.js:567
+#: dist/prefs.js:588
 msgid "Move the focused window to the tile below"
 msgstr "Mover la ventana enfocada al mosaico de abajo"
 
-#: dist/prefs.js:573
+#: dist/prefs.js:594
 msgid "Span window to right tile"
 msgstr "Extender la ventana hacia el mosaico derecho"
 
-#: dist/prefs.js:574
+#: dist/prefs.js:595
 msgid "Span the focused window to the tile on its right"
 msgstr "Extender la ventana enfocada al mosaico de su derecha"
 
-#: dist/prefs.js:580
+#: dist/prefs.js:601
 msgid "Span window to left tile"
 msgstr "Extender la ventana hacia el mosaico izquierdo"
 
-#: dist/prefs.js:581
+#: dist/prefs.js:602
 msgid "Span the focused window to the tile on its left"
 msgstr "Extender la ventana enfocada al mosaico de su izquierda"
 
-#: dist/prefs.js:587
+#: dist/prefs.js:608
 msgid "Span window above"
 msgstr "Extender la ventana hacia arriba"
 
-#: dist/prefs.js:588
+#: dist/prefs.js:609
 msgid "Span the focused window to the tile above"
 msgstr "Extender la ventana enfocada al mosaico superior"
 
-#: dist/prefs.js:594
+#: dist/prefs.js:615
 msgid "Span window down"
 msgstr "Extender la ventana hacia abajo"
 
-#: dist/prefs.js:595
+#: dist/prefs.js:616
 msgid "Span the focused window to the tile below"
 msgstr "Extender la ventana enfocada al mosaico inferior"
 
-#: dist/prefs.js:601
+#: dist/prefs.js:622
 msgid "Span window to all tiles"
 msgstr "Extender la ventana a todas los mosaicos"
 
-#: dist/prefs.js:602
+#: dist/prefs.js:623
 msgid "Span the focused window to all the tiles"
 msgstr "Extender la ventana enfocada a todos los mosaicos"
 
-#: dist/prefs.js:608
+#: dist/prefs.js:629
 msgid "Untile focused window"
 msgstr "Desanclar ventana enfocada"
 
-#: dist/prefs.js:616
+#: dist/prefs.js:636
+msgid "Untile all windows from current workspace"
+msgstr "Quitar del mosaico todas las ventanas del área de trabajo actual"
+
+#: dist/prefs.js:644
 msgid "Move window to the center"
 msgstr "Mover la ventana al centro"
 
-#: dist/prefs.js:618
+#: dist/prefs.js:646
 msgid "Move the focused window to the center of the screen"
 msgstr "Mover la ventana enfocada al centro de la pantalla"
 
-#: dist/prefs.js:627
+#: dist/prefs.js:655
 msgid "Focus window to the right"
 msgstr "Enfocar la ventana de la derecha"
 
-#: dist/prefs.js:629
+#: dist/prefs.js:657
 msgid "Focus the window to the right of the current focused window"
 msgstr ""
 "Enfoca la ventana situada a la derecha de la ventana enfocada actualmente"
 
-#: dist/prefs.js:636
+#: dist/prefs.js:664
 msgid "Focus window to the left"
 msgstr "Enfocar la ventana de la izquierda"
 
-#: dist/prefs.js:637
+#: dist/prefs.js:665
 msgid "Focus the window to the left of the current focused window"
 msgstr ""
 "Enfoca la ventana situada a la izquierda de la ventana enfocada actualmente"
 
-#: dist/prefs.js:643
+#: dist/prefs.js:671
 msgid "Focus window above"
 msgstr "Enfocar la ventana superior"
 
-#: dist/prefs.js:644
+#: dist/prefs.js:672
 msgid "Focus the window above the current focused window"
 msgstr "Enfoca la ventana situada encima de la ventana enfocada actualmente"
 
-#: dist/prefs.js:650
+#: dist/prefs.js:678
 msgid "Focus window below"
 msgstr "Enfocar la ventana inferior"
 
-#: dist/prefs.js:651
+#: dist/prefs.js:679
 msgid "Focus the window below the current focused window"
 msgstr "Enfoca la ventana situada debajo de la ventana enfocada actualmente"
 
-#: dist/prefs.js:657
+#: dist/prefs.js:685
 msgid "Focus next window"
 msgstr "Enfocar la ventana siguiente"
 
-#: dist/prefs.js:658
+#: dist/prefs.js:686
 msgid "Focus the window next to the current focused window"
 msgstr "Enfoca la ventana siguiente a la ventana enfocada actualmente"
 
-#: dist/prefs.js:664
+#: dist/prefs.js:692
 msgid "Focus previous window"
 msgstr "Enfocar la ventana anterior"
 
-#: dist/prefs.js:665
+#: dist/prefs.js:693
 msgid "Focus the window prior to the current focused window"
 msgstr "Enfoca la ventana anterior a la ventana enfocada actualmente"
 
-#: dist/prefs.js:671
+#: dist/prefs.js:699
 msgid "Highlight focused window"
-msgstr ""
+msgstr "Resaltar la ventana enfocada"
 
-#: dist/prefs.js:673
+#: dist/prefs.js:701
 msgid "Minimize all the other windows and show only the focused window"
-msgstr ""
+msgstr "Minimiza todas las demás ventanas y muestra solo la ventana enfocada"
 
-#: dist/prefs.js:680
+#: dist/prefs.js:708
 msgid "Cycle layouts"
-msgstr ""
+msgstr "Alternar entre diseños"
 
-#: dist/prefs.js:681
+#: dist/prefs.js:709
 msgid "Cycle through available workspace layouts"
-msgstr ""
+msgstr "Alterna entre los diseños disponibles del espacio de trabajo"
 
-#: dist/prefs.js:711
+#: dist/prefs.js:739
 msgid "View and Customize all the Shortcuts"
 msgstr "Ver y personalizar todos los atajos"
 
-#: dist/prefs.js:739 dist/prefs.js:740
+#: dist/prefs.js:767 dist/prefs.js:768
 msgid "View and Customize Shortcuts"
 msgstr "Ver y personalizar los atajos"
 
-#: dist/prefs.js:763
+#: dist/prefs.js:791
 msgid "Enable next/previous window focus to wrap around"
 msgstr ""
 "Permitir que el foco de la ventana siguiente/anterior se envuelva alrededor"
 
-#: dist/prefs.js:765
+#: dist/prefs.js:793
 msgid "When focusing next or previous window, wrap around at the window edge"
 msgstr ""
 "Al enfocar la ventana siguiente o anterior, se envuelve en el borde de la "
 "ventana"
 
-#: dist/prefs.js:771
+#: dist/prefs.js:799
 msgid "Restrict directional focus to tiled windows"
-msgstr ""
+msgstr "Limitar el enfoque direccional a ventanas en mosaico"
 
-#: dist/prefs.js:773
+#: dist/prefs.js:801
 msgid "When using directional focus navigation, only consider tiled windows"
 msgstr ""
+"Al usar la navegación direccional, considera únicamente las ventanas en "
+"mosaico"
 
-#: dist/prefs.js:778
+#: dist/prefs.js:806
 msgid "Import, export and reset"
 msgstr "Importar, exportar y restablecer"
 
-#: dist/prefs.js:780
+#: dist/prefs.js:808
 msgid "Import, export and reset the settings of Tiling Shell"
 msgstr "Importar, exportar y restablecer la configuración de Tiling Shell"
 
-#: dist/prefs.js:785 dist/prefs.js:786
+#: dist/prefs.js:813 dist/prefs.js:814
 msgid "Export settings"
 msgstr "Exportar configuración"
 
-#: dist/prefs.js:787
+#: dist/prefs.js:815
 msgid "Export settings to a file"
 msgstr "Exportar la configuración a un archivo"
 
-#: dist/prefs.js:790
+#: dist/prefs.js:818
 msgid "Export settings to a text file"
 msgstr "Exportar la configuración a un archivo de texto"
 
-#: dist/prefs.js:797
+#: dist/prefs.js:825
 msgid "Text file"
 msgstr "Archivo de texto"
 
-#: dist/prefs.js:840 dist/prefs.js:841
+#: dist/prefs.js:868 dist/prefs.js:869
 msgid "Import settings"
 msgstr "Importar configuración"
 
-#: dist/prefs.js:842
+#: dist/prefs.js:870
 msgid "Import settings from a file"
 msgstr "Importar la configuración desde un archivo"
 
-#: dist/prefs.js:845
+#: dist/prefs.js:873
 msgid "Select a text file to import from"
 msgstr "Seleccione un archivo de texto para importar"
 
-#: dist/prefs.js:887 dist/prefs.js:888
+#: dist/prefs.js:915 dist/prefs.js:916
 msgid "Reset settings"
 msgstr "Restablecer configuración"
 
-#: dist/prefs.js:889
+#: dist/prefs.js:917
 msgid "Bring back the default settings"
 msgstr "Restablecer la configuración predeterminada"
 
-#: dist/prefs.js:904
+#: dist/prefs.js:932
 msgid "Donate on ko-fi"
 msgstr "Donar en ko-fi"
 
-#: dist/prefs.js:910
+#: dist/prefs.js:938
 msgid "Report a bug"
 msgstr "Informar de un error"
 
-#: dist/prefs.js:916
+#: dist/prefs.js:944
 msgid "Request a feature"
 msgstr "Solicitar una característica"
 
-#: dist/prefs.js:924
+#: dist/prefs.js:952
 msgid "Have issues, you want to suggest a new feature or contribute?"
 msgstr ""
 "¿Tiene algún problema, quiere sugerir una característica nueva o contribuir?"
 
-#: dist/prefs.js:931
+#: dist/prefs.js:959
 msgid "Open a new issue on"
 msgstr "¡Abra una incidencia nueva en"
 
-#: dist/prefs.js:999
+#: dist/prefs.js:1027
 msgid "Choose how windows snap to screen edges"
-msgstr ""
+msgstr "Elige cómo se ajustan las ventanas en los bordes de la pantalla"
 
-#: dist/prefs.js:1014
+#: dist/prefs.js:1042
 msgid "Default"
-msgstr ""
+msgstr "Predeterminado"
 
-#: dist/prefs.js:1015
+#: dist/prefs.js:1043
 msgid "Follow quarters or screen halves"
-msgstr ""
+msgstr "Ajusta a los cuartos de pantalla o a las mitades"
 
-#: dist/prefs.js:1020
+#: dist/prefs.js:1048
 msgid "Adaptive"
-msgstr ""
+msgstr "Adaptativo"
 
-#: dist/prefs.js:1021
+#: dist/prefs.js:1049
 msgid "Follow corners of selected layout or screen halves"
 msgstr ""
+"Ajusta a las esquinas del diseño seleccionado o a las mitades de la pantalla"
 
-#: dist/prefs.js:1026
+#: dist/prefs.js:1054
 msgid "Granular"
-msgstr ""
+msgstr "Preciso"
 
-#: dist/prefs.js:1027
+#: dist/prefs.js:1055
 msgid "Follow currently selected layout"
-msgstr ""
+msgstr "Ajusta al diseño seleccionado actualmente"
 
-#: dist/prefs.js:1216
+#: dist/prefs.js:1160
+msgid "Right Mouse Button"
+msgstr "Botón secundario del ratón"
+
+#: dist/prefs.js:1162
+msgid "(None)"
+msgstr "(Ninguna)"
+
+#: dist/prefs.js:1246
 msgid "Choose custom color"
-msgstr ""
+msgstr "Elegir un color personalizado"
 
-#: dist/prefs.js:1217
+#: dist/prefs.js:1247
 msgid "Use system accent color"
-msgstr ""
+msgstr "Usar el color de resaltado del sistema"
 
-#: dist/prefs.js:1271 dist/prefs.js:1298
+#: dist/prefs.js:1301 dist/prefs.js:1328
 msgid "New accelerator…"
 msgstr "Atajo nuevo…"
 
-#: dist/prefs.js:1301
+#: dist/prefs.js:1331
 msgid "Use Backspace to clear"
 msgstr "Use Retroceso para borrar"
+
+#: dist/components/editor/editorDialog.js:36
+msgid "Select the layout to edit"
+msgstr "Seleccionar el diseño a editar"
+
+#: dist/components/editor/editorDialog.js:54
+msgid "Close"
+msgstr "Cerrar"
+
+#: dist/components/editor/editorDialog.js:81
+msgid "to split a tile"
+msgstr "para dividir un mosaico"
+
+#: dist/components/editor/editorDialog.js:120
+msgid "to split a tile vertically"
+msgstr "para dividir un mosaico verticalmente"
+
+#: dist/components/editor/editorDialog.js:140
+msgid "to delete a tile"
+msgstr "para quitar un mosaico"
+
+#: dist/components/editor/editorDialog.js:164
+msgid "use the indicator button to save or cancel"
+msgstr "usar el botón indicador para guardar o cancelar"
+
+#: dist/components/editor/editorDialog.js:182
+msgid "How to use the editor"
+msgstr "Cómo usar el editor"
+
+#: dist/components/editor/editorDialog.js:191
+msgid "Start editing"
+msgstr "Comenzar edición"
+
+#: dist/components/altTab/MultipleWindowsIcon.js:42
+msgid "Tiled windows"
+msgstr "Ventanas en mosaico"
+
+#: dist/components/window_menu/overriddenWindowMenu.js:117
+msgid "Move to best tile"
+msgstr "Mover al mejor mosaico"
+
+#: dist/components/window_menu/overriddenWindowMenu.js:137
+msgid "Move to leftmost tile"
+msgstr "Mover al mosaico más a la izquierda"
+
+#: dist/components/window_menu/overriddenWindowMenu.js:156
+msgid "Move to rightmost tile"
+msgstr "Mover al mosaico más a la derecha"
+
+#: dist/indicator/editingMenu.js:19
+msgid "Menu"
+msgstr "Menú"
+
+#: dist/indicator/editingMenu.js:26
+msgid "Info"
+msgstr "Información"
+
+#: dist/indicator/defaultMenu.js:298
+msgid "Edit Layouts"
+msgstr "Editar diseños"
+
+#: dist/indicator/defaultMenu.js:308
+msgid "New Layout"
+msgstr "Diseño nuevo"

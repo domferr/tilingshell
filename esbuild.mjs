@@ -40,7 +40,7 @@ var Extension = class {
         return imports.misc.extensionUtils.getSettings();
     }
 
-    static openPrefs() {
+    openPreferences() {
         return imports.misc.extensionUtils.openPrefs();
     }
 }
@@ -312,7 +312,12 @@ build({
     format: 'esm',
     plugins: [sassPlugin()],
 }).then(async () => {
-    const excludedFiles = ['./ambient.d.js']; // paths relative to dist directory
+    const excludedFiles = [ // paths relative to dist directory
+        './ambient.d.js', // not needed in the build
+        './indicator/currentMenu.js', // it is empty
+        './components/tilepreview/blurTilePreview.js', // not used, but Shexli complains
+        './components/tilingsystem/extendedWindow.js' // it is empty
+    ];
     excludedFiles.forEach(file => {
         fsSync.rmSync(path.resolve(distDir, file), { recursive: true, force: true });
     });

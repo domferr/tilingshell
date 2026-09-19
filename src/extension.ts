@@ -27,6 +27,7 @@ import {
     filterUnfocusableWindows,
     getMonitors,
     getWindows,
+    isFractionalScalingEnabled,
     squaredEuclideanDistance,
 } from './utils/ui';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -82,6 +83,7 @@ export default class TilingShellExtension extends Extension {
         this._indicator = new Indicator(this.path, this.uuid);
         this._indicator.enableScaling = !this._fractionalScalingEnabled;
         this._indicator.enable();
+        this._signals?.connect(this._indicator, 'open-preferences', () => this.openPreferences());
     }
 
     private _validateSettings() {
@@ -131,7 +133,7 @@ export default class TilingShellExtension extends Extension {
         // force initialization and tracking of windows
         TilingShellWindowManager.get();
 
-        this._fractionalScalingEnabled = this._isFractionalScalingEnabled(
+        this._fractionalScalingEnabled = isFractionalScalingEnabled(
             new Gio.Settings({ schema: 'org.gnome.mutter' }),
         );
 
@@ -225,7 +227,7 @@ export default class TilingShellExtension extends Extension {
                 if (!_mutterSettings) return;
 
                 const fractionalScalingEnabled =
-                    this._isFractionalScalingEnabled(_mutterSettings);
+                    isFractionalScalingEnabled(_mutterSettings);
 
                 if (this._fractionalScalingEnabled === fractionalScalingEnabled)
                     return;
@@ -239,7 +241,7 @@ export default class TilingShellExtension extends Extension {
                 if (this._windowBorderManager)
                     this._windowBorderManager.destroy();
                 this._windowBorderManager = new WindowBorderManager(
-                    this._fractionalScalingEnabled,
+                    !this._fractionalScalingEnabled,
                 );
                 this._windowBorderManager.enable();
             },
@@ -776,36 +778,42 @@ export default class TilingShellExtension extends Extension {
         });
     }
 
-    private _isFractionalScalingEnabled(
-        _mutterSettings: Gio.Settings,
-    ): boolean {
-        return (
-            _mutterSettings
-                .get_strv('experimental-features')
-                .find(
-                    (feat) =>
-                        feat === 'scale-monitor-framebuffer' ||
-                        feat === 'x11-randr-fractional-scaling',
-                ) !== undefined
-        );
+    private _onKeyboardUntileAllWindows(_kb: KeyBindings, _display: Meta.Display) {
+        getWindows().forEach((extWin) => {
+            if (extWin && !extWin.minimized && (extWin as ExtendedWindow).assignedTile) {
+                if (
+                    extWin.windowType !== Meta.WindowType.NORMAL ||
+                    (extWin.get_wm_class() &&
+                        extWin.get_wm_class() === 'gjs')
+                )
+                    return;
+                // if the window is maximized, unmaximize it
+                if (
+                    extWin.maximizedHorizontally ||
+                    extWin.maximizedVertically
+                )
+                    unmaximizeWindow(extWin);
+                const monitorTilingManager =
+                    this._tilingManagers[extWin.get_monitor()];
+                if (!monitorTilingManager) return;
+
+                monitorTilingManager.onUntileWindow(extWin, true);
+            }
+        });
     }
 
     disable(): void {
-        // bring back overridden keybindings
+        // disconnect signals
+        this._signals?.disconnect();
+        this._signals = null;
+
+       // bring back overridden keybindings
         this._keybindings?.destroy();
         this._keybindings = null;
 
         // destroy indicator
         this._indicator?.destroy();
         this._indicator = null;
-
-        // destroy tiling managers
-        this._tilingManagers.forEach((tm) => tm.destroy());
-        this._tilingManagers = [];
-
-        // disconnect signals
-        this._signals?.disconnect();
-        this._signals = null;
 
         this._resizingManager?.destroy();
         this._resizingManager = null;

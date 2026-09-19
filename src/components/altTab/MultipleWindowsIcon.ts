@@ -59,6 +59,7 @@ export default class MultipleWindowsIcon extends LayoutWidget<TilePreviewWithWin
         });
         // gnome shell accesses to this window, we need to abstract operations to work for a group of windows instead of one
         this._window = new MetaWindowGroup(params.windows);
+        this.connect('destroy', () => this._window.destroy());
 
         // if the rightmost tiled window doesn't reach the end of the icon
         // let's shrink the width to make it happen

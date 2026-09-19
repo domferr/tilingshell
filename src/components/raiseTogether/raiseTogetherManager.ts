@@ -65,8 +65,14 @@ export class RaiseTogetherManager {
 
     private _onTiledWindowRaised(tiledWindow: Meta.Window) {
         const workspace = tiledWindow.get_workspace();
+        const monitorIndex = tiledWindow.get_monitor();
         getWindows(workspace).forEach(winSameWorkspace => {
             if (!(winSameWorkspace as ExtendedWindow).assignedTile) return; // window not tiled
+            if (
+                Settings.RAISE_TOGETHER_CURRENT_MONITOR_ONLY &&
+                winSameWorkspace.get_monitor() !== monitorIndex
+            )
+                return;
 
             this._stopRaiseSignalHandling(winSameWorkspace);
             winSameWorkspace.raise();

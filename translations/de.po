@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: Tiling Shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-25 18:00+0100\n"
-"PO-Revision-Date: 2026-01-31 15:45+0100\n"
+"PO-Revision-Date: 2026-04-25 16:24+0200\n"
 "Last-Translator: Christian Lauinger <christian@lauinger-clan.de>\n"
 "Language-Team: German\n"
 "Language: de\n"
@@ -178,8 +178,7 @@ msgstr "Intelligenter Rahmenradius"
 
 #: dist/prefs.js:133
 msgid "Dynamically adapt to the window's actual border radius"
-msgstr ""
-"Rahmenradius dynamisch an den tatsächlichen Fensterrahmenradius anpassen."
+msgstr "Rahmenradius dynamisch an den tatsächlichen Fensterrahmenradius anpassen."
 
 #: dist/prefs.js:139
 msgid "Width"
@@ -241,7 +240,7 @@ msgstr ""
 
 #: dist/prefs.js:201
 msgid "Sync layout when tiling with Snap Assistant"
-msgstr "Layout beim Kacheln mit Snap Assistant synchronisieren"
+msgstr "Layout beim Kacheln mit Snap-Assistent synchronisieren"
 
 #: dist/prefs.js:203
 msgid ""
@@ -249,7 +248,7 @@ msgid ""
 "Snap Assistant"
 msgstr ""
 "Ändern Sie das aktive Layout so, dass es dem Layout entspricht, das beim "
-"Kacheln eines Fensters mit dem Snap Assistant verwendet wird."
+"Kacheln eines Fensters mit dem Snap-Assistenten verwendet wird."
 
 #: dist/prefs.js:214
 msgid "Enable Tiling System"
@@ -416,13 +415,13 @@ msgstr ""
 
 #: dist/prefs.js:376
 msgid "Enable window suggestions for screen edge tiling"
-msgstr "Fenster-Vorschläge für Bildschirmrand-Kacheln aktivieren"
+msgstr "Fenstervorschläge für die Anordnung an Bildschirmrändern aktivieren"
 
 #: dist/prefs.js:378
 msgid "Suggests windows to occupy empty tiles when tiling to screen edges"
 msgstr ""
-"Schlägt Fenster vor, um leere Kacheln zu belegen, wenn an Bildschirmrändern "
-"gekachelt wird"
+"Schlägt vor, dass Fenster leere Kacheln ausfüllen, wenn sie an den "
+"Bildschirmrändern angeordnet werden"
 
 #: dist/prefs.js:384
 msgid "Layouts"
@@ -731,7 +730,8 @@ msgstr "Neuen Issue öffnen auf"
 #: dist/prefs.js:999
 msgid "Choose how windows snap to screen edges"
 msgstr ""
-"Wählen Sie aus, wie Fenster an Bildschirmrändern ausgerichtet werden sollen."
+"Wählen Sie aus, wie Fenster an den Bildschirmrändern ausgerichtet werden "
+"sollen."
 
 #: dist/prefs.js:1014
 msgid "Default"
@@ -739,7 +739,7 @@ msgstr "Standard"
 
 #: dist/prefs.js:1015
 msgid "Follow quarters or screen halves"
-msgstr "Viertel oder Hälften des Spielfelds verfolgen"
+msgstr "Viertel oder Bildschirmhälften"
 
 #: dist/prefs.js:1020
 msgid "Adaptive"
