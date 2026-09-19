@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tiling Shell\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:00+0100\n"
+"POT-Creation-Date: 2026-09-19 20:46+0200\n"
 "PO-Revision-Date: 2025-03-17 02:23+0200\n"
 "Last-Translator: Yevhen Popok <xalt7x.service@gmail.com>\n"
 "Language-Team: Ukrainian\n"
@@ -25,51 +25,55 @@ msgstr ""
 msgid "Select the layout to edit"
 msgstr "Виберіть макет для редагування"
 
-#: dist/components/editor/editorDialog.js:54
+#: dist/components/editor/editorDialog.js:90
 msgid "Close"
 msgstr "Закрити"
 
-#: dist/components/editor/editorDialog.js:81
+#: dist/components/editor/editorDialog.js:117
 msgid "to split a tile"
 msgstr "для розділення плитки"
 
-#: dist/components/editor/editorDialog.js:120
+#: dist/components/editor/editorDialog.js:156
 msgid "to split a tile vertically"
 msgstr "для розділення плитки вертикально"
 
-#: dist/components/editor/editorDialog.js:140
+#: dist/components/editor/editorDialog.js:176
 msgid "to delete a tile"
 msgstr "для вилучення плитки"
 
-#: dist/components/editor/editorDialog.js:164
+#: dist/components/editor/editorDialog.js:200
 msgid "use the indicator button to save or cancel"
 msgstr "використайте кнопку індикатора для збереження чи скасування"
 
-#: dist/components/editor/editorDialog.js:182
+#: dist/components/editor/editorDialog.js:218
 msgid "How to use the editor"
 msgstr "Як використовувати редактор"
 
-#: dist/components/editor/editorDialog.js:191
+#: dist/components/editor/editorDialog.js:227
 msgid "Start editing"
 msgstr "Почати редагування"
 
-#: dist/components/window_menu/overriddenWindowMenu.js:117
+#: dist/components/window_menu/overriddenWindowMenu.js:120
 msgid "Move to best tile"
 msgstr ""
 
-#: dist/components/window_menu/overriddenWindowMenu.js:137
+#: dist/components/window_menu/overriddenWindowMenu.js:140
 msgid "Move to leftmost tile"
 msgstr "Перемістити до крайньої лівої плитки"
 
-#: dist/components/window_menu/overriddenWindowMenu.js:156
+#: dist/components/window_menu/overriddenWindowMenu.js:159
 msgid "Move to rightmost tile"
 msgstr "Перемістити до крайньої правої плитки"
 
-#: dist/indicator/defaultMenu.js:297
+#: dist/indicator/defaultMenu.js:43
+msgid "Monitor"
+msgstr ""
+
+#: dist/indicator/defaultMenu.js:298
 msgid "Edit Layouts"
 msgstr "Редагувати макет"
 
-#: dist/indicator/defaultMenu.js:307
+#: dist/indicator/defaultMenu.js:308
 msgid "New Layout"
 msgstr "Новий макет"
 
@@ -81,12 +85,12 @@ msgstr "Меню"
 msgid "Info"
 msgstr "Інформація"
 
-#: dist/indicator/editingMenu.js:33 dist/prefs.js:404 dist/prefs.js:793
+#: dist/indicator/editingMenu.js:33 dist/prefs.js:425 dist/prefs.js:821
 msgid "Save"
 msgstr "Зберегти"
 
-#: dist/indicator/editingMenu.js:43 dist/prefs.js:405 dist/prefs.js:459
-#: dist/prefs.js:794 dist/prefs.js:849
+#: dist/indicator/editingMenu.js:43 dist/prefs.js:426 dist/prefs.js:480
+#: dist/prefs.js:822 dist/prefs.js:877
 msgid "Cancel"
 msgstr "Скасувати"
 
@@ -336,422 +340,454 @@ msgid ""
 "together"
 msgstr ""
 
-#: dist/prefs.js:288
+#: dist/prefs.js:289
+msgid "Raise tiled windows together: limit to current display"
+msgstr ""
+
+#: dist/prefs.js:291
+msgid ""
+"When raising tiled windows together, only raise tiled windows on the same "
+"display as the window being raised"
+msgstr ""
+
+#: dist/prefs.js:302
+msgid "Sync layout across workspaces"
+msgstr ""
+
+#: dist/prefs.js:304
+msgid ""
+"When a layout is selected, apply it to all workspaces instead of just the "
+"active one"
+msgstr ""
+
+#: dist/prefs.js:309
 msgid "Screen Edges"
 msgstr "Краї екрана"
 
-#: dist/prefs.js:290
+#: dist/prefs.js:311
 msgid ""
 "Drag windows against the top, left and right screen edges to resize them"
 msgstr ""
 "Перетягніть вікно до верхнього, лівого чи правого країв екрана для зміни "
 "розміру вікна"
 
-#: dist/prefs.js:304
+#: dist/prefs.js:325
 msgid "Drag against top edge to maximize window"
 msgstr "Перетягніть до верхнього краю для розгортання"
 
-#: dist/prefs.js:305
+#: dist/prefs.js:326
 msgid "Drag windows against the top edge to maximize them"
 msgstr "Перетягніть вікно до верхнього краю екрана для розгортання вікна"
 
-#: dist/prefs.js:314
+#: dist/prefs.js:335
 msgid "Quarter tiling activation area"
 msgstr "Ділянка активації четвертинного укладання"
 
-#: dist/prefs.js:315
+#: dist/prefs.js:336
 #, javascript-format
 msgid "Activation area to trigger quarter tiling (%% of the screen)"
 msgstr ""
 
-#: dist/prefs.js:331
+#: dist/prefs.js:352
 msgid "Edge tiling offset"
 msgstr ""
 
-#: dist/prefs.js:332
+#: dist/prefs.js:353
 msgid "Offset from the screen edge to trigger edge tiling (in pixels)"
 msgstr ""
 
-#: dist/prefs.js:354
+#: dist/prefs.js:375
 msgid "Windows suggestions"
 msgstr "Пропозиції вікон"
 
-#: dist/prefs.js:355
+#: dist/prefs.js:376
 msgid "Enable and disable windows suggestions"
 msgstr "Увімкнути чи вимкнути пропозиції вікон"
 
-#: dist/prefs.js:360
+#: dist/prefs.js:381
 msgid "Enable window suggestions for the tiling system"
 msgstr "Увімкнути пропозиції щодо вікон в системі укладання"
 
-#: dist/prefs.js:362
+#: dist/prefs.js:383
 msgid ""
 "Provides smart suggestions to fill empty tiles when using the tiling system"
 msgstr ""
 "Розумні пропозиції для заповнення вільних плиток під час використання "
 "системи укладання"
 
-#: dist/prefs.js:368
+#: dist/prefs.js:389
 msgid "Enable window suggestions for the snap assistant"
 msgstr "Увімкнути пропозиції для помічника укладання"
 
-#: dist/prefs.js:370
+#: dist/prefs.js:391
 msgid ""
 "Offers suggestions to populate empty tiles when using the snap assistant"
 msgstr ""
 "Пропонує заповнення вільних плиток під час використання помічника укладання"
 
-#: dist/prefs.js:376
+#: dist/prefs.js:397
 msgid "Enable window suggestions for screen edge tiling"
 msgstr ""
 
-#: dist/prefs.js:378
+#: dist/prefs.js:399
 msgid "Suggests windows to occupy empty tiles when tiling to screen edges"
 msgstr ""
 
-#: dist/prefs.js:384
+#: dist/prefs.js:405
 msgid "Layouts"
 msgstr "Макети"
 
-#: dist/prefs.js:385
+#: dist/prefs.js:406
 msgid "Configure the layouts of Tiling Shell"
 msgstr "Налаштуйте макети Tiling Shell"
 
-#: dist/prefs.js:389 dist/prefs.js:390
+#: dist/prefs.js:410 dist/prefs.js:411
 msgid "Edit layouts"
 msgstr "Редагувати макети"
 
-#: dist/prefs.js:391
+#: dist/prefs.js:412
 msgid "Open the layouts editor"
 msgstr "Відкрити редактор макетів"
 
-#: dist/prefs.js:396 dist/prefs.js:397 dist/prefs.js:401
+#: dist/prefs.js:417 dist/prefs.js:418 dist/prefs.js:422
 msgid "Export layouts"
 msgstr "Експортувати макети"
 
-#: dist/prefs.js:398
+#: dist/prefs.js:419
 msgid "Export layouts to a file"
 msgstr "Експортувати макети до файлу"
 
-#: dist/prefs.js:450 dist/prefs.js:451
+#: dist/prefs.js:471 dist/prefs.js:472
 msgid "Import layouts"
 msgstr "Імпортувати макети"
 
-#: dist/prefs.js:452
+#: dist/prefs.js:473
 msgid "Import layouts from a file"
 msgstr "Імпортувати макети до файлу"
 
-#: dist/prefs.js:455
+#: dist/prefs.js:476
 msgid "Select layouts file"
 msgstr "Вибрати файл макетів"
 
-#: dist/prefs.js:458 dist/prefs.js:848
+#: dist/prefs.js:479 dist/prefs.js:876
 msgid "Open"
 msgstr "Відкрити"
 
-#: dist/prefs.js:506 dist/prefs.js:507
+#: dist/prefs.js:527 dist/prefs.js:528
 msgid "Reset layouts"
 msgstr "Відновити макети"
 
-#: dist/prefs.js:508
+#: dist/prefs.js:529
 msgid "Bring back the default layouts"
 msgstr "Повернути типові макети"
 
-#: dist/prefs.js:521
+#: dist/prefs.js:542
 msgid "Keybindings"
 msgstr "Привʼязки клавіш"
 
-#: dist/prefs.js:523
+#: dist/prefs.js:544
 msgid "Use hotkeys to perform actions on the focused window"
 msgstr "Використайте гарячі клавіші для виконання дій над вікнами у фокусі"
 
-#: dist/prefs.js:541
+#: dist/prefs.js:562
 msgid "Move window to right tile"
 msgstr "Укласти вікно праворуч"
 
-#: dist/prefs.js:543
+#: dist/prefs.js:564
 msgid "Move the focused window to the tile on its right"
 msgstr "Перемістити вікно у фокусі до плитки праворуч"
 
-#: dist/prefs.js:552
+#: dist/prefs.js:573
 msgid "Move window to left tile"
 msgstr "Укласти вікно ліворуч"
 
-#: dist/prefs.js:553
+#: dist/prefs.js:574
 msgid "Move the focused window to the tile on its left"
 msgstr "Перемістити вікно у фокусі до плитки ліворуч"
 
-#: dist/prefs.js:559
+#: dist/prefs.js:580
 msgid "Move window to tile above"
 msgstr "Укласти вікно вгорі"
 
-#: dist/prefs.js:560
+#: dist/prefs.js:581
 msgid "Move the focused window to the tile above"
 msgstr "Перемістити вікно у фокусі до плитки вище"
 
-#: dist/prefs.js:566
+#: dist/prefs.js:587
 msgid "Move window to tile below"
 msgstr "Укласти вікно знизу"
 
-#: dist/prefs.js:567
+#: dist/prefs.js:588
 msgid "Move the focused window to the tile below"
 msgstr "Перемістити вікно у фокусі до плитки нижче"
 
-#: dist/prefs.js:573
+#: dist/prefs.js:594
 msgid "Span window to right tile"
 msgstr "Охопити плитку праворуч"
 
-#: dist/prefs.js:574
+#: dist/prefs.js:595
 msgid "Span the focused window to the tile on its right"
 msgstr "Збільшити розмір вікна у фокусі, охопивши плитку праворуч"
 
-#: dist/prefs.js:580
+#: dist/prefs.js:601
 msgid "Span window to left tile"
 msgstr "Охопити плитку ліворуч"
 
-#: dist/prefs.js:581
+#: dist/prefs.js:602
 msgid "Span the focused window to the tile on its left"
 msgstr "Збільшити розмір вікна у фокусі, охопивши плитку ліворуч"
 
-#: dist/prefs.js:587
+#: dist/prefs.js:608
 msgid "Span window above"
 msgstr "Охопити плиту вгорі"
 
-#: dist/prefs.js:588
+#: dist/prefs.js:609
 msgid "Span the focused window to the tile above"
 msgstr "Збільшити розмір вікна у фокусі, охопивши плитку вгорі"
 
-#: dist/prefs.js:594
+#: dist/prefs.js:615
 msgid "Span window down"
 msgstr "Охопити плитку знизу"
 
-#: dist/prefs.js:595
+#: dist/prefs.js:616
 msgid "Span the focused window to the tile below"
 msgstr "Збільшити розмір вікна у фокусі, охопивши плитку знизу"
 
-#: dist/prefs.js:601
+#: dist/prefs.js:622
 msgid "Span window to all tiles"
 msgstr "Охопити всі плитки"
 
-#: dist/prefs.js:602
+#: dist/prefs.js:623
 msgid "Span the focused window to all the tiles"
 msgstr "Збільшити розмір вікна у фокусі, охопивши всі плитки"
 
-#: dist/prefs.js:608
+#: dist/prefs.js:629
 msgid "Untile focused window"
 msgstr "Відокремити вікно у фокусі від плитки"
 
-#: dist/prefs.js:616
+#: dist/prefs.js:636
+msgid "Untile all windows from current workspace"
+msgstr ""
+
+#: dist/prefs.js:644
 msgid "Move window to the center"
 msgstr "Перемістити вікно у центр"
 
-#: dist/prefs.js:618
+#: dist/prefs.js:646
 msgid "Move the focused window to the center of the screen"
 msgstr "Перемістити вікно у фокусі в центр екрана"
 
-#: dist/prefs.js:627
+#: dist/prefs.js:655
 msgid "Focus window to the right"
 msgstr "Фокус до вікна праворуч"
 
-#: dist/prefs.js:629
+#: dist/prefs.js:657
 msgid "Focus the window to the right of the current focused window"
 msgstr ""
 "Перемістити фокус до вікна, що знаходиться праворуч від поточного вікна у "
 "фокусі"
 
-#: dist/prefs.js:636
+#: dist/prefs.js:664
 msgid "Focus window to the left"
 msgstr "Фокус до вікна ліворуч"
 
-#: dist/prefs.js:637
+#: dist/prefs.js:665
 msgid "Focus the window to the left of the current focused window"
 msgstr ""
 "Перемістити фокус до вікна, що знаходиться ліворуч від поточного вікна у "
 "фокусі"
 
-#: dist/prefs.js:643
+#: dist/prefs.js:671
 msgid "Focus window above"
 msgstr "Фокус до вікна вище"
 
-#: dist/prefs.js:644
+#: dist/prefs.js:672
 msgid "Focus the window above the current focused window"
 msgstr ""
 "Перемістити фокус до вікна, що знаходиться вище від поточного вікна у фокусі"
 
-#: dist/prefs.js:650
+#: dist/prefs.js:678
 msgid "Focus window below"
 msgstr "Фокус до вікна нижче"
 
-#: dist/prefs.js:651
+#: dist/prefs.js:679
 msgid "Focus the window below the current focused window"
 msgstr ""
 "Перемістити фокус до вікна, що знаходиться нижче від поточного вікна у фокусі"
 
-#: dist/prefs.js:657
+#: dist/prefs.js:685
 msgid "Focus next window"
 msgstr "Фокус до наступного вікна"
 
-#: dist/prefs.js:658
+#: dist/prefs.js:686
 msgid "Focus the window next to the current focused window"
 msgstr ""
 "Перемістити фокус до вікна, що є наступним відносно поточного вікна у фокусі"
 
-#: dist/prefs.js:664
+#: dist/prefs.js:692
 msgid "Focus previous window"
 msgstr "Фокус до попереднього вікна"
 
-#: dist/prefs.js:665
+#: dist/prefs.js:693
 msgid "Focus the window prior to the current focused window"
 msgstr ""
 "Перемістити фокус до вікна, що є попереднім відносно поточного вікна у фокусі"
 
-#: dist/prefs.js:671
+#: dist/prefs.js:699
 msgid "Highlight focused window"
 msgstr "Виділити вікно у фокусі"
 
-#: dist/prefs.js:673
+#: dist/prefs.js:701
 msgid "Minimize all the other windows and show only the focused window"
 msgstr "Згорнути решту вікон та показати лише вікно у фокусі"
 
-#: dist/prefs.js:680
+#: dist/prefs.js:708
 msgid "Cycle layouts"
 msgstr ""
 
-#: dist/prefs.js:681
+#: dist/prefs.js:709
 msgid "Cycle through available workspace layouts"
 msgstr ""
 
-#: dist/prefs.js:711
+#: dist/prefs.js:739
 msgid "View and Customize all the Shortcuts"
 msgstr "Переглянути та налаштувати всі скорочення"
 
-#: dist/prefs.js:739 dist/prefs.js:740
+#: dist/prefs.js:767 dist/prefs.js:768
 msgid "View and Customize Shortcuts"
 msgstr "Переглянути та налаштувати скорочення"
 
-#: dist/prefs.js:763
+#: dist/prefs.js:791
 msgid "Enable next/previous window focus to wrap around"
 msgstr ""
 "Увімкнути циклічність переміщення фокуса до попереднього/наступного вікна"
 
-#: dist/prefs.js:765
+#: dist/prefs.js:793
 msgid "When focusing next or previous window, wrap around at the window edge"
 msgstr ""
 "Під час переміщення фокуса до наступного чи попереднього вікна, для крайніх "
 "вікон використовувати циклічність"
 
-#: dist/prefs.js:771
+#: dist/prefs.js:799
 msgid "Restrict directional focus to tiled windows"
 msgstr ""
 
-#: dist/prefs.js:773
+#: dist/prefs.js:801
 msgid "When using directional focus navigation, only consider tiled windows"
 msgstr ""
 
-#: dist/prefs.js:778
+#: dist/prefs.js:806
 msgid "Import, export and reset"
 msgstr "Імпортування, експортування та скидання"
 
-#: dist/prefs.js:780
+#: dist/prefs.js:808
 msgid "Import, export and reset the settings of Tiling Shell"
 msgstr "Імпортування, експортування та скидання налаштувань Tiling Shell"
 
-#: dist/prefs.js:785 dist/prefs.js:786
+#: dist/prefs.js:813 dist/prefs.js:814
 msgid "Export settings"
 msgstr "Експортувати налаштування"
 
-#: dist/prefs.js:787
+#: dist/prefs.js:815
 msgid "Export settings to a file"
 msgstr "Експортувати налаштування до файлу"
 
-#: dist/prefs.js:790
+#: dist/prefs.js:818
 msgid "Export settings to a text file"
 msgstr "Експортувати налаштування до текстового файлу"
 
-#: dist/prefs.js:797
+#: dist/prefs.js:825 dist/prefs.js:880
 msgid "Text file"
 msgstr "Текстовий файл"
 
-#: dist/prefs.js:840 dist/prefs.js:841
+#: dist/prefs.js:868 dist/prefs.js:869
 msgid "Import settings"
 msgstr "Імпортувати налаштування"
 
-#: dist/prefs.js:842
+#: dist/prefs.js:870
 msgid "Import settings from a file"
 msgstr "Імпортувати налаштування з файлу"
 
-#: dist/prefs.js:845
+#: dist/prefs.js:873
 msgid "Select a text file to import from"
 msgstr "Виберіть текстовий файл для імпортування"
 
-#: dist/prefs.js:887 dist/prefs.js:888
+#: dist/prefs.js:915 dist/prefs.js:916
 msgid "Reset settings"
 msgstr "Скинути налаштування"
 
-#: dist/prefs.js:889
+#: dist/prefs.js:917
 msgid "Bring back the default settings"
 msgstr "Повернути типові налаштування"
 
-#: dist/prefs.js:904
+#: dist/prefs.js:932
 msgid "Donate on ko-fi"
 msgstr "Фінансова підтримка на ko-fi"
 
-#: dist/prefs.js:910
+#: dist/prefs.js:938
 msgid "Report a bug"
 msgstr "Повідомити про ваду"
 
-#: dist/prefs.js:916
+#: dist/prefs.js:944
 msgid "Request a feature"
 msgstr "Запит щодо функціоналу"
 
-#: dist/prefs.js:924
+#: dist/prefs.js:952
 msgid "Have issues, you want to suggest a new feature or contribute?"
 msgstr "Маєте проблеми, хочете запропонувати новий фунціонал чи допомогти?"
 
-#: dist/prefs.js:931
+#: dist/prefs.js:959
 msgid "Open a new issue on"
 msgstr "Відкрийте нове завдання на"
 
-#: dist/prefs.js:999
+#: dist/prefs.js:1027
 msgid "Choose how windows snap to screen edges"
 msgstr ""
 
-#: dist/prefs.js:1014
+#: dist/prefs.js:1042
 msgid "Default"
 msgstr ""
 
-#: dist/prefs.js:1015
+#: dist/prefs.js:1043
 msgid "Follow quarters or screen halves"
 msgstr ""
 
-#: dist/prefs.js:1020
+#: dist/prefs.js:1048
 msgid "Adaptive"
 msgstr ""
 
-#: dist/prefs.js:1021
+#: dist/prefs.js:1049
 msgid "Follow corners of selected layout or screen halves"
 msgstr ""
 
-#: dist/prefs.js:1026
+#: dist/prefs.js:1054
 msgid "Granular"
 msgstr ""
 
-#: dist/prefs.js:1027
+#: dist/prefs.js:1055
 msgid "Follow currently selected layout"
 msgstr ""
 
-#: dist/prefs.js:1216
+#: dist/prefs.js:1160
+msgid "Right Mouse Button"
+msgstr ""
+
+#: dist/prefs.js:1162
+msgid "(None)"
+msgstr ""
+
+#: dist/prefs.js:1246
 msgid "Choose custom color"
 msgstr ""
 
-#: dist/prefs.js:1217
+#: dist/prefs.js:1247
 msgid "Use system accent color"
 msgstr ""
 
-#: dist/prefs.js:1271 dist/prefs.js:1298
+#: dist/prefs.js:1301 dist/prefs.js:1328
 msgid "New accelerator…"
 msgstr "Нове скорочення..."
 
-#: dist/prefs.js:1301
+#: dist/prefs.js:1331
 msgid "Use Backspace to clear"
 msgstr "Використайте Backspace, щоб очистити"

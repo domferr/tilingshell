@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tiling Shell\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-09 23:12+0200\n"
+"POT-Creation-Date: 2026-09-19 20:46+0200\n"
 "PO-Revision-Date: 2026-07-09 23:19+0200\n"
 "Last-Translator: Sergio Gil <sergio@sgil.es>\n"
 "Language-Team: Spanish\n"
@@ -19,6 +19,83 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Gtranslator 49.0\n"
+
+#: dist/components/altTab/MultipleWindowsIcon.js:42
+msgid "Tiled windows"
+msgstr "Ventanas en mosaico"
+
+#: dist/components/editor/editorDialog.js:36
+msgid "Select the layout to edit"
+msgstr "Seleccionar el diseño a editar"
+
+#: dist/components/editor/editorDialog.js:90
+msgid "Close"
+msgstr "Cerrar"
+
+#: dist/components/editor/editorDialog.js:117
+msgid "to split a tile"
+msgstr "para dividir un mosaico"
+
+#: dist/components/editor/editorDialog.js:156
+msgid "to split a tile vertically"
+msgstr "para dividir un mosaico verticalmente"
+
+#: dist/components/editor/editorDialog.js:176
+msgid "to delete a tile"
+msgstr "para quitar un mosaico"
+
+#: dist/components/editor/editorDialog.js:200
+msgid "use the indicator button to save or cancel"
+msgstr "usar el botón indicador para guardar o cancelar"
+
+#: dist/components/editor/editorDialog.js:218
+msgid "How to use the editor"
+msgstr "Cómo usar el editor"
+
+#: dist/components/editor/editorDialog.js:227
+msgid "Start editing"
+msgstr "Comenzar edición"
+
+#: dist/components/window_menu/overriddenWindowMenu.js:120
+msgid "Move to best tile"
+msgstr "Mover al mejor mosaico"
+
+#: dist/components/window_menu/overriddenWindowMenu.js:140
+msgid "Move to leftmost tile"
+msgstr "Mover al mosaico más a la izquierda"
+
+#: dist/components/window_menu/overriddenWindowMenu.js:159
+msgid "Move to rightmost tile"
+msgstr "Mover al mosaico más a la derecha"
+
+#: dist/indicator/defaultMenu.js:43
+msgid "Monitor"
+msgstr ""
+
+#: dist/indicator/defaultMenu.js:298
+msgid "Edit Layouts"
+msgstr "Editar diseños"
+
+#: dist/indicator/defaultMenu.js:308
+msgid "New Layout"
+msgstr "Diseño nuevo"
+
+#: dist/indicator/editingMenu.js:19
+msgid "Menu"
+msgstr "Menú"
+
+#: dist/indicator/editingMenu.js:26
+msgid "Info"
+msgstr "Información"
+
+#: dist/indicator/editingMenu.js:33 dist/prefs.js:425 dist/prefs.js:821
+msgid "Save"
+msgstr "Guardar"
+
+#: dist/indicator/editingMenu.js:43 dist/prefs.js:426 dist/prefs.js:480
+#: dist/prefs.js:822 dist/prefs.js:877
+msgid "Cancel"
+msgstr "Cancelar"
 
 #: dist/prefs.js:59
 msgid "General"
@@ -401,15 +478,6 @@ msgstr "Exportar diseños"
 msgid "Export layouts to a file"
 msgstr "Exportar diseños a un archivo"
 
-#: dist/prefs.js:425 dist/prefs.js:821 dist/indicator/editingMenu.js:33
-msgid "Save"
-msgstr "Guardar"
-
-#: dist/prefs.js:426 dist/prefs.js:480 dist/prefs.js:822 dist/prefs.js:877
-#: dist/indicator/editingMenu.js:43
-msgid "Cancel"
-msgstr "Cancelar"
-
 #: dist/prefs.js:471 dist/prefs.js:472
 msgid "Import layouts"
 msgstr "Importar diseños"
@@ -645,7 +713,7 @@ msgstr "Exportar la configuración a un archivo"
 msgid "Export settings to a text file"
 msgstr "Exportar la configuración a un archivo de texto"
 
-#: dist/prefs.js:825
+#: dist/prefs.js:825 dist/prefs.js:880
 msgid "Text file"
 msgstr "Archivo de texto"
 
@@ -742,67 +810,3 @@ msgstr "Atajo nuevo…"
 #: dist/prefs.js:1331
 msgid "Use Backspace to clear"
 msgstr "Use Retroceso para borrar"
-
-#: dist/components/editor/editorDialog.js:36
-msgid "Select the layout to edit"
-msgstr "Seleccionar el diseño a editar"
-
-#: dist/components/editor/editorDialog.js:54
-msgid "Close"
-msgstr "Cerrar"
-
-#: dist/components/editor/editorDialog.js:81
-msgid "to split a tile"
-msgstr "para dividir un mosaico"
-
-#: dist/components/editor/editorDialog.js:120
-msgid "to split a tile vertically"
-msgstr "para dividir un mosaico verticalmente"
-
-#: dist/components/editor/editorDialog.js:140
-msgid "to delete a tile"
-msgstr "para quitar un mosaico"
-
-#: dist/components/editor/editorDialog.js:164
-msgid "use the indicator button to save or cancel"
-msgstr "usar el botón indicador para guardar o cancelar"
-
-#: dist/components/editor/editorDialog.js:182
-msgid "How to use the editor"
-msgstr "Cómo usar el editor"
-
-#: dist/components/editor/editorDialog.js:191
-msgid "Start editing"
-msgstr "Comenzar edición"
-
-#: dist/components/altTab/MultipleWindowsIcon.js:42
-msgid "Tiled windows"
-msgstr "Ventanas en mosaico"
-
-#: dist/components/window_menu/overriddenWindowMenu.js:117
-msgid "Move to best tile"
-msgstr "Mover al mejor mosaico"
-
-#: dist/components/window_menu/overriddenWindowMenu.js:137
-msgid "Move to leftmost tile"
-msgstr "Mover al mosaico más a la izquierda"
-
-#: dist/components/window_menu/overriddenWindowMenu.js:156
-msgid "Move to rightmost tile"
-msgstr "Mover al mosaico más a la derecha"
-
-#: dist/indicator/editingMenu.js:19
-msgid "Menu"
-msgstr "Menú"
-
-#: dist/indicator/editingMenu.js:26
-msgid "Info"
-msgstr "Información"
-
-#: dist/indicator/defaultMenu.js:298
-msgid "Edit Layouts"
-msgstr "Editar diseños"
-
-#: dist/indicator/defaultMenu.js:308
-msgid "New Layout"
-msgstr "Diseño nuevo"

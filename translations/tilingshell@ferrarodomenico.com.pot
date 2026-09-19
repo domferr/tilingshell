@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-07 17:16+0200\n"
+"POT-Creation-Date: 2026-09-19 20:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,52 +17,56 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: dist/components/editor/editorDialog.js:36
-msgid "Select the layout to edit"
-msgstr ""
-
-#: dist/components/editor/editorDialog.js:54
-msgid "Close"
-msgstr ""
-
-#: dist/components/editor/editorDialog.js:81
-msgid "to split a tile"
-msgstr ""
-
-#: dist/components/editor/editorDialog.js:120
-msgid "to split a tile vertically"
-msgstr ""
-
-#: dist/components/editor/editorDialog.js:140
-msgid "to delete a tile"
-msgstr ""
-
-#: dist/components/editor/editorDialog.js:164
-msgid "use the indicator button to save or cancel"
-msgstr ""
-
-#: dist/components/editor/editorDialog.js:182
-msgid "How to use the editor"
-msgstr ""
-
-#: dist/components/editor/editorDialog.js:191
-msgid "Start editing"
-msgstr ""
-
 #: dist/components/altTab/MultipleWindowsIcon.js:42
 msgid "Tiled windows"
 msgstr ""
 
-#: dist/components/window_menu/overriddenWindowMenu.js:117
+#: dist/components/editor/editorDialog.js:36
+msgid "Select the layout to edit"
+msgstr ""
+
+#: dist/components/editor/editorDialog.js:90
+msgid "Close"
+msgstr ""
+
+#: dist/components/editor/editorDialog.js:117
+msgid "to split a tile"
+msgstr ""
+
+#: dist/components/editor/editorDialog.js:156
+msgid "to split a tile vertically"
+msgstr ""
+
+#: dist/components/editor/editorDialog.js:176
+msgid "to delete a tile"
+msgstr ""
+
+#: dist/components/editor/editorDialog.js:200
+msgid "use the indicator button to save or cancel"
+msgstr ""
+
+#: dist/components/editor/editorDialog.js:218
+msgid "How to use the editor"
+msgstr ""
+
+#: dist/components/editor/editorDialog.js:227
+msgid "Start editing"
+msgstr ""
+
+#: dist/components/window_menu/overriddenWindowMenu.js:120
 msgid "Move to best tile"
 msgstr ""
 
-#: dist/components/window_menu/overriddenWindowMenu.js:137
+#: dist/components/window_menu/overriddenWindowMenu.js:140
 msgid "Move to leftmost tile"
 msgstr ""
 
-#: dist/components/window_menu/overriddenWindowMenu.js:156
+#: dist/components/window_menu/overriddenWindowMenu.js:159
 msgid "Move to rightmost tile"
+msgstr ""
+
+#: dist/indicator/defaultMenu.js:43
+msgid "Monitor"
 msgstr ""
 
 #: dist/indicator/defaultMenu.js:298
@@ -665,7 +669,7 @@ msgstr ""
 msgid "Export settings to a text file"
 msgstr ""
 
-#: dist/prefs.js:825
+#: dist/prefs.js:825 dist/prefs.js:880
 msgid "Text file"
 msgstr ""
 
@@ -759,330 +763,4 @@ msgstr ""
 
 #: dist/prefs.js:1331
 msgid "Use Backspace to clear"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Active Screen Edges"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Add snap assistant and auto-tile buttons in the menu that shows up whe"
-"n you right click on a window title."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Add the tiled windows to the alt+tab menu to open all the tiled window"
-"s at once"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Add tiled windows group to alt+tab menu"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Animation time in milliseconds of the snap assistant"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Animation time in milliseconds of the tiles"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Automatically tile a new window to the best tile according to the curr"
-"ent layout."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Blur selected tile previews"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Blur snap assistant"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Change the desktop layout to match the layout used when tiling a windo"
-"w with Snap Assistant."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Controls how windows snap to screen edges:\\n'default' (corners snap t"
-"o quarters, edges to halves),\\n'adaptive' (snap to layout tiles by co"
-"lumn),\\n'granular' (snap to exact tile under cursor)."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Cycle backwards through available workspace layouts"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Dinamically adapt to the window's border radius."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Drag agains top edge to maximize window"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Drag windows against the top, left and right screen edges to resize th"
-"em."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Each monitor's active layout used by the monitor tiling manager."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Edge tiling behavior"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Enable Snap Assistant blur"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Enable auto tiling"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Enable keybindings"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Enable selected tile preview blur"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Enable smart window border radius"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Enable snap assist"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Enable tiling system"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Enable window border"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "External gaps between the layout and the monitor borders."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Focus the window to the right the current focused window"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Focused window border color"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Focused window border width"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Hold ALT to span multiple tiles."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Hold CTRL while moving a window to tile it."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Internal gaps between tiles in a layout."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Key to span multiple tiles"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Last version installed"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Last version installed of this extension."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Move focused window through tiles by using keybindings."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Move focused window to the tile above"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Move focused window to the tile below"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Move focused window to the tile to its left"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Move focused window to the tile to its right"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Move the window on top of the screen to snap assist it."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Offers suggestions to populate empty tiles when using the snap assista"
-"nt."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Offset to trigger edge tiling (left and right edge)."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Overridden settings"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Provides smart suggestions to fill empty tiles when using the tiling s"
-"ystem."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Quarter tiling threshold"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Raise tiled windows on current display only"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Resize the focused window to span all tiles"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Restore the windows to their original size when untiled."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Selected layouts"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Show a border around focused window."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Shows an indicator on top panel."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Shows indicator"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Snap Assistant's threshold to enlarge, shrink, open and close it."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Snap assistant animation time (milliseconds)"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Span focused window to the tile above"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Span focused window to the tile below"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Span focused window to the tile to its left"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Span focused window to the tile to its right"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Suggests windows to occupy empty tiles when tiling to screen edges."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "The color of the focused window's border."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "The layouts available to the tiling managers and the snap assist."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "The settings that are overridden and their old value."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "The width of the focused window's border."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Threshold to trigger quarter tiling."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Tile animation time (milliseconds)"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Tiling system activation key"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Tiling system deactivation key"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Untile the focused window"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Use custom color"
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Use the color defined here for the focused window's border."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "When a layout is selected, apply it to all workspaces instead of just "
-"the active one."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "When a tiled window is resized, auto-resize the other tiled windows ne"
-"ar it."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "When one tiled window is raised, raise all tiled windows into the fore"
-"ground together."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "When raising tiled windows together, only raise tiled windows on the s"
-"ame display as the window being raised."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Which key to hold to span multiple tiles."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Which key to hold while moving a window to activate the tiling system."
-msgstr ""
-
-#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml
-msgid "Which key to hold while moving a window to deactivate the tiling syste"
-"m."
 msgstr ""
