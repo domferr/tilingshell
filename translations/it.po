@@ -61,7 +61,7 @@ msgstr "Sposta nel riquadro più a destra"
 
 #: dist/indicator/defaultMenu.js:43
 msgid "Monitor"
-msgstr ""
+msgstr "Monitor"
 
 #: dist/indicator/defaultMenu.js:298
 msgid "Edit Layouts"
@@ -345,7 +345,7 @@ msgstr ""
 
 #: dist/prefs.js:289
 msgid "Raise tiled windows together: limit to current display"
-msgstr ""
+msgstr "Apri tutte le fineste assieme: limite al display attuale"
 
 #: dist/prefs.js:291
 msgid ""
@@ -361,7 +361,9 @@ msgstr "Sincronizza layout tra più workspace"
 msgid ""
 "When a layout is selected, apply it to all workspaces instead of just the "
 "active one"
-msgstr "Quando viene selezionato un layout, applica il layout a tutti i workspace e non solo a quello attivo"
+msgstr ""
+"Quando viene selezionato un layout, applica il layout a tutti i workspace e "
+"non solo a quello attivo"
 
 #: dist/prefs.js:309
 msgid "Screen Edges"
@@ -579,7 +581,7 @@ msgstr "Sgancia la finestra selezionata"
 
 #: dist/prefs.js:636
 msgid "Untile all windows from current workspace"
-msgstr ""
+msgstr "Sgancia tutte le finestre nel workspace corrente"
 
 #: dist/prefs.js:644
 msgid "Move window to the center"
