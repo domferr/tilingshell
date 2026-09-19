@@ -2,13 +2,13 @@
 
 [![release](https://img.shields.io/badge/Release_v16-blue?style=for-the-badge)]([https://ko-fi.com/domferr](https://github.com/domferr/tilingshell/releases))
 ![](https://img.shields.io/github/license/domferr/tilingshell?style=for-the-badge)
-![](https://img.shields.io/badge/GNOME-42--50-e04196?style=for-the-badge&logo=gnome&logoColor=white)
+![](https://img.shields.io/badge/GNOME-42--51-e04196?style=for-the-badge&logo=gnome&logoColor=white)
 [![kofi](https://img.shields.io/badge/Donate_on_Ko--fi-purple?logo=ko-fi&style=for-the-badge)](https://ko-fi.com/domferr)
 [![patreon](https://img.shields.io/badge/Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white)](https://patreon.com/domferr)
 
 # Tiling Shell #
 
-This is a Gnome Shell extension implementing modern windows tiling system by extending GNOME's default 2 columns to any layout you want! Can be installed on Gnome Shells from **42 to 50** on X11 and Wayland: the most recent GNOME Shell is supported, and older releases will include all the features and bug fixes!
+This is a Gnome Shell extension implementing modern windows tiling system by extending GNOME's default 2 columns to any layout you want! Can be installed on Gnome Shells from **42 to 51** on X11 and Wayland: the most recent GNOME Shell is supported, and older releases will include all the features and bug fixes!
 
 - 🤩 First and only extension that provides Windows 11's **snap assistant**
 - 🖥️🖥️ **multiple monitors support**, even with different scaling factors!
