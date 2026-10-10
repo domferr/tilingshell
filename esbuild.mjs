@@ -5,7 +5,7 @@ import fsSync from 'fs';
 import path from 'path';
 import { glob } from 'glob';
 import parser from '@babel/parser';
-import types from '@babel/types';
+import * as  types from '@babel/types';
 import traverseBabel from '@babel/traverse';
 import generatorBabel from '@babel/generator';
 import { ESLint } from "eslint";
