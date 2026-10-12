@@ -65,9 +65,7 @@ export default class Slider extends St.Button {
             Math.round(y - this.height / 2),
         );
 
-        this.connect('notify::hover', () =>
-            global.display.set_cursor(this.preferredCursor),
-        );
+        this.connect('notify::hover', () => this._setPreferredCursor());
         this.connect('destroy', this._onDestroy.bind(this));
     }
 
@@ -99,6 +97,23 @@ export default class Slider extends St.Button {
                 ? horizCursor
                 : vertCursor
             : Meta.Cursor.DEFAULT;
+    }
+
+    private _setPreferredCursor(): void {
+        if ('set_cursor_type' in this) {
+            // @ts-expect-error "CursorType is available on GNOME 51+"
+            const CursorType = Clutter.CursorType;
+            const cursor =
+                this.hover || this._dragging
+                    ? this._horizontalDir
+                        ? CursorType.W_RESIZE
+                        : CursorType.N_RESIZE
+                    : CursorType.DEFAULT;
+            // @ts-expect-error "set_cursor_type is available on GNOME 51+"
+            this.set_cursor_type(cursor);
+        } else {
+            global.display.set_cursor(this.preferredCursor);
+        }
     }
 
     public addTile(tile: EditableTilePreview) {
@@ -325,7 +340,7 @@ export default class Slider extends St.Button {
         if (this._dragging) return Clutter.EVENT_PROPAGATE;
 
         this._dragging = true;
-        global.display.set_cursor(this.preferredCursor);
+        this._setPreferredCursor();
 
         this._grab = global.stage.grab(this);
 
@@ -344,7 +359,7 @@ export default class Slider extends St.Button {
             this._dragging = false;
             this._lastEventCoord = null;
         }
-        global.display.set_cursor(this.preferredCursor);
+        this._setPreferredCursor();
         return Clutter.EVENT_STOP;
     }
 
