@@ -1,14 +1,13 @@
 # pkly @github <>, 2025.
 # Adam Lewicki <a.lewick95@gmail.com>, 2025.
-# Rafał Widło <rafal.widlo@gmail.com>, 2026.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Tiling Shell\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-19 20:46+0200\n"
-"PO-Revision-Date: 2026-08-07 17:02+0200\n"
-"Last-Translator: Rafał Widło <rafal.widlo@gmail.com>\n"
+"POT-Creation-Date: 2026-10-13 19:24+0200\n"
+"PO-Revision-Date: 2026-10-13 19:30+0200\n"
+"Last-Translator: Adam Lewicki <a.lewick95@gmail.com>\n"
 "Language-Team: Polish\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -16,257 +15,760 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2);\n"
-"X-Generator: Poedit 3.8\n"
+"X-Generator: Poedit 3.9\n"
 
-#: dist/components/altTab/MultipleWindowsIcon.js:42
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:7
+msgid "Last version installed"
+msgstr "Ostatnia zainstalowana wersja"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:8
+msgid "Last version installed of this extension."
+msgstr "Ostatnia wersja tego rozszerzenia."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:12
+msgid "Enable tiling system"
+msgstr "Włącz system układania okien"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:13
+msgid "Hold CTRL while moving a window to tile it."
+msgstr "Przytrzymaj klawisz CTRL podczas przesuwania okna, aby je ułożyć."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:17
+msgid "Tiling system activation key"
+msgstr "Klawisz aktywacji systemu układania okien"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:18
+msgid "Which key to hold while moving a window to activate the tiling system."
+msgstr ""
+"Klawisz do przytrzymania podczas przesuwania okna, aby włączyć system "
+"układania okien."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:22
+msgid "Tiling system deactivation key"
+msgstr "Klawisz deaktywacji systemu układania okien"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:23
+msgid ""
+"Which key to hold while moving a window to deactivate the tiling system."
+msgstr ""
+"Klawisz do przytrzymania podczas przesuwania okna, aby wyłączyć system "
+"układania okien."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:27
+msgid "Enable snap assist"
+msgstr "Włącz Asystenta przyciągania"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:28
+msgid "Move the window on top of the screen to snap assist it."
+msgstr ""
+"Przesuń okno na górną krawędź ekranu, aby wywołać Asystenta przyciągania."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:32
+#: src/prefs.ts:224
+msgid "Sync layout when tiling with Snap Assistant"
+msgstr "Synchronizuj układ podczas układania za pomocą Asystenta przyciągania"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:33
+msgid ""
+"Change the desktop layout to match the layout used when tiling a window with "
+"Snap Assistant."
+msgstr ""
+"Zmień układ pulpitu tak, aby odpowiadał układowi używanemu podczas układania "
+"okna za pomocą Asystenta przyciągania."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:37
+msgid "Shows indicator"
+msgstr "Pokaż wskaźnik"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:38
+msgid "Shows an indicator on top panel."
+msgstr "Wyświetla wskaźnik na górnym panelu."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:42
+#: src/prefs.ts:89
+msgid "Inner gaps"
+msgstr "Przerwy wewnętrzne"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:43
+msgid "Internal gaps between tiles in a layout."
+msgstr "Wewnętrzne przerwy między kafelkami w układzie."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:47
+#: src/prefs.ts:96
+msgid "Outer gaps"
+msgstr "Przerwy zewnętrzne"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:48
+msgid "External gaps between the layout and the monitor borders."
+msgstr "Zewnętrzne przerwy między układem a granicami monitora."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:52
+#: src/prefs.ts:261
+msgid "Span multiple tiles"
+msgstr "Rozciągnij na wiele kafelków"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:53
+msgid "Hold ALT to span multiple tiles."
+msgstr "Przytrzymaj klawisz ALT, aby rozciągnąć na wiele kafelków."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:57
+msgid "Key to span multiple tiles"
+msgstr "Klawisz do rozciągania na wiele kafelków"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:58
+msgid "Which key to hold to span multiple tiles."
+msgstr "Klawisz do przytrzymania, aby rozciągnąć na wiele kafelków."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:62
+#: src/prefs.ts:458
+msgid "Layouts"
+msgstr "Układy"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:63
+msgid "The layouts available to the tiling managers and the snap assist."
+msgstr "Układy dostępne dla menedżerów układania i Asystenta przyciągania."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:67
+msgid "Selected layouts"
+msgstr "Wybrane układy"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:68
+msgid "Each monitor's active layout used by the monitor tiling manager."
+msgstr ""
+"Aktywny układ każdego monitora używany przez menedżera układania monitora."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:72
+#: src/prefs.ts:289
+msgid "Restore window size"
+msgstr "Przywróć rozmiar okna"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:73
+msgid "Restore the windows to their original size when untiled."
+msgstr "Przywracaj okna do ich oryginalnego rozmiaru po usunięciu z układu."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:77
+#: src/prefs.ts:867
+msgid "Enable next/previous window focus to wrap around"
+msgstr "Włącz zawijanie aktywnego okna do następnego/poprzedniego"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:78
+#: src/prefs.ts:869
+msgid "When focusing next or previous window, wrap around at the window edge"
+msgstr ""
+"Podczas przełączania na następne lub poprzednie aktywne okno, zawijaj po "
+"osiągnięciu krawędzi okien"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:82
+#: src/prefs.ts:876
+msgid "Restrict directional focus to tiled windows"
+msgstr "Ogranicz nawigację kierunkową do ułożonych okien"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:83
+#: src/prefs.ts:878
+msgid "When using directional focus navigation, only consider tiled windows"
+msgstr ""
+"Podczas korzystania z nawigacji kierunkowej uwzględniaj tylko ułożone okna"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:87
+#: src/prefs.ts:280
+msgid "Enable auto-resize of the complementing tiled windows"
+msgstr "Włącz automatyczną zmianę rozmiaru sąsiednich ułożonych okien"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:88
+msgid ""
+"When a tiled window is resized, auto-resize the other tiled windows near it."
+msgstr ""
+"Gdy rozmiar ułożonego okna jest zmieniany, automatycznie zmień rozmiar "
+"sąsiednich ułożonych okien."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:92
+msgid "Enable Snap Assistant blur"
+msgstr "Włącz rozmycie asystenta przyciągania"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:93
+msgid "Blur snap assistant"
+msgstr "Rozmycie Asystenta przyciągania"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:97
+msgid "Enable selected tile preview blur"
+msgstr "Włącz rozmycie podglądu wybranego kafelka"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:98
+msgid "Blur selected tile previews"
+msgstr "Rozmyj podglądy wybranych kafelków"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:102
+msgid "Enable keybindings"
+msgstr "Włącz skróty klawiszowe"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:103
+msgid "Move focused window through tiles by using keybindings."
+msgstr "Przenieś aktywne okno przez kafelki, używając skrótów klawiszowych."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:107
+msgid "Enable auto tiling"
+msgstr "Włącz automatyczne układanie"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:108
+msgid ""
+"Automatically tile a new window to the best tile according to the current "
+"layout."
+msgstr ""
+"Automatycznie układaj nowe okno do najlepszego kafelka zgodnie z bieżącym "
+"układem."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:112
+#: src/prefs.ts:316
+msgid "Raise tiled windows together"
+msgstr "Podnoś ułożone okna razem"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:113
+msgid ""
+"When one tiled window is raised, raise all tiled windows into the foreground "
+"together."
+msgstr ""
+"Gdy jedno ułożone okno zostanie przeniesione na wierzch, przenieś na wierzch "
+"wszystkie ułożone okna jednocześnie."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:117
+msgid "Raise tiled windows on current display only"
+msgstr "Podnoś ułożone okna tylko na bieżącym ekranie"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:118
+msgid ""
+"When raising tiled windows together, only raise tiled windows on the same "
+"display as the window being raised."
+msgstr ""
+"Podczas jednoczesnego podnoszenia ułożonych okien, podnoś tylko te, które "
+"znajdują się na tym samym ekranie, co podnoszone okno."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:122
+msgid "Overridden settings"
+msgstr "Nadpisane ustawienia"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:123
+msgid "The settings that are overridden and their old value."
+msgstr "Ustawienia, które są nadpisane, oraz ich stara wartość."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:127
+msgid "Active Screen Edges"
+msgstr "Aktywne krawędzie ekranu"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:128
+msgid ""
+"Drag windows against the top, left and right screen edges to resize them."
+msgstr ""
+"Przeciągnij okna do górnej, lewej lub prawej krawędzi ekranu, aby zmienić "
+"ich rozmiar."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:132
+msgid "Drag agains top edge to maximize window"
+msgstr "Przeciągnij do górnej krawędzi, aby zmaksymalizować okno"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:133
+#: src/prefs.ts:366
+msgid "Drag windows against the top edge to maximize them"
+msgstr "Przeciągnij okna do górnej krawędzi, aby je zmaksymalizować"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:137
+#: src/prefs.ts:298
+msgid "Add snap assistant and auto-tile buttons to window menu"
+msgstr ""
+"Dodaj przyciski Asystenta przyciągania i automatycznego układania do menu "
+"okna"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:138
+msgid ""
+"Add snap assistant and auto-tile buttons in the menu that shows up when you "
+"right click on a window title."
+msgstr ""
+"Dodaj przyciski Asystenta przyciągania i automatycznego układania do menu "
+"wyświetlanego po kliknięciu prawym przyciskiem myszy na pasku tytułu okna."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:142
+msgid "Add tiled windows group to alt+tab menu"
+msgstr "Dodaj grupę ułożonych okien do menu ALT+TAB"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:143
+msgid ""
+"Add the tiled windows to the alt+tab menu to open all the tiled windows at "
+"once"
+msgstr ""
+"Dodaj ułożone okna do menu ALT+TAB, aby otworzyć wszystkie ułożone okna "
+"jednocześnie"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:147
+#: src/prefs.ts:111
+msgid "Snap Assistant threshold"
+msgstr "Progi Asystenta przyciągania"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:148
+msgid "Snap Assistant's threshold to enlarge, shrink, open and close it."
+msgstr ""
+"Progi Asystenta przyciągania do powiększania, pomniejszania, otwierania i "
+"zamykania."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:152
+msgid "Quarter tiling threshold"
+msgstr "Próg aktywacji ćwiartkowego układania"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:153
+msgid "Threshold to trigger quarter tiling."
+msgstr "Próg aktywacji ćwiartkowego układania."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:157
+#: src/prefs.ts:394
+msgid "Edge tiling offset"
+msgstr "Przesunięcie krawędzi układania"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:158
+msgid "Offset to trigger edge tiling (left and right edge)."
+msgstr ""
+"Przesunięcie do aktywacji układania krawędziowego (lewa i prawa krawędź)."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:162
+msgid "Enable window border"
+msgstr "Włącz obramowanie okna"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:163
+msgid "Show a border around focused window."
+msgstr "Pokaż obramowanie wokół aktywnego okna."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:167
+msgid "Focused window border color"
+msgstr "Kolor obramowania aktywnego okna"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:168
+msgid "The color of the focused window's border."
+msgstr "Kolor obramowania aktywnego okna."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:172
+msgid "Use custom color"
+msgstr "Użyj własnego koloru"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:173
+msgid "Use the color defined here for the focused window's border."
+msgstr "Użyj zdefiniowanego tutaj koloru dla obramowania aktywnego okna."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:177
+msgid "Focused window border width"
+msgstr "Szerokość obramowania aktywnego okna"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:178
+msgid "The width of the focused window's border."
+msgstr "Szerokość obramowania aktywnego okna."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:182
+msgid "Enable smart window border radius"
+msgstr "Włącz inteligentny promień obramowania okna"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:183
+msgid "Dinamically adapt to the window's border radius."
+msgstr "Dynamicznie dopasowuj do rzeczywistego promienia obramowania okna."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:187
+msgid "Snap assistant animation time (milliseconds)"
+msgstr "Czas trwania animacji Asystenta przyciągania (w milisekundach)"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:188
+msgid "Animation time in milliseconds of the snap assistant"
+msgstr "Czas trwania animacji Asystenta przyciągania w milisekundach"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:192
+msgid "Tile animation time (milliseconds)"
+msgstr "Czas trwania animacji kafelka (w milisekundach)"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:193
+msgid "Animation time in milliseconds of the tiles"
+msgstr "Czas trwania animacji kafelków w milisekundach"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:197
+#: src/prefs.ts:429
+msgid "Enable window suggestions for the tiling system"
+msgstr "Włącz podpowiedzi okien dla systemu układania"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:198
+msgid ""
+"Provides smart suggestions to fill empty tiles when using the tiling system."
+msgstr ""
+"Wyświetlaj inteligentne podpowiedzi wypełniania pustych kafelków podczas "
+"korzystania z systemu układania."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:202
+#: src/prefs.ts:438
+msgid "Enable window suggestions for the snap assistant"
+msgstr "Włącz podpowiedzi okien dla Asystenta przyciągania"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:203
+msgid ""
+"Offers suggestions to populate empty tiles when using the snap assistant."
+msgstr ""
+"Wyświetlaj podpowiedzi wypełniania pustych kafelków podczas korzystania z "
+"Asystenta przyciągania."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:207
+#: src/prefs.ts:447
+msgid "Enable window suggestions for screen edge tiling"
+msgstr "Włącz podpowiedzi okien dla układania przy krawędziach ekranu"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:208
+msgid "Suggests windows to occupy empty tiles when tiling to screen edges."
+msgstr ""
+"Sugeruje okna do zajęcia pustych kafelków podczas układania przy krawędziach "
+"ekranu."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:212
+msgid "Edge tiling behavior"
+msgstr "Zachowanie układania przy krawędziach"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:213
+msgid ""
+"Controls how windows snap to screen edges:\\n'default' (corners snap to "
+"quarters, edges to halves),\\n'adaptive' (snap to layout tiles by column),"
+"\\n'granular' (snap to exact tile under cursor)."
+msgstr ""
+"Steruje sposobem przyciągania okien do krawędzi ekranu:\\n'default' (rogi do "
+"ćwiartek, krawędzie do połówek),\\n'adaptive' (przyciągaj do kafelków układu "
+"kolumnami),\\n'granular' (przyciągaj do dokładnego kafelka pod kursor)."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:218
+#: src/prefs.ts:339
+msgid "Sync layout across workspaces"
+msgstr "Synchronizuj układ między obszarami roboczymi"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:219
+msgid ""
+"When a layout is selected, apply it to all workspaces instead of just the "
+"active one."
+msgstr ""
+"Gdy wybrano układ, zastosuj go do wszystkich obszarów roboczych zamiast "
+"tylko do aktywnego."
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:225
+msgid "Move focused window to the tile to its right"
+msgstr "Przenieś aktywne okno do kafelka po prawej"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:229
+msgid "Move focused window to the tile to its left"
+msgstr "Przenieś aktywne okno do kafelka po lewej"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:233
+msgid "Move focused window to the tile above"
+msgstr "Przenieś aktywne okno do kafelka powyżej"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:237
+msgid "Move focused window to the tile below"
+msgstr "Przenieś aktywne okno do kafelka poniżej"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:241
+msgid "Span focused window to the tile to its right"
+msgstr "Rozciągnij aktywne okno na kafelek po prawej"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:245
+msgid "Span focused window to the tile to its left"
+msgstr "Rozciągnij aktywne okno na kafelek po lewej"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:249
+msgid "Span focused window to the tile above"
+msgstr "Rozciągnij aktywne okno na kafelek powyżej"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:253
+msgid "Span focused window to the tile below"
+msgstr "Rozciągnij aktywne okno na kafelek poniżej"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:257
+msgid "Resize the focused window to span all tiles"
+msgstr "Rozciągnij aktywne okno na wszystkie kafelki"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:261
+msgid "Untile the focused window"
+msgstr "Usuń aktywne okno z układu"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:265
+#: src/prefs.ts:705
+msgid "Untile all windows from current workspace"
+msgstr "Usuń wszystkie okna z układu na bieżącym obszarze roboczym"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:269
+#: src/prefs.ts:713
+msgid "Move the focused window to the center of the screen"
+msgstr "Przenieś aktywne okno na środek ekranu"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:273
+msgid "Focus the window to the right the current focused window"
+msgstr "Aktywuj okno po prawej od bieżącego aktywnego okna"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:277
+#: src/prefs.ts:729
+msgid "Focus the window to the left of the current focused window"
+msgstr "Aktywuj okno po lewej stronie od aktualnie aktywnego okna"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:281
+#: src/prefs.ts:736
+msgid "Focus the window above the current focused window"
+msgstr "Aktywuj okno powyżej aktualnie aktywnego okna"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:285
+#: src/prefs.ts:743
+msgid "Focus the window below the current focused window"
+msgstr "Aktywuj okno poniżej aktualnie aktywnego okna"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:289
+#: src/prefs.ts:750
+msgid "Focus the window next to the current focused window"
+msgstr "Aktywuj następne okno obok aktualnie aktywnego"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:293
+#: src/prefs.ts:757
+msgid "Focus the window prior to the current focused window"
+msgstr "Aktywuj poprzednie okno obok aktualnie aktywnego"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:297
+#: src/prefs.ts:765
+msgid "Minimize all the other windows and show only the focused window"
+msgstr "Zminimalizuj wszystkie inne okna i pokaż tylko aktywne okno"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:301
+#: src/prefs.ts:773
+msgid "Cycle through available workspace layouts"
+msgstr "Przełączaj dostępne układy obszaru roboczego"
+
+#: resources/schemas/org.gnome.shell.extensions.tilingshell.gschema.xml:305
+msgid "Cycle backwards through available workspace layouts"
+msgstr "Przełączaj wstecz dostępne układy obszaru roboczego"
+
+#: src/components/altTab/MultipleWindowsIcon.ts:58
 msgid "Tiled windows"
 msgstr "Ułożone okna"
 
-#: dist/components/editor/editorDialog.js:36
+#: src/components/editor/editorDialog.ts:52
 msgid "Select the layout to edit"
 msgstr "Wybierz układ do edycji"
 
-#: dist/components/editor/editorDialog.js:90
+#: src/components/editor/editorDialog.ts:121
 msgid "Close"
 msgstr "Zamknij"
 
-#: dist/components/editor/editorDialog.js:117
+#: src/components/editor/editorDialog.ts:150
 msgid "to split a tile"
 msgstr "aby podzielić kafelek"
 
-#: dist/components/editor/editorDialog.js:156
+#: src/components/editor/editorDialog.ts:191
 msgid "to split a tile vertically"
 msgstr "aby podzielić kafelek pionowo"
 
-#: dist/components/editor/editorDialog.js:176
+#: src/components/editor/editorDialog.ts:213
 msgid "to delete a tile"
 msgstr "aby usunąć kafelek"
 
-#: dist/components/editor/editorDialog.js:200
+#: src/components/editor/editorDialog.ts:239
 msgid "use the indicator button to save or cancel"
 msgstr "użyj przycisku wskaźnika, aby zapisać lub anulować"
 
-#: dist/components/editor/editorDialog.js:218
+#: src/components/editor/editorDialog.ts:259
 msgid "How to use the editor"
 msgstr "Jak używać edytora"
 
-#: dist/components/editor/editorDialog.js:227
+#: src/components/editor/editorDialog.ts:269
 msgid "Start editing"
-msgstr "Rozpocznij edycję"
+msgstr "Rozpocznij edycje"
 
-#: dist/components/window_menu/overriddenWindowMenu.js:120
+#: src/components/window_menu/overriddenWindowMenu.ts:169
 msgid "Move to best tile"
-msgstr "Przesuń do najlepszego kafelka"
+msgstr "Przenieś do najlepszego kafelka"
 
-#: dist/components/window_menu/overriddenWindowMenu.js:140
+#: src/components/window_menu/overriddenWindowMenu.ts:191
 msgid "Move to leftmost tile"
-msgstr "Przesuń do kafelka najbardziej po lewej"
+msgstr "Przenieś do skrajnego kafelka po lewej"
 
-#: dist/components/window_menu/overriddenWindowMenu.js:159
+#: src/components/window_menu/overriddenWindowMenu.ts:214
 msgid "Move to rightmost tile"
-msgstr "Przesuń do kafelka najbardziej po prawej"
+msgstr "Przenieś do skrajnego kafelka po prawej"
 
-#: dist/indicator/defaultMenu.js:43
+#: src/indicator/defaultMenu.ts:65
 msgid "Monitor"
-msgstr ""
+msgstr "Monitor"
 
-#: dist/indicator/defaultMenu.js:298
+#: src/indicator/defaultMenu.ts:383
 msgid "Edit Layouts"
 msgstr "Edytuj układy"
 
-#: dist/indicator/defaultMenu.js:308
+#: src/indicator/defaultMenu.ts:392
 msgid "New Layout"
 msgstr "Nowy układ"
 
-#: dist/indicator/editingMenu.js:19
+#: src/indicator/editingMenu.ts:24
 msgid "Menu"
 msgstr "Menu"
 
-#: dist/indicator/editingMenu.js:26
+#: src/indicator/editingMenu.ts:32
 msgid "Info"
 msgstr "Info"
 
-#: dist/indicator/editingMenu.js:33 dist/prefs.js:425 dist/prefs.js:821
+#: src/indicator/editingMenu.ts:40 src/prefs.ts:480 src/prefs.ts:901
 msgid "Save"
 msgstr "Zapisz"
 
-#: dist/indicator/editingMenu.js:43 dist/prefs.js:426 dist/prefs.js:480
-#: dist/prefs.js:822 dist/prefs.js:877
+#: src/indicator/editingMenu.ts:51 src/prefs.ts:481 src/prefs.ts:538
+#: src/prefs.ts:902 src/prefs.ts:961
 msgid "Cancel"
 msgstr "Anuluj"
 
-#: dist/prefs.js:59
+#: src/prefs.ts:69
 msgid "General"
 msgstr "Ogólne"
 
-#: dist/prefs.js:64
+#: src/prefs.ts:76
 msgid "Appearance"
 msgstr "Wygląd"
 
-#: dist/prefs.js:65
+#: src/prefs.ts:77
 msgid "Configure the appearance of Tiling Shell"
 msgstr "Skonfiguruj wygląd Układania okien"
 
-#: dist/prefs.js:70
+#: src/prefs.ts:83
 msgid "Show Indicator"
 msgstr "Pokaż wskaźnik"
 
-#: dist/prefs.js:71
+#: src/prefs.ts:84
 msgid "Whether to show the panel indicator"
 msgstr "Pokazywanie ikony wskaźnika na panelu"
 
-#: dist/prefs.js:76
-msgid "Inner gaps"
-msgstr "Wewnętrzne przerwy"
-
-#: dist/prefs.js:77
+#: src/prefs.ts:90
 msgid "Gaps between windows"
 msgstr "Przerwy między oknami"
 
-#: dist/prefs.js:82
-msgid "Outer gaps"
-msgstr ""
-
-#: dist/prefs.js:83
+#: src/prefs.ts:97
 msgid "Gaps between a window and the monitor borders"
 msgstr "Przerwy pomiędzy oknami i granicami monitora"
 
-#: dist/prefs.js:87
+#: src/prefs.ts:102
 msgid "Blur (experimental feature)"
 msgstr "Rozmycie (funkcja eksperymentalna)"
 
-#: dist/prefs.js:89
+#: src/prefs.ts:104
 msgid "Apply blur effect to Snap Assistant and tile previews"
 msgstr "Zastosuj efekt rozmycia do Asystenta przyciągania i podglądów kafelków"
 
-#: dist/prefs.js:95
-msgid "Snap Assistant threshold"
-msgstr ""
-
-#: dist/prefs.js:97
+#: src/prefs.ts:113
 msgid "Minimum distance from the Snap Assistant to the pointer to open it"
 msgstr ""
-"Minimalna odległość od wskaźnika, przy której otwiera się Asystent "
-"przyciągania"
+"Minimalna odległość otwarcia względem wskaźnika od Asystenta przyciągania"
 
-#: dist/prefs.js:106
+#: src/prefs.ts:123
 msgid "Snap Assistant"
 msgstr "Asystent przyciągania"
 
-#: dist/prefs.js:107
+#: src/prefs.ts:124
 msgid "Apply blur effect to Snap Assistant"
 msgstr "Zastosuj efekt rozmycia do Asystenta przyciągania"
 
-#: dist/prefs.js:113
+#: src/prefs.ts:130
 msgid "Selected tile preview"
-msgstr "Podgląd wybranego kafelka"
+msgstr "Podgląd kafelka"
 
-#: dist/prefs.js:114
+#: src/prefs.ts:131
 msgid "Apply blur effect to selected tile preview"
-msgstr "Zastosuj efekt rozmycia do podglądu wybranego kafelka"
+msgstr "Zastosuj efekt rozmycia do zaznaczonej strefy"
 
-#: dist/prefs.js:118
+#: src/prefs.ts:136
 msgid "Window border"
 msgstr "Obramowanie okna"
 
-#: dist/prefs.js:119 dist/prefs.js:126
+#: src/prefs.ts:137 src/prefs.ts:144
 msgid "Show a border around focused window"
 msgstr "Pokaż obramowanie wokół aktywnego okna"
 
-#: dist/prefs.js:125
+#: src/prefs.ts:143
 msgid "Enable"
 msgstr "Włącz"
 
-#: dist/prefs.js:132
+#: src/prefs.ts:150
 msgid "Smart border radius"
 msgstr "Inteligentny promień obramowania"
 
-#: dist/prefs.js:133
+#: src/prefs.ts:151
 msgid "Dynamically adapt to the window's actual border radius"
-msgstr "Dostosuj dynamicznie do rzeczywistego promienia obramowania okna"
+msgstr "Dynamicznie dopasowuj do rzeczywistego promienia obramowania okna"
 
-#: dist/prefs.js:139
+#: src/prefs.ts:157
 msgid "Width"
 msgstr "Szerokość"
 
-#: dist/prefs.js:140
+#: src/prefs.ts:158
 msgid "The size of the border"
 msgstr "Rozmiar obramowania"
 
-#: dist/prefs.js:149
+#: src/prefs.ts:167
 msgid "Border color"
 msgstr "Kolor obramowania"
 
-#: dist/prefs.js:150
+#: src/prefs.ts:168
 msgid "Choose the color of the border"
-msgstr "Wybierz kolor obramowania"
+msgstr "Wybiera kolor obramowania"
 
-#: dist/prefs.js:166
+#: src/prefs.ts:185
 msgid "Animations"
 msgstr "Animacje"
 
-#: dist/prefs.js:167
+#: src/prefs.ts:186
 msgid "Customize animations"
 msgstr "Dostosuj animacje"
 
-#: dist/prefs.js:173
+#: src/prefs.ts:192
 msgid "Snap assistant animation time"
 msgstr "Czas trwania animacji Asystenta przyciągania"
 
-#: dist/prefs.js:174
+#: src/prefs.ts:193
 msgid "The snap assistant animation time in milliseconds"
 msgstr "Czas trwania animacji Asystenta przyciągania w milisekundach"
 
-#: dist/prefs.js:182
+#: src/prefs.ts:201
 msgid "Tiles animation time"
 msgstr "Czas animacji"
 
-#: dist/prefs.js:183
+#: src/prefs.ts:202
 msgid "The tiles animation time in milliseconds"
 msgstr "Czas trwania animacji kafelków w milisekundach"
 
-#: dist/prefs.js:189
+#: src/prefs.ts:210
 msgid "Behaviour"
 msgstr "Zachowanie"
 
-#: dist/prefs.js:190
+#: src/prefs.ts:211
 msgid "Configure the behaviour of Tiling Shell"
 msgstr "Skonfiguruj zachowanie Układania okien"
 
-#: dist/prefs.js:195
+#: src/prefs.ts:217
 msgid "Enable Snap Assistant"
 msgstr "Włącz Asystenta przyciągania"
 
-#: dist/prefs.js:196
+#: src/prefs.ts:218
 msgid "Move the window on top of the screen to snap assist it"
 msgstr ""
 "Przesuń okno na górną krawędź ekranu, aby wywołać Asystenta przyciągania"
 
-#: dist/prefs.js:201
-msgid "Sync layout when tiling with Snap Assistant"
-msgstr "Synchronizuj układ przy układaniu za pomocą Asystenta przyciągania"
-
-#: dist/prefs.js:203
+#: src/prefs.ts:226
 msgid ""
 "Change the active layout to match the layout used when tiling a window with "
 "Snap Assistant"
 msgstr ""
-"Zmieniaj aktywny układ tak, aby odpowiadał układowi używanemu przy układaniu "
-"okna przy pomocy Asystenta przyciągania"
+"Zmień aktywny układ tak, aby odpowiadał układowi używanemu podczas układania "
+"okna za pomocą Asystenta przyciągania"
 
-#: dist/prefs.js:214
+#: src/prefs.ts:238
 msgid "Enable Tiling System"
 msgstr "Włącz system układania okien"
 
-#: dist/prefs.js:215
+#: src/prefs.ts:239
 msgid "Hold the activation key while moving a window to tile it"
 msgstr "Przytrzymaj klawisz aktywacji podczas przesuwania okna, aby je ułożyć"
 
-#: dist/prefs.js:223
+#: src/prefs.ts:249
 msgid "Tiling System deactivation key"
 msgstr "Klawisz deaktywacji systemu układania okien"
 
-#: dist/prefs.js:225
+#: src/prefs.ts:251
 msgid ""
 "Hold the deactivation key while moving a window to deactivate the tiling "
 "system"
@@ -274,46 +776,30 @@ msgstr ""
 "Przytrzymaj klawisz deaktywacji podczas przesuwania okna, aby wyłączyć "
 "system układania okien"
 
-#: dist/prefs.js:233
-msgid "Span multiple tiles"
-msgstr ""
-
-#: dist/prefs.js:234
+#: src/prefs.ts:262
 msgid "Hold the activation key to span multiple tiles"
 msgstr "Przytrzymaj klawisz aktywacji, aby rozciągnąć na wiele kafelków"
 
-#: dist/prefs.js:243
+#: src/prefs.ts:273
 msgid "Enable Auto Tiling"
 msgstr "Włącz automatyczne układanie"
 
-#: dist/prefs.js:244
+#: src/prefs.ts:274
 msgid "Automatically tile new windows to the best tile"
 msgstr "Automatycznie układaj nowe okna do najlepszego kafelka"
 
-#: dist/prefs.js:249
-msgid "Enable auto-resize of the complementing tiled windows"
-msgstr ""
-
-#: dist/prefs.js:251
+#: src/prefs.ts:282
 msgid ""
 "When a tiled window is resized, auto-resize the other tiled windows near it"
 msgstr ""
 "Gdy rozmiar ułożonego okna jest zmieniany, automatycznie zmień rozmiar "
 "sąsiednich ułożonych okien"
 
-#: dist/prefs.js:257
-msgid "Restore window size"
-msgstr ""
-
-#: dist/prefs.js:259
+#: src/prefs.ts:291
 msgid "Whether to restore the windows to their original size when untiled"
 msgstr "Przywracaj okna do ich oryginalnego rozmiaru po usunięciu z układu"
 
-#: dist/prefs.js:265
-msgid "Add snap assistant and auto-tile buttons to window menu"
-msgstr ""
-
-#: dist/prefs.js:267
+#: src/prefs.ts:300
 msgid ""
 "Add snap assistant and auto-tile buttons in the menu that shows up when you "
 "right click on a window title"
@@ -321,774 +807,391 @@ msgstr ""
 "Dodaj przyciski Asystenta przyciągania i automatycznego układania do menu "
 "wyświetlanego po kliknięciu prawym przyciskiem myszy na pasku tytułu okna"
 
-#: dist/prefs.js:273
+#: src/prefs.ts:307
 msgid "Add tiled windows to ALT+TAB menu"
 msgstr "Dodaj ułożone okna do menu ALT+TAB"
 
-#: dist/prefs.js:275
+#: src/prefs.ts:309
 msgid ""
 "Add the tiled windows to the ALT+TAB menu to open all the tiled windows at "
 "once"
 msgstr ""
 "Dodaj ułożone okna do menu ALT+TAB, aby otworzyć je wszystkie jednocześnie"
 
-#: dist/prefs.js:281
-msgid "Raise tiled windows together"
-msgstr "Podnieś jednocześnie wszystkie ułożone okna"
-
-#: dist/prefs.js:283
+#: src/prefs.ts:318
 msgid ""
 "When one tiled window is raised, raise all tiled windows into the foreground "
 "together"
 msgstr ""
-"Gdy jedno ułożone okno zostanie podniesione, wszystkie ułożone okna zostaną "
-"podniesione wraz z nim"
+"Gdy jedno ułożone okno zostanie przeniesione na wierzch, przenieś na wierzch "
+"wszystkie ułożone okna jednocześnie"
 
-#: dist/prefs.js:289
+#: src/prefs.ts:325
 msgid "Raise tiled windows together: limit to current display"
-msgstr "Podnieś jednocześnie ułożone okna: ogranicz do bieżącego ekranu"
+msgstr "Podnoś ułożone okna razem: ogranicz do bieżącego ekranu"
 
-#: dist/prefs.js:291
+#: src/prefs.ts:327
 msgid ""
 "When raising tiled windows together, only raise tiled windows on the same "
 "display as the window being raised"
 msgstr ""
-"Gdy podnosisz jednocześnie ułożone okna, podnoś tylko te na tym samym "
-"ekranie co podnoszone okno"
+"Podczas jednoczesnego podnoszenia ułożonych okien, podnoś tylko te "
+"znajdujące się na tym samym ekranie, co podnoszone okno"
 
-#: dist/prefs.js:302
-msgid "Sync layout across workspaces"
-msgstr "Synchronizuj układ w obszarach roboczych"
-
-#: dist/prefs.js:304
+#: src/prefs.ts:341
 msgid ""
 "When a layout is selected, apply it to all workspaces instead of just the "
 "active one"
 msgstr ""
-"Gdy układ zostanie wybrany, zastosuj go we wszystkich obszarach roboczych "
-"zamiast tylko w aktywnym"
+"Gdy wybrano układ, zastosuj go do wszystkich obszarów roboczych zamiast "
+"tylko do aktywnego"
 
-#: dist/prefs.js:309
+#: src/prefs.ts:348
 msgid "Screen Edges"
 msgstr "Krawędzie ekranu"
 
-#: dist/prefs.js:311
+#: src/prefs.ts:350
 msgid ""
 "Drag windows against the top, left and right screen edges to resize them"
 msgstr ""
 "Przeciągnij okna do górnej, lewej lub prawej krawędzi ekranu, aby zmienić "
 "ich rozmiar"
 
-#: dist/prefs.js:325
+#: src/prefs.ts:365
 msgid "Drag against top edge to maximize window"
 msgstr "Przeciągnij do górnej krawędzi, aby zmaksymalizować okno"
 
-#: dist/prefs.js:326
-msgid "Drag windows against the top edge to maximize them"
-msgstr "Przeciągnij okna do górnej krawędzi, aby je zmaksymalizować"
-
-#: dist/prefs.js:335
+#: src/prefs.ts:376
 msgid "Quarter tiling activation area"
 msgstr "Obszar aktywacji ćwiartkowego układania"
 
-#: dist/prefs.js:336
+#: src/prefs.ts:377
 #, javascript-format
 msgid "Activation area to trigger quarter tiling (%% of the screen)"
 msgstr "Obszar aktywacji ćwiartkowego układania (%% ekranu)"
 
-#: dist/prefs.js:352
-msgid "Edge tiling offset"
-msgstr "Przesunięcie krawędzi układania"
-
-#: dist/prefs.js:353
+#: src/prefs.ts:395
 msgid "Offset from the screen edge to trigger edge tiling (in pixels)"
 msgstr ""
 "Odległość od krawędzi ekranu do aktywacji układania krawędziowego (w "
 "pikselach)"
 
-#: dist/prefs.js:375
+#: src/prefs.ts:422
 msgid "Windows suggestions"
 msgstr "Sugestie okien"
 
-#: dist/prefs.js:376
+#: src/prefs.ts:423
 msgid "Enable and disable windows suggestions"
 msgstr "Włącz i wyłącz sugestie okien"
 
-#: dist/prefs.js:381
-msgid "Enable window suggestions for the tiling system"
-msgstr "Włącz podpowiedzi okien dla systemu układania"
-
-#: dist/prefs.js:383
+#: src/prefs.ts:431
 msgid ""
 "Provides smart suggestions to fill empty tiles when using the tiling system"
 msgstr ""
 "Wyświetlaj inteligentne podpowiedzi wypełniania pustych kafelków podczas "
 "korzystania z systemu układania"
 
-#: dist/prefs.js:389
-msgid "Enable window suggestions for the snap assistant"
-msgstr "Włącz podpowiedzi okien dla Asystenta przyciągania"
-
-#: dist/prefs.js:391
+#: src/prefs.ts:440
 msgid ""
 "Offers suggestions to populate empty tiles when using the snap assistant"
 msgstr ""
 "Wyświetlaj podpowiedzi wypełniania pustych kafelków podczas korzystania z "
 "Asystenta przyciągania"
 
-#: dist/prefs.js:397
-msgid "Enable window suggestions for screen edge tiling"
-msgstr "Włącz podpowiedzi okien dla układania krawędziowego"
-
-#: dist/prefs.js:399
+#: src/prefs.ts:449
 msgid "Suggests windows to occupy empty tiles when tiling to screen edges"
 msgstr ""
-"Sugeruj okna do zajęcia pustych kafelków podczas układania do krawędzi ekranu"
+"Sugeruje okna do zajęcia pustych kafelków podczas układania przy krawędziach "
+"ekranu"
 
-#: dist/prefs.js:405
-msgid "Layouts"
-msgstr "Układy"
-
-#: dist/prefs.js:406
+#: src/prefs.ts:459
 msgid "Configure the layouts of Tiling Shell"
 msgstr "Skonfiguruj układy Układania okien"
 
-#: dist/prefs.js:410 dist/prefs.js:411
+#: src/prefs.ts:464 src/prefs.ts:465
 msgid "Edit layouts"
 msgstr "Edytuj układy"
 
-#: dist/prefs.js:412
+#: src/prefs.ts:466
 msgid "Open the layouts editor"
 msgstr "Otwórz edytor układów"
 
-#: dist/prefs.js:417 dist/prefs.js:418 dist/prefs.js:422
+#: src/prefs.ts:472 src/prefs.ts:473 src/prefs.ts:477
 msgid "Export layouts"
 msgstr "Eksportuj układy"
 
-#: dist/prefs.js:419
+#: src/prefs.ts:474
 msgid "Export layouts to a file"
 msgstr "Eksportuj układy do pliku"
 
-#: dist/prefs.js:471 dist/prefs.js:472
+#: src/prefs.ts:529 src/prefs.ts:530
 msgid "Import layouts"
 msgstr "Importuj układy"
 
-#: dist/prefs.js:473
+#: src/prefs.ts:531
 msgid "Import layouts from a file"
 msgstr "Importuj układy z pliku"
 
-#: dist/prefs.js:476
+#: src/prefs.ts:534
 msgid "Select layouts file"
 msgstr "Wybierz plik układów"
 
-#: dist/prefs.js:479 dist/prefs.js:876
+#: src/prefs.ts:537 src/prefs.ts:960
 msgid "Open"
 msgstr "Otwórz"
 
-#: dist/prefs.js:527 dist/prefs.js:528
+#: src/prefs.ts:591 src/prefs.ts:592
 msgid "Reset layouts"
 msgstr "Resetuj układy"
 
-#: dist/prefs.js:529
+#: src/prefs.ts:593
 msgid "Bring back the default layouts"
 msgstr "Przywróć domyślne układy"
 
-#: dist/prefs.js:542
+#: src/prefs.ts:609
 msgid "Keybindings"
 msgstr "Skróty klawiszowe"
 
-#: dist/prefs.js:544
+#: src/prefs.ts:611
 msgid "Use hotkeys to perform actions on the focused window"
 msgstr "Używaj skrótów klawiszowych do wykonywania akcji na aktywnym oknie"
 
-#: dist/prefs.js:562
+#: src/prefs.ts:635
 msgid "Move window to right tile"
 msgstr "Przenieś okno do prawego kafelka"
 
-#: dist/prefs.js:564
+#: src/prefs.ts:636
 msgid "Move the focused window to the tile on its right"
 msgstr "Przenieś aktywne okno do kafelka po prawej"
 
-#: dist/prefs.js:573
+#: src/prefs.ts:642
 msgid "Move window to left tile"
 msgstr "Przenieś okno do lewego kafelka"
 
-#: dist/prefs.js:574
+#: src/prefs.ts:643
 msgid "Move the focused window to the tile on its left"
 msgstr "Przenieś aktywne okno do kafelka po lewej"
 
-#: dist/prefs.js:580
+#: src/prefs.ts:649
 msgid "Move window to tile above"
 msgstr "Przenieś okno do kafelka powyżej"
 
-#: dist/prefs.js:581
+#: src/prefs.ts:650
 msgid "Move the focused window to the tile above"
 msgstr "Przenieś aktywne okno do kafelka powyżej"
 
-#: dist/prefs.js:587
+#: src/prefs.ts:656
 msgid "Move window to tile below"
 msgstr "Przenieś okno do kafelka poniżej"
 
-#: dist/prefs.js:588
+#: src/prefs.ts:657
 msgid "Move the focused window to the tile below"
 msgstr "Przenieś aktywne okno do kafelka poniżej"
 
-#: dist/prefs.js:594
+#: src/prefs.ts:663
 msgid "Span window to right tile"
 msgstr "Rozciągnij okno na prawy kafelek"
 
-#: dist/prefs.js:595
+#: src/prefs.ts:664
 msgid "Span the focused window to the tile on its right"
 msgstr "Rozciągnij aktywne okno na kafelek po prawej"
 
-#: dist/prefs.js:601
+#: src/prefs.ts:670
 msgid "Span window to left tile"
 msgstr "Rozciągnij okno na lewy kafelek"
 
-#: dist/prefs.js:602
+#: src/prefs.ts:671
 msgid "Span the focused window to the tile on its left"
 msgstr "Rozciągnij aktywne okno na kafelek po lewej"
 
-#: dist/prefs.js:608
+#: src/prefs.ts:677
 msgid "Span window above"
 msgstr "Rozciągnij okno na kafelek powyżej"
 
-#: dist/prefs.js:609
+#: src/prefs.ts:678
 msgid "Span the focused window to the tile above"
 msgstr "Rozciągnij aktywne okno na kafelek powyżej"
 
-#: dist/prefs.js:615
+#: src/prefs.ts:684
 msgid "Span window down"
 msgstr "Rozciągnij okno na kafelek poniżej"
 
-#: dist/prefs.js:616
+#: src/prefs.ts:685
 msgid "Span the focused window to the tile below"
 msgstr "Rozciągnij aktywne okno na kafelek poniżej"
 
-#: dist/prefs.js:622
+#: src/prefs.ts:691
 msgid "Span window to all tiles"
 msgstr "Rozciągnij okno na wszystkie kafelki"
 
-#: dist/prefs.js:623
+#: src/prefs.ts:692
 msgid "Span the focused window to all the tiles"
 msgstr "Rozciągnij aktywne okno na wszystkie kafelki"
 
-#: dist/prefs.js:629
+#: src/prefs.ts:698
 msgid "Untile focused window"
 msgstr "Usuń aktywne okno z układu"
 
-#: dist/prefs.js:636
-msgid "Untile all windows from current workspace"
-msgstr "Usuń z układu wszystkie okna z bieżącego obszaru roboczego"
-
-#: dist/prefs.js:644
+#: src/prefs.ts:712
 msgid "Move window to the center"
 msgstr "Przenieś okno na środek"
 
-#: dist/prefs.js:646
-msgid "Move the focused window to the center of the screen"
-msgstr "Przenieś aktywne okno na środek ekranu"
-
-#: dist/prefs.js:655
+#: src/prefs.ts:719
 msgid "Focus window to the right"
 msgstr "Aktywuj okno po prawej"
 
-#: dist/prefs.js:657
+#: src/prefs.ts:721
 msgid "Focus the window to the right of the current focused window"
 msgstr "Aktywuj okno po prawej stronie od aktualnie aktywnego okna"
 
-#: dist/prefs.js:664
+#: src/prefs.ts:728
 msgid "Focus window to the left"
 msgstr "Aktywuj okno po lewej"
 
-#: dist/prefs.js:665
-msgid "Focus the window to the left of the current focused window"
-msgstr "Aktywuj okno po lewej stronie od aktualnie aktywnego okna"
-
-#: dist/prefs.js:671
+#: src/prefs.ts:735
 msgid "Focus window above"
 msgstr "Aktywuj okno powyżej"
 
-#: dist/prefs.js:672
-msgid "Focus the window above the current focused window"
-msgstr "Aktywuj okno powyżej aktualnie aktywnego okna"
-
-#: dist/prefs.js:678
+#: src/prefs.ts:742
 msgid "Focus window below"
 msgstr "Aktywuj okno poniżej"
 
-#: dist/prefs.js:679
-msgid "Focus the window below the current focused window"
-msgstr "Aktywuj okno poniżej aktualnie aktywnego okna"
-
-#: dist/prefs.js:685
+#: src/prefs.ts:749
 msgid "Focus next window"
 msgstr "Aktywuj następne okno"
 
-#: dist/prefs.js:686
-msgid "Focus the window next to the current focused window"
-msgstr "Aktywuj następne okno obok aktualnie aktywnego"
-
-#: dist/prefs.js:692
+#: src/prefs.ts:756
 msgid "Focus previous window"
 msgstr "Aktywuj poprzednie okno"
 
-#: dist/prefs.js:693
-msgid "Focus the window prior to the current focused window"
-msgstr "Aktywuj poprzednie okno obok aktualnie aktywnego"
-
-#: dist/prefs.js:699
+#: src/prefs.ts:763
 msgid "Highlight focused window"
 msgstr "Podświetl aktywne okno"
 
-#: dist/prefs.js:701
-msgid "Minimize all the other windows and show only the focused window"
-msgstr "Zminimalizuj wszystkie inne okna i pokaż tylko aktywne okno"
-
-#: dist/prefs.js:708
+#: src/prefs.ts:772
 msgid "Cycle layouts"
 msgstr "Przełącz układy"
 
-#: dist/prefs.js:709
-msgid "Cycle through available workspace layouts"
-msgstr "Przełączaj dostępne układy obszaru roboczego"
-
-#: dist/prefs.js:739
+#: src/prefs.ts:811
 msgid "View and Customize all the Shortcuts"
 msgstr "Wyświetl i dostosuj wszystkie skróty"
 
-#: dist/prefs.js:767 dist/prefs.js:768
+#: src/prefs.ts:839 src/prefs.ts:840
 msgid "View and Customize Shortcuts"
 msgstr "Wyświetl i dostosuj skróty"
 
-#: dist/prefs.js:791
-msgid "Enable next/previous window focus to wrap around"
-msgstr "Włącz zawijanie aktywnego okna do następnego/poprzedniego"
-
-#: dist/prefs.js:793
-msgid "When focusing next or previous window, wrap around at the window edge"
-msgstr ""
-"Podczas przełączania na następne lub poprzednie aktywne okno, zawijaj po "
-"osiągnięciu krawędzi okien"
-
-#: dist/prefs.js:799
-msgid "Restrict directional focus to tiled windows"
-msgstr "Ogranicz aktywację kierunkową do ułożonych okien"
-
-#: dist/prefs.js:801
-msgid "When using directional focus navigation, only consider tiled windows"
-msgstr ""
-"Podczas przełączania na następne lub poprzednie aktywne okno, zawijaj po "
-"osiągnięciu krawędzi okien"
-
-#: dist/prefs.js:806
+#: src/prefs.ts:885
 msgid "Import, export and reset"
 msgstr "Import, eksport i reset"
 
-#: dist/prefs.js:808
+#: src/prefs.ts:887
 msgid "Import, export and reset the settings of Tiling Shell"
 msgstr "Importuj, eksportuj i resetuj ustawienia Układania okien"
 
-#: dist/prefs.js:813 dist/prefs.js:814
+#: src/prefs.ts:893 src/prefs.ts:894
 msgid "Export settings"
 msgstr "Eksportuj ustawienia"
 
-#: dist/prefs.js:815
+#: src/prefs.ts:895
 msgid "Export settings to a file"
 msgstr "Eksportuj ustawienia do pliku"
 
-#: dist/prefs.js:818
+#: src/prefs.ts:898
 msgid "Export settings to a text file"
 msgstr "Eksportuj ustawienia do pliku tekstowego"
 
-#: dist/prefs.js:825 dist/prefs.js:880
+#: src/prefs.ts:905 src/prefs.ts:964
 msgid "Text file"
 msgstr "Plik tekstowy"
 
-#: dist/prefs.js:868 dist/prefs.js:869
+#: src/prefs.ts:952 src/prefs.ts:953
 msgid "Import settings"
 msgstr "Importuj ustawienia"
 
-#: dist/prefs.js:870
+#: src/prefs.ts:954
 msgid "Import settings from a file"
 msgstr "Importuj ustawienia z pliku"
 
-#: dist/prefs.js:873
+#: src/prefs.ts:957
 msgid "Select a text file to import from"
 msgstr "Wybierz plik tekstowy do importu"
 
-#: dist/prefs.js:915 dist/prefs.js:916
+#: src/prefs.ts:1003 src/prefs.ts:1004
 msgid "Reset settings"
 msgstr "Resetuj ustawienia"
 
-#: dist/prefs.js:917
+#: src/prefs.ts:1005
 msgid "Bring back the default settings"
 msgstr "Przywróć ustawienia domyślne"
 
-#: dist/prefs.js:932
+#: src/prefs.ts:1023
 msgid "Donate on ko-fi"
 msgstr "Dotacja na ko-fi"
 
-#: dist/prefs.js:938
+#: src/prefs.ts:1029
 msgid "Report a bug"
 msgstr "Zgłoś błąd"
 
-#: dist/prefs.js:944
+#: src/prefs.ts:1035
 msgid "Request a feature"
 msgstr "Zgłoś propozycję funkcji"
 
-#: dist/prefs.js:952
+#: src/prefs.ts:1044
 msgid "Have issues, you want to suggest a new feature or contribute?"
 msgstr "Masz problemy, chcesz zasugerować nową funkcję lub wnieść swój wkład?"
 
-#: dist/prefs.js:959
+#: src/prefs.ts:1051
 msgid "Open a new issue on"
 msgstr "Otwórz nowe zgłoszenie na"
 
-#: dist/prefs.js:1027
+#: src/prefs.ts:1131
 msgid "Choose how windows snap to screen edges"
 msgstr "Wybierz sposób przyciągania okien do krawędzi ekranu"
 
-#: dist/prefs.js:1042
+#: src/prefs.ts:1146
 msgid "Default"
 msgstr "Domyślny"
 
-#: dist/prefs.js:1043
+#: src/prefs.ts:1147
 msgid "Follow quarters or screen halves"
-msgstr "Przyciągaj do ćwiartek lub połówek ekranu"
+msgstr "Dopasuj do ćwiartek lub połówek ekranu"
 
-#: dist/prefs.js:1048
+#: src/prefs.ts:1152
 msgid "Adaptive"
-msgstr "Adaptacyjne"
+msgstr "Adaptacyjny"
 
-#: dist/prefs.js:1049
+#: src/prefs.ts:1153
 msgid "Follow corners of selected layout or screen halves"
-msgstr "Przyciągaj do narożników wybranego układu lub połówek ekranu"
+msgstr "Dopasuj do rogów wybranego układu lub połówek ekranu"
 
-#: dist/prefs.js:1054
+#: src/prefs.ts:1158
 msgid "Granular"
-msgstr "Precyzyjne"
+msgstr "Szczegółowy"
 
-#: dist/prefs.js:1055
+#: src/prefs.ts:1159
 msgid "Follow currently selected layout"
-msgstr "Przyciągaj zgodnie z aktualnie wybranym układem"
+msgstr "Dopasuj do aktualnie wybranego układu"
 
-#: dist/prefs.js:1160
+#: src/prefs.ts:1301
 msgid "Right Mouse Button"
 msgstr "Prawy przycisk myszy"
 
-#: dist/prefs.js:1162
+#: src/prefs.ts:1304
 msgid "(None)"
 msgstr "(Brak)"
 
-#: dist/prefs.js:1246
+#: src/prefs.ts:1415
 msgid "Choose custom color"
 msgstr "Wybierz własny kolor"
 
-#: dist/prefs.js:1247
+#: src/prefs.ts:1416
 msgid "Use system accent color"
 msgstr "Użyj systemowego koloru akcentu"
 
-#: dist/prefs.js:1301 dist/prefs.js:1328
+#: src/prefs.ts:1506 src/prefs.ts:1536
 msgid "New accelerator…"
 msgstr "Nowy skrót…"
 
-#: dist/prefs.js:1331
+#: src/prefs.ts:1539
 msgid "Use Backspace to clear"
 msgstr "Użyj Backspace, aby wyczyścić"
-
-#~ msgid "Active Screen Edges"
-#~ msgstr "Aktywne krawędzie ekranu"
-
-#~ msgid ""
-#~ "Add snap assistant and auto-tile buttons in the menu that shows up when "
-#~ "you right click on a window title."
-#~ msgstr ""
-#~ "Dodaj przyciski Asystenta przyciągania i automatycznego układania do menu "
-#~ "wyświetlanego po kliknięciu prawym przyciskiem myszy na pasku tytułu okna."
-
-#~ msgid ""
-#~ "Add the tiled windows to the alt+tab menu to open all the tiled windows "
-#~ "at once"
-#~ msgstr ""
-#~ "Dodaj ułożone okna do menu ALT+TAB, aby otworzyć wszystkie ułożone okna "
-#~ "jednocześnie"
-
-#~ msgid "Add tiled windows group to alt+tab menu"
-#~ msgstr "Dodaj grupę ułożonych okien do menu ALT+TAB"
-
-#~ msgid "Animation time in milliseconds of the snap assistant"
-#~ msgstr "Czas trwania animacji Asystenta przyciągania w milisekundach"
-
-#~ msgid "Animation time in milliseconds of the tiles"
-#~ msgstr "Czas trwania animacji kafelków w milisekundach"
-
-#~ msgid ""
-#~ "Automatically tile a new window to the best tile according to the current "
-#~ "layout."
-#~ msgstr ""
-#~ "Automatycznie układaj nowe okno do najlepszego kafelka zgodnie z bieżącym "
-#~ "układem."
-
-#~ msgid "Blur selected tile previews"
-#~ msgstr "Rozmyj podglądy wybranych kafelków"
-
-#~ msgid "Blur snap assistant"
-#~ msgstr "Rozmycie Asystenta przyciągania"
-
-#~ msgid ""
-#~ "Change the desktop layout to match the layout used when tiling a window "
-#~ "with Snap Assistant."
-#~ msgstr ""
-#~ "Zmiana układu pulpitu, aby dopasować go do układu używanego podczas "
-#~ "kafelkowania okna za pomocą asystenta przyciągania."
-
-#~ msgid ""
-#~ "Controls how windows snap to screen edges:\\n'default' (corners snap to "
-#~ "quarters, edges to halves),\\n'adaptive' (snap to layout tiles by column),"
-#~ "\\n'granular' (snap to exact tile under cursor)."
-#~ msgstr ""
-#~ "Sterowanie sposobem przyciągania okien do krawędzi ekranu:"
-#~ "\\n'Domyślne' (narożniki przyciągają do ćwiartek, krawędzie do połówek),"
-#~ "\\n'Adaptacyjne' (przyciąganie do kafelków układu według kolumn),\\n\n"
-#~ "'Szczegółowe' (przyciąganie do konkretnego kafelka pod kursorem)."
-
-#~ msgid "Cycle backwards through available workspace layouts"
-#~ msgstr "Przełączanie wstecz między dostępnymi układami obszarów roboczych"
-
-#~ msgid "Dinamically adapt to the window's border radius."
-#~ msgstr "Dynamicznie dopasowuj do rzeczywistego promienia obramowania okna."
-
-#~ msgid "Drag agains top edge to maximize window"
-#~ msgstr "Przeciągnij do górnej krawędzi, aby zmaksymalizować okno"
-
-#~ msgid ""
-#~ "Drag windows against the top, left and right screen edges to resize them."
-#~ msgstr ""
-#~ "Przeciągnij okna do górnej, lewej lub prawej krawędzi ekranu, aby zmienić "
-#~ "ich rozmiar."
-
-#~ msgid "Each monitor's active layout used by the monitor tiling manager."
-#~ msgstr ""
-#~ "Aktywny układ każdego monitora używany przez menedżera układania monitora."
-
-#~ msgid "Edge tiling behavior"
-#~ msgstr "Zachowanie przyciągania do krawędzi ekranu"
-
-#~ msgid "Enable Snap Assistant blur"
-#~ msgstr "Włącz rozmycie asystenta przyciągania"
-
-#~ msgid "Enable auto tiling"
-#~ msgstr "Włącz automatyczne układanie"
-
-#~ msgid "Enable keybindings"
-#~ msgstr "Włącz skróty klawiszowe"
-
-#~ msgid "Enable selected tile preview blur"
-#~ msgstr "Włącz rozmycie podglądu wybranego kafelka"
-
-#~ msgid "Enable smart window border radius"
-#~ msgstr "Włącz inteligentny promień obramowania okna"
-
-#~ msgid "Enable snap assist"
-#~ msgstr "Włącz Asystenta przyciągania"
-
-#~ msgid "Enable tiling system"
-#~ msgstr "Włącz system układania okien"
-
-#~ msgid "Enable window border"
-#~ msgstr "Włącz obramowanie okna"
-
-#~ msgid "External gaps between the layout and the monitor borders."
-#~ msgstr "Zewnętrzne przerwy między układem a granicami monitora."
-
-#~ msgid "Focus the window to the right the current focused window"
-#~ msgstr "Aktywuj okno po prawej od bieżącego aktywnego okna"
-
-#~ msgid "Focused window border color"
-#~ msgstr "Kolor obramowania aktywnego okna"
-
-#~ msgid "Focused window border width"
-#~ msgstr "Szerokość obramowania aktywnego okna"
-
-#~ msgid "Hold ALT to span multiple tiles."
-#~ msgstr "Przytrzymaj klawisz ALT, aby rozciągnąć na wiele kafelków."
-
-#~ msgid "Hold CTRL while moving a window to tile it."
-#~ msgstr "Przytrzymaj klawisz CTRL podczas przesuwania okna, aby je ułożyć."
-
-#~ msgid "Internal gaps between tiles in a layout."
-#~ msgstr "Wewnętrzna przerwa między kafelkami w układzie."
-
-#~ msgid "Key to span multiple tiles"
-#~ msgstr "Klawisz do rozciągania na wiele kafelków"
-
-#~ msgid "Last version installed"
-#~ msgstr "Zainstalowano najnowszą wersję"
-
-#~ msgid "Last version installed of this extension."
-#~ msgstr "Ostatnia wersja tego rozszerzenia."
-
-#~ msgid "Move focused window through tiles by using keybindings."
-#~ msgstr "Przenieś aktywne okno przez kafelki, używając skrótów klawiszowych."
-
-#~ msgid "Move focused window to the tile above"
-#~ msgstr "Przenieś aktywne okno do kafelka powyżej"
-
-#~ msgid "Move focused window to the tile below"
-#~ msgstr "Przenieś aktywne okno do kafelka poniżej"
-
-#~ msgid "Move focused window to the tile to its left"
-#~ msgstr "Przenieś aktywne okno do kafelka po lewej"
-
-#~ msgid "Move focused window to the tile to its right"
-#~ msgstr "Przenieś aktywne okno do kafelka po prawej"
-
-#~ msgid "Move the window on top of the screen to snap assist it."
-#~ msgstr ""
-#~ "Przesuń okno na górną krawędź ekranu, aby wywołać Asystenta przyciągania."
-
-#~ msgid ""
-#~ "Offers suggestions to populate empty tiles when using the snap assistant."
-#~ msgstr ""
-#~ "Wyświetlaj podpowiedzi wypełniania pustych kafelków podczas korzystania z "
-#~ "Asystenta przyciągania."
-
-#~ msgid "Offset to trigger edge tiling (left and right edge)."
-#~ msgstr ""
-#~ "Przesunięcie do aktywacji układania krawędziowego (lewa i prawa krawędź)."
-
-#~ msgid "Overridden settings"
-#~ msgstr "Nadpisane ustawienia"
-
-#~ msgid ""
-#~ "Provides smart suggestions to fill empty tiles when using the tiling "
-#~ "system."
-#~ msgstr ""
-#~ "Wyświetlaj inteligentne podpowiedzi wypełniania pustych kafelków podczas "
-#~ "korzystania z systemu układania."
-
-#~ msgid "Quarter tiling threshold"
-#~ msgstr "Próg aktywacji ćwiartkowego układania"
-
-#~ msgid "Raise tiled windows on current display only"
-#~ msgstr "Podnoś ułożone okna tylko na bieżącym ekranie"
-
-#~ msgid "Resize the focused window to span all tiles"
-#~ msgstr "Rozciągnij aktywne okno na wszystkie kafelki"
-
-#~ msgid "Restore the windows to their original size when untiled."
-#~ msgstr "Przywracaj okna do ich oryginalnego rozmiaru po usunięciu z układu."
-
-#~ msgid "Selected layouts"
-#~ msgstr "Wybrane układy"
-
-#~ msgid "Show a border around focused window."
-#~ msgstr "Pokaż obramowanie wokół aktywnego okna."
-
-#~ msgid "Shows an indicator on top panel."
-#~ msgstr "Wyświetla wskaźnik na górnym panelu."
-
-#~ msgid "Shows indicator"
-#~ msgstr "Pokaż wskaźnik"
-
-#~ msgid "Snap Assistant's threshold to enlarge, shrink, open and close it."
-#~ msgstr ""
-#~ "Progi Asystenta przyciągania do powiększania, pomniejszania, otwierania i "
-#~ "zamykania."
-
-#~ msgid "Snap assistant animation time (milliseconds)"
-#~ msgstr "Czas trwania animacji Asystenta przyciągania (w milisekundach)"
-
-#~ msgid "Span focused window to the tile above"
-#~ msgstr "Rozciągnij aktywne okno na kafelek powyżej"
-
-#~ msgid "Span focused window to the tile below"
-#~ msgstr "Rozciągnij aktywne okno na kafelek poniżej"
-
-#~ msgid "Span focused window to the tile to its left"
-#~ msgstr "Rozciągnij aktywne okno na kafelek po lewej"
-
-#~ msgid "Span focused window to the tile to its right"
-#~ msgstr "Rozciągnij aktywne okno na kafelek po prawej"
-
-#~ msgid "Suggests windows to occupy empty tiles when tiling to screen edges."
-#~ msgstr ""
-#~ "Sugerowanie okien do zajęcia pustych kafelków podczas kafelkowania do "
-#~ "krawędzi ekranu."
-
-#~ msgid "The color of the focused window's border."
-#~ msgstr "Kolor obramowania aktywnego okna."
-
-#~ msgid "The layouts available to the tiling managers and the snap assist."
-#~ msgstr "Układy dostępne dla menedżerów układania i Asystenta przyciągania."
-
-#~ msgid "The settings that are overridden and their old value."
-#~ msgstr "Ustawienia, które są nadpisane, oraz ich stara wartość."
-
-#~ msgid "The width of the focused window's border."
-#~ msgstr "Szerokość obramowania aktywnego okna."
-
-#~ msgid "Threshold to trigger quarter tiling."
-#~ msgstr "Próg aktywacji ćwiartkowego układania."
-
-#~ msgid "Tile animation time (milliseconds)"
-#~ msgstr "Czas trwania animacji kafelka (w milisekundach)"
-
-#~ msgid "Tiling system activation key"
-#~ msgstr "Klawisz aktywacji systemu układania okien"
-
-#~ msgid "Tiling system deactivation key"
-#~ msgstr "Klawisz deaktywacji systemu układania okien"
-
-#~ msgid "Untile the focused window"
-#~ msgstr "Usuń aktywne okno z układu"
-
-#~ msgid "Use custom color"
-#~ msgstr "Użyj własnego koloru"
-
-#~ msgid "Use the color defined here for the focused window's border."
-#~ msgstr "Użyj zdefiniowanego tutaj koloru dla obramowania aktywnego okna."
-
-#~ msgid ""
-#~ "When a layout is selected, apply it to all workspaces instead of just the "
-#~ "active one."
-#~ msgstr ""
-#~ "Gdy układ zostanie wybrany, zastosuj go we wszystkich obszarach roboczych "
-#~ "zamiast tylko w aktywnym."
-
-#~ msgid ""
-#~ "When a tiled window is resized, auto-resize the other tiled windows near "
-#~ "it."
-#~ msgstr ""
-#~ "Gdy rozmiar ułożonego okna jest zmieniany, automatycznie zmień rozmiar "
-#~ "sąsiednich ułożonych okien."
-
-#~ msgid ""
-#~ "When one tiled window is raised, raise all tiled windows into the "
-#~ "foreground together."
-#~ msgstr ""
-#~ "Gdy jedno kafelkowe okno zostanie podniesione, podnieś wszystkie "
-#~ "kafelkowe okna na pierwszy plan razem."
-
-#~ msgid ""
-#~ "When raising tiled windows together, only raise tiled windows on the same "
-#~ "display as the window being raised."
-#~ msgstr ""
-#~ "Gdy podnosisz jednocześnie ułożone okna, podnoś tylko te na tym samym "
-#~ "ekranie co podnoszone okno."
-
-#~ msgid "Which key to hold to span multiple tiles."
-#~ msgstr "Klawisz do przytrzymania, aby rozciągnąć na wiele kafelków."
-
-#~ msgid ""
-#~ "Which key to hold while moving a window to activate the tiling system."
-#~ msgstr ""
-#~ "Klawisz do przytrzymania podczas przesuwania okna, aby włączyć system "
-#~ "układania okien."
-
-#~ msgid ""
-#~ "Which key to hold while moving a window to deactivate the tiling system."
-#~ msgstr ""
-#~ "Klawisz do przytrzymania podczas przesuwania okna, aby wyłączyć system "
-#~ "układania okien."
