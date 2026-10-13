@@ -21,7 +21,7 @@
  */
 
 import { Extension } from './polyfill'; // must stay at the top
-import { Gio, GLib, Meta } from './gi/ext';
+import { Gio, GLib, Meta, Mtk } from './gi/ext';
 import { logger } from './utils/logger';
 import {
     filterUnfocusableWindows,
@@ -48,11 +48,28 @@ import TilingShellWindowManager from './components/windowManager/tilingShellWind
 import ExtendedWindow from './components/tilingsystem/extendedWindow';
 import OverriddenAltTab from './components/altTab/overriddenAltTab';
 import { LayoutSwitcherPopup } from './components/layoutSwitcher/layoutSwitcher';
-import { unmaximizeWindow } from './utils/gnomesupport';
+import { maximizeWindow, unmaximizeWindow } from './utils/gnomesupport';
 import * as Config from 'resource:///org/gnome/shell/misc/config.js';
 import { RaiseTogetherManager } from './components/raiseTogether/raiseTogetherManager';
 
 const debug = logger('extension');
+
+interface SavedWindowGeometries {
+    monitorsLayout: string;
+    windows: { window: Meta.Window; rect: Mtk.Rectangle; maximized: boolean }[];
+}
+
+// The extension is disabled while the screen is locked. Some monitors disconnect
+// when they go to standby, so GNOME moves every window to the remaining monitors.
+// Window geometries are saved on disable and restored on enable, once the
+// monitors layout is the same again. Module scope survives disable/enable.
+let savedWindowGeometries: SavedWindowGeometries | null = null;
+
+function getMonitorsLayout(): string {
+    return Main.layoutManager.monitors
+        .map(m => `${m.x},${m.y},${m.width}x${m.height}`)
+        .join(';');
+}
 
 export default class TilingShellExtension extends Extension {
     private _indicator: Indicator | null;
@@ -64,6 +81,7 @@ export default class TilingShellExtension extends Extension {
     private _resizingManager: ResizingManager | null;
     private _windowBorderManager: WindowBorderManager | null;
     private _raiseTogetherManager: RaiseTogetherManager | null;
+    private _restoreWindowsTimerId: number;
 
     constructor(metadata: ExtensionMetadata) {
         super(metadata);
@@ -76,6 +94,7 @@ export default class TilingShellExtension extends Extension {
         this._resizingManager = null;
         this._windowBorderManager = null;
         this._raiseTogetherManager = null;
+        this._restoreWindowsTimerId = 0;
     }
 
     createIndicator() {
@@ -183,7 +202,86 @@ export default class TilingShellExtension extends Extension {
         if (Settings.OVERRIDE_WINDOW_MENU) OverriddenWindowMenu.enable();
         if (Settings.OVERRIDE_ALT_TAB) OverriddenAltTab.enable();
 
+        this._restoreWindowGeometries();
+
         debug('extension is enabled');
+    }
+
+    private _saveWindowGeometries() {
+        savedWindowGeometries = {
+            monitorsLayout: getMonitorsLayout(),
+            windows: global.display
+                .list_all_windows()
+                .filter(win => win.get_window_type() === Meta.WindowType.NORMAL)
+                .map(win => ({
+                    window: win,
+                    rect: win.get_frame_rect(),
+                    maximized:
+                        win.maximizedHorizontally && win.maximizedVertically,
+                })),
+        };
+        debug(
+            `saved ${savedWindowGeometries.windows.length} window geometries`
+        );
+    }
+
+    private _restoreWindowGeometries() {
+        if (!savedWindowGeometries) return;
+
+        if (getMonitorsLayout() !== savedWindowGeometries.monitorsLayout) {
+            // the monitors are not back yet, wait for them
+            this._signals?.connect(
+                Main.layoutManager,
+                'monitors-changed',
+                () => {
+                    if (
+                        this._restoreWindowsTimerId === 0 &&
+                        savedWindowGeometries &&
+                        getMonitorsLayout() ===
+                            savedWindowGeometries.monitorsLayout
+                    )
+                        this._restoreWindowGeometries();
+                }
+            );
+            return;
+        }
+
+        // let GNOME and the tiling managers settle after the layout change
+        this._restoreWindowsTimerId = GLib.timeout_add(
+            GLib.PRIORITY_DEFAULT,
+            1000,
+            () => {
+                this._restoreWindowsTimerId = 0;
+                const saved = savedWindowGeometries;
+                savedWindowGeometries = null;
+                if (!saved || getMonitorsLayout() !== saved.monitorsLayout)
+                    return GLib.SOURCE_REMOVE;
+
+                saved.windows.forEach(({ window, rect, maximized }) => {
+                    // skip windows closed in the meantime
+                    if (!window.get_compositor_private()) return;
+
+                    if (maximized) {
+                        maximizeWindow(window);
+                        return;
+                    }
+                    if (
+                        window.maximizedHorizontally ||
+                        window.maximizedVertically
+                    )
+                        unmaximizeWindow(window);
+                    window.move_resize_frame(
+                        false,
+                        rect.x,
+                        rect.y,
+                        rect.width,
+                        rect.height
+                    );
+                });
+                debug(`restored ${saved.windows.length} window geometries`);
+                return GLib.SOURCE_REMOVE;
+            }
+        );
     }
 
     public openLayoutEditor() {
@@ -763,6 +861,12 @@ export default class TilingShellExtension extends Extension {
     }
 
     disable(): void {
+        if (this._restoreWindowsTimerId) {
+            GLib.Source.remove(this._restoreWindowsTimerId);
+            this._restoreWindowsTimerId = 0;
+        }
+        this._saveWindowGeometries();
+
         // bring back overridden keybindings
         this._keybindings?.destroy();
         this._keybindings = null;
