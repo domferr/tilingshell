@@ -751,15 +751,20 @@ export default class TilingShellExtension extends Extension {
     private _isFractionalScalingEnabled(
         _mutterSettings: Gio.Settings,
     ): boolean {
-        return (
-            _mutterSettings
-                .get_strv('experimental-features')
-                .find(
-                    (feat) =>
-                        feat === 'scale-monitor-framebuffer' ||
-                        feat === 'x11-randr-fractional-scaling',
-                ) !== undefined
-        );
+        try{//old method
+            return (
+                _mutterSettings
+                    .get_strv('experimental-features') //this is the part that's breaking
+                    .find(
+                        (feat) =>
+                            feat === 'scale-monitor-framebuffer' ||
+                            feat === 'x11-randr-fractional-scaling',
+                    ) !== undefined
+            );
+        }catch (e){
+            return true; //gnome 51 isn't happy with the old method. 
+        }
+    
     }
 
     disable(): void {
