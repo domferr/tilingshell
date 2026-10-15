@@ -31,6 +31,16 @@ export function buildBlurEffect(sigma: number): Shell.BlurEffect {
     return effect;
 }
 
+// GNOME 51 removed Clutter.get_default_backend(). The backend is now
+// reached through the stage context (available since GNOME 47).
+export function getDefaultSeat(): Clutter.Seat {
+    const clutter = Clutter as any;
+    const backend: Clutter.Backend = clutter.get_default_backend
+        ? clutter.get_default_backend()
+        : (global.stage as Clutter.Stage).get_context().get_backend();
+    return backend.get_default_seat();
+}
+
 export function getEventCoords(event: any): number[] {
     return event.get_coords ? event.get_coords() : [event.x, event.y]; // GNOME 40-44
 }
