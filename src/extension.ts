@@ -219,32 +219,38 @@ export default class TilingShellExtension extends Extension {
             }
         });
 
-        this._signals.connect(
-            new Gio.Settings({ schema: 'org.gnome.mutter' }),
-            'changed::experimental-features',
-            (_mutterSettings: Gio.Settings) => {
-                if (!_mutterSettings) return;
+        const mutterSettings = new Gio.Settings({
+            schema: 'org.gnome.mutter',
+        });
+        // the key does not exist anymore in GNOME 51+
+        if (mutterSettings.settings_schema.has_key('experimental-features')) {
+            this._signals.connect(
+                mutterSettings,
+                'changed::experimental-features',
+                (_mutterSettings: Gio.Settings) => {
+                    if (!_mutterSettings) return;
 
-                const fractionalScalingEnabled =
-                    this._isFractionalScalingEnabled(_mutterSettings);
+                    const fractionalScalingEnabled =
+                        this._isFractionalScalingEnabled(_mutterSettings);
 
-                if (this._fractionalScalingEnabled === fractionalScalingEnabled)
-                    return;
+                    if (this._fractionalScalingEnabled === fractionalScalingEnabled)
+                        return;
 
-                this._fractionalScalingEnabled = fractionalScalingEnabled;
-                this._createTilingManagers();
-                if (this._indicator) {
-                    this._indicator.enableScaling =
-                        !this._fractionalScalingEnabled;
-                }
-                if (this._windowBorderManager)
-                    this._windowBorderManager.destroy();
-                this._windowBorderManager = new WindowBorderManager(
-                    this._fractionalScalingEnabled,
-                );
-                this._windowBorderManager.enable();
-            },
-        );
+                    this._fractionalScalingEnabled = fractionalScalingEnabled;
+                    this._createTilingManagers();
+                    if (this._indicator) {
+                        this._indicator.enableScaling =
+                            !this._fractionalScalingEnabled;
+                    }
+                    if (this._windowBorderManager)
+                        this._windowBorderManager.destroy();
+                    this._windowBorderManager = new WindowBorderManager(
+                        this._fractionalScalingEnabled,
+                    );
+                    this._windowBorderManager.enable();
+                },
+            );
+        }
 
         if (this._keybindings) {
             this._signals.connect(
@@ -751,6 +757,11 @@ export default class TilingShellExtension extends Extension {
     private _isFractionalScalingEnabled(
         _mutterSettings: Gio.Settings,
     ): boolean {
+        // GNOME 51 removed the 'experimental-features' key. Fractional
+        // scaling is no longer experimental there and is always available.
+        if (!_mutterSettings.settings_schema.has_key('experimental-features'))
+            return true;
+
         return (
             _mutterSettings
                 .get_strv('experimental-features')
