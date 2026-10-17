@@ -29,7 +29,11 @@ import TouchPointer from './touchPointer';
 import { KeyBindingsDirection } from '../../keybindings';
 import TilingShellWindowManager from '../../components/windowManager/tilingShellWindowManager';
 import TilingLayoutWithSuggestions from '../windowsSuggestions/tilingLayoutWithSuggestions';
-import { maximizeWindow, unmaximizeWindow } from '../../utils/gnomesupport';
+import {
+    getDefaultSeat,
+    maximizeWindow,
+    unmaximizeWindow,
+} from '../../utils/gnomesupport';
 
 const MINIMUM_DISTANCE_TO_RESTORE_ORIGINAL_SIZE = 90;
 
@@ -530,8 +534,7 @@ export class TilingManager {
                         const [x, y] = event.get_coords();
                         TouchPointer.get().onTouchEvent(x, y);
                         // Move the actual mouse cursor to match tablet position
-                        const seat = Clutter.get_default_backend().get_default_seat();
-                        seat.warp_pointer(x, y);
+                        getDefaultSeat().warp_pointer(x, y);
                     }
                 }
             },
