@@ -15,7 +15,7 @@
     "clean:resources": "rm -rf ./dist/*.gresource; rm -rf ./dist_legacy/*.gresource",
     "build:package": "npm run clean:package; npm run build && cd ./dist && zip -x 'schemas/gschemas.compiled' -qr ../tilingshell@ferrarodomenico.com.zip * && cd ../dist_legacy && zip -qr ../GNOME.42-44.tilingshell@ferrarodomenico.com.zip *",
     "clean:package": "rm -rf './dist/tilingshell@ferrarodomenico.com.zip'; rm -rf './dist_legacy/tilingshell@ferrarodomenico.com.zip'",
-    "install:extension": "mkdir -p ~/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com && cp ./dist$([ $(gnome-shell --version | grep -o -E '[0-9]+' | head -n 1) -le 44 ] && echo '_legacy')/* ~/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/ -r",
+    "install:extension": "npm run build:schema && mkdir -p ~/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com && cp ./dist$([ $(gnome-shell --version | grep -o -E '[0-9]+' | head -n 1) -le 44 ] && echo '_legacy')/* ~/.local/share/gnome-shell/extensions/tilingshell@ferrarodomenico.com/ -r",
     "wayland-session": "dbus-run-session -- env MUTTER_DEBUG_NUM_DUMMY_MONITORS=1 MUTTER_DEBUG_DUMMY_MODE_SPECS=1920x1080 gnome-shell --nested --wayland",
     "dev:wayland": "npm run build && npm run install:extension && npm run wayland-session",
     "build:translations": "for file in $(ls translations/*.po); do mkdir -p resources/locale/$(basename $file .po)/LC_MESSAGES; msgfmt -c $file -o resources/locale/$(basename $file .po)/LC_MESSAGES/tilingshell.mo; done",

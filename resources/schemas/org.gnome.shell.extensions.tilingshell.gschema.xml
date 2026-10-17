@@ -67,6 +67,11 @@
             <summary>Selected layouts</summary>
             <description>Each monitor's active layout used by the monitor tiling manager.</description>
         </key>
+        <key name="selected-layouts-by-topology" type="s">
+            <default>'{}'</default>
+            <summary>Selected layouts by topology</summary>
+            <description>JSON map of monitor topology signatures to selected layouts.</description>
+        </key>
         <key name="restore-window-original-size" type="b">
             <default>true</default>
             <summary>Restore window size</summary>
