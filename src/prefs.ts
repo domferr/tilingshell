@@ -320,6 +320,29 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         behaviourGroup.add(raiseTogetherRow);
 
+        const raiseTogetherCurrentMonitorRow = this._buildSwitchRow(
+            Settings.KEY_RAISE_TOGETHER_CURRENT_MONITOR_ONLY,
+            _('Raise tiled windows together: limit to current display'),
+            _(
+                'When raising tiled windows together, only raise tiled windows on the same display as the window being raised',
+            ),
+        );
+        Settings.bind(
+            Settings.KEY_RAISE_TOGETHER,
+            raiseTogetherCurrentMonitorRow,
+            'sensitive',
+        );
+        behaviourGroup.add(raiseTogetherCurrentMonitorRow);
+
+        const syncLayoutRow = this._buildSwitchRow(
+            Settings.KEY_SYNC_LAYOUT_ACROSS_WORKSPACES,
+            _('Sync layout across workspaces'),
+            _(
+                'When a layout is selected, apply it to all workspaces instead of just the active one',
+            ),
+        );
+        behaviourGroup.add(syncLayoutRow);
+
         // Screen Edges section
         const activeScreenEdgesGroup = new Adw.PreferencesGroup({
             title: _('Screen Edges'),
@@ -678,6 +701,13 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                 false,
             ],
             [
+                Settings.SETTING_UNTILE_ALL_WINDOWS,
+                _('Untile all windows from current workspace'),
+                undefined,
+                false,
+                false,
+            ],
+            [
                 Settings.SETTING_MOVE_WINDOW_CENTER, // settings key
                 _('Move window to the center'), // title
                 _('Move the focused window to the center of the screen'), // subtitle
@@ -931,7 +961,7 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
                     _('Cancel'),
                     new Gtk.FileFilter({
                         suffixes: ['txt'],
-                        name: 'Text file',
+                        name: _('Text file'),
                     }),
                     (_source: Gtk.FileChooserNative, response_id: number) => {
                         try {
@@ -1264,9 +1294,14 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             ActivationKey.CTRL,
             ActivationKey.ALT,
             ActivationKey.SUPER,
+            ActivationKey.RIGHT_BUTTON,
         ];
-        activationKeys.forEach((k) => options.append(ActivationKey[k]));
-        options.append('(None)');
+        const labelFor = (k: ActivationKey): string =>
+            k === ActivationKey.RIGHT_BUTTON
+                ? _('Right Mouse Button')
+                : ActivationKey[k];
+        activationKeys.forEach((k) => options.append(labelFor(k)));
+        options.append(_('(None)'));
         const dropdown = new Gtk.DropDown({
             model: options,
             selected: initialValue,

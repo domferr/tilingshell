@@ -46,3 +46,13 @@ export function unmaximizeWindow(window: Meta.Window): void {
         ? window.unmaximize(Meta.MaximizeFlags.BOTH)
         : window.unmaximize();
 }
+
+// GNOME 51 removed Clutter.get_default_backend(). The backend is now
+// reached through the stage context (available since GNOME 47).
+export function getDefaultSeat(): Clutter.Seat {
+    const clutter = Clutter as any;
+    const backend: Clutter.Backend = clutter.get_default_backend
+        ? clutter.get_default_backend()
+        : (global.stage as Clutter.Stage).get_context().get_backend();
+    return backend.get_default_seat();
+}

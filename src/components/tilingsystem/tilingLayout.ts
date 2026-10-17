@@ -453,7 +453,7 @@ export default class TilingLayout extends LayoutWidget<DynamicTilePreview> {
 
         const sourceCenter = {
             x: source.x + source.width / 2,
-            y: source.x + source.height / 2,
+            y: source.y + source.height / 2,
         };
 
         for (let i = 0; i < this._previews.length; i++) {

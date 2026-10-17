@@ -5,6 +5,7 @@ import { Meta } from '../../gi/ext';
  */
 export default class MetaWindowGroup {
     private _windows: Meta.Window[];
+    private _signalIds: number[];
     private _unmanagedCounter: number; // count how many windows are unmanaged
     private _unmanagedEventHandler: (() => void) | null;
 
@@ -17,7 +18,7 @@ export default class MetaWindowGroup {
         this._unmanagedCounter = 0;
         this._unmanagedEventHandler = null;
 
-        this._windows.forEach((win) =>
+        this._signalIds = this._windows.map((win) =>
             win.connect('unmanaged', () => {
                 this._unmanagedCounter++;
                 if (
@@ -75,5 +76,14 @@ export default class MetaWindowGroup {
 
     public onAllWindowsUnmanaged(fn: () => void) {
         this._unmanagedEventHandler = fn;
+    }
+
+    public destroy() {
+        this._windows.forEach((win, i) => {
+            if (this._signalIds[i])
+                win.disconnect(this._signalIds[i]);
+        });
+        this._signalIds = [];
+        this._unmanagedEventHandler = null;
     }
 }

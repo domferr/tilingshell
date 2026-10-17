@@ -59,9 +59,14 @@ export default class OverriddenAltTab {
         this._switcherList._list.get_layout_manager().homogeneous = false;
         this._switcherList._squareItems = false;
 
-        // Call original show function
+        // Call original show function. Note: show() may synchronously
+        // destroy the popup if the modifier key was already released
+        // (see GNOME bug 596695), so we must check liveness afterward.
         const oldFunction = OverriddenAltTab._old_show?.bind(this);
         const res = !oldFunction || oldFunction(backward, binding, mask);
+
+        // If the popup was destroyed during show(), bail out.
+        if (!this._switcherList || !this._items?.length) return res;
 
         const tiledWindows: Meta.Window[] = (
             this._getWindowList() as Meta.Window[]

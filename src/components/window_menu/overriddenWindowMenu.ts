@@ -2,7 +2,7 @@
 import * as windowMenu from 'resource:///org/gnome/shell/ui/windowMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import { GObject, St, Clutter, Meta } from '../../gi/ext';
+import { GObject, St, Clutter, Meta, Gio } from '../../gi/ext';
 import GlobalState from '../../utils/globalState';
 import { registerGObjectClass } from '../../utils/gjs';
 import Tile from '../../components/layout/Tile';
@@ -10,6 +10,7 @@ import {
     enableScalingFactorSupport,
     getMonitorScalingFactor,
     getWindows,
+    isFractionalScalingEnabled,
 } from '../../utils/ui';
 import ExtendedWindow from '../../components/tilingsystem/extendedWindow';
 import TileUtils from '../../components/layout/TileUtils';
@@ -131,7 +132,9 @@ export default class OverriddenWindowMenu extends GObject.Object {
         });
 
         const enableScaling =
-            window.get_monitor() === Main.layoutManager.primaryIndex;
+            !isFractionalScalingEnabled(
+                new Gio.Settings({ schemaId: 'org.gnome.mutter' }),
+            ) && window.get_monitor() === Main.layoutManager.primaryIndex;
         const scalingFactor = getMonitorScalingFactor(window.get_monitor());
 
         if (vacantTiles.length > 0) {
@@ -140,8 +143,8 @@ export default class OverriddenWindowMenu extends GObject.Object {
             let bestTileIndex = 0;
             let bestDistance = Math.abs(
                 0.5 -
-                    vacantTiles[bestTileIndex].x +
-                    vacantTiles[bestTileIndex].width / 2,
+                    (vacantTiles[bestTileIndex].x +
+                        vacantTiles[bestTileIndex].width / 2),
             );
             for (let index = 1; index < vacantTiles.length; index++) {
                 const distance = Math.abs(

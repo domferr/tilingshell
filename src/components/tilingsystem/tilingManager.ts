@@ -29,7 +29,11 @@ import TouchPointer from './touchPointer';
 import { KeyBindingsDirection } from '../../keybindings';
 import TilingShellWindowManager from '../../components/windowManager/tilingShellWindowManager';
 import TilingLayoutWithSuggestions from '../windowsSuggestions/tilingLayoutWithSuggestions';
-import { maximizeWindow, unmaximizeWindow } from '../../utils/gnomesupport';
+import {
+    getDefaultSeat,
+    maximizeWindow,
+    unmaximizeWindow,
+} from '../../utils/gnomesupport';
 
 const MINIMUM_DISTANCE_TO_RESTORE_ORIGINAL_SIZE = 90;
 
@@ -67,6 +71,8 @@ export class TilingManager {
     private _enableScaling: boolean;
 
     private _isGrabbingWindow: boolean;
+    private _rmbFilterId: number = 0;
+    private _rmbFilterInstalled: boolean = false;
     private _movingWindowTimerDuration: number = 15;
     private _lastCursorPos: { x: number; y: number } | null = null;
     private _grabStartPosition: { x: number; y: number } | null = null;
@@ -149,7 +155,6 @@ export class TilingManager {
         this._snapAssist = new SnapAssist(
             Main.uiGroup,
             this._workArea,
-            this._monitor.index,
             monitorScalingFactor,
         );
     }
@@ -392,7 +397,7 @@ export class TilingManager {
                 64, // if the gaps are all 0 we choose 64 instead
                 tilingLayout.innerGaps.right,
                 tilingLayout.innerGaps.left,
-                tilingLayout.innerGaps.right,
+                tilingLayout.innerGaps.top,
                 tilingLayout.innerGaps.bottom,
             );
             destination = tilingLayout.findNearestTileDirection(
@@ -470,6 +475,7 @@ export class TilingManager {
         }
         this._signals.disconnect();
         this._isGrabbingWindow = false;
+        this._removeRmbFilterIfInstalled();
         this._snapAssistingInfo.update(undefined);
         this._edgeTilingManager.abortEdgeTiling();
         this._workspaceTilingLayout.forEach((tl) => tl.destroy());
@@ -528,8 +534,7 @@ export class TilingManager {
                         const [x, y] = event.get_coords();
                         TouchPointer.get().onTouchEvent(x, y);
                         // Move the actual mouse cursor to match tablet position
-                        const seat = Clutter.get_default_backend().get_default_seat();
-                        seat.warp_pointer(x, y);
+                        getDefaultSeat().warp_pointer(x, y);
                     }
                 }
             },
@@ -556,6 +561,7 @@ export class TilingManager {
         }
 
         this._isGrabbingWindow = true;
+        this._installRmbFilterIfNeeded();
         this._movingWindowTimerId = GLib.timeout_add(
             GLib.PRIORITY_DEFAULT_IDLE,
             this._movingWindowTimerDuration,
@@ -563,6 +569,82 @@ export class TilingManager {
         );
 
         this._onMovingWindow(window, grabOp);
+    }
+
+    private _anyActivationKeyIsRmb(): boolean {
+        return (
+            Settings.TILING_SYSTEM_ACTIVATION_KEY === ActivationKey.RIGHT_BUTTON ||
+            Settings.TILING_SYSTEM_DEACTIVATION_KEY === ActivationKey.RIGHT_BUTTON ||
+            Settings.SPAN_MULTIPLE_TILES_ACTIVATION_KEY === ActivationKey.RIGHT_BUTTON
+        );
+    }
+
+    private _rmbEventFilter(event: Clutter.Event, _actor: Clutter.Actor): boolean {
+        // Fast path: only act on button press/release.
+        const t = event.type();
+        if (
+            t !== Clutter.EventType.BUTTON_PRESS &&
+            t !== Clutter.EventType.BUTTON_RELEASE
+        ) {
+            return Clutter.EVENT_PROPAGATE;
+        }
+        // Swallow RMB press/release so Mutter's MOVING grab doesn't see them.
+        // CLUTTER_BUTTON_SECONDARY === 3.
+        if (event.get_button() === Clutter.BUTTON_SECONDARY) {
+            return Clutter.EVENT_STOP;
+        }
+        return Clutter.EVENT_PROPAGATE;
+    }
+
+    private _installRmbFilterIfNeeded(): void {
+        if (this._rmbFilterInstalled) return;
+        if (!this._anyActivationKeyIsRmb()) return;
+        // `Clutter.event_add_filter` / `event_remove_filter` are not always
+        // present in @girs/clutter type stubs. Cast to `any` to access them
+        // and runtime-check for availability below.
+        const addFilter = (Clutter as any).event_add_filter;
+        if (typeof addFilter !== 'function') {
+            console.error(
+                'tilingshell: Clutter.event_add_filter unavailable; ' +
+                'RIGHT_BUTTON activation key will not work on this version.',
+            );
+            return;
+        }
+        try {
+            this._rmbFilterId = addFilter(
+                global.stage,
+                this._rmbEventFilter.bind(this),
+            );
+            this._rmbFilterInstalled = this._rmbFilterId !== 0;
+            if (!this._rmbFilterInstalled) {
+                console.error(
+                    'tilingshell: Clutter.event_add_filter returned 0; ' +
+                    'RIGHT_BUTTON activation key will not work this drag.',
+                );
+            }
+        } catch (e) {
+            console.error('tilingshell: failed to install RMB filter: ' + e);
+            this._rmbFilterInstalled = false;
+            this._rmbFilterId = 0;
+        }
+    }
+
+    private _removeRmbFilterIfInstalled(): void {
+        if (!this._rmbFilterInstalled || this._rmbFilterId === 0) return;
+        const removeFilter = (Clutter as any).event_remove_filter;
+        if (typeof removeFilter !== 'function') {
+            // Defensive: should not happen if install succeeded.
+            this._rmbFilterInstalled = false;
+            this._rmbFilterId = 0;
+            return;
+        }
+        try {
+            removeFilter(this._rmbFilterId);
+        } catch (e) {
+            console.error('tilingshell: failed to remove RMB filter: ' + e);
+        }
+        this._rmbFilterInstalled = false;
+        this._rmbFilterId = 0;
     }
 
     private _activationKeyStatus(
@@ -580,10 +662,18 @@ export class TilingManager {
                 mask = Clutter.ModifierType.MOD1_MASK;
                 break;
             case ActivationKey.SUPER:
-                mask = Clutter.ModifierType.SUPER_MASK;
+                // global.get_pointer() returns MOD4_MASK for the Super key,
+                // not SUPER_MASK (which has a different bit position).
+                mask = Clutter.ModifierType.MOD4_MASK;
+                break;
+            case ActivationKey.RIGHT_BUTTON:
+                // Clutter's native backend maps clutter_button=3 (RMB) to
+                // BUTTON2_MASK (see mutter src/backends/native/meta-seat-impl.c
+                // maskmap). BUTTON3_MASK is the middle button — do not use it.
+                mask = Clutter.ModifierType.BUTTON2_MASK;
                 break;
         }
-        return (modifier & mask) === mask;
+        return (modifier & mask) !== 0;
     }
 
     private _onMovingWindow(window: Meta.Window, grabOp: number) {
@@ -799,6 +889,7 @@ export class TilingManager {
 
     private _onWindowGrabEnd(window: Meta.Window) {
         this._isGrabbingWindow = false;
+        this._removeRmbFilterIfInstalled();
         this._grabStartPosition = null;
 
         this._signals.disconnect(window);
@@ -1335,8 +1426,8 @@ export class TilingManager {
         let bestTileIndex = 0;
         let bestDistance = Math.abs(
             0.5 -
-                vacantTiles[bestTileIndex].x +
-                vacantTiles[bestTileIndex].width / 2,
+                (vacantTiles[bestTileIndex].x +
+                    vacantTiles[bestTileIndex].width / 2),
         );
         for (let index = 1; index < vacantTiles.length; index++) {
             const distance = Math.abs(

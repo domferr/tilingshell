@@ -42,7 +42,7 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         if (params.enableScaling) {
             const monitor = Main.layoutManager.findMonitorForActor(this);
             const scalingFactor = getMonitorScalingFactor(
-                monitor?.index || Main.layoutManager.primaryIndex,
+                monitor?.index ?? Main.layoutManager.primaryIndex,
             );
             enableScalingFactorSupport(this, scalingFactor);
         }
