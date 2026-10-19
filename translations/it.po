@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Tiling Shell\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-19 20:46+0200\n"
-"PO-Revision-Date: 2026-01-31 12:11+0200\n"
+"PO-Revision-Date: 2026-10-19 22:05+0200\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <>\n"
 "Language: it\n"
@@ -352,6 +352,8 @@ msgid ""
 "When raising tiled windows together, only raise tiled windows on the same "
 "display as the window being raised"
 msgstr ""
+"Quando si portano in primo piano le finestre affiancate insieme, porta in "
+"primo piano solo quelle presenti sullo stesso schermo della finestra selezionata"
 
 #: dist/prefs.js:302
 msgid "Sync layout across workspaces"
@@ -755,11 +757,11 @@ msgstr "Scegli come le finestre vengono mosse verso i bordi dello schermo"
 
 #: dist/prefs.js:1042
 msgid "Default"
-msgstr "Default"
+msgstr "Predefinito"
 
 #: dist/prefs.js:1043
 msgid "Follow quarters or screen halves"
-msgstr ""
+msgstr "Segui i quarti o le metà dello schermo"
 
 #: dist/prefs.js:1048
 msgid "Adaptive"
