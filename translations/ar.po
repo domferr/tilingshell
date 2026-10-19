@@ -1,0 +1,731 @@
+# Arabic translations for Tiling Shell package.
+# Copyright (C) 2026 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the Tiling Shell package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Tiling Shell\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-25 18:09+0100\n"
+"PO-Revision-Date: 2026-10-14 12:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Arabic\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : "
+"n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5);\n"
+
+
+#: dist/components/altTab/MultipleWindowsIcon.js:42
+msgid "Tiled windows"
+msgstr "النوافذ المقسّمة"
+
+#: dist/components/editor/editorDialog.js:36
+msgid "Select the layout to edit"
+msgstr "اختر التخطيط الذي تريد تحريره"
+
+#: dist/components/editor/editorDialog.js:54
+msgid "Close"
+msgstr "إغلاق"
+
+#: dist/components/editor/editorDialog.js:81
+msgid "to split a tile"
+msgstr "لتقسيم المربع"
+
+#: dist/components/editor/editorDialog.js:120
+msgid "to split a tile vertically"
+msgstr "لتقسيم المربع عموديًا"
+
+#: dist/components/editor/editorDialog.js:140
+msgid "to delete a tile"
+msgstr "لحذف المربع"
+
+#: dist/components/editor/editorDialog.js:164
+msgid "use the indicator button to save or cancel"
+msgstr "استخدم زر المؤشر للحفظ أو الإلغاء"
+
+#: dist/components/editor/editorDialog.js:182
+msgid "How to use the editor"
+msgstr "كيفية استخدام المحرر"
+
+#: dist/components/editor/editorDialog.js:191
+msgid "Start editing"
+msgstr "ابدأ التحرير"
+
+#: dist/components/window_menu/overriddenWindowMenu.js:117
+msgid "Move to best tile"
+msgstr "نقل إلى أفضل مربع"
+
+#: dist/components/window_menu/overriddenWindowMenu.js:137
+msgid "Move to leftmost tile"
+msgstr "نقل إلى أقصى مربع على اليسار"
+
+#: dist/components/window_menu/overriddenWindowMenu.js:156
+msgid "Move to rightmost tile"
+msgstr "نقل إلى أقصى مربع على اليمين"
+
+#: dist/indicator/defaultMenu.js:297
+msgid "Edit Layouts"
+msgstr "تحرير التخطيطات"
+
+#: dist/indicator/defaultMenu.js:307
+msgid "New Layout"
+msgstr "تخطيط جديد"
+
+#: dist/indicator/editingMenu.js:19
+msgid "Menu"
+msgstr "القائمة"
+
+#: dist/indicator/editingMenu.js:26
+msgid "Info"
+msgstr "معلومات"
+
+#: dist/indicator/editingMenu.js:33 dist/prefs.js:404 dist/prefs.js:793
+msgid "Save"
+msgstr "حفظ"
+
+#: dist/indicator/editingMenu.js:43 dist/prefs.js:405 dist/prefs.js:459
+#: dist/prefs.js:794 dist/prefs.js:849
+msgid "Cancel"
+msgstr "إلغاء"
+
+#: dist/prefs.js:59
+msgid "General"
+msgstr "عام"
+
+#: dist/prefs.js:64
+msgid "Appearance"
+msgstr "المظهر"
+
+#: dist/prefs.js:65
+msgid "Configure the appearance of Tiling Shell"
+msgstr "اضبط مظهر Tiling Shell"
+
+#: dist/prefs.js:70
+msgid "Show Indicator"
+msgstr "إظهار المؤشر"
+
+#: dist/prefs.js:71
+msgid "Whether to show the panel indicator"
+msgstr "إظهار مؤشر اللوحة أو إخفاؤه"
+
+#: dist/prefs.js:76
+msgid "Inner gaps"
+msgstr "الفراغات الداخلية"
+
+#: dist/prefs.js:77
+msgid "Gaps between windows"
+msgstr "الفراغات بين النوافذ"
+
+#: dist/prefs.js:82
+msgid "Outer gaps"
+msgstr "الفراغات الخارجية"
+
+#: dist/prefs.js:83
+msgid "Gaps between a window and the monitor borders"
+msgstr "الفراغات بين النافذة وحدود الشاشة"
+
+#: dist/prefs.js:87
+msgid "Blur (experimental feature)"
+msgstr "التمويه (ميزة تجريبية)"
+
+#: dist/prefs.js:89
+msgid "Apply blur effect to Snap Assistant and tile previews"
+msgstr "تطبيق تأثير التمويه على مساعد الالتقاط ومعاينات المربعات"
+
+#: dist/prefs.js:95
+msgid "Snap Assistant threshold"
+msgstr "عتبة مساعد الالتقاط"
+
+#: dist/prefs.js:97
+msgid "Minimum distance from the Snap Assistant to the pointer to open it"
+msgstr "أقل مسافة بين مساعد الالتقاط والمؤشر لفتحه"
+
+#: dist/prefs.js:106
+msgid "Snap Assistant"
+msgstr "مساعد الالتقاط"
+
+#: dist/prefs.js:107
+msgid "Apply blur effect to Snap Assistant"
+msgstr "تطبيق تأثير التمويه على مساعد الالتقاط"
+
+#: dist/prefs.js:113
+msgid "Selected tile preview"
+msgstr "معاينة المربع المحدد"
+
+#: dist/prefs.js:114
+msgid "Apply blur effect to selected tile preview"
+msgstr "تطبيق تأثير التمويه على معاينة المربع المحدد"
+
+#: dist/prefs.js:118
+msgid "Window border"
+msgstr "حدود النافذة"
+
+#: dist/prefs.js:119 dist/prefs.js:126
+msgid "Show a border around focused window"
+msgstr "إظهار حد حول النافذة المركّز عليها"
+
+#: dist/prefs.js:125
+msgid "Enable"
+msgstr "تفعيل"
+
+#: dist/prefs.js:132
+msgid "Smart border radius"
+msgstr "نصف قطر الحد الذكي"
+
+#: dist/prefs.js:133
+msgid "Dynamically adapt to the window's actual border radius"
+msgstr "التكيّف تلقائيًا مع نصف قطر حد النافذة الفعلي"
+
+#: dist/prefs.js:139
+msgid "Width"
+msgstr "العرض"
+
+#: dist/prefs.js:140
+msgid "The size of the border"
+msgstr "حجم الحد"
+
+#: dist/prefs.js:149
+msgid "Border color"
+msgstr "لون الحد"
+
+#: dist/prefs.js:150
+msgid "Choose the color of the border"
+msgstr "اختر لون الحد"
+
+#: dist/prefs.js:166
+msgid "Animations"
+msgstr "الحركات"
+
+#: dist/prefs.js:167
+msgid "Customize animations"
+msgstr "تخصيص الحركات"
+
+#: dist/prefs.js:173
+msgid "Snap assistant animation time"
+msgstr "مدة حركة مساعد الالتقاط"
+
+#: dist/prefs.js:174
+msgid "The snap assistant animation time in milliseconds"
+msgstr "مدة حركة مساعد الالتقاط بالمللي ثانية"
+
+#: dist/prefs.js:182
+msgid "Tiles animation time"
+msgstr "مدة حركة المربعات"
+
+#: dist/prefs.js:183
+msgid "The tiles animation time in milliseconds"
+msgstr "مدة حركة المربعات بالمللي ثانية"
+
+#: dist/prefs.js:189
+msgid "Behaviour"
+msgstr "السلوك"
+
+#: dist/prefs.js:190
+msgid "Configure the behaviour of Tiling Shell"
+msgstr "اضبط سلوك Tiling Shell"
+
+#: dist/prefs.js:195
+msgid "Enable Snap Assistant"
+msgstr "تفعيل مساعد الالتقاط"
+
+#: dist/prefs.js:196
+msgid "Move the window on top of the screen to snap assist it"
+msgstr "حرّك النافذة إلى أعلى الشاشة لاستخدام مساعد الالتقاط"
+
+#: dist/prefs.js:201
+msgid "Sync layout when tiling with Snap Assistant"
+msgstr "مزامنة التخطيط عند التقسيم بمساعد الالتقاط"
+
+#: dist/prefs.js:203
+msgid ""
+"Change the active layout to match the layout used when tiling a window with "
+"Snap Assistant"
+msgstr "تغيير التخطيط النشط ليطابق التخطيط المستخدم عند تقسيم نافذة بمساعد الالتقاط"
+
+#: dist/prefs.js:214
+msgid "Enable Tiling System"
+msgstr "تفعيل نظام التقسيم"
+
+#: dist/prefs.js:215
+msgid "Hold the activation key while moving a window to tile it"
+msgstr "اضغط مفتاح التفعيل مطولًا أثناء تحريك النافذة لتقسيمها"
+
+#: dist/prefs.js:223
+msgid "Tiling System deactivation key"
+msgstr "مفتاح تعطيل نظام التقسيم"
+
+#: dist/prefs.js:225
+msgid ""
+"Hold the deactivation key while moving a window to deactivate the tiling "
+"system"
+msgstr "اضغط مفتاح التعطيل مطولًا أثناء تحريك النافذة لتعطيل نظام التقسيم"
+
+#: dist/prefs.js:233
+msgid "Span multiple tiles"
+msgstr "التمدد على عدة مربعات"
+
+#: dist/prefs.js:234
+msgid "Hold the activation key to span multiple tiles"
+msgstr "اضغط مفتاح التفعيل مطولًا للتمدد على عدة مربعات"
+
+#: dist/prefs.js:243
+msgid "Enable Auto Tiling"
+msgstr "تفعيل التقسيم التلقائي"
+
+#: dist/prefs.js:244
+msgid "Automatically tile new windows to the best tile"
+msgstr "تقسيم النوافذ الجديدة تلقائيًا إلى أفضل مربع"
+
+#: dist/prefs.js:249
+msgid "Enable auto-resize of the complementing tiled windows"
+msgstr "تفعيل تغيير الحجم التلقائي للنوافذ المقسّمة المجاورة"
+
+#: dist/prefs.js:251
+msgid ""
+"When a tiled window is resized, auto-resize the other tiled windows near it"
+msgstr "عند تغيير حجم نافذة مقسّمة، يُغيَّر حجم النوافذ المقسّمة القريبة منها تلقائيًا"
+
+#: dist/prefs.js:257
+msgid "Restore window size"
+msgstr "استعادة حجم النافذة"
+
+#: dist/prefs.js:259
+msgid "Whether to restore the windows to their original size when untiled"
+msgstr "استعادة النوافذ إلى حجمها الأصلي عند إلغاء تقسيمها أو عدمه"
+
+#: dist/prefs.js:265
+msgid "Add snap assistant and auto-tile buttons to window menu"
+msgstr "إضافة أزرار مساعد الالتقاط والتقسيم التلقائي إلى قائمة النافذة"
+
+#: dist/prefs.js:267
+msgid ""
+"Add snap assistant and auto-tile buttons in the menu that shows up when you "
+"right click on a window title"
+msgstr "إضافة أزرار مساعد الالتقاط والتقسيم التلقائي إلى القائمة التي تظهر عند النقر بزر الفأرة الأيمن على عنوان النافذة"
+
+#: dist/prefs.js:273
+msgid "Add tiled windows to ALT+TAB menu"
+msgstr "إضافة النوافذ المقسّمة إلى قائمة ALT+TAB"
+
+#: dist/prefs.js:275
+msgid ""
+"Add the tiled windows to the ALT+TAB menu to open all the tiled windows at "
+"once"
+msgstr "إضافة النوافذ المقسّمة إلى قائمة ALT+TAB لفتحها جميعًا دفعة واحدة"
+
+#: dist/prefs.js:281
+msgid "Raise tiled windows together"
+msgstr "رفع النوافذ المقسّمة معًا"
+
+#: dist/prefs.js:283
+msgid ""
+"When one tiled window is raised, raise all tiled windows into the foreground "
+"together"
+msgstr "عند رفع نافذة مقسّمة، تُرفع جميع النوافذ المقسّمة إلى المقدمة معًا"
+
+#: dist/prefs.js:288
+msgid "Screen Edges"
+msgstr "حواف الشاشة"
+
+#: dist/prefs.js:290
+msgid ""
+"Drag windows against the top, left and right screen edges to resize them"
+msgstr "اسحب النوافذ إلى الحافة العلوية أو اليسرى أو اليمنى للشاشة لتغيير حجمها"
+
+#: dist/prefs.js:304
+msgid "Drag against top edge to maximize window"
+msgstr "السحب إلى الحافة العلوية لتكبير النافذة"
+
+#: dist/prefs.js:305
+msgid "Drag windows against the top edge to maximize them"
+msgstr "اسحب النوافذ إلى الحافة العلوية لتكبيرها"
+
+#: dist/prefs.js:314
+msgid "Quarter tiling activation area"
+msgstr "منطقة تفعيل التقسيم إلى أرباع"
+
+#: dist/prefs.js:315
+#, javascript-format
+msgid "Activation area to trigger quarter tiling (%% of the screen)"
+msgstr "منطقة التفعيل لبدء التقسيم إلى أرباع (%% من الشاشة)"
+
+#: dist/prefs.js:331
+msgid "Edge tiling offset"
+msgstr "إزاحة تقسيم الحواف"
+
+#: dist/prefs.js:332
+msgid "Offset from the screen edge to trigger edge tiling (in pixels)"
+msgstr "الإزاحة عن حافة الشاشة لبدء تقسيم الحواف (بالبكسل)"
+
+#: dist/prefs.js:354
+msgid "Windows suggestions"
+msgstr "اقتراحات النوافذ"
+
+#: dist/prefs.js:355
+msgid "Enable and disable windows suggestions"
+msgstr "تفعيل اقتراحات النوافذ وتعطيلها"
+
+#: dist/prefs.js:360
+msgid "Enable window suggestions for the tiling system"
+msgstr "تفعيل اقتراحات النوافذ لنظام التقسيم"
+
+#: dist/prefs.js:362
+msgid ""
+"Provides smart suggestions to fill empty tiles when using the tiling system"
+msgstr "يقدّم اقتراحات ذكية لملء المربعات الفارغة عند استخدام نظام التقسيم"
+
+#: dist/prefs.js:368
+msgid "Enable window suggestions for the snap assistant"
+msgstr "تفعيل اقتراحات النوافذ لمساعد الالتقاط"
+
+#: dist/prefs.js:370
+msgid ""
+"Offers suggestions to populate empty tiles when using the snap assistant"
+msgstr "يقدّم اقتراحات لملء المربعات الفارغة عند استخدام مساعد الالتقاط"
+
+#: dist/prefs.js:376
+msgid "Enable window suggestions for screen edge tiling"
+msgstr "تفعيل اقتراحات النوافذ لتقسيم حواف الشاشة"
+
+#: dist/prefs.js:378
+msgid "Suggests windows to occupy empty tiles when tiling to screen edges"
+msgstr "يقترح نوافذ لشغل المربعات الفارغة عند التقسيم إلى حواف الشاشة"
+
+#: dist/prefs.js:384
+msgid "Layouts"
+msgstr "التخطيطات"
+
+#: dist/prefs.js:385
+msgid "Configure the layouts of Tiling Shell"
+msgstr "اضبط تخطيطات Tiling Shell"
+
+#: dist/prefs.js:389 dist/prefs.js:390
+msgid "Edit layouts"
+msgstr "تحرير التخطيطات"
+
+#: dist/prefs.js:391
+msgid "Open the layouts editor"
+msgstr "فتح محرر التخطيطات"
+
+#: dist/prefs.js:396 dist/prefs.js:397 dist/prefs.js:401
+msgid "Export layouts"
+msgstr "تصدير التخطيطات"
+
+#: dist/prefs.js:398
+msgid "Export layouts to a file"
+msgstr "تصدير التخطيطات إلى ملف"
+
+#: dist/prefs.js:450 dist/prefs.js:451
+msgid "Import layouts"
+msgstr "استيراد التخطيطات"
+
+#: dist/prefs.js:452
+msgid "Import layouts from a file"
+msgstr "استيراد التخطيطات من ملف"
+
+#: dist/prefs.js:455
+msgid "Select layouts file"
+msgstr "اختر ملف التخطيطات"
+
+#: dist/prefs.js:458 dist/prefs.js:848
+msgid "Open"
+msgstr "فتح"
+
+#: dist/prefs.js:506 dist/prefs.js:507
+msgid "Reset layouts"
+msgstr "إعادة تعيين التخطيطات"
+
+#: dist/prefs.js:508
+msgid "Bring back the default layouts"
+msgstr "استعادة التخطيطات الافتراضية"
+
+#: dist/prefs.js:521
+msgid "Keybindings"
+msgstr "اختصارات لوحة المفاتيح"
+
+#: dist/prefs.js:523
+msgid "Use hotkeys to perform actions on the focused window"
+msgstr "استخدم مفاتيح الاختصار لتنفيذ إجراءات على النافذة المركّز عليها"
+
+#: dist/prefs.js:541
+msgid "Move window to right tile"
+msgstr "نقل النافذة إلى المربع الأيمن"
+
+#: dist/prefs.js:543
+msgid "Move the focused window to the tile on its right"
+msgstr "نقل النافذة المركّز عليها إلى المربع على يمينها"
+
+#: dist/prefs.js:552
+msgid "Move window to left tile"
+msgstr "نقل النافذة إلى المربع الأيسر"
+
+#: dist/prefs.js:553
+msgid "Move the focused window to the tile on its left"
+msgstr "نقل النافذة المركّز عليها إلى المربع على يسارها"
+
+#: dist/prefs.js:559
+msgid "Move window to tile above"
+msgstr "نقل النافذة إلى المربع العلوي"
+
+#: dist/prefs.js:560
+msgid "Move the focused window to the tile above"
+msgstr "نقل النافذة المركّز عليها إلى المربع الذي فوقها"
+
+#: dist/prefs.js:566
+msgid "Move window to tile below"
+msgstr "نقل النافذة إلى المربع السفلي"
+
+#: dist/prefs.js:567
+msgid "Move the focused window to the tile below"
+msgstr "نقل النافذة المركّز عليها إلى المربع الذي تحتها"
+
+#: dist/prefs.js:573
+msgid "Span window to right tile"
+msgstr "تمديد النافذة إلى المربع الأيمن"
+
+#: dist/prefs.js:574
+msgid "Span the focused window to the tile on its right"
+msgstr "تمديد النافذة المركّز عليها إلى المربع على يمينها"
+
+#: dist/prefs.js:580
+msgid "Span window to left tile"
+msgstr "تمديد النافذة إلى المربع الأيسر"
+
+#: dist/prefs.js:581
+msgid "Span the focused window to the tile on its left"
+msgstr "تمديد النافذة المركّز عليها إلى المربع على يسارها"
+
+#: dist/prefs.js:587
+msgid "Span window above"
+msgstr "تمديد النافذة للأعلى"
+
+#: dist/prefs.js:588
+msgid "Span the focused window to the tile above"
+msgstr "تمديد النافذة المركّز عليها إلى المربع الذي فوقها"
+
+#: dist/prefs.js:594
+msgid "Span window down"
+msgstr "تمديد النافذة للأسفل"
+
+#: dist/prefs.js:595
+msgid "Span the focused window to the tile below"
+msgstr "تمديد النافذة المركّز عليها إلى المربع الذي تحتها"
+
+#: dist/prefs.js:601
+msgid "Span window to all tiles"
+msgstr "تمديد النافذة إلى جميع المربعات"
+
+#: dist/prefs.js:602
+msgid "Span the focused window to all the tiles"
+msgstr "تمديد النافذة المركّز عليها إلى جميع المربعات"
+
+#: dist/prefs.js:608
+msgid "Untile focused window"
+msgstr "إلغاء تقسيم النافذة المركّز عليها"
+
+#: dist/prefs.js:616
+msgid "Move window to the center"
+msgstr "نقل النافذة إلى المنتصف"
+
+#: dist/prefs.js:618
+msgid "Move the focused window to the center of the screen"
+msgstr "نقل النافذة المركّز عليها إلى منتصف الشاشة"
+
+#: dist/prefs.js:627
+msgid "Focus window to the right"
+msgstr "التركيز على النافذة اليمنى"
+
+#: dist/prefs.js:629
+msgid "Focus the window to the right of the current focused window"
+msgstr "التركيز على النافذة الواقعة يمين النافذة المركّز عليها حاليًا"
+
+#: dist/prefs.js:636
+msgid "Focus window to the left"
+msgstr "التركيز على النافذة اليسرى"
+
+#: dist/prefs.js:637
+msgid "Focus the window to the left of the current focused window"
+msgstr "التركيز على النافذة الواقعة يسار النافذة المركّز عليها حاليًا"
+
+#: dist/prefs.js:643
+msgid "Focus window above"
+msgstr "التركيز على النافذة العلوية"
+
+#: dist/prefs.js:644
+msgid "Focus the window above the current focused window"
+msgstr "التركيز على النافذة الواقعة فوق النافذة المركّز عليها حاليًا"
+
+#: dist/prefs.js:650
+msgid "Focus window below"
+msgstr "التركيز على النافذة السفلية"
+
+#: dist/prefs.js:651
+msgid "Focus the window below the current focused window"
+msgstr "التركيز على النافذة الواقعة تحت النافذة المركّز عليها حاليًا"
+
+#: dist/prefs.js:657
+msgid "Focus next window"
+msgstr "التركيز على النافذة التالية"
+
+#: dist/prefs.js:658
+msgid "Focus the window next to the current focused window"
+msgstr "التركيز على النافذة التالية للنافذة المركّز عليها حاليًا"
+
+#: dist/prefs.js:664
+msgid "Focus previous window"
+msgstr "التركيز على النافذة السابقة"
+
+#: dist/prefs.js:665
+msgid "Focus the window prior to the current focused window"
+msgstr "التركيز على النافذة السابقة للنافذة المركّز عليها حاليًا"
+
+#: dist/prefs.js:671
+msgid "Highlight focused window"
+msgstr "إبراز النافذة المركّز عليها"
+
+#: dist/prefs.js:673
+msgid "Minimize all the other windows and show only the focused window"
+msgstr "تصغير جميع النوافذ الأخرى وإظهار النافذة المركّز عليها فقط"
+
+#: dist/prefs.js:680
+msgid "Cycle layouts"
+msgstr "التنقل بين التخطيطات"
+
+#: dist/prefs.js:681
+msgid "Cycle through available workspace layouts"
+msgstr "التنقل بين تخطيطات مساحة العمل المتاحة"
+
+#: dist/prefs.js:711
+msgid "View and Customize all the Shortcuts"
+msgstr "عرض جميع الاختصارات وتخصيصها"
+
+#: dist/prefs.js:739 dist/prefs.js:740
+msgid "View and Customize Shortcuts"
+msgstr "عرض الاختصارات وتخصيصها"
+
+#: dist/prefs.js:763
+msgid "Enable next/previous window focus to wrap around"
+msgstr "تفعيل الدوران الدائري عند التركيز على النافذة التالية/السابقة"
+
+#: dist/prefs.js:765
+msgid "When focusing next or previous window, wrap around at the window edge"
+msgstr "عند التركيز على النافذة التالية أو السابقة، يعود التركيز إلى الطرف الآخر عند بلوغ آخر نافذة"
+
+#: dist/prefs.js:771
+msgid "Restrict directional focus to tiled windows"
+msgstr "حصر التركيز الاتجاهي في النوافذ المقسّمة"
+
+#: dist/prefs.js:773
+msgid "When using directional focus navigation, only consider tiled windows"
+msgstr "عند استخدام التنقل الاتجاهي بين النوافذ، تُؤخذ النوافذ المقسّمة فقط في الاعتبار"
+
+#: dist/prefs.js:778
+msgid "Import, export and reset"
+msgstr "الاستيراد والتصدير وإعادة التعيين"
+
+#: dist/prefs.js:780
+msgid "Import, export and reset the settings of Tiling Shell"
+msgstr "استيراد إعدادات Tiling Shell وتصديرها وإعادة تعيينها"
+
+#: dist/prefs.js:785 dist/prefs.js:786
+msgid "Export settings"
+msgstr "تصدير الإعدادات"
+
+#: dist/prefs.js:787
+msgid "Export settings to a file"
+msgstr "تصدير الإعدادات إلى ملف"
+
+#: dist/prefs.js:790
+msgid "Export settings to a text file"
+msgstr "تصدير الإعدادات إلى ملف نصي"
+
+#: dist/prefs.js:797
+msgid "Text file"
+msgstr "ملف نصي"
+
+#: dist/prefs.js:840 dist/prefs.js:841
+msgid "Import settings"
+msgstr "استيراد الإعدادات"
+
+#: dist/prefs.js:842
+msgid "Import settings from a file"
+msgstr "استيراد الإعدادات من ملف"
+
+#: dist/prefs.js:845
+msgid "Select a text file to import from"
+msgstr "اختر ملفًا نصيًا للاستيراد منه"
+
+#: dist/prefs.js:887 dist/prefs.js:888
+msgid "Reset settings"
+msgstr "إعادة تعيين الإعدادات"
+
+#: dist/prefs.js:889
+msgid "Bring back the default settings"
+msgstr "استعادة الإعدادات الافتراضية"
+
+#: dist/prefs.js:904
+msgid "Donate on ko-fi"
+msgstr "تبرّع عبر ko-fi"
+
+#: dist/prefs.js:910
+msgid "Report a bug"
+msgstr "الإبلاغ عن خطأ"
+
+#: dist/prefs.js:916
+msgid "Request a feature"
+msgstr "طلب ميزة"
+
+#: dist/prefs.js:924
+msgid "Have issues, you want to suggest a new feature or contribute?"
+msgstr "هل واجهت مشكلة، أو تريد اقتراح ميزة جديدة أو المساهمة؟"
+
+#: dist/prefs.js:931
+msgid "Open a new issue on"
+msgstr "افتح مشكلة جديدة على"
+
+#: dist/prefs.js:999
+msgid "Choose how windows snap to screen edges"
+msgstr "اختر كيفية التقاط النوافذ لحواف الشاشة"
+
+#: dist/prefs.js:1014
+msgid "Default"
+msgstr "افتراضي"
+
+#: dist/prefs.js:1015
+msgid "Follow quarters or screen halves"
+msgstr "اتباع الأرباع أو أنصاف الشاشة"
+
+#: dist/prefs.js:1020
+msgid "Adaptive"
+msgstr "متكيّف"
+
+#: dist/prefs.js:1021
+msgid "Follow corners of selected layout or screen halves"
+msgstr "اتباع زوايا التخطيط المحدد أو أنصاف الشاشة"
+
+#: dist/prefs.js:1026
+msgid "Granular"
+msgstr "دقيق"
+
+#: dist/prefs.js:1027
+msgid "Follow currently selected layout"
+msgstr "اتباع التخطيط المحدد حاليًا"
+
+#: dist/prefs.js:1216
+msgid "Choose custom color"
+msgstr "اختر لونًا مخصصًا"
+
+#: dist/prefs.js:1217
+msgid "Use system accent color"
+msgstr "استخدام لون تمييز النظام"
+
+#: dist/prefs.js:1271 dist/prefs.js:1298
+msgid "New accelerator…"
+msgstr "اختصار جديد…"
+
+#: dist/prefs.js:1301
+msgid "Use Backspace to clear"
+msgstr "استخدم Backspace للمسح"
