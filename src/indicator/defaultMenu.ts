@@ -20,6 +20,7 @@ import Layout from '../components/layout/Layout';
 import { _ } from '../translations';
 import { widgetOrientation } from '../utils/gnomesupport';
 import { createButton, createIconButton } from './utils';
+import { disambiguateMonitorNames, MonitorDetails } from './monitorNames';
 
 const debug = logger('DefaultMenu');
 
@@ -105,14 +106,7 @@ class LayoutsRow extends St.BoxLayout {
 
     public updateMonitorName(
         showMonitorName: boolean,
-        monitorsDetails: {
-            name: string;
-            index?: number;
-            x?: number;
-            y?: number;
-            height?: number;
-            width?: number;
-        }[],
+        monitorsDetails: MonitorDetails[],
     ) {
         if (!showMonitorName) this._label.hide();
         else this._label.show();
@@ -278,16 +272,13 @@ export default class DefaultMenu implements CurrentMenu {
         }
 
         // GNOME 49+ has Meta.Monitor with get_display_name()
-        const monitorsDetails: {
-            name: string;
-            index: number;
-            x: number;
-            y: number;
-        }[] | undefined = this._get_display_name();
+        const monitorsDetails: MonitorDetails[] | undefined =
+            this._get_display_name();
 
         if (monitorsDetails) {
+            const disambiguated = disambiguateMonitorNames(monitorsDetails);
             this._layoutsRows.forEach((lr) =>
-                lr.updateMonitorName(true, monitorsDetails),
+                lr.updateMonitorName(true, disambiguated),
             );
             return;
         }
@@ -313,8 +304,11 @@ export default class DefaultMenu implements CurrentMenu {
                     if (pr.get_successful()) {
                         debug(stdout);
                         const parsedMonitorsDetails = JSON.parse(stdout);
+                        const disambiguated = disambiguateMonitorNames(
+                            parsedMonitorsDetails,
+                        );
                         this._layoutsRows.forEach((lr) =>
-                            lr.updateMonitorName(true, parsedMonitorsDetails),
+                            lr.updateMonitorName(true, disambiguated),
                         );
                     } else {
                         debug('error:', stderr);
@@ -327,19 +321,15 @@ export default class DefaultMenu implements CurrentMenu {
     }
 
     // Use GNOME 49+'s Meta.Monitor with get_display_name()
-    private _get_display_name() {
+    private _get_display_name(): MonitorDetails[] | undefined {
         const monitorManager = global.backend.get_monitor_manager();
         if (!monitorManager.get_logical_monitors) return undefined;
 
         const logicalMonitors = monitorManager.get_logical_monitors();
         if (!logicalMonitors || logicalMonitors.length <= 0) return undefined;
 
-        const monitorsDetails: {
-            name: string;
-            index: number;
-            x: number;
-            y: number;
-        }[] = [];
+        const shellMonitors = getMonitors();
+        const monitorsDetails: MonitorDetails[] = [];
         logicalMonitors.forEach(logicalMonitor => {
             const metaMonitors = logicalMonitor.get_monitors();
             if (metaMonitors.length <= 0) return;
@@ -347,14 +337,19 @@ export default class DefaultMenu implements CurrentMenu {
             const metaMonitor = metaMonitors[0];
             if (!metaMonitor.get_display_name) return;
 
-            // MetaLogicalMonitor has x, y as direct properties
-            const x = (logicalMonitor as any).x ?? 0;
-            const y = (logicalMonitor as any).y ?? 0;
+            // MetaLogicalMonitor exposes no geometry to GJS (only
+            // get_monitors() and get_number()), so take x, y, width and
+            // height from the shell's monitor with the same index
+            const shellMonitor = shellMonitors.find(
+                (m) => m.index === logicalMonitor.get_number(),
+            );
             monitorsDetails.push({
                 name: metaMonitor.get_display_name(),
                 index: logicalMonitor.get_number(),
-                x,
-                y,
+                x: shellMonitor?.x ?? 0,
+                y: shellMonitor?.y ?? 0,
+                width: shellMonitor?.width,
+                height: shellMonitor?.height,
             });
         });
 
