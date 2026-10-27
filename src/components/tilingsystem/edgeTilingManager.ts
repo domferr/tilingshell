@@ -347,7 +347,7 @@ export default class EdgeTilingManager extends GObject.Object {
                     exactLeftColumnTiles,
                     false,
                 );
-                previewRect.x = this._workArea.x + this._workArea.width * minX;
+                previewRect.x = newRect.x;
                 previewRect.y = newRect.y;
                 previewRect.width = newRect.width;
                 previewRect.height = newRect.height;
@@ -374,12 +374,7 @@ export default class EdgeTilingManager extends GObject.Object {
                     true,
                 );
 
-                // Calculate the starting X position based on the actual tiles
-                const rightMostX = Math.min(
-                    ...exactRightColumnTiles.map((tile) => tile.x),
-                );
-                previewRect.x =
-                    this._workArea.x + this._workArea.width * rightMostX;
+                previewRect.x = newRect.x;
                 previewRect.y = newRect.y;
                 previewRect.width = newRect.width;
                 previewRect.height = newRect.height;
@@ -393,25 +388,22 @@ export default class EdgeTilingManager extends GObject.Object {
             // Snap to top-left corner tile
             const topLeftTile = this._findTileAtCorner('top-left');
             if (topLeftTile) {
-                previewRect.width = this._workArea.width * topLeftTile.width;
-                previewRect.height = this._workArea.height * topLeftTile.height;
-                previewRect.x =
-                    this._workArea.x + this._workArea.width * topLeftTile.x;
-                previewRect.y =
-                    this._workArea.y + this._workArea.height * topLeftTile.y;
+                const newRect = this._createRectForSingleTile(topLeftTile);
+                previewRect.x = newRect.x;
+                previewRect.y = newRect.y;
+                previewRect.width = newRect.width;
+                previewRect.height = newRect.height;
             }
             this._activeEdgeTile = this._topLeft;
         } else if (isPointInsideRect({ x, y }, this._bottomLeft)) {
             // Snap to bottom-left corner tile
             const bottomLeftTile = this._findTileAtCorner('bottom-left');
             if (bottomLeftTile) {
-                previewRect.width = this._workArea.width * bottomLeftTile.width;
-                previewRect.height =
-                    this._workArea.height * bottomLeftTile.height;
-                previewRect.x =
-                    this._workArea.x + this._workArea.width * bottomLeftTile.x;
-                previewRect.y =
-                    this._workArea.y + this._workArea.height * bottomLeftTile.y;
+                const newRect = this._createRectForSingleTile(bottomLeftTile);
+                previewRect.x = newRect.x;
+                previewRect.y = newRect.y;
+                previewRect.width = newRect.width;
+                previewRect.height = newRect.height;
             } else {
                 previewRect.y =
                     this._workArea.y +
@@ -423,13 +415,11 @@ export default class EdgeTilingManager extends GObject.Object {
             // Snap to top-right corner tile
             const topRightTile = this._findTileAtCorner('top-right');
             if (topRightTile) {
-                previewRect.width = this._workArea.width * topRightTile.width;
-                previewRect.height =
-                    this._workArea.height * topRightTile.height;
-                previewRect.x =
-                    this._workArea.x + this._workArea.width * topRightTile.x;
-                previewRect.y =
-                    this._workArea.y + this._workArea.height * topRightTile.y;
+                const newRect = this._createRectForSingleTile(topRightTile);
+                previewRect.x = newRect.x;
+                previewRect.y = newRect.y;
+                previewRect.width = newRect.width;
+                previewRect.height = newRect.height;
             } else {
                 previewRect.x =
                     this._workArea.x + this._workArea.width - previewRect.width;
@@ -439,15 +429,11 @@ export default class EdgeTilingManager extends GObject.Object {
             // Snap to bottom-right corner tile
             const bottomRightTile = this._findTileAtCorner('bottom-right');
             if (bottomRightTile) {
-                previewRect.width =
-                    this._workArea.width * bottomRightTile.width;
-                previewRect.height =
-                    this._workArea.height * bottomRightTile.height;
-                previewRect.x =
-                    this._workArea.x + this._workArea.width * bottomRightTile.x;
-                previewRect.y =
-                    this._workArea.y +
-                    this._workArea.height * bottomRightTile.y;
+                const newRect = this._createRectForSingleTile(bottomRightTile);
+                previewRect.x = newRect.x;
+                previewRect.y = newRect.y;
+                previewRect.width = newRect.width;
+                previewRect.height = newRect.height;
             } else {
                 previewRect.x =
                     this._workArea.x + this._workArea.width - previewRect.width;
@@ -537,25 +523,22 @@ export default class EdgeTilingManager extends GObject.Object {
             // Snap to top-left corner tile
             const topLeftTile = this._findTileAtCorner('top-left');
             if (topLeftTile) {
-                previewRect.width = this._workArea.width * topLeftTile.width;
-                previewRect.height = this._workArea.height * topLeftTile.height;
-                previewRect.x =
-                    this._workArea.x + this._workArea.width * topLeftTile.x;
-                previewRect.y =
-                    this._workArea.y + this._workArea.height * topLeftTile.y;
+                const newRect = this._createRectForSingleTile(topLeftTile);
+                previewRect.x = newRect.x;
+                previewRect.y = newRect.y;
+                previewRect.width = newRect.width;
+                previewRect.height = newRect.height;
             }
             this._activeEdgeTile = this._topLeft;
         } else if (isPointInsideRect({ x, y }, this._bottomLeft)) {
             // Snap to bottom-left corner tile
             const bottomLeftTile = this._findTileAtCorner('bottom-left');
             if (bottomLeftTile) {
-                previewRect.width = this._workArea.width * bottomLeftTile.width;
-                previewRect.height =
-                    this._workArea.height * bottomLeftTile.height;
-                previewRect.x =
-                    this._workArea.x + this._workArea.width * bottomLeftTile.x;
-                previewRect.y =
-                    this._workArea.y + this._workArea.height * bottomLeftTile.y;
+                const newRect = this._createRectForSingleTile(bottomLeftTile);
+                previewRect.x = newRect.x;
+                previewRect.y = newRect.y;
+                previewRect.width = newRect.width;
+                previewRect.height = newRect.height;
             } else {
                 previewRect.y =
                     this._workArea.y +
@@ -567,13 +550,11 @@ export default class EdgeTilingManager extends GObject.Object {
             // Snap to top-right corner tile
             const topRightTile = this._findTileAtCorner('top-right');
             if (topRightTile) {
-                previewRect.width = this._workArea.width * topRightTile.width;
-                previewRect.height =
-                    this._workArea.height * topRightTile.height;
-                previewRect.x =
-                    this._workArea.x + this._workArea.width * topRightTile.x;
-                previewRect.y =
-                    this._workArea.y + this._workArea.height * topRightTile.y;
+                const newRect = this._createRectForSingleTile(topRightTile);
+                previewRect.x = newRect.x;
+                previewRect.y = newRect.y;
+                previewRect.width = newRect.width;
+                previewRect.height = newRect.height;
             } else {
                 previewRect.x =
                     this._workArea.x + this._workArea.width - previewRect.width;
@@ -583,15 +564,11 @@ export default class EdgeTilingManager extends GObject.Object {
             // Snap to bottom-right corner tile
             const bottomRightTile = this._findTileAtCorner('bottom-right');
             if (bottomRightTile) {
-                previewRect.width =
-                    this._workArea.width * bottomRightTile.width;
-                previewRect.height =
-                    this._workArea.height * bottomRightTile.height;
-                previewRect.x =
-                    this._workArea.x + this._workArea.width * bottomRightTile.x;
-                previewRect.y =
-                    this._workArea.y +
-                    this._workArea.height * bottomRightTile.y;
+                const newRect = this._createRectForSingleTile(bottomRightTile);
+                previewRect.x = newRect.x;
+                previewRect.y = newRect.y;
+                previewRect.width = newRect.width;
+                previewRect.height = newRect.height;
             } else {
                 previewRect.x =
                     this._workArea.x + this._workArea.width - previewRect.width;
@@ -665,14 +642,25 @@ export default class EdgeTilingManager extends GObject.Object {
             return rect;
         }
 
-        // When we have tiles, use their actual dimensions
-        // Get the minimum x and maximum width to create a rect that covers all tiles in column
-        const minX = Math.min(...tiles.map((tile) => tile.x));
-        const maxWidth = Math.max(...tiles.map((tile) => tile.width));
+        const minX = Math.min(...tiles.map((t) => t.x));
+        const maxWidth = Math.max(...tiles.map((t) => t.width));
+        const maxEndX = minX + maxWidth;
 
-        rect.width = this._workArea.width * maxWidth;
-        rect.height = this._workArea.height;
-        rect.x = this._workArea.x + this._workArea.width * minX;
+        const outerGaps = Settings.get_outer_gaps();
+        const containerW = this._workArea.width - outerGaps.left - outerGaps.right;
+        const containerH = this._workArea.height - outerGaps.top - outerGaps.bottom;
+
+        // Column tiles always span full height
+        const isLeft = Math.abs(minX) < 0.01;
+        const isRight = Math.abs(maxEndX - 1) < 0.01;
+
+        rect.x = this._workArea.x + outerGaps.left + Math.round(containerW * minX);
+        rect.y = this._workArea.y; // always top of workArea
+        rect.width = Math.round(containerW * maxWidth);
+        rect.height = this._workArea.height; // always full height
+
+        if (isLeft) { rect.x -= outerGaps.left; rect.width += outerGaps.left; }
+        if (isRight) { rect.width += outerGaps.right; }
 
         return rect;
     }
@@ -829,11 +817,26 @@ export default class EdgeTilingManager extends GObject.Object {
             return rect;
         }
 
-        // Create rect based on the single tile
-        rect.width = this._workArea.width * tile.width;
-        rect.height = this._workArea.height * tile.height;
-        rect.x = this._workArea.x + this._workArea.width * tile.x;
-        rect.y = this._workArea.y + this._workArea.height * tile.y;
+        const outerGaps = Settings.get_outer_gaps();
+        const containerW = this._workArea.width - outerGaps.left - outerGaps.right;
+        const containerH = this._workArea.height - outerGaps.top - outerGaps.bottom;
+
+        // Compute relative to containerWithoutOuterGaps, then expand for screen edges
+        const isLeft = Math.abs(tile.x) < 0.01;
+        const isTop = Math.abs(tile.y) < 0.01;
+        const isRight = Math.abs(tile.x + tile.width - 1) < 0.01;
+        const isBottom = Math.abs(tile.y + tile.height - 1) < 0.01;
+
+        rect.x = this._workArea.x + outerGaps.left + Math.round(containerW * tile.x);
+        rect.y = this._workArea.y + outerGaps.top + Math.round(containerH * tile.y);
+        rect.width  = Math.round(containerW * tile.width);
+        rect.height = Math.round(containerH * tile.height);
+
+        // Expand back into outer gap area, matching draw_layout()
+        if (isLeft) { rect.x -= outerGaps.left; rect.width  += outerGaps.left; }
+        if (isTop) { rect.y -= outerGaps.top; rect.height += outerGaps.top; }
+        if (isRight) { rect.width += outerGaps.right; }
+        if (isBottom) { rect.height += outerGaps.bottom; }
 
         return rect;
     }
