@@ -159,6 +159,8 @@ class SnapAssistContent extends St.BoxLayout {
     }
 
     private _applyStyle() {
+        // the inline style is cleared before reading the theme node, which
+        // would otherwise return the previously set inline values
         this.set_style(null);
 
         const [alreadyScaled, finalScalingFactor] = getScalingFactorOf(this);
@@ -167,13 +169,20 @@ class SnapAssistContent extends St.BoxLayout {
             (this.get_theme_node().get_length('padding-value') /
                 (alreadyScaled ? finalScalingFactor : 1));
 
+        // with the experimental blur disabled, leave the background to the
+        // 'popup-menu-content' theme node: external overrides such as themes
+        // or Blur My Shell then apply as they do on native popup menus
+        if (!this._blur) {
+            this.set_style(`padding: ${this._padding}px;`);
+            return;
+        }
+
         const backgroundColor = this.get_theme_node()
             .get_background_color()
             .copy();
-        const alpha = this._blur ? 0.7 : backgroundColor.alpha;
         this.set_style(`
             padding: ${this._padding}px;
-            background-color: rgba(${backgroundColor.red}, ${backgroundColor.green}, ${backgroundColor.blue}, ${alpha}) !important;
+            background-color: rgba(${backgroundColor.red}, ${backgroundColor.green}, ${backgroundColor.blue}, 0.7) !important;
         `);
     }
 
