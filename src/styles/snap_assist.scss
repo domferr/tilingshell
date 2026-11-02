@@ -3,10 +3,11 @@
 $snap-assist-tile-border-width: 1px;
 $snap-assist-tile-border-radius: 6px;
 
+// the snap assistant borrows the 'popup-menu-content' style class: leave the
+// container shape (border radius, border, shadow and background) to the shell
+// theme so that it stays consistent with native popup menus. Only the inner
+// spacing is defined here, as the code reads it to lay out the previews.
 .snap-assistant {
-    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px;
-    border: 0;
-    border-radius: constants.$base_border_radius + 2;
     padding-value: 16px;
 }
 
