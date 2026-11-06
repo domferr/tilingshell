@@ -1,4 +1,4 @@
-import Settings from '../../settings/settings';
+import Settings, { LayoutEditorShortcut } from '../../settings/settings';
 import { registerGObjectClass } from '../../utils/gjs';
 import { St, Clutter, Gio } from '../../gi/ext';
 import LayoutButton from '../../indicator/layoutButton';
@@ -37,6 +37,9 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         super({
             destroyOnClose: true,
             styleClass: 'editor-dialog',
+            // Public and supported from GNOME 42 onward. This keeps the
+            // desktop visible without relying on ModalDialog._lightbox.
+            shellReactive: true,
         });
 
         if (params.enableScaling) {
@@ -173,32 +176,6 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
             }),
         );
 
-        const suggestion4 = new St.BoxLayout({
-            xExpand: true,
-            margin_top: 16,
-        });
-        // use indicator to save or cancel
-        suggestion4.add_child(
-            new St.Icon({
-                iconSize: 16,
-                yAlign: Clutter.ActorAlign.CENTER,
-                gicon: Gio.icon_new_for_string(
-                    `${params.path}/icons/indicator-symbolic.svg`,
-                ),
-                styleClass: 'button kbd',
-                pseudoClass: 'active',
-            }),
-        );
-        suggestion4.add_child(
-            new St.Label({
-                text: ` ${_('use the indicator button to save or cancel')}.`,
-                xAlign: Clutter.ActorAlign.CENTER,
-                yAlign: Clutter.ActorAlign.CENTER,
-                styleClass: '',
-                xExpand: false,
-            }),
-        );
-
         const legend = new St.BoxLayout({
             styleClass: 'legend',
             ...widgetOrientation(true),
@@ -206,7 +183,18 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         legend.add_child(suggestion1);
         legend.add_child(suggestion2);
         legend.add_child(suggestion3);
-        legend.add_child(suggestion4);
+        this._addShortcutSuggestion(
+            legend,
+            Settings.LAYOUT_EDITOR_SAVE_SHORTCUT,
+            _('to save the layout'),
+            true,
+        );
+        this._addShortcutSuggestion(
+            legend,
+            Settings.LAYOUT_EDITOR_CANCEL_SHORTCUT,
+            _('to cancel editing'),
+        );
+        this._addKeyboardFallbackSuggestion(legend);
 
         this.contentLayout.destroy_all_children();
         this.contentLayout.add_child(
@@ -220,12 +208,83 @@ export default class EditorDialog extends ModalDialog.ModalDialog {
         this.contentLayout.add_child(legend);
 
         this.clearButtons();
-        this.addButton({
+        const startEditingButton = this.addButton({
             label: _('Start editing'),
             default: true,
-            key: Clutter.KEY_Escape,
             action: params.onClose,
         });
+        startEditingButton.add_style_class_name('editor-start-button');
+    }
+
+    private _shortcutLabel(shortcut: LayoutEditorShortcut): string {
+        switch (shortcut) {
+            case LayoutEditorShortcut.MIDDLE:
+                return _('MIDDLE CLICK');
+            case LayoutEditorShortcut.CTRL_MIDDLE:
+                return _('CTRL + MIDDLE CLICK');
+            case LayoutEditorShortcut.ALT_MIDDLE:
+                return _('ALT + MIDDLE CLICK');
+            case LayoutEditorShortcut.SUPER_MIDDLE:
+                return _('SUPER + MIDDLE CLICK');
+            default:
+                return '';
+        }
+    }
+
+    private _addShortcutSuggestion(
+        legend: St.BoxLayout,
+        shortcut: LayoutEditorShortcut,
+        description: string,
+        marginTop: boolean = false,
+    ) {
+        if (shortcut === LayoutEditorShortcut.DISABLED) return;
+
+        const suggestion = new St.BoxLayout({
+            xExpand: true,
+            margin_top: marginTop ? 16 : 0,
+        });
+        suggestion.add_child(
+            new St.Label({
+                text: this._shortcutLabel(shortcut),
+                xAlign: Clutter.ActorAlign.CENTER,
+                yAlign: Clutter.ActorAlign.CENTER,
+                styleClass: 'button kbd',
+                xExpand: false,
+                pseudoClass: 'active',
+            }),
+        );
+        suggestion.add_child(
+            new St.Label({
+                text: ` ${description}.`,
+                xAlign: Clutter.ActorAlign.CENTER,
+                yAlign: Clutter.ActorAlign.CENTER,
+                xExpand: false,
+            }),
+        );
+        legend.add_child(suggestion);
+    }
+
+    private _addKeyboardFallbackSuggestion(legend: St.BoxLayout) {
+        const suggestion = new St.BoxLayout();
+        suggestion.add_child(
+            new St.Label({
+                text: 'CTRL + S / ESC',
+                xAlign: Clutter.ActorAlign.CENTER,
+                yAlign: Clutter.ActorAlign.CENTER,
+                styleClass: 'button kbd',
+                xExpand: false,
+                pseudoClass: 'active',
+            }),
+        );
+        suggestion.add_child(
+            new St.Label({
+                text: ` ${_('keyboard alternatives to save or cancel')}.`,
+                xAlign: Clutter.ActorAlign.CENTER,
+                yAlign: Clutter.ActorAlign.CENTER,
+                xExpand: false,
+            }),
+        );
+        legend.add_child(suggestion);
     }
 
     private _drawLayouts(params: {

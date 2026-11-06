@@ -1,7 +1,7 @@
 import { St, Clutter, Shell, Gio } from '../gi/ext';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
-import Settings from '../settings/settings';
+import Settings, { LayoutEditorShortcut } from '../settings/settings';
 import Layout from '../components/layout/Layout';
 import Tile from '../components/layout/Tile';
 import LayoutEditor from '../components/editor/layoutEditor';
@@ -12,6 +12,7 @@ import EditorDialog from '../components/editor/editorDialog';
 import CurrentMenu from './currentMenu';
 import { registerGObjectClass } from '../utils/gjs';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
+import { matchesLayoutEditorShortcut } from '../utils/layoutEditorShortcuts';
 
 enum IndicatorState {
     DEFAULT = 1,
@@ -35,7 +36,7 @@ export default class Indicator extends PanelMenu.Button {
     private _state: IndicatorState;
     private _enableScaling: boolean;
     private _path: string;
-    private _keyPressEvent: number | null;
+    private _editorInputEvent: number | null;
 
     constructor(path: string, uuid: string) {
         super(0.5, 'Tiling Shell Indicator', false);
@@ -61,7 +62,7 @@ export default class Indicator extends PanelMenu.Button {
         this._editorDialog = null;
         this._currentMenu = null;
         this._state = IndicatorState.DEFAULT;
-        this._keyPressEvent = null;
+        this._editorInputEvent = null;
         this._enableScaling = false;
         this._path = path;
 
@@ -92,7 +93,7 @@ export default class Indicator extends PanelMenu.Button {
             layoutToSelectId,
             monitorIndex,
         );
-        this.menu.toggle();
+        if (this.menu.isOpen) this.menu.close(true);
     }
 
     public newLayoutOnClick(showLegendOnly: boolean) {
@@ -194,7 +195,7 @@ export default class Indicator extends PanelMenu.Button {
             GlobalState.get().addLayout(newLayout);
         else GlobalState.get().editLayout(newLayout);
 
-        this.menu.toggle();
+        if (this.menu.isOpen) this.menu.close(true);
 
         this._layoutEditor.destroy();
         this._layoutEditor = null;
@@ -209,7 +210,7 @@ export default class Indicator extends PanelMenu.Button {
         )
             return;
 
-        this.menu.toggle();
+        if (this.menu.isOpen) this.menu.close(true);
 
         this._layoutEditor.destroy();
         this._layoutEditor = null;
@@ -229,21 +230,67 @@ export default class Indicator extends PanelMenu.Button {
             case IndicatorState.DEFAULT:
                 this._currentMenu = new DefaultMenu(this, this._enableScaling, this._openPreferences.bind(this));
                 if (!Settings.SHOW_INDICATOR) this.hide();
-                if (this._keyPressEvent) {
-                    global.stage.disconnect(this._keyPressEvent);
-                    this._keyPressEvent = null;
+                if (this._editorInputEvent) {
+                    global.stage.disconnect(this._editorInputEvent);
+                    this._editorInputEvent = null;
                 }
                 break;
             case IndicatorState.CREATE_NEW:
             case IndicatorState.EDITING_LAYOUT:
-                if (this._keyPressEvent)
-                    global.stage.disconnect(this._keyPressEvent);
-                this._keyPressEvent = global.stage.connect_after(
-                    'key-press-event',
+                if (this._editorInputEvent)
+                    global.stage.disconnect(this._editorInputEvent);
+                this._editorInputEvent = global.stage.connect(
+                    'captured-event',
                     (_, event) => {
+                        // Do not execute editor actions while the layout picker
+                        // or help dialog owns the modal interaction.
+                        if (this._editorDialog)
+                            return Clutter.EVENT_PROPAGATE;
+
+                        const eventType = event.type();
+                        const modifiers = event.get_state();
+
+                        if (eventType === Clutter.EventType.BUTTON_PRESS) {
+                            if (event.get_button() !== 2)
+                                return Clutter.EVENT_PROPAGATE;
+
+                            if (
+                                this._matchesEditorShortcut(
+                                    Settings.LAYOUT_EDITOR_CANCEL_SHORTCUT,
+                                    modifiers,
+                                )
+                            )
+                                this.cancelLayoutOnClick();
+                            else if (
+                                this._matchesEditorShortcut(
+                                    Settings.LAYOUT_EDITOR_SAVE_SHORTCUT,
+                                    modifiers,
+                                )
+                            )
+                                this.saveLayoutOnClick();
+                            else return Clutter.EVENT_PROPAGATE;
+
+                            return Clutter.EVENT_STOP;
+                        }
+
+                        if (eventType !== Clutter.EventType.KEY_PRESS)
+                            return Clutter.EVENT_PROPAGATE;
+
                         const symbol = event.get_key_symbol();
-                        if (symbol === Clutter.KEY_Escape)
+
+                        if (symbol === Clutter.KEY_Escape) {
                             this.cancelLayoutOnClick();
+                            return Clutter.EVENT_STOP;
+                        }
+
+                        if (
+                            (symbol === Clutter.KEY_s ||
+                                symbol === Clutter.KEY_S) &&
+                            (modifiers & Clutter.ModifierType.CONTROL_MASK) !== 0
+                        ) {
+                            this.saveLayoutOnClick();
+                            return Clutter.EVENT_STOP;
+                        }
 
                         return Clutter.EVENT_PROPAGATE;
                     },
@@ -254,7 +301,22 @@ export default class Indicator extends PanelMenu.Button {
         }
     }
 
+    private _matchesEditorShortcut(
+        shortcut: LayoutEditorShortcut,
+        modifiers: Clutter.ModifierType,
+    ): boolean {
+        return matchesLayoutEditorShortcut(shortcut, modifiers, {
+            ctrl: Clutter.ModifierType.CONTROL_MASK,
+            alt: Clutter.ModifierType.MOD1_MASK,
+            super: Clutter.ModifierType.SUPER_MASK,
+        });
+    }
+
     private _onDestroy() {
+        if (this._editorInputEvent) {
+            global.stage.disconnect(this._editorInputEvent);
+            this._editorInputEvent = null;
+        }
         this._editorDialog?.destroy();
         this._editorDialog = null;
         this._layoutEditor?.destroy();

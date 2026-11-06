@@ -1,5 +1,5 @@
 import { registerGObjectClass } from '../../utils/gjs';
-import { GObject, St, Clutter, Mtk, Meta, Shell } from '../../gi/ext';
+import { GObject, St, Clutter, Mtk, Shell } from '../../gi/ext';
 import Settings from '../../settings/settings';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {
@@ -8,7 +8,6 @@ import {
     buildTileGaps,
     enableScalingFactorSupport,
     getMonitorScalingFactor,
-    getWindowsOfMonitor,
 } from '../../utils/ui';
 import Layout from '../layout/Layout';
 import TileUtils from '../layout/TileUtils';
@@ -29,10 +28,12 @@ export default class LayoutEditor extends St.Widget {
     private _hoverWidget: HoverLine;
     private _sliders: Slider[];
 
-    private _minimizedWindows: Meta.Window[];
-
     constructor(layout: Layout, monitor: Monitor, enableScaling: boolean) {
-        super({ styleClass: 'layout-editor' });
+        super({
+            styleClass: 'layout-editor',
+            reactive: true,
+            canFocus: true,
+        });
 
         Main.layoutManager.addChrome(this);
         global.windowGroup.bind_property(
@@ -61,13 +62,6 @@ export default class LayoutEditor extends St.Widget {
             width: workArea.width,
             height: workArea.height,
         });
-
-        this._minimizedWindows = getWindowsOfMonitor(monitor).filter(
-            (win) => !win.is_hidden(),
-        );
-        this._minimizedWindows.forEach(
-            (win) => win.can_minimize() && win.minimize(),
-        );
 
         this._hoverWidget = new HoverLine(this);
 
@@ -361,8 +355,6 @@ export default class LayoutEditor extends St.Widget {
     }
 
     private _onDestroy() {
-        this._minimizedWindows.forEach((win) => win.unminimize());
-
         this.destroy_all_children();
         this._sliders = [];
 

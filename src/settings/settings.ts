@@ -1,6 +1,12 @@
 import { Gio, GObject, GLib } from '../gi/shared';
 import Layout from '../components/layout/Layout';
 import Tile from '../components/layout/Tile';
+import {
+    LayoutEditorShortcut,
+    normalizeLayoutEditorShortcut,
+} from '../utils/layoutEditorShortcuts';
+
+export { LayoutEditorShortcut };
 
 export enum ActivationKey {
     NONE = -1,
@@ -14,6 +20,13 @@ export enum EdgeTilingMode {
     DEFAULT = 'default',
     ADAPTIVE = 'adaptive',
     GRANULAR = 'granular',
+}
+
+function get_layout_editor_shortcut(
+    key: string,
+    fallback: LayoutEditorShortcut,
+): LayoutEditorShortcut {
+    return normalizeLayoutEditorShortcut(get_string(key), fallback);
 }
 
 /** ------------- Utility functions ------------- */
@@ -91,6 +104,8 @@ export default class Settings {
     static KEY_SNAP_ASSIST = 'enable-snap-assist';
     static KEY_SNAP_ASSIST_SYNC_LAYOUT = 'snap-assist-sync-layout';
     static KEY_SHOW_INDICATOR = 'show-indicator';
+    static KEY_LAYOUT_EDITOR_SAVE_SHORTCUT = 'layout-editor-save-shortcut';
+    static KEY_LAYOUT_EDITOR_CANCEL_SHORTCUT = 'layout-editor-cancel-shortcut';
     static KEY_TILING_SYSTEM_ACTIVATION_KEY = 'tiling-system-activation-key';
     static KEY_TILING_SYSTEM_DEACTIVATION_KEY = 'tiling-system-deactivation-key';
     static KEY_SPAN_MULTIPLE_TILES_ACTIVATION_KEY = 'span-multiple-tiles-activation-key';
@@ -106,6 +121,7 @@ export default class Settings {
     static KEY_RAISE_TOGETHER = 'raise-together';
     static KEY_RAISE_TOGETHER_CURRENT_MONITOR_ONLY =
         'raise-together-current-monitor-only';
+
     static KEY_ACTIVE_SCREEN_EDGES = 'active-screen-edges';
     static KEY_TOP_EDGE_MAXIMIZE = 'top-edge-maximize';
     static KEY_OVERRIDE_WINDOW_MENU = 'override-window-menu';
@@ -223,6 +239,28 @@ export default class Settings {
 
     static set SHOW_INDICATOR(val: boolean) {
         set_boolean(Settings.KEY_SHOW_INDICATOR, val);
+    }
+
+    static get LAYOUT_EDITOR_SAVE_SHORTCUT(): LayoutEditorShortcut {
+        return get_layout_editor_shortcut(
+            Settings.KEY_LAYOUT_EDITOR_SAVE_SHORTCUT,
+            LayoutEditorShortcut.MIDDLE,
+        );
+    }
+
+    static set LAYOUT_EDITOR_SAVE_SHORTCUT(val: LayoutEditorShortcut) {
+        set_string(Settings.KEY_LAYOUT_EDITOR_SAVE_SHORTCUT, val);
+    }
+
+    static get LAYOUT_EDITOR_CANCEL_SHORTCUT(): LayoutEditorShortcut {
+        return get_layout_editor_shortcut(
+            Settings.KEY_LAYOUT_EDITOR_CANCEL_SHORTCUT,
+            LayoutEditorShortcut.ALT_MIDDLE,
+        );
+    }
+
+    static set LAYOUT_EDITOR_CANCEL_SHORTCUT(val: LayoutEditorShortcut) {
+        set_string(Settings.KEY_LAYOUT_EDITOR_CANCEL_SHORTCUT, val);
     }
 
     static get TILING_SYSTEM_ACTIVATION_KEY(): ActivationKey {

@@ -37,6 +37,30 @@
             <summary>Shows indicator</summary>
             <description>Shows an indicator on top panel.</description>
         </key>
+        <key name="layout-editor-save-shortcut" type="s">
+            <default>'middle'</default>
+            <choices>
+                <choice value='middle'/>
+                <choice value='ctrl-middle'/>
+                <choice value='alt-middle'/>
+                <choice value='super-middle'/>
+                <choice value='disabled'/>
+            </choices>
+            <summary>Layout editor save shortcut</summary>
+            <description>Mouse shortcut used to save a layout while editing.</description>
+        </key>
+        <key name="layout-editor-cancel-shortcut" type="s">
+            <default>'alt-middle'</default>
+            <choices>
+                <choice value='middle'/>
+                <choice value='ctrl-middle'/>
+                <choice value='alt-middle'/>
+                <choice value='super-middle'/>
+                <choice value='disabled'/>
+            </choices>
+            <summary>Layout editor cancel shortcut</summary>
+            <description>Mouse shortcut used to cancel layout editing.</description>
+        </key>
         <key name="inner-gaps" type="u">
             <default>16</default>
             <summary>Inner gaps</summary>

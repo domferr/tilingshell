@@ -21,7 +21,11 @@
 
 import { Gtk, Adw, Gio, GLib, Gdk, GObject } from './gi/prefs';
 import Settings from './settings/settings';
-import { EdgeTilingMode, ActivationKey } from './settings/settings';
+import {
+    EdgeTilingMode,
+    ActivationKey,
+    LayoutEditorShortcut,
+} from './settings/settings';
 import { logger } from './utils/logger';
 import { ExtensionPreferences } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 import Layout from './components/layout/Layout';
@@ -467,6 +471,41 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
             () => this._openLayoutEditor(),
         );
         layoutsGroup.add(editLayoutsBtn);
+
+        layoutsGroup.add(
+            this._buildLayoutEditorShortcutRow(
+                _('Save layout shortcut'),
+                _('Mouse shortcut used to save while editing a layout'),
+                Settings.KEY_LAYOUT_EDITOR_SAVE_SHORTCUT,
+                Settings.LAYOUT_EDITOR_SAVE_SHORTCUT,
+                (shortcut) => {
+                    if (
+                        shortcut !== LayoutEditorShortcut.DISABLED &&
+                        shortcut === Settings.LAYOUT_EDITOR_CANCEL_SHORTCUT
+                    )
+                        Settings.LAYOUT_EDITOR_CANCEL_SHORTCUT =
+                            LayoutEditorShortcut.DISABLED;
+                    Settings.LAYOUT_EDITOR_SAVE_SHORTCUT = shortcut;
+                },
+            ),
+        );
+        layoutsGroup.add(
+            this._buildLayoutEditorShortcutRow(
+                _('Cancel editing shortcut'),
+                _('Mouse shortcut used to cancel layout editing'),
+                Settings.KEY_LAYOUT_EDITOR_CANCEL_SHORTCUT,
+                Settings.LAYOUT_EDITOR_CANCEL_SHORTCUT,
+                (shortcut) => {
+                    if (
+                        shortcut !== LayoutEditorShortcut.DISABLED &&
+                        shortcut === Settings.LAYOUT_EDITOR_SAVE_SHORTCUT
+                    )
+                        Settings.LAYOUT_EDITOR_SAVE_SHORTCUT =
+                            LayoutEditorShortcut.DISABLED;
+                    Settings.LAYOUT_EDITOR_CANCEL_SHORTCUT = shortcut;
+                },
+            ),
+        );
 
         const exportLayoutsBtn = this._buildButtonRow(
             _('Export layouts'),
@@ -1219,6 +1258,63 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         adwRow.add_suffix(dropDown);
 
         return adwRow;
+    }
+
+    _buildLayoutEditorShortcutRow(
+        title: string,
+        subtitle: string,
+        settingsKey: string,
+        initialValue: LayoutEditorShortcut,
+        onChange: (_: LayoutEditorShortcut) => void,
+    ): Adw.ActionRow {
+        const shortcuts = [
+            LayoutEditorShortcut.MIDDLE,
+            LayoutEditorShortcut.CTRL_MIDDLE,
+            LayoutEditorShortcut.ALT_MIDDLE,
+            LayoutEditorShortcut.SUPER_MIDDLE,
+            LayoutEditorShortcut.DISABLED,
+        ];
+        const labels = new Gtk.StringList();
+        labels.append(_('Middle Mouse Button'));
+        labels.append(_('Ctrl + Middle Mouse Button'));
+        labels.append(_('Alt + Middle Mouse Button'));
+        labels.append(_('Super + Middle Mouse Button'));
+        labels.append(_('(Disabled)'));
+
+        const initialIndex = shortcuts.indexOf(initialValue);
+        const selected =
+            initialIndex >= 0
+                ? initialIndex
+                : shortcuts.indexOf(LayoutEditorShortcut.DISABLED);
+        const dropDown = new Gtk.DropDown({
+            model: labels,
+            selected,
+            vexpand: false,
+            valign: Gtk.Align.CENTER,
+        });
+        dropDown.connect('notify::selected', () => {
+            const index = dropDown.get_selected();
+            if (index < shortcuts.length) onChange(shortcuts[index]);
+        });
+        const settings = Settings.gioSetting;
+        const settingsSignalId = settings.connect(
+            `changed::${settingsKey}`,
+            () => {
+                const value = settings.get_string(settingsKey) as LayoutEditorShortcut;
+                const index = shortcuts.indexOf(value);
+                if (index >= 0 && dropDown.get_selected() !== index)
+                    dropDown.set_selected(index);
+            },
+        );
+        dropDown.connect('destroy', () => settings.disconnect(settingsSignalId));
+
+        const row = new Adw.ActionRow({
+            title,
+            subtitle,
+            activatableWidget: dropDown,
+        });
+        row.add_suffix(dropDown);
+        return row;
     }
 
     _buildSpinButtonRow(
