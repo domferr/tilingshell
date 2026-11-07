@@ -207,7 +207,32 @@ Clone the repo then run ```npm i``` to install dependencies and then run ```npm 
 ```bash
 npm run install:extension
 ```
-You can restart your GNOME shell e.g. logout then login, or restart in place with an `alt-F2` and entering `r` (X11 only) and enable the extension. Enjoy it!
+
+For JavaScript changes on Wayland, test in a clean nested GNOME Shell without
+logging out of the real desktop:
+
+```bash
+npm run dev:nested
+```
+
+GNOME 49 and newer use Mutter's development kit. On Ubuntu, install its
+launcher once if the command requests it:
+
+```bash
+sudo apt install mutter-dev-bin
+```
+
+For settings, styles, resources, or a quick extension-state refresh, rebuild,
+install, and toggle the extension in the current session:
+
+```bash
+npm run dev:reload
+```
+
+GNOME caches imported JavaScript for the lifetime of the Shell process, so
+`dev:reload` is not guaranteed to load JavaScript edits that were already
+imported. Use `dev:nested` for reliable source testing. On X11 only, Alt-F2
+followed by `r` can restart GNOME Shell in place.
 To enable via the command line you can run
 ```bash
 /usr/bin/gnome-extensions enable tilingshell@ferrarodomenico.com
