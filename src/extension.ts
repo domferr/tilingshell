@@ -813,6 +813,8 @@ export default class TilingShellExtension extends Extension {
         SettingsOverride.destroy();
 
         // destroy state and settings
+        this._tilingManagers.forEach((tm) => tm.destroy());
+        this._tilingManagers = [];
         GlobalState.destroy();
         Settings.destroy();
         TilingShellWindowManager.destroy();
