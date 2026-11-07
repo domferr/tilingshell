@@ -80,9 +80,11 @@ The layout is not strict. You can select multiple tiles too! Just hold <kbd>ALT<
 
 ### Layout editor ###
 
-| Split a tile | Split a tile _vertically_ | Delete a tile | Save, close the editor or open the menu |
-|:---:|:---:|:---:|:---:|
-| <kbd>LEFT CLICK</kbd> | <kbd>LEFT CLICK</kbd> + <kbd>CTRL</kbd> | <kbd>RIGHT CLICK</kbd> | Click the Tiling Shell's icon <img src="https://github.com/domferr/tilingshell/assets/14203981/13e27ec1-6a5d-420f-a87f-8f3df0b34c92" width=96 /> on the panel. |
+| Split a tile | Split a tile _vertically_ | Delete a tile | Save | Cancel |
+|:---:|:---:|:---:|:---:|:---:|
+| <kbd>LEFT CLICK</kbd> | <kbd>LEFT CLICK</kbd> + <kbd>CTRL</kbd> | <kbd>RIGHT CLICK</kbd> | <kbd>MIDDLE CLICK</kbd> | <kbd>ALT</kbd> + <kbd>MIDDLE CLICK</kbd> |
+
+The save and cancel mouse shortcuts can be changed or disabled from **Preferences → Layouts**.
 
 [layout_editor.webm](https://github.com/domferr/tilingshell/assets/14203981/c6e05589-69d9-4fa3-a4df-61ee875cf9e1)
 
@@ -205,7 +207,32 @@ Clone the repo then run ```npm i``` to install dependencies and then run ```npm 
 ```bash
 npm run install:extension
 ```
-You can restart your GNOME shell e.g. logout then login, or restart in place with an `alt-F2` and entering `r` (X11 only) and enable the extension. Enjoy it!
+
+For JavaScript changes on Wayland, test in a clean nested GNOME Shell without
+logging out of the real desktop:
+
+```bash
+npm run dev:nested
+```
+
+GNOME 49 and newer use Mutter's development kit. On Ubuntu, install its
+launcher once if the command requests it:
+
+```bash
+sudo apt install mutter-dev-bin
+```
+
+For settings, styles, resources, or a quick extension-state refresh, rebuild,
+install, and toggle the extension in the current session:
+
+```bash
+npm run dev:reload
+```
+
+GNOME caches imported JavaScript for the lifetime of the Shell process, so
+`dev:reload` is not guaranteed to load JavaScript edits that were already
+imported. Use `dev:nested` for reliable source testing. On X11 only, Alt-F2
+followed by `r` can restart GNOME Shell in place.
 To enable via the command line you can run
 ```bash
 /usr/bin/gnome-extensions enable tilingshell@ferrarodomenico.com

@@ -2,23 +2,35 @@
 @use "functions";
 
 .layout-editor {
-    background-color: rgba(255, 255, 255, 0.14);
+    background-color: rgba(234, 246, 255, 0.06);
+}
+
+.editable-tile-preview {
+    background-color: rgba(190, 227, 248, 0.14);
+    border: 2px solid rgba(98, 181, 229, 0.9);
 }
 
 .layout-editor-slider {
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgb(153, 211, 242);
     border-radius: 6px;
-    border: 2px solid rgb(65, 65, 65, 0.8);
+    border: 2px solid rgb(23, 50, 77);
 }
 
 .editable-tile-preview-button {
+    background-color: transparent;
     text-align: center;
     font-weight: bold;
     font-size: 20px;
-    color: white;
+    color: rgb(23, 50, 77);
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
 }
 
 .editor-dialog {
+    background-color: rgb(234, 246, 255);
+    color: rgb(23, 50, 77);
+    border: 1px solid rgb(98, 181, 229);
+    border-radius: 16px;
+
     .layouts-box-layout {
         spacing: 18px;
     }
@@ -42,6 +54,10 @@
     }
 
     .kbd {
+        background-color: rgb(255, 255, 255);
+        color: rgb(23, 50, 77);
+        border: 1px solid rgb(98, 181, 229);
+        border-radius: 6px;
         @include functions.fontsize(constants.$base_font_size);
         font-weight: bold;
         text-align: center;
@@ -49,8 +65,19 @@
         padding: calc(constants.$base-padding / 3) calc(constants.$base-padding * 2);
         box-shadow: inset 0px -3px 0px 0px rgba(0, 0, 0, 0.2);
     }
+
+    .editor-start-button {
+        background-color: rgb(98, 181, 229);
+        color: rgb(23, 50, 77);
+        border: 2px solid rgb(23, 50, 77);
+        border-radius: 8px;
+        padding: 10px 24px;
+        font-weight: bold;
+    }
 }
 
 .hover-line {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(98, 181, 229, 0.42);
+    border: 1px solid rgba(23, 50, 77, 0.65);
+    border-radius: 6px;
 }

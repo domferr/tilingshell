@@ -10,10 +10,8 @@ const GAPS = 3;
 export default class OverriddenAltTab {
     private static _enabled: boolean = false;
     private static _instance: OverriddenAltTab | null = null;
-    private static _old_show: {
-        (): boolean;
-        (_backward: boolean, _binding: any, _mask: any): boolean;
-    } | null;
+    private static _oldShow: AltTabShow | null = null;
+    private static _overriddenShow: AltTabShow | null = null;
 
     // AltTab has these private fields
     private _switcherList: any;
@@ -28,11 +26,27 @@ export default class OverriddenAltTab {
         // if it is already enabled, do not enable again
         if (this._enabled) return;
 
-        const owm = this.get();
+        const overriddenAltTab = this.get();
+        const oldShow = AltTab.WindowSwitcherPopup.prototype.show as AltTabShow;
+        const overriddenShow: AltTabShow = function (
+            this: AltTabWindowSwitcherPopup,
+            backward,
+            binding,
+            mask
+        ) {
+            return overriddenAltTab.newShow.call(
+                this,
+                oldShow,
+                backward,
+                binding,
+                mask
+            );
+        };
 
-        OverriddenAltTab._old_show = AltTab.WindowSwitcherPopup.prototype.show;
+        this._oldShow = oldShow;
+        this._overriddenShow = overriddenShow;
         // @ts-expect-error "This is expected"
-        AltTab.WindowSwitcherPopup.prototype.show = owm.newShow;
+        AltTab.WindowSwitcherPopup.prototype.show = overriddenShow;
 
         this._enabled = true;
     }
@@ -41,9 +55,20 @@ export default class OverriddenAltTab {
         // if it is not enabled, do not disable
         if (!this._enabled) return;
 
-        // @ts-expect-error "This is expected"
-        AltTab.WindowSwitcherPopup.prototype.show = OverriddenAltTab._old_show;
-        this._old_show = null;
+        // Do not overwrite a patch installed by another extension after ours.
+        // In particular, leave GNOME's key-event handling chain intact so that
+        // Escape continues to cancel the native switcher.
+        if (
+            AltTab.WindowSwitcherPopup.prototype.show ===
+                this._overriddenShow &&
+            this._oldShow
+        ) {
+            // @ts-expect-error "This is expected"
+            AltTab.WindowSwitcherPopup.prototype.show = this._oldShow;
+        }
+
+        this._oldShow = null;
+        this._overriddenShow = null;
 
         this._enabled = false;
     }
@@ -54,7 +79,13 @@ export default class OverriddenAltTab {
     }
 
     // the function will be treated as a method of class WindowMenu
-    private newShow(backward: boolean, binding: any, mask: any): boolean {
+    private newShow(
+        this: AltTabWindowSwitcherPopup,
+        oldShow: AltTabShow,
+        backward: boolean,
+        binding: any,
+        mask: any
+    ): boolean {
         // allow the list to show NON-squared widgets
         this._switcherList._list.get_layout_manager().homogeneous = false;
         this._switcherList._squareItems = false;
@@ -62,21 +93,20 @@ export default class OverriddenAltTab {
         // Call original show function. Note: show() may synchronously
         // destroy the popup if the modifier key was already released
         // (see GNOME bug 596695), so we must check liveness afterward.
-        const oldFunction = OverriddenAltTab._old_show?.bind(this);
-        const res = !oldFunction || oldFunction(backward, binding, mask);
+        const res = oldShow.call(this, backward, binding, mask);
 
         // If the popup was destroyed during show(), bail out.
         if (!this._switcherList || !this._items?.length) return res;
 
         const tiledWindows: Meta.Window[] = (
             this._getWindowList() as Meta.Window[]
-        ).filter((win) => (win as ExtendedWindow).assignedTile);
+        ).filter(win => (win as ExtendedWindow).assignedTile);
 
         if (tiledWindows.length <= 1) return res;
 
         const tiles = tiledWindows
-            .map((win) => (win as ExtendedWindow).assignedTile)
-            .filter((tile) => tile !== undefined);
+            .map(win => (win as ExtendedWindow).assignedTile)
+            .filter(tile => tile !== undefined);
 
         const inner_gaps = Settings.get_inner_gaps();
         const height = this._items[0].height;
@@ -114,3 +144,14 @@ export default class OverriddenAltTab {
         return getWindows();
     }
 }
+
+type AltTabWindowSwitcherPopup = OverriddenAltTab & {
+    _getWindowList(): Meta.Window[];
+};
+
+type AltTabShow = (
+    this: AltTabWindowSwitcherPopup,
+    backward: boolean,
+    binding: any,
+    mask: any
+) => boolean;
