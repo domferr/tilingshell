@@ -165,7 +165,12 @@ export default class Settings {
     }
 
     static get gioSetting(): Gio.Settings {
-        return this._settings ?? new Gio.Settings();
+        return (
+            this._settings ??
+            new Gio.Settings({
+                schema_id: 'org.gnome.shell.extensions.tilingshell',
+            })
+        );
     }
 
     static bind(
