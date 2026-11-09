@@ -779,6 +779,12 @@ export default class TilingShellExtension extends Extension {
     }
 
     disable(): void {
+        // Destroy the tiling managers before anything else is torn down:
+        // their signal handlers must not fire once Settings.destroy() has
+        // invalidated the settings object (see #646).
+        this._tilingManagers.forEach((tm) => tm.destroy());
+        this._tilingManagers = [];
+
         // disconnect signals
         this._signals?.disconnect();
         this._signals = null;
