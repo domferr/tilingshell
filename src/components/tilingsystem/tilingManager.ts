@@ -1353,14 +1353,22 @@ export class TilingManager {
         // do not handle windows in monitors not managed by this manager
         if (window.get_monitor() !== this._monitor.index) return;
 
+        // new windows may open maximized (mutter's auto-maximize or the app
+        // restoring its previous state). Optionally tile them anyway, since
+        // _easeWindowRectFromTile unmaximizes before moving the window
+        const allowMaximized =
+            windowCreated && Settings.AUTOTILE_MAXIMIZED_WINDOWS;
+        const isMaximized = () =>
+            !allowMaximized &&
+            (window.maximizedHorizontally || window.maximizedVertically);
+
         if (
             window === null ||
             window.windowType !== Meta.WindowType.NORMAL ||
             window.get_transient_for() !== null ||
             window.is_attached_dialog() ||
             window.minimized ||
-            window.maximizedHorizontally ||
-            window.maximizedVertically
+            isMaximized()
         )
             return;
 
@@ -1378,8 +1386,7 @@ export class TilingManager {
                 // autotiling, immediately restore its opacity
                 if (
                     !window.minimized &&
-                    !window.maximizedHorizontally &&
-                    !window.maximizedVertically &&
+                    !isMaximized() &&
                     window.get_transient_for() === null &&
                     !window.is_attached_dialog()
                 )

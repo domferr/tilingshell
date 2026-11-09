@@ -107,6 +107,11 @@
             <summary>Enable auto tiling</summary>
             <description>Automatically tile a new window to the best tile according to the current layout.</description>
         </key>
+        <key name="autotile-maximized-windows" type="b">
+            <default>false</default>
+            <summary>Auto tile maximized windows</summary>
+            <description>When auto tiling is enabled, also tile new windows that open maximized instead of leaving them maximized.</description>
+        </key>
         <key name="raise-together" type="b">
             <default>false</default>
             <summary>Raise tiled windows together</summary>

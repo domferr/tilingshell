@@ -275,6 +275,13 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         behaviourGroup.add(autoTilingRow);
 
+        const autoTileMaximizedRow = this._buildSwitchRow(
+            Settings.KEY_AUTOTILE_MAXIMIZED_WINDOWS,
+            _('Auto Tile Maximized Windows'),
+            _('Also tile new windows that open maximized'),
+        );
+        behaviourGroup.add(autoTileMaximizedRow);
+
         const resizeComplementingRow = this._buildSwitchRow(
             Settings.KEY_RESIZE_COMPLEMENTING_WINDOWS,
             _('Enable auto-resize of the complementing tiled windows'),

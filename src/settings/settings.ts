@@ -103,6 +103,7 @@ export default class Settings {
     static KEY_ENABLE_BLUR_SELECTED_TILEPREVIEW = 'enable-blur-selected-tilepreview';
     static KEY_ENABLE_MOVE_KEYBINDINGS = 'enable-move-keybindings';
     static KEY_ENABLE_AUTO_TILING = 'enable-autotiling';
+    static KEY_AUTOTILE_MAXIMIZED_WINDOWS = 'autotile-maximized-windows';
     static KEY_RAISE_TOGETHER = 'raise-together';
     static KEY_RAISE_TOGETHER_CURRENT_MONITOR_ONLY =
         'raise-together-current-monitor-only';
@@ -344,6 +345,14 @@ export default class Settings {
 
     static set ENABLE_AUTO_TILING(val: boolean) {
         set_boolean(Settings.KEY_ENABLE_AUTO_TILING, val);
+    }
+
+    static get AUTOTILE_MAXIMIZED_WINDOWS(): boolean {
+        return get_boolean(Settings.KEY_AUTOTILE_MAXIMIZED_WINDOWS);
+    }
+
+    static set AUTOTILE_MAXIMIZED_WINDOWS(val: boolean) {
+        set_boolean(Settings.KEY_AUTOTILE_MAXIMIZED_WINDOWS, val);
     }
 
     static get RAISE_TOGETHER(): boolean {
