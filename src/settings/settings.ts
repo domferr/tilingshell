@@ -81,6 +81,7 @@ function set_activationkey(key: string, val: ActivationKey): boolean {
 
 export default class Settings {
     static _settings: Gio.Settings | null;
+    static _schemaId: string | null = null;
     static _is_initialized: boolean = false;
 
     static KEY_LAST_VERSION_NAME_INSTALLED = 'last-version-name-installed';
@@ -155,6 +156,9 @@ export default class Settings {
 
         this._is_initialized = true;
         this._settings = settings;
+        // remember the schema id so the fallback in `gioSetting` can build a
+        // valid settings object even when this class is not initialized
+        this._schemaId = settings.settings_schema.get_id();
     }
 
     static destroy() {
@@ -162,10 +166,21 @@ export default class Settings {
             this._is_initialized = false;
             this._settings = null;
         }
+        // note: `_schemaId` intentionally survives destroy() — it is static
+        // configuration, not runtime state
     }
 
     static get gioSetting(): Gio.Settings {
-        return this._settings ?? new Gio.Settings();
+        if (this._settings) return this._settings;
+
+        // Signal handlers may still fire before initialize() or after
+        // destroy() (e.g. during the session-mode switch at login). Build a
+        // valid settings object against the remembered schema so reads return
+        // values/defaults instead of throwing an invalid-construction error.
+        return new Gio.Settings({
+            schema_id:
+                this._schemaId ?? 'org.gnome.shell.extensions.tilingshell',
+        });
     }
 
     static bind(
