@@ -86,7 +86,9 @@ export default class WindowBorder extends St.DrawingArea {
                 prop,
                 this,
                 prop,
-                GObject.BindingFlags.DEFAULT, // if winActor changes, this will change
+                // copy the current values now (SYNC_CREATE), so a scale left
+                // from the previously tracked (closing) window is not kept
+                GObject.BindingFlags.SYNC_CREATE,
             ),
         );
 
