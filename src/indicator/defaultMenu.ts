@@ -1,4 +1,4 @@
-import { GObject, St, Clutter, Gio } from '../gi/ext';
+import { GObject, St, Clutter, Gio, GLib } from '../gi/ext';
 import SignalHandling from '../utils/signalHandling';
 import Indicator from './indicator';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -277,6 +277,95 @@ export default class DefaultMenu implements CurrentMenu {
             return;
         }
 
+        // Ask Mutter's DisplayConfig D-Bus API for the monitors' names. It is
+        // available on every supported GNOME version and also provides the
+        // numbering used by GNOME Settings, so the labels match the system.
+        // If it fails, fall back to the previous approaches.
+        try {
+            Gio.DBus.session.call(
+                'org.gnome.Mutter.DisplayConfig',
+                '/org/gnome/Mutter/DisplayConfig',
+                'org.gnome.Mutter.DisplayConfig',
+                'GetCurrentState',
+                null,
+                null,
+                Gio.DBusCallFlags.NONE,
+                -1,
+                null,
+                (conn: Gio.DBusConnection | null, res: Gio.AsyncResult) => {
+                    try {
+                        if (!conn) throw new Error('no D-Bus connection');
+                        const details = this._parseDisplayConfigState(
+                            conn.call_finish(res),
+                        );
+                        this._layoutsRows.forEach((lr) =>
+                            lr.updateMonitorName(true, details),
+                        );
+                    } catch (e) {
+                        debug('DisplayConfig error:', e);
+                        this._computeMonitorsDetailsFallback();
+                    }
+                },
+            );
+        } catch (e) {
+            debug(e);
+            this._computeMonitorsDetailsFallback();
+        }
+    }
+
+    // Build the monitors' details from DisplayConfig's GetCurrentState
+    // reply. Monitors are numbered like GNOME Settings does: the built-in
+    // display first, then the others in the order Mutter reports them.
+    private _parseDisplayConfigState(state: GLib.Variant): {
+        name: string;
+        x: number;
+        y: number;
+    }[] {
+        // (serial, monitors, logical_monitors, properties)
+        type MonitorSpec = [string, string, string, string];
+        type MonitorInfo = [MonitorSpec, unknown, Record<string, unknown>];
+        type LogicalMonitorInfo = [
+            number, // x
+            number, // y
+            number, // scale
+            number, // transform
+            boolean, // primary
+            MonitorSpec[],
+            unknown, // properties
+        ];
+        const [, monitors, logicalMonitors] = state.recursiveUnpack() as [
+            number,
+            MonitorInfo[],
+            LogicalMonitorInfo[],
+            unknown,
+        ];
+
+        const isBuiltin = (props: Record<string, unknown>) =>
+            props['is-builtin'] === true;
+        const sorted = [
+            ...monitors.filter(([, , props]) => isBuiltin(props)),
+            ...monitors.filter(([, , props]) => !isBuiltin(props)),
+        ];
+        const names = new Map<string, string>();
+        sorted.forEach(([[connector], , props], i) => {
+            const displayName = props['display-name'];
+            const name =
+                typeof displayName === 'string' && displayName.length > 0
+                    ? displayName
+                    : connector;
+            names.set(connector, `${name} (${i + 1})`);
+        });
+
+        return logicalMonitors.map(([x, y, , , , specs]) => ({
+            name: specs
+                .map(([connector]) => names.get(connector) ?? connector)
+                .join(' + '),
+            x,
+            y,
+        }));
+    }
+
+    private _computeMonitorsDetailsFallback() {
         // GNOME 49+ has Meta.Monitor with get_display_name()
         const monitorsDetails: {
             name: string;
