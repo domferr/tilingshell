@@ -14,6 +14,11 @@ Gio._promisify(Shell.Screenshot, 'composite_to_stream');
 
 const DEFAULT_BORDER_RADIUS = 11;
 const SMART_BORDER_RADIUS_FIRST_FRAME_DELAY = 240;
+const SMART_BORDER_RADIUS_RETRY_DELAY = 1000;
+const SMART_BORDER_RADIUS_MAX_RETRIES = 2;
+// real window corners are much smaller, a bigger value means the window
+// wasn't fully painted yet when it was measured
+const SMART_BORDER_RADIUS_MAX = 32;
 
 interface WindowWithCachedRadius extends Meta.Window {
     __ts_cached_radius: [number, number, number, number] | undefined;
@@ -31,6 +36,7 @@ export default class WindowBorder extends St.DrawingArea {
     private _borderRadiusValue: [number, number, number, number];
     private _timeout: GLib.Source | undefined;
     private _delayedSmartBorderRadius: boolean;
+    private _measureId: number;
     private _scaledBorderWidth: number;
 
     constructor(win: Meta.Window, enableScaling: boolean) {
@@ -44,6 +50,7 @@ export default class WindowBorder extends St.DrawingArea {
         this._windowMonitor = win.get_monitor();
         this._enableScaling = enableScaling;
         this._delayedSmartBorderRadius = false;
+        this._measureId = 0;
         const smartRadius = Settings.ENABLE_SMART_WINDOW_BORDER_RADIUS;
         this._borderRadiusValue = [
             DEFAULT_BORDER_RADIUS,
@@ -59,8 +66,7 @@ export default class WindowBorder extends St.DrawingArea {
             this._bindings.forEach((b) => b.unbind());
             this._bindings = [];
             this._signals.disconnect();
-            if (this._timeout) clearTimeout(this._timeout);
-            this._timeout = undefined;
+            this._cancelBorderRadiusMeasure();
         });
     }
 
@@ -70,6 +76,7 @@ export default class WindowBorder extends St.DrawingArea {
         this._bindings.forEach((b) => b.unbind());
         this._bindings = [];
         this._signals.disconnect();
+        this._cancelBorderRadiusMeasure();
         this._window = win;
         this.close();
         const winActor =
@@ -215,22 +222,50 @@ export default class WindowBorder extends St.DrawingArea {
         }
     }
 
-    private _runComputeBorderRadiusTimeout(winActor: Meta.WindowActor) {
+    // drop a pending or running measure, it belongs to a window we no longer track
+    private _cancelBorderRadiusMeasure() {
+        this._measureId++;
+        if (this._timeout) clearTimeout(this._timeout);
+        this._timeout = undefined;
+    }
+
+    private _runComputeBorderRadiusTimeout(
+        winActor: Meta.WindowActor,
+        retriesLeft: number = SMART_BORDER_RADIUS_MAX_RETRIES,
+        delay: number = SMART_BORDER_RADIUS_FIRST_FRAME_DELAY,
+    ) {
         if (this._timeout) clearTimeout(this._timeout);
         this._timeout = undefined;
 
+        const measureId = this._measureId;
         this._timeout = setTimeout(() => {
-            this._computeBorderRadius(winActor).then(() => this.updateStyle());
+            // the window was closed, its actor is already disposed
+            if (this._window.get_compositor_private() !== winActor) return;
+            this._computeBorderRadius(winActor, measureId).then((measured) => {
+                if (measureId !== this._measureId) return;
+                if (measured) this.updateStyle();
+                else if (retriesLeft > 0) {
+                    this._runComputeBorderRadiusTimeout(
+                        winActor,
+                        retriesLeft - 1,
+                        SMART_BORDER_RADIUS_RETRY_DELAY,
+                    );
+                }
+            });
             if (this._timeout) clearTimeout(this._timeout);
             this._timeout = undefined;
-        }, SMART_BORDER_RADIUS_FIRST_FRAME_DELAY);
+        }, delay);
     }
 
-    private async _computeBorderRadius(winActor: Meta.WindowActor) {
+    // returns false if the window couldn't be measured yet
+    private async _computeBorderRadius(
+        winActor: Meta.WindowActor,
+        measureId: number,
+    ): Promise<boolean> {
         // we are only interested into analyze the leftmost pixels (i.e. the whole left border)
         const width = 3;
         const height = winActor.metaWindow.get_frame_rect().height;
-        if (height <= 0) return;
+        if (height <= 0) return false;
         const content = winActor.paint_to_content(
             buildRectangle({
                 x: winActor.metaWindow.get_frame_rect().x,
@@ -239,7 +274,7 @@ export default class WindowBorder extends St.DrawingArea {
                 width,
             }),
         );
-        if (!content) return;
+        if (!content) return false;
 
         /* for debugging purposes
         const elem = new St.Widget({
@@ -273,19 +308,28 @@ export default class WindowBorder extends St.DrawingArea {
             1,
             stream,
         );
+        if (measureId !== this._measureId) {
+            stream.close(null);
+            return false;
+        }
         // @ts-expect-error "pixbuf has get_pixels() method"
         const pixels = pixbuf.get_pixels();
 
         const alphaThreshold = 240; // 255 would be the best value, however, some windows may still have a bit of transparency
         // iterate pixels from top to bottom
+        let topRadius = -1;
         for (let i = 0; i < height; i++) {
             if (pixels[i * width * 4 + 3] > alphaThreshold) {
-                this._borderRadiusValue[St.Corner.TOPLEFT] = i;
-                this._borderRadiusValue[St.Corner.TOPRIGHT] =
-                    this._borderRadiusValue[St.Corner.TOPLEFT];
+                topRadius = i;
                 break;
             }
         }
+        if (topRadius < 0 || topRadius > SMART_BORDER_RADIUS_MAX) {
+            stream.close(null);
+            return false;
+        }
+        this._borderRadiusValue[St.Corner.TOPLEFT] = topRadius;
+        this._borderRadiusValue[St.Corner.TOPRIGHT] = topRadius;
         // iterate pixels from bottom to top
         for (let i = height - 1; i >= height - this._borderRadiusValue[St.Corner.TOPLEFT] - 2; i--) {
             if (pixels[i * width * 4 + 3] > alphaThreshold) {
@@ -313,6 +357,7 @@ export default class WindowBorder extends St.DrawingArea {
             this._borderRadiusValue[St.Corner.BOTTOMRIGHT];
         (this._window as WindowWithCachedRadius).__ts_cached_radius =
             cached_radius;
+        return true;
     }
 
     public updateStyle(): void {
