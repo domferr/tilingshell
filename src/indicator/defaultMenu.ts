@@ -23,6 +23,17 @@ import { createButton, createIconButton } from './utils';
 
 const debug = logger('DefaultMenu');
 
+interface MonitorDetails {
+    name: string;
+    index?: number;
+    x?: number;
+    y?: number;
+    height?: number;
+    width?: number;
+    // system number of the monitor (as shown by GNOME Settings), if known
+    order?: number;
+}
+
 class LayoutsRow extends St.BoxLayout {
     static { registerGObjectClass(this, {
         GTypeName: 'LayoutsRow',
@@ -37,6 +48,7 @@ class LayoutsRow extends St.BoxLayout {
     private _layoutsButtons: LayoutButton[];
     private _label: St.Label;
     private _monitor: Monitor;
+    private _order: number;
 
     constructor(
         parent: Clutter.Actor,
@@ -61,6 +73,7 @@ class LayoutsRow extends St.BoxLayout {
             styleClass: 'layouts-box-layout',
         });
         this._monitor = monitor;
+        this._order = monitor.index;
         this._label = new St.Label({
             text: `${_('Monitor')} ${this._monitor.index + 1}`,
             styleClass: 'monitor-layouts-title',
@@ -103,16 +116,15 @@ class LayoutsRow extends St.BoxLayout {
         );
     }
 
+    // position of this row in the menu: it follows the system's numbering
+    // of the monitors when known, the monitor's index otherwise
+    public get order(): number {
+        return this._order;
+    }
+
     public updateMonitorName(
         showMonitorName: boolean,
-        monitorsDetails: {
-            name: string;
-            index?: number;
-            x?: number;
-            y?: number;
-            height?: number;
-            width?: number;
-        }[],
+        monitorsDetails: MonitorDetails[],
     ) {
         if (!showMonitorName) this._label.hide();
         else this._label.show();
@@ -142,6 +154,7 @@ class LayoutsRow extends St.BoxLayout {
 
         debug(`updateMonitorName: setting label to "${details.name}"`);
         this._label.set_text(details.name);
+        if (details.order !== undefined) this._order = details.order;
     }
 }
 
@@ -154,6 +167,8 @@ export default class DefaultMenu implements CurrentMenu {
     private _scalingFactor: number;
     private _children: St.Widget[];
     private _openPrefsFn: () => void;
+    // last known monitors' details, reapplied when the rows are redrawn
+    private _monitorsDetails: MonitorDetails[] | undefined;
 
     constructor(indicator: Indicator, enableScalingFactor: boolean, openPrefsFn: () => void) {
         this._indicator = indicator;
@@ -252,6 +267,8 @@ export default class DefaultMenu implements CurrentMenu {
             );
             enableScalingFactorSupport(this._container, scalingFactor);
 
+            // the known details are outdated now
+            this._monitorsDetails = undefined;
             this._updateScaling();
             if (this._layoutsRows.length !== getMonitors().length)
                 this._drawLayouts();
@@ -273,6 +290,7 @@ export default class DefaultMenu implements CurrentMenu {
     // compute monitors details and update labels asynchronously (if we have successful results...)
     private _computeMonitorsDetails() {
         if (getMonitors().length === 1) {
+            this._monitorsDetails = undefined;
             this._layoutsRows.forEach((lr) => lr.updateMonitorName(false, []));
             return;
         }
@@ -298,9 +316,7 @@ export default class DefaultMenu implements CurrentMenu {
                         const details = this._parseDisplayConfigState(
                             conn.call_finish(res),
                         );
-                        this._layoutsRows.forEach((lr) =>
-                            lr.updateMonitorName(true, details),
-                        );
+                        this._applyMonitorsDetails(details);
                     } catch (e) {
                         debug('DisplayConfig error:', e);
                         this._computeMonitorsDetailsFallback();
@@ -313,14 +329,21 @@ export default class DefaultMenu implements CurrentMenu {
         }
     }
 
+    // Update the rows' labels and show the rows in the order of the system's
+    // numbering. Only the actors are reordered: this._layoutsRows stays
+    // indexed by monitor index.
+    private _applyMonitorsDetails(details: MonitorDetails[]) {
+        this._monitorsDetails = details;
+        this._layoutsRows.forEach((lr) => lr.updateMonitorName(true, details));
+        [...this._layoutsRows]
+            .sort((a, b) => a.order - b.order)
+            .forEach((lr, i) => this._container.set_child_at_index(lr, i));
+    }
+
     // Build the monitors' details from DisplayConfig's GetCurrentState
     // reply. Monitors are numbered like GNOME Settings does: the built-in
     // display first, then the others in the order Mutter reports them.
-    private _parseDisplayConfigState(state: GLib.Variant): {
-        name: string;
-        x: number;
-        y: number;
-    }[] {
+    private _parseDisplayConfigState(state: GLib.Variant): MonitorDetails[] {
         // (serial, monitors, logical_monitors, properties)
         type MonitorSpec = [string, string, string, string];
         type MonitorInfo = [MonitorSpec, unknown, Record<string, unknown>];
@@ -347,6 +370,7 @@ export default class DefaultMenu implements CurrentMenu {
             ...monitors.filter(([, , props]) => !isBuiltin(props)),
         ];
         const names = new Map<string, string>();
+        const numbers = new Map<string, number>();
         sorted.forEach(([[connector], , props], i) => {
             const displayName = props['display-name'];
             const name =
@@ -354,6 +378,7 @@ export default class DefaultMenu implements CurrentMenu {
                     ? displayName
                     : connector;
             names.set(connector, `${name} (${i + 1})`);
+            numbers.set(connector, i + 1);
         });
 
         return logicalMonitors.map(([x, y, , , , specs]) => ({
@@ -362,6 +387,12 @@ export default class DefaultMenu implements CurrentMenu {
                 .join(' + '),
             x,
             y,
+            // mirrored monitors share a row: use their lowest number
+            order: Math.min(
+                ...specs.map(
+                    ([connector]) => numbers.get(connector) ?? Infinity,
+                ),
+            ),
         }));
     }
 
@@ -375,9 +406,7 @@ export default class DefaultMenu implements CurrentMenu {
         }[] | undefined = this._get_display_name();
 
         if (monitorsDetails) {
-            this._layoutsRows.forEach((lr) =>
-                lr.updateMonitorName(true, monitorsDetails),
-            );
+            this._applyMonitorsDetails(monitorsDetails);
             return;
         }
 
@@ -402,9 +431,7 @@ export default class DefaultMenu implements CurrentMenu {
                     if (pr.get_successful()) {
                         debug(stdout);
                         const parsedMonitorsDetails = JSON.parse(stdout);
-                        this._layoutsRows.forEach((lr) =>
-                            lr.updateMonitorName(true, parsedMonitorsDetails),
-                        );
+                        this._applyMonitorsDetails(parsedMonitorsDetails);
                     } else {
                         debug('error:', stderr);
                     }
@@ -539,6 +566,10 @@ export default class DefaultMenu implements CurrentMenu {
             );
             return row;
         });
+
+        // the new rows have the default labels and order
+        if (this._monitorsDetails)
+            this._applyMonitorsDetails(this._monitorsDetails);
     }
 
     public destroy() {
