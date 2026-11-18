@@ -236,22 +236,27 @@ export class ResizingManager {
             let [hasIntersection, intersection] = otherWin
                 .get_frame_rect()
                 .intersect(borderRect);
+            // allow a small overlap too: some clients (e.g. Electron apps
+            // with fractional scaling) end up a few pixels bigger than
+            // their tile and overlap the adjacent window
             switch (side) {
                 case St.Side.RIGHT:
-                    hasIntersection &&= intersection.x <= otherWinRect.x;
+                    hasIntersection &&=
+                        intersection.x <= otherWinRect.x + errorFactor;
                     break;
                 case St.Side.LEFT:
                     hasIntersection &&=
                         intersection.x + intersection.width >=
-                        otherWinRect.x + otherWinRect.width;
+                        otherWinRect.x + otherWinRect.width - errorFactor;
                     break;
                 case St.Side.BOTTOM:
-                    hasIntersection &&= intersection.y <= otherWinRect.y;
+                    hasIntersection &&=
+                        intersection.y <= otherWinRect.y + errorFactor;
                     break;
                 case St.Side.TOP:
                     hasIntersection &&=
                         intersection.y + intersection.height >=
-                        otherWinRect.y + otherWinRect.height;
+                        otherWinRect.y + otherWinRect.height - errorFactor;
                     break;
             }
 
