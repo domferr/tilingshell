@@ -14,6 +14,7 @@ import CurrentMenu from './currentMenu';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import LayoutButton from './layoutButton';
 import { logger } from '../utils/logger';
+import { getMonitorLabel } from '../utils/monitorIdentity';
 import { registerGObjectClass } from '../utils/gjs';
 import { Monitor } from 'resource:///org/gnome/shell/ui/layout.js';
 import Layout from '../components/layout/Layout';
@@ -118,6 +119,18 @@ class LayoutsRow extends St.BoxLayout {
         else this._label.show();
 
         debug(`updateMonitorName: monitor=${this._monitor.index}, x=${this._monitor.x}, y=${this._monitor.y}`);
+
+        // Read the label straight off the Meta monitor. This needs no matching
+        // against a separately-gathered table, and it separates two panels of the
+        // same model - the EDID name alone cannot, which is why two identical
+        // panels used to render as the very same string.
+        const label = getMonitorLabel(this._monitor);
+        if (label) {
+            debug(`updateMonitorName: label from Meta monitor "${label}"`);
+            this._label.set_text(label);
+            return;
+        }
+
         debug(`updateMonitorName: monitorsDetails=${JSON.stringify(monitorsDetails)}`);
 
         // Try to match by index first, then fall back to coordinates

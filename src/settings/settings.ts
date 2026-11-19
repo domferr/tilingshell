@@ -118,6 +118,8 @@ export default class Settings {
     static KEY_TILE_PREVIEW_ANIMATION_TIME = 'tile-preview-animation-time';
     static KEY_SETTING_LAYOUTS_JSON = 'layouts-json';
     static KEY_SETTING_SELECTED_LAYOUTS = 'selected-layouts';
+    static KEY_SETTING_SELECTED_LAYOUTS_BY_MONITOR =
+        'selected-layouts-by-monitor';
     static KEY_WINDOW_BORDER_WIDTH = 'window-border-width';
     static KEY_ENABLE_SMART_WINDOW_BORDER_RADIUS = 'enable-smart-window-border-radius';
     static KEY_QUARTER_TILING_THRESHOLD = 'quarter-tiling-threshold';
@@ -717,6 +719,47 @@ export default class Settings {
             this.KEY_SETTING_LAYOUTS_JSON,
             JSON.stringify(layouts),
         );
+    }
+
+    /**
+     * Durable record of which layout belongs to which physical monitor.
+     *
+     * Shape: { "<workspaceIndex>": { "<monitor identity>": "<layout id>" } }
+     *
+     * `selected-layouts` is positional and mutter renumbers it whenever the
+     * display topology changes, so it cannot be the thing we remember by.
+     */
+    static get_selected_layouts_by_monitor(): Record<string, Record<string, string>> {
+        const raw = this._settings?.get_string(
+            Settings.KEY_SETTING_SELECTED_LAYOUTS_BY_MONITOR,
+        );
+        if (!raw) return {};
+        try {
+            const parsed = JSON.parse(raw) as Record<string, unknown>;
+            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed))
+                return {};
+            for (const key of Object.keys(parsed)) {
+                const workspace = parsed[key];
+                if (!workspace || typeof workspace !== 'object')
+                    delete parsed[key];
+            }
+            return parsed as Record<string, Record<string, string>>;
+        } catch (_unused) {
+            return {};
+        }
+    }
+
+    static save_selected_layouts_by_monitor(
+        map: Record<string, Record<string, string>>,
+    ) {
+        this._settings?.set_string(
+            Settings.KEY_SETTING_SELECTED_LAYOUTS_BY_MONITOR,
+            JSON.stringify(map ?? {}),
+        );
+    }
+
+    static reset_selected_layouts_by_monitor() {
+        this._settings?.reset(Settings.KEY_SETTING_SELECTED_LAYOUTS_BY_MONITOR);
     }
 
     static save_selected_layouts(ids: string[][]) {
