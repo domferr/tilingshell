@@ -67,6 +67,11 @@
             <summary>Selected layouts</summary>
             <description>Each monitor's active layout used by the monitor tiling manager.</description>
         </key>
+        <key name="selected-layouts-by-monitor" type="s">
+            <default>'{}'</default>
+            <summary>Selected layouts keyed by monitor identity</summary>
+            <description>Per-workspace map of stable monitor identity (EDID vendor/product/serial) to the layout selected on that monitor. This is the durable record of which layout belongs to which physical monitor: it survives the monitor list being renumbered when a dock or lid changes the display topology. The positional selected-layouts array is derived from it.</description>
+        </key>
         <key name="restore-window-original-size" type="b">
             <default>true</default>
             <summary>Restore window size</summary>
