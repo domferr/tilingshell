@@ -49,7 +49,7 @@ import TilingShellWindowManager from './components/windowManager/tilingShellWind
 import ExtendedWindow from './components/tilingsystem/extendedWindow';
 import OverriddenAltTab from './components/altTab/overriddenAltTab';
 import { LayoutSwitcherPopup } from './components/layoutSwitcher/layoutSwitcher';
-import { unmaximizeWindow } from './utils/gnomesupport';
+import { getDefaultSeat, unmaximizeWindow } from './utils/gnomesupport';
 import * as Config from 'resource:///org/gnome/shell/misc/config.js';
 import { RaiseTogetherManager } from './components/raiseTogether/raiseTogetherManager';
 
@@ -682,7 +682,7 @@ export default class TilingShellExtension extends Extension {
 
         if (!bestWindow) return;
 
-        bestWindow.activate(global.get_current_time());
+        this._activateFocusedWindow(bestWindow);
     }
 
     private _onKeyboardFocusWin(
@@ -712,21 +712,30 @@ export default class TilingShellExtension extends Extension {
         switch (direction) {
             case FocusSwitchDirection.PREV:
                 if (focusedIdx === 0 && Settings.WRAPAROUND_FOCUS) {
-                    windowList[windowList.length - 1].activate(
-                        global.get_current_time(),
+                    this._activateFocusedWindow(
+                        windowList[windowList.length - 1],
                     );
                 } else {
-                    windowList[focusedIdx - 1].activate(
-                        global.get_current_time(),
-                    );
+                    this._activateFocusedWindow(windowList[focusedIdx - 1]);
                 }
                 break;
             case FocusSwitchDirection.NEXT:
                 nextIndex = (focusedIdx + 1) % windowList.length;
                 if (nextIndex > 0 || Settings.WRAPAROUND_FOCUS)
-                    windowList[nextIndex].activate(global.get_current_time());
+                    this._activateFocusedWindow(windowList[nextIndex]);
                 break;
         }
+    }
+
+    private _activateFocusedWindow(window: Meta.Window) {
+        window.activate(global.get_current_time());
+        if (!Settings.ENABLE_WARP_POINTER_ON_FOCUS) return;
+
+        const rect = window.get_frame_rect();
+        getDefaultSeat().warp_pointer(
+            rect.x + Math.floor(rect.width / 2),
+            rect.y + Math.floor(rect.height / 2),
+        );
     }
 
     private _onKeyboardUntileWindow(kb: KeyBindings, display: Meta.Display) {

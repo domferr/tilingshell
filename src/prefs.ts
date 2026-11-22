@@ -880,6 +880,15 @@ export default class TilingShellExtensionPreferences extends ExtensionPreference
         );
         keybindingsGroup.add(directionalFocusTiledWindows);
 
+        const warpPointerOnFocusRow = this._buildSwitchRow(
+            Settings.KEY_ENABLE_WARP_POINTER_ON_FOCUS,
+            _('Move the pointer to the focused window'),
+            _(
+                'When focusing a window with a keybinding, move the mouse pointer to the center of that window',
+            ),
+        );
+        keybindingsGroup.add(warpPointerOnFocusRow);
+
         // Import/export/reset section
         const importExportGroup = new Adw.PreferencesGroup({
             title: _('Import, export and reset'),

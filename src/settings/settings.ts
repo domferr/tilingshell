@@ -98,6 +98,7 @@ export default class Settings {
     static KEY_RESTORE_WINDOW_ORIGINAL_SIZE = 'restore-window-original-size';
     static KEY_WRAPAROUND_FOCUS = 'enable-wraparound-focus';
     static KEY_ENABLE_DIRECTIONAL_FOCUS_TILED_ONLY = 'enable-directional-focus-tiled-only';
+    static KEY_ENABLE_WARP_POINTER_ON_FOCUS = 'enable-warp-pointer-on-focus';
     static KEY_RESIZE_COMPLEMENTING_WINDOWS = 'resize-complementing-windows';
     static KEY_ENABLE_BLUR_SNAP_ASSISTANT = 'enable-blur-snap-assistant';
     static KEY_ENABLE_BLUR_SELECTED_TILEPREVIEW = 'enable-blur-selected-tilepreview';
@@ -304,6 +305,14 @@ export default class Settings {
 
     static set ENABLE_DIRECTIONAL_FOCUS_TILED_ONLY(val: boolean) {
         set_boolean(Settings.KEY_ENABLE_DIRECTIONAL_FOCUS_TILED_ONLY, val);
+    }
+
+    static get ENABLE_WARP_POINTER_ON_FOCUS(): boolean {
+        return get_boolean(Settings.KEY_ENABLE_WARP_POINTER_ON_FOCUS);
+    }
+
+    static set ENABLE_WARP_POINTER_ON_FOCUS(val: boolean) {
+        set_boolean(Settings.KEY_ENABLE_WARP_POINTER_ON_FOCUS, val);
     }
 
     static get RESIZE_COMPLEMENTING_WINDOWS(): boolean {
