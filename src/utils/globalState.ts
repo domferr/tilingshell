@@ -7,6 +7,7 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { logger } from './logger';
 import { getWindows } from './ui';
 import ExtendedWindow from '../components/tilingsystem/extendedWindow';
+import { fetchMonitorIds } from './monitorIdentity';
 
 const debug = logger('GlobalState');
 
@@ -41,6 +42,11 @@ export default class GlobalState extends GObject.Object {
     // if workspaces are reordered, we use this map to know which layouts where selected
     // to each workspace and we save the new ordering in the settings
     private _selected_layouts: Map<Meta.Workspace, string[]>; // used to handle reordering of workspaces
+    // The selected layouts are indexed by monitor index, but the index of a
+    // monitor may change across logins. Remember the selection by a stable
+    // monitor identifier too, so it can be given back to the right monitor.
+    private _monitorIds: string[] | undefined; // stable identifier for each monitor index
+    private _monitorIdsRequest: number;
 
     static get(): GlobalState {
         if (!this._instance) this._instance = new GlobalState();
@@ -63,7 +69,14 @@ export default class GlobalState extends GObject.Object {
         this._layouts = Settings.get_layouts_json();
         this._tilePreviewAnimationTime = 100;
         this._selected_layouts = new Map();
+        this._monitorIds = undefined;
+        this._monitorIdsRequest = 0;
         this.validate_selected_layouts();
+        this._refreshMonitorIds();
+
+        this._signals.connect(Main.layoutManager, 'monitors-changed', () => {
+            this._refreshMonitorIds();
+        });
 
         Settings.bind(
             Settings.KEY_TILE_PREVIEW_ANIMATION_TIME,
@@ -109,6 +122,8 @@ export default class GlobalState extends GObject.Object {
 
                     this._selected_layouts.set(ws, monitors_layouts);
                 }
+
+                this._storeSelectedLayoutsByMonitor(selected_layouts);
             },
         );
 
@@ -223,6 +238,84 @@ export default class GlobalState extends GObject.Object {
         }
 
         this._save_selected_layouts();
+    }
+
+    // Look up the monitors' stable identifiers and give each monitor back the
+    // layouts that were selected for it, whatever its current index is.
+    private _refreshMonitorIds() {
+        // until the new identifiers are known, the indexes can't be mapped
+        this._monitorIds = undefined;
+        const request = ++this._monitorIdsRequest;
+        fetchMonitorIds((ids) => {
+            // ignore stale replies and replies after the extension is disabled
+            if (
+                GlobalState._instance !== this ||
+                request !== this._monitorIdsRequest
+            )
+                return;
+            if (!ids || ids.length !== Main.layoutManager.monitors.length) {
+                debug('cannot identify the monitors');
+                return;
+            }
+
+            debug(`monitors: ${ids.join(', ')}`);
+            this._monitorIds = ids;
+            this._restoreSelectedLayoutsByMonitor();
+        });
+    }
+
+    private _restoreSelectedLayoutsByMonitor() {
+        const ids = this._monitorIds;
+        if (!ids) return;
+
+        const byMonitor = Settings.get_selected_layouts_by_monitor();
+        const selected = Settings.get_selected_layouts();
+        let changed = false;
+        selected.forEach((monitors_layouts, wsIndex) => {
+            ids.forEach((id, monitorIndex) => {
+                const storedId = byMonitor[id]?.[wsIndex];
+                if (
+                    storedId === undefined ||
+                    monitorIndex >= monitors_layouts.length ||
+                    monitors_layouts[monitorIndex] === storedId ||
+                    !this._layouts.find((lay) => lay.id === storedId)
+                )
+                    return;
+
+                monitors_layouts[monitorIndex] = storedId;
+                changed = true;
+            });
+        });
+
+        // saving triggers the update of the tiling managers and of the
+        // stored layouts by monitor
+        if (changed) Settings.save_selected_layouts(selected);
+        else this._storeSelectedLayoutsByMonitor(selected);
+    }
+
+    private _storeSelectedLayoutsByMonitor(selected: string[][]) {
+        const ids = this._monitorIds;
+        if (!ids || ids.length !== Main.layoutManager.monitors.length) return;
+
+        const byMonitor = Settings.get_selected_layouts_by_monitor();
+        const before = JSON.stringify(byMonitor);
+        ids.forEach((id, monitorIndex) => {
+            const stored = byMonitor[id] ?? [];
+            const current = selected.map(
+                (monitors_layouts, wsIndex) =>
+                    monitors_layouts[monitorIndex] ??
+                    stored[wsIndex] ??
+                    this._layouts[0].id,
+            );
+            // keep what was stored for workspaces that don't exist right now,
+            // unless the layout is synced across all workspaces
+            byMonitor[id] = Settings.SYNC_LAYOUT_ACROSS_WORKSPACES
+                ? current
+                : [...current, ...stored.slice(current.length)];
+        });
+
+        if (JSON.stringify(byMonitor) !== before)
+            Settings.save_selected_layouts_by_monitor(byMonitor);
     }
 
     private _save_selected_layouts() {

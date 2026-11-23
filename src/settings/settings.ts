@@ -118,6 +118,8 @@ export default class Settings {
     static KEY_TILE_PREVIEW_ANIMATION_TIME = 'tile-preview-animation-time';
     static KEY_SETTING_LAYOUTS_JSON = 'layouts-json';
     static KEY_SETTING_SELECTED_LAYOUTS = 'selected-layouts';
+    static KEY_SETTING_SELECTED_LAYOUTS_BY_MONITOR =
+        'selected-layouts-by-monitor';
     static KEY_WINDOW_BORDER_WIDTH = 'window-border-width';
     static KEY_ENABLE_SMART_WINDOW_BORDER_RADIUS = 'enable-smart-window-border-radius';
     static KEY_QUARTER_TILING_THRESHOLD = 'quarter-tiling-threshold';
@@ -716,6 +718,41 @@ export default class Settings {
         this._settings?.set_string(
             this.KEY_SETTING_LAYOUTS_JSON,
             JSON.stringify(layouts),
+        );
+    }
+
+    // selected layout ids per workspace, keyed by a stable monitor identifier
+    static get_selected_layouts_by_monitor(): Record<string, string[]> {
+        try {
+            const parsed: unknown = JSON.parse(
+                get_string(Settings.KEY_SETTING_SELECTED_LAYOUTS_BY_MONITOR) ||
+                    '{}',
+            );
+            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed))
+                return {};
+
+            const result: Record<string, string[]> = {};
+            Object.entries(parsed as Record<string, unknown>).forEach(
+                ([monitorId, ids]) => {
+                    if (
+                        Array.isArray(ids) &&
+                        ids.every((id) => typeof id === 'string')
+                    )
+                        result[monitorId] = ids as string[];
+                },
+            );
+            return result;
+        } catch (_unused) {
+            return {};
+        }
+    }
+
+    static save_selected_layouts_by_monitor(
+        byMonitor: Record<string, string[]>,
+    ) {
+        set_string(
+            Settings.KEY_SETTING_SELECTED_LAYOUTS_BY_MONITOR,
+            JSON.stringify(byMonitor),
         );
     }
 
