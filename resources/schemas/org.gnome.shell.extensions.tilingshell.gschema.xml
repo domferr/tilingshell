@@ -82,6 +82,11 @@
             <summary>Restrict directional focus to tiled windows</summary>
             <description>When using directional focus navigation, only consider tiled windows</description>
         </key>
+        <key name="enable-warp-pointer-on-focus" type="b">
+            <default>false</default>
+            <summary>Move the pointer to the focused window</summary>
+            <description>When focusing a window with a keybinding, move the mouse pointer to the center of that window</description>
+        </key>
         <key name="resize-complementing-windows" type="b">
             <default>true</default>
             <summary>Enable auto-resize of the complementing tiled windows</summary>
