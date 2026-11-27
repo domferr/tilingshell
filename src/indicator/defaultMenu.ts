@@ -126,8 +126,12 @@ class LayoutsRow extends St.BoxLayout {
         showMonitorName: boolean,
         monitorsDetails: MonitorDetails[],
     ) {
-        if (!showMonitorName) this._label.hide();
-        else this._label.show();
+        if (!showMonitorName) {
+            // nothing to match when the name is hidden
+            this._label.hide();
+            return;
+        }
+        this._label.show();
 
         debug(`updateMonitorName: monitor=${this._monitor.index}, x=${this._monitor.x}, y=${this._monitor.y}`);
         debug(`updateMonitorName: monitorsDetails=${JSON.stringify(monitorsDetails)}`);
