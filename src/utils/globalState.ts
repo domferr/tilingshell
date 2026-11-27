@@ -264,16 +264,28 @@ export default class GlobalState extends GObject.Object {
         });
     }
 
+    // identifies the set of connected monitors, whatever their order
+    private _monitorSetupKey(ids: string[]): string {
+        return [...ids].sort().join(',');
+    }
+
     private _restoreSelectedLayoutsByMonitor() {
         const ids = this._monitorIds;
         if (!ids) return;
 
+        // prefer what was selected for a monitor while the same monitors were
+        // connected, then what was last selected for it in any setup
+        const bySetup =
+            Settings.get_selected_layouts_by_monitor_setup()[
+                this._monitorSetupKey(ids)
+            ] ?? {};
         const byMonitor = Settings.get_selected_layouts_by_monitor();
         const selected = Settings.get_selected_layouts();
         let changed = false;
         selected.forEach((monitors_layouts, wsIndex) => {
             ids.forEach((id, monitorIndex) => {
-                const storedId = byMonitor[id]?.[wsIndex];
+                const storedId =
+                    bySetup[id]?.[wsIndex] ?? byMonitor[id]?.[wsIndex];
                 if (
                     storedId === undefined ||
                     monitorIndex >= monitors_layouts.length ||
@@ -298,6 +310,25 @@ export default class GlobalState extends GObject.Object {
         if (!ids || ids.length !== Main.layoutManager.monitors.length) return;
 
         const byMonitor = Settings.get_selected_layouts_by_monitor();
+        if (this._mergeSelectedLayouts(byMonitor, ids, selected))
+            Settings.save_selected_layouts_by_monitor(byMonitor);
+
+        const allSetups = Settings.get_selected_layouts_by_monitor_setup();
+        const setupKey = this._monitorSetupKey(ids);
+        const bySetup = allSetups[setupKey] ?? {};
+        if (this._mergeSelectedLayouts(bySetup, ids, selected)) {
+            allSetups[setupKey] = bySetup;
+            Settings.save_selected_layouts_by_monitor_setup(allSetups);
+        }
+    }
+
+    // stores the selected layouts of each monitor into the given map and
+    // returns whether it changed
+    private _mergeSelectedLayouts(
+        byMonitor: Record<string, string[]>,
+        ids: string[],
+        selected: string[][],
+    ): boolean {
         const before = JSON.stringify(byMonitor);
         ids.forEach((id, monitorIndex) => {
             const stored = byMonitor[id] ?? [];
@@ -313,9 +344,7 @@ export default class GlobalState extends GObject.Object {
                 ? current
                 : [...current, ...stored.slice(current.length)];
         });
-
-        if (JSON.stringify(byMonitor) !== before)
-            Settings.save_selected_layouts_by_monitor(byMonitor);
+        return JSON.stringify(byMonitor) !== before;
     }
 
     private _save_selected_layouts() {
