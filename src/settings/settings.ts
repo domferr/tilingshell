@@ -28,6 +28,32 @@ function set_string(key: string, val: string): boolean {
     return Settings.gioSetting.set_string(key, val);
 }
 
+function parseJsonObject(json: string): Record<string, unknown> {
+    try {
+        const parsed: unknown = JSON.parse(json || '{}');
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed))
+            return parsed as Record<string, unknown>;
+    } catch (_unused) {
+        // fall through
+    }
+    return {};
+}
+
+// keeps the entries that map a monitor identifier to a list of layout ids
+function parseLayoutsByMonitor(value: unknown): Record<string, string[]> {
+    const result: Record<string, string[]> = {};
+    if (!value || typeof value !== 'object' || Array.isArray(value))
+        return result;
+
+    Object.entries(value as Record<string, unknown>).forEach(
+        ([monitorId, ids]) => {
+            if (Array.isArray(ids) && ids.every((id) => typeof id === 'string'))
+                result[monitorId] = ids as string[];
+        },
+    );
+    return result;
+}
+
 function get_boolean(key: string): boolean {
     return (
         Settings.gioSetting.get_boolean(key) ??
@@ -118,6 +144,11 @@ export default class Settings {
     static KEY_TILE_PREVIEW_ANIMATION_TIME = 'tile-preview-animation-time';
     static KEY_SETTING_LAYOUTS_JSON = 'layouts-json';
     static KEY_SETTING_SELECTED_LAYOUTS = 'selected-layouts';
+    static KEY_SETTING_SELECTED_LAYOUTS_BY_MONITOR =
+        'selected-layouts-by-monitor';
+
+    static KEY_SETTING_SELECTED_LAYOUTS_BY_MONITOR_SETUP =
+        'selected-layouts-by-monitor-setup';
     static KEY_WINDOW_BORDER_WIDTH = 'window-border-width';
     static KEY_ENABLE_SMART_WINDOW_BORDER_RADIUS = 'enable-smart-window-border-radius';
     static KEY_QUARTER_TILING_THRESHOLD = 'quarter-tiling-threshold';
@@ -716,6 +747,48 @@ export default class Settings {
         this._settings?.set_string(
             this.KEY_SETTING_LAYOUTS_JSON,
             JSON.stringify(layouts),
+        );
+    }
+
+    // selected layout ids per workspace, keyed by a stable monitor identifier
+    static get_selected_layouts_by_monitor(): Record<string, string[]> {
+        return parseLayoutsByMonitor(
+            parseJsonObject(
+                get_string(Settings.KEY_SETTING_SELECTED_LAYOUTS_BY_MONITOR),
+            ),
+        );
+    }
+
+    static save_selected_layouts_by_monitor(
+        byMonitor: Record<string, string[]>,
+    ) {
+        set_string(
+            Settings.KEY_SETTING_SELECTED_LAYOUTS_BY_MONITOR,
+            JSON.stringify(byMonitor),
+        );
+    }
+
+    // like get_selected_layouts_by_monitor, for each set of connected monitors
+    static get_selected_layouts_by_monitor_setup(): Record<
+        string,
+        Record<string, string[]>
+    > {
+        const parsed = parseJsonObject(
+            get_string(Settings.KEY_SETTING_SELECTED_LAYOUTS_BY_MONITOR_SETUP),
+        );
+        const result: Record<string, Record<string, string[]>> = {};
+        Object.entries(parsed).forEach(([setup, byMonitor]) => {
+            result[setup] = parseLayoutsByMonitor(byMonitor);
+        });
+        return result;
+    }
+
+    static save_selected_layouts_by_monitor_setup(
+        bySetup: Record<string, Record<string, string[]>>,
+    ) {
+        set_string(
+            Settings.KEY_SETTING_SELECTED_LAYOUTS_BY_MONITOR_SETUP,
+            JSON.stringify(bySetup),
         );
     }
 
