@@ -283,12 +283,20 @@ export default class GlobalState extends GObject.Object {
         const selected = Settings.get_selected_layouts();
         let changed = false;
         selected.forEach((monitors_layouts, wsIndex) => {
+            // The identifiers may arrive before the selected layouts were
+            // validated for the new monitors. Add the missing monitors here:
+            // otherwise the validation adds them with the default layout,
+            // which would then be stored as their selection.
+            while (monitors_layouts.length < ids.length) {
+                monitors_layouts.push(this._layouts[0].id);
+                changed = true;
+            }
+
             ids.forEach((id, monitorIndex) => {
                 const storedId =
                     bySetup[id]?.[wsIndex] ?? byMonitor[id]?.[wsIndex];
                 if (
                     storedId === undefined ||
-                    monitorIndex >= monitors_layouts.length ||
                     monitors_layouts[monitorIndex] === storedId ||
                     !this._layouts.find((lay) => lay.id === storedId)
                 )
